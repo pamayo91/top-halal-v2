@@ -11,7 +11,7 @@
     <nav aria-label="Navigation du compte">
         <a href="{{ route('home') }}">Accueil</a>
         @auth
-            <a href="{{ route('account.dashboard') }}">Compte</a>
+            @unless(auth()->user()->must_change_password)<a href="{{ route('account.dashboard') }}">Compte</a>@endunless
             <form method="post" action="{{ route('logout') }}" style="display:inline">@csrf <button type="submit">Déconnexion</button></form>
         @else
             <a href="{{ route('login') }}">Connexion</a>
