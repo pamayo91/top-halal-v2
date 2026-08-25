@@ -71,14 +71,14 @@ class LegacyInventoryCommand extends Command
     private function tables(ConnectionInterface $connection, string $database): array
     {
         return collect($connection->select(
-            'SELECT TABLE_NAME AS name, TABLE_ROWS AS rows
+            'SELECT TABLE_NAME AS table_name, TABLE_ROWS AS table_rows
              FROM information_schema.TABLES
              WHERE TABLE_SCHEMA = ?
              ORDER BY TABLE_NAME',
             [$database],
         ))->map(fn (object $row): array => [
-            'name' => (string) $row->name,
-            'rows' => $row->rows === null ? null : (int) $row->rows,
+            'name' => (string) $row->table_name,
+            'rows' => $row->table_rows === null ? null : (int) $row->table_rows,
         ])->all();
     }
 
