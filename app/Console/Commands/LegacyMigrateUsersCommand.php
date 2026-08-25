@@ -40,7 +40,9 @@ class LegacyMigrateUsersCommand extends Command
             ];
             if ($this->option('apply') && $row->user_email !== '') {
                 DB::transaction(function () use ($row): void {
-                    User::updateOrCreate(['legacy_wp_user_id' => $row->ID], [
+                    $user = User::firstOrNew(['legacy_wp_user_id' => $row->ID]);
+                    $user->forceFill([
+                        'legacy_wp_user_id' => $row->ID,
                         'name' => trim($row->display_name) ?: 'Utilisateur',
                         'email' => $row->user_email,
                         'password' => Hash::make((string) env('LEGACY_MIGRATION_TEMP_PASSWORD')),
@@ -49,6 +51,7 @@ class LegacyMigrateUsersCommand extends Command
                         'must_change_password' => true,
                         'created_at' => $row->user_registered,
                     ]);
+                    $user->save();
                 });
             }
             $report['items'][] = $item;
