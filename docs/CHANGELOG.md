@@ -3,6 +3,7 @@
 ## 2026-08-25
 - Added the V2 editorial pilot schema, reader/transformer/sanitizer pipeline, technical preview route and controlled `legacy:migrate-content` command.
 - Migrated only five articles and five pages; legacy scripts/non-allowlisted iframes are removed and Visual Composer is converted to clean HTML.
+- Restored Playwright by using Codex's bundled Node runtime and validated all ten editorial previews on desktop and mobile.
 - Audited all 7,704 ListingPro restaurant option rows for opening hours. No usable legacy schedule exists; no complementary hours migration was run.
 - Added `legacy:audit-opening-hours` and a sanitized report with format counts, examples and the hostile time-like email anomaly.
 - Added the controlled Restaurant/ListingPro pilot schema, models and read-only `legacy:migrate-restaurants` command.

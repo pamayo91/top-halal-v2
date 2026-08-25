@@ -8,4 +8,5 @@
 - Legacy scripts and non-allowlisted iframes are removed. The current embed allowlist is YouTube and Vimeo.
 - SEO values from Yoast are persisted when available; no legacy JSON-LD is copied.
 - Featured-image references are retained as legacy attachment IDs only; no WordPress upload bulk copy occurred.
-- Visual browser validation is pending because the local Node.js executable is not available on PATH. Existing preproduction PHP tests are green.
+- Playwright passed on all ten preproduction previews in desktop and mobile: HTTP 200, H1, clean console/network, no visible shortcode, no legacy script and no non-allowlisted iframe.
+- The workstation uses Codex's bundled Node runtime at `C:\Users\pamay\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`; it was absent only from the shell PATH.
