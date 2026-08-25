@@ -22,7 +22,7 @@ class LegacyAuditInlineMediaCommand extends Command
         foreach ([['post', Article::class], ['page', Page::class]] as [$type, $model]) {
             foreach ($model::orderBy('legacy_wp_id')->pluck('legacy_wp_id') as $id) {
                 $content = (string) $reader->read($type, $id)['post']->post_content;
-                preg_match_all('/<img\b[^>]*\bsrc=["\']([^"\']*top-halal\.fr\/wp-content[^"\']*)["\'][^>]*>/i', $content, $matches, PREG_OFFSET_CAPTURE);
+                preg_match_all('/<img\b[^>]*\bsrc=["\']([^"\']*top-halal\.fr\/wp-conten(?:t|u)[^"\']*)["\'][^>]*>/i', $content, $matches, PREG_OFFSET_CAPTURE);
 
                 foreach ($matches[1] as $position => [$url, $offset]) {
                     $path = (string) parse_url(html_entity_decode($url), PHP_URL_PATH);

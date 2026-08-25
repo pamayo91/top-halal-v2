@@ -23,6 +23,7 @@ Last updated: 2026-08-25
 | Migration: articles/pages | DONE (pilot) | Five posts and five pages migrated idempotently; PHP and Playwright desktop/mobile validations are green. |
 | Migration: comments | DONE (pilot) | Aggregate audit completed; ten deterministic approved/pending editorial comments migrated idempotently to migrated articles/pages only. Spam, pingbacks, reviews and all non-pilot comments remain untouched. |
 | Migration: reviews | DONE (pilot) | Eight deterministic ListingPro reviews migrated idempotently; three malformed/unrated links reported and skipped. |
+| Migration: media | IN PROGRESS | Controlled V2 storage/WebP pilot and reconciliation specification are implemented locally. Preproduction validation is blocked pending SSH host-key verification; current deployed previews still reveal legacy `wp-contenu` inline images, now covered by the pending sanitizer fix. |
 | Redirect manager | TODO | Exact + regex/query rules + htaccess import |
 | Public design system | TODO | Simple, modern, mobile-first, CWV-first |
 | Restaurant frontend | TODO | |

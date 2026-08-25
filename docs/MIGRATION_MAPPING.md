@@ -75,7 +75,7 @@
 - ListingPro stores important structured data in serialized/meta option fields, especially `lp_listingpro_options`.
 - Yoast data is present in postmeta and dedicated Yoast tables.
 - A small amount of AIOSEO postmeta exists and should be reconciled after Yoast precedence is defined.
-- Inline legacy `wp-content` images removed from the editorial pilot are tracked in `docs/generated/inline-media-debt.*` for a future media reconciliation; physical media remains out of scope.
+- Inline legacy `wp-content` and `wp-contenu` images removed from the editorial pilot are tracked in `docs/generated/inline-media-debt.*` for a future media reconciliation; physical media remains out of scope.
 - Review IDs `21098`, `21147` and `21502` have no valid listing target; four reviews lack ratings. They remain audit anomalies, never arbitrarily attached.
 - No orphan postmeta or orphan term relationship rows were detected in the inventory.
 
