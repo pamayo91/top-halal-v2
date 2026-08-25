@@ -32,6 +32,11 @@
 - The complete opening-hours audit found `business_hours = null` on 3,168 ListingPro option rows and an empty string on 4,536; there are no non-empty schedules in the 7,704 legacy listings. A single time-like value is in an email field and is classified as hostile data, never as an opening hour. No complementary hours sample exists to migrate.
 - `tp_posts.post_type = post` -> articles
 - `tp_posts.post_type = page` -> pages
+
+### Editorial pilot implementation
+- Pilot articles: `27`, `104`, `295`, `10697`, `11461`; pilot pages: `4`, `5`, `38`, `10430`, `11554`.
+- Yoast metadata has precedence when present; AIOSEO is reported for later reconciliation. Legacy JSON-LD is not imported.
+- Visual Composer rows/columns are removed, column text retained, messages become semantic asides, sidebars are removed and raw HTML is decoded then sanitized. Scripts and non-allowlisted iframes are removed.
 - approved/pending `tp_comments.comment_type = comment` -> editorial comments
 - `tp_posts.post_type = lp-reviews` -> restaurant reviews
 - ListingPro claim posts `lp-claims` -> future claim records
