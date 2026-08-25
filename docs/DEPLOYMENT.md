@@ -92,3 +92,8 @@ Laravel scheduler should have one server Cron entry (exact path/user decided aft
 
 ## Queue worker
 Use systemd or Supervisor after server audit. Do not rely on a browser request to process mail/AI queues.
+
+## Transactional email
+- Keep `MAIL_*` values exclusively in server `.env`; preproduction may use a log/capture transport until an operator supplies a real test recipient.
+- Run the database queue worker with three attempts and progressive backoff: `/opt/alt/php84/usr/bin/php artisan queue:work --tries=3 --backoff=30,120,300`.
+- Inspect failures with `artisan queue:failed`; do not paste message content or credentials into deployment logs.

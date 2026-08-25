@@ -30,7 +30,7 @@ Last updated: 2026-08-25
 | Accounts/claims | DONE (pilot) | Auth Laravel, changement obligatoire des comptes legacy, claims et modération technique validés ; aucune migration massive utilisateur autorisée. |
 | Admin/moderation | TODO | |
 | Advertising | TODO | Native/sponsored placements |
-| Email | TODO | Provider/config/queue/logging/templates |
+| Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |
 | Automated news workflow | TODO | Disclosure configurable |
 | SEO validation | TODO | |

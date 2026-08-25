@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-08-25
+- Added queued Laravel transactional email notifications for verification, reset/password changes and claim status; SMTP/API transport remains environment-configured.
+- Added preproduction email test command, database-queue operating guidance and read-only SPF/DKIM/DMARC audit. No legacy-user campaign or real-recipient send occurred.
 - Added and validated the controlled Users/Auth/Claims pilot: registration, login/logout, password reset request/reset, CSRF/session protection and email/IP rate limiting.
 - Added mandatory password replacement for migrated legacy users; old WordPress hashes are never imported and the server-only temporary secret is never documented or logged.
 - Added pending/approve/reject restaurant claims, backend restaurant ownership Policy and minimal technical moderation views. E2E accounts, claims and restaurants were deleted after validation.
