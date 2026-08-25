@@ -17,7 +17,7 @@ class LegacyRestaurantMigrator
 {
     public function __construct(private readonly string $connection = 'legacy_wp') {}
 
-    /** @return array<string, int> */
+    /** @return array<int, array<int, string>> */
     public function sample(int $limit): array
     {
         $prefix = $this->prefix();
@@ -30,31 +30,29 @@ class LegacyRestaurantMigrator
             'multiple_categories' => $this->termCandidate($terms, 'listing-category', 2),
             'multiple_features' => $this->termCandidate($terms, 'features', 2),
             'gallery' => $this->metaCandidate($meta, 'gallery_image_ids'),
-            'hours' => $this->metaCandidate($meta, 'lp_listingpro_options'),
-            'gps' => $this->metaCandidate($meta, 'fave_property_location'),
+            'hours' => $this->metaCandidateRegex($meta, 'monday|lundi|opening|hour|timing'),
+            'gps' => $this->metaCandidateRegex($meta, 'latitude|longitude|\\blat\\b|\\blng\\b'),
             'incomplete_location' => $base()->where('post.post_status', 'publish')->whereNotExists(fn ($query) => $query->selectRaw('1')->from($meta)->whereColumn('post_id', 'post.ID')->whereIn('meta_key', ['fave_property_location', 'latitude']))->orderBy('post.ID')->value('post.ID'),
-            'claimed' => $base()->whereExists(fn ($query) => $query->selectRaw('1')->from($meta)->whereColumn('post_id', 'post.ID')->where('meta_key', 'claimed')->where('meta_value', '1'))->orderBy('post.ID')->value('post.ID'),
+            'claimed' => $this->metaCandidate($meta, 'claimed'),
             'pending' => $base()->where('post.post_status', 'pending')->orderBy('post.ID')->value('post.ID'),
             'unusual_meta' => $this->metaCandidate($meta, 'lp_listingpro_options_fields'),
         ];
 
         $selected = [];
         foreach ($choices as $reason => $id) {
-            if ($id !== null && ! in_array((int) $id, $selected, true)) {
-                $selected[$reason] = (int) $id;
-            }
+            if ($id !== null) $selected[(int) $id][] = $reason;
         }
 
         foreach ($base()->where('post.post_status', 'publish')->orderBy('post.ID')->pluck('post.ID') as $id) {
             if (count($selected) >= $limit) break;
-            if (! in_array((int) $id, $selected, true)) $selected['published_fallback_'.count($selected)] = (int) $id;
+            if (! array_key_exists((int) $id, $selected)) $selected[(int) $id] = ['published_fallback_'.count($selected)];
         }
 
         return array_slice($selected, 0, $limit, true);
     }
 
     /** @return array<string, mixed> */
-    public function inspect(int $legacyId, ?string $selectionReason = null): array
+    public function inspect(int $legacyId, string|array|null $selectionReason = null): array
     {
         $connection = DB::connection($this->connection);
         $prefix = $this->prefix();
@@ -154,6 +152,10 @@ class LegacyRestaurantMigrator
     private function metaCandidate(string $meta, string $key): ?int
     {
         return DB::connection($this->connection)->table($meta.' as meta')->join($this->prefix().'posts as post', 'post.ID', '=', 'meta.post_id')->where('post.post_type', 'listing')->where('meta.meta_key', $key)->where('meta.meta_value', '!=', '')->orderBy('meta.post_id')->value('meta.post_id');
+    }
+    private function metaCandidateRegex(string $meta, string $pattern): ?int
+    {
+        return DB::connection($this->connection)->table($meta.' as meta')->join($this->prefix().'posts as post', 'post.ID', '=', 'meta.post_id')->where('post.post_type', 'listing')->whereRaw('meta.meta_value REGEXP ?', [$pattern])->orderBy('meta.post_id')->value('meta.post_id');
     }
     private function prefix(): string { return ''; }
 

@@ -27,17 +27,17 @@ class LegacyMigrateRestaurantsCommand extends Command
         $selection = $migrator->sample($limit);
         $report = ['generated_at' => now()->toIso8601String(), 'mode' => $apply ? 'apply' : 'dry-run', 'selection' => $selection, 'restaurants' => [], 'summary' => ['inspected' => 0, 'persisted' => 0, 'failed' => 0, 'anomalies' => 0]];
 
-        foreach ($selection as $reason => $id) {
+        foreach ($selection as $id => $reasons) {
             try {
-                $record = $migrator->inspect($id, $reason);
+                $record = $migrator->inspect((int) $id, $reasons);
                 $report['summary']['inspected']++;
                 $report['summary']['anomalies'] += count($record['anomalies']);
                 if ($apply) { $migrator->persist($record); $record['result'] = 'persisted'; $report['summary']['persisted']++; }
                 else $record['result'] = 'planned';
-                $report['restaurants'][] = $record;
+                $report['restaurants'][] = $this->safeRecord($record);
             } catch (Throwable $exception) {
                 $report['summary']['failed']++;
-                $report['restaurants'][] = ['legacy_wp_id' => $id, 'selection_reason' => $reason, 'result' => 'failed', 'anomalies' => ['migration_failure'], 'error' => $exception->getMessage()];
+                $report['restaurants'][] = ['legacy_wp_id' => (int) $id, 'selection_reasons' => $reasons, 'result' => 'failed', 'anomalies' => ['migration_failure'], 'error' => $exception->getMessage()];
                 $this->error("Listing $id failed: {$exception->getMessage()}");
             }
         }
@@ -55,5 +55,29 @@ class LegacyMigrateRestaurantsCommand extends Command
         $lines = ['# Restaurant Migration Sample', '', '- Mode: `'.$report['mode'].'`', '- Selection: `'.json_encode($report['selection']).'`', '- Summary: `'.json_encode($report['summary']).'`', '', '## Records', ''];
         foreach ($report['restaurants'] as $record) $lines[] = '- Legacy `'.($record['source']['legacy_wp_id'] ?? $record['legacy_wp_id']).'`: `'.($record['result'] ?? 'failed').'`; anomalies: `'.implode(', ', $record['anomalies'] ?? []).'`';
         return implode("\n", [...$lines, '']);
+    }
+
+    /** @param array<string, mixed> $record @return array<string, mixed> */
+    private function safeRecord(array $record): array
+    {
+        $restaurant = $record['target']['restaurant'];
+        return [
+            'source' => $record['source'],
+            'transformed' => [
+                'restaurant' => [
+                    'legacy_wp_id' => $restaurant['legacy_wp_id'], 'name' => $restaurant['name'], 'slug' => $restaurant['slug'],
+                    'status' => $restaurant['status'], 'is_claimed' => $restaurant['is_claimed'],
+                    'has_address' => $restaurant['address'] !== null, 'has_postal_code' => $restaurant['postal_code'] !== null,
+                    'has_city_name' => $restaurant['city_name'] !== null, 'has_phone' => $restaurant['phone'] !== null,
+                    'has_contact_email' => $restaurant['contact_email'] !== null, 'latitude' => $restaurant['latitude'], 'longitude' => $restaurant['longitude'],
+                ],
+                'terms' => $record['target']['terms'],
+                'hours' => collect($record['target']['hours'])->map(fn (array $hour) => array_diff_key($hour, ['legacy_value' => true]))->all(),
+                'media' => collect($record['target']['media'])->map(fn (array $media) => [
+                    'legacy_attachment_id' => $media['legacy_attachment_id'], 'sort_order' => $media['sort_order'], 'status' => $media['status'],
+                ])->all(),
+            ],
+            'anomalies' => $record['anomalies'], 'destination' => $record['destination'], 'result' => $record['result'],
+        ];
     }
 }
