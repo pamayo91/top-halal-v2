@@ -1,4 +1,7 @@
-# Users Audit\n\n```json\n{
+# Users Audit
+
+```json
+{
     "total": 545,
     "roles": {
         "administrator": 1,
@@ -21,4 +24,5 @@
     },
     "claims": 52,
     "claimed_listings": 25
-}\n```\n
+}
+```
