@@ -29,6 +29,7 @@
 - `restaurant_media` records gallery attachment IDs and legacy paths as pending reconciliation, without copying uploads or exposing legacy source URLs.
 - The validated pilot selection is `13453`, `13454`, `13455`, `13456`, `13457`, `13465`, `13567`, `21293`, `21333`, `22184`. It covers published, pending, claimed, multiple-category, multiple-feature, gallery, GPS and unusual ListingPro metadata cases.
 - The selected legacy records did not contain enabled/parseable business hours. This is an explicit pilot anomaly, not an inferred schedule.
+- The complete opening-hours audit found `business_hours = null` on 3,168 ListingPro option rows and an empty string on 4,536; there are no non-empty schedules in the 7,704 legacy listings. A single time-like value is in an email field and is classified as hostile data, never as an opening hour. No complementary hours sample exists to migrate.
 - `tp_posts.post_type = post` -> articles
 - `tp_posts.post_type = page` -> pages
 - approved/pending `tp_comments.comment_type = comment` -> editorial comments

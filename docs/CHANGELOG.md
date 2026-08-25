@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-08-25
+- Audited all 7,704 ListingPro restaurant option rows for opening hours. No usable legacy schedule exists; no complementary hours migration was run.
+- Added `legacy:audit-opening-hours` and a sanitized report with format counts, examples and the hostile time-like email anomaly.
 - Added the controlled Restaurant/ListingPro pilot schema, models and read-only `legacy:migrate-restaurants` command.
 - Ran the deterministic ten-restaurant dry-run and applied it twice on preproduction; no duplicate restaurant, slug or relationship was created.
 - Recorded the sanitized restaurant migration report and the selected legacy IDs. No articles, pages, comments, reviews, users, advertising or AI data was migrated.

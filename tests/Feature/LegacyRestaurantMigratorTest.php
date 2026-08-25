@@ -62,6 +62,17 @@ class LegacyRestaurantMigratorTest extends TestCase
         $this->assertContains('no_gallery_media', $record['anomalies']);
     }
 
+    public function test_it_does_not_treat_a_time_like_value_in_an_email_field_as_opening_hours(): void
+    {
+        $this->seedRestaurant(14, 'Valeur legacy hostile', 'valeur-legacy-hostile', 'publish', false, false);
+        DB::connection('legacy_test')->table('postmeta')->where('post_id', 14)->where('meta_key', 'lp_listingpro_options')->update(['meta_value' => serialize(['email' => "1 waitfor delay '0:0:15' --"])]);
+
+        $record = $this->migrator->inspect(14);
+
+        $this->assertSame([], $record['target']['hours']);
+        $this->assertContains('no_recognized_opening_hours', $record['anomalies']);
+    }
+
     public function test_it_is_idempotent_and_only_reads_the_legacy_connection(): void
     {
         $this->seedRestaurant(12, 'Idempotent', 'idempotent', 'publish', true, false);

@@ -12,6 +12,7 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 - Each imported entity keeps its WordPress identifier (`legacy_wp_id`, `legacy_term_id` or `legacy_attachment_id`).
 - `legacy:migrate-restaurants` is read-only on `legacy_wp`; its default and `--dry-run` modes write no V2 data. `--apply --limit=10` is the only currently supported write mode.
 - Missing gallery, hours, coordinates or location terms are reported record-by-record. Hours are only persisted when ListingPro contains an enabled, parseable value; no schedule is inferred.
+- The 2026-08-25 legacy audit found no enabled, parseable ListingPro schedule across 7,704 listings. `restaurant_opening_hours` remains ready for future/admin-entered schedules, but no legacy record is inserted until a real source format exists.
 
 ## Public page
 - Fast server-rendered content.
