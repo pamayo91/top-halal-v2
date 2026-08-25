@@ -60,7 +60,8 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 - Tests PHP passes dans un repertoire temporaire isole avec `/opt/alt/php84/usr/bin/php artisan test`.
 - Commande `legacy:inventory` enregistree dans Artisan.
 - Test navigateur/Playwright preproduction en attente du deploiement et de l'exposition Apache.
-- Connexions MariaDB application et legacy en attente des vrais identifiants preproduction.
+- Connexion MariaDB application en attente des vrais identifiants preproduction.
+- Connexion legacy: doit pointer vers la base existante `meyo5199_th` avec un utilisateur dedie en lecture seule et le prefixe `tp_`; tests de refus d'ecriture obligatoires avant utilisation.
 
 ## Chemins confirmes avant clone/deploiement
 - Chemin applicatif confirme: `/home/meyo5199/top-halal-v2`.

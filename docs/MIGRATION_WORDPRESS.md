@@ -1,10 +1,25 @@
 # Legacy WordPress / ListingPro Migration
 
 ## Source handling
-- Place `meyo5199_th.sql.gz` under `legacy/` locally/on authorized preprod storage.
+- Use the existing live Top-Halal MariaDB database `meyo5199_th` as the legacy source through a dedicated read-only database user.
+- The legacy application connection must never use the current WordPress credentials because they may have write permissions.
+- The dedicated legacy user must have only `SELECT` on `meyo5199_th`.*.
+- The WordPress table prefix is `tp_`.
+- `meyo5199_th.sql.gz` remains under `legacy/` only as a safety/reference snapshot for now.
 - The dump is Git-ignored and must never be committed.
-- Import it into a separate legacy MariaDB database/user with read-only application credentials after import.
+- Do not import or duplicate the dump unless the migration plan is explicitly changed.
 - Migration code queries legacy tables; it must never parse the whole SQL dump into AI/model context.
+- No Laravel migration may target the legacy connection.
+- No business command may write to the legacy database.
+
+## Read-only verification
+Before any legacy inventory or migration planning command uses the legacy connection, verify:
+- `SELECT` succeeds;
+- `INSERT` is refused;
+- `UPDATE` is refused;
+- `DELETE` is refused;
+- `ALTER` is refused;
+- `DROP` is refused.
 
 ## Core mapping
 - WordPress posts of ListingPro listing type -> restaurants.

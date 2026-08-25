@@ -16,6 +16,7 @@
 - Added `legacy:inventory` for safe aggregate legacy WordPress inventory reports.
 - Re-ran the `.htaccess` inventory and confirmed the parser matches all active rule lines in the supplied file.
 - Cloned `develop` to the confirmed preproduction application path and installed Composer dependencies with explicit PHP 8.4, without changing DocumentRoot or creating `.env`.
+- Updated the legacy database plan to use the existing `meyo5199_th` database through a dedicated SELECT-only user with WordPress prefix `tp_`.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.
