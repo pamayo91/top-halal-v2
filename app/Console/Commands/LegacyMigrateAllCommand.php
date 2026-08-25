@@ -76,7 +76,7 @@ class LegacyMigrateAllCommand extends Command
     private function migrateUsers(string $phase): void
     {
         if($this->apply&&!filled(env('LEGACY_MIGRATION_TEMP_PASSWORD')))throw new \RuntimeException('Temporary legacy password is not configured.');
-        $this->idBatches($phase,'users',fn($q)=>$q,function($id){$row=DB::connection('legacy_wp')->table('users')->where('ID',$id)->first();if(!$row||$row->user_email==='')return['ignored',['missing_email']];if($this->apply){$exists=User::where('legacy_wp_user_id',$id)->exists();if(!$exists)User::create(['legacy_wp_user_id'=>$id,'name'=>trim($row->display_name)?:'Utilisateur','email'=>$row->user_email,'password'=>Hash::make((string)env('LEGACY_MIGRATION_TEMP_PASSWORD')),'role'=>'user','status'=>'active','must_change_password'=>true,'created_at'=>$row->user_registered]);return[$exists?'existing':'migrated',[]];}return['migrated',[]];});
+        $this->idBatches($phase,'users',fn($q)=>$q,function($id){$row=DB::connection('legacy_wp')->table('users')->where('ID',$id)->first();if(!$row||$row->user_email==='')return['ignored',['missing_email']];if($this->apply){$user=User::where('legacy_wp_user_id',$id)->first();if(!$user)$user=User::where('email',$row->user_email)->first();$exists=$user!==null;if(!$user)$user=new User();if(!$exists)$user->forceFill(['name'=>trim($row->display_name)?:'Utilisateur','email'=>$row->user_email,'password'=>Hash::make((string)env('LEGACY_MIGRATION_TEMP_PASSWORD')),'role'=>'user','status'=>'active','must_change_password'=>true,'created_at'=>$row->user_registered]);$user->forceFill(['legacy_wp_user_id'=>$id]);$user->save();return[$exists?'existing':'migrated',[]];}return['migrated',[]];});
     }
 
     private function migrateClaims(string $phase): void
