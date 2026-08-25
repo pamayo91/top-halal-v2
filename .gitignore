@@ -1,0 +1,39 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Legacy / private data
+legacy/*.sql
+legacy/*.sql.gz
+legacy/*.dump
+legacy/*.zip
+legacy/uploads/
+legacy/private/
+
+# PHP / Laravel
+/vendor/
+/node_modules/
+/public/build/
+/storage/*.key
+/storage/logs/*
+/bootstrap/cache/*.php
+.phpunit.result.cache
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Test artifacts
+/playwright-report/
+/test-results/
+/coverage/
+
+# Python
+__pycache__/
+*.py[cod]

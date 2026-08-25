@@ -1,0 +1,499 @@
+
+RewriteCond %{HTTP_HOST} ^www.top-halal.fr$
+RewriteRule ^(.*)$ https://top-halal.fr/$1 [QSA,L,R=301]
+RewriteCond %{HTTPS} !=on
+RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]
+RewriteCond %{HTTP_HOST} ^goodtime-restaurant.fr$ [or]
+RewriteCond %{HTTP_HOST} ^www.goodtime-restaurant.fr$
+RewriteRule ^(.*) https://top-halal.fr/? [L,R=301]
+RedirectPermanent /events https://top-halal.fr/
+RedirectPermanent /password-recovery https://top-halal.fr/
+RedirectPermanent /restaurants/specialite/creperie https://top-halal.fr/specialites/cuisine-creperie
+RedirectPermanent /restaurants/specialite/software https://top-halal.fr/
+RedirectPermanent /restaurants-par-specialite https://top-halal.fr/guide-top-halal
+RedirectPermanent /restaurants-par-specialites-services https://top-halal.fr/guide-top-halal
+RedirectPermanent /testttt https://top-halal.fr/guide-top-halal
+RedirectPermanent /cuisine-fast-food https://top-halal.fr/specialites/cuisine-fast-food
+RedirectPermanent /videoss https://top-halal.fr/videos
+RedirectPermanent /mon-compte/event-favorites/www.linkedin.com/www.google.com/www.linkedin.com/appthemes https://top-halal.fr/
+RedirectPermanent /mon-compte/event-favorites/www.linkedin.com/www.google.com/appthemes https://top-halal.fr/
+RedirectPermanent /mon-compte/restaurants/customer/page/495 https://top-halal.fr/
+RedirectPermanent /mon-compte/restaurants/customer https://top-halal.fr/
+RedirectPermanent /tout-savoir-sur-le-halal https://top-halal.fr/signification-du-mot-halal
+RedirectPermanent /mosquee-de-paris/sida-et-islam https://top-halal.fr/mosquee-de-paris/islam-et-sida
+RedirectPermanent /eyeblaster/addineyeV2.html https://top-halal.fr/
+RedirectPermanent /quick https://top-halal.fr/quick-hallal
+rewritecond %{REQUEST_URI} ^$
+RewriteRule ^muslim-gourmet/$ https://top-halal.fr/muslim-gourmet? [L,R=301]
+rewritecond %{REQUEST_URI} ^/mon-compte/restaurants/twitter.*$
+RewriteRule ^.*$ https://top-halal.fr/? [L,R=301]
+rewritecond %{REQUEST_URI} ^/mon-compte/restaurants/www.youtube.*$
+RewriteRule ^.*$ https://top-halal.fr/? [L,R=301]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/page/.*$
+RewriteRule ^.*$ https://top-halal.fr/muslim-gourmet? [L,R=301]
+rewritecond %{REQUEST_URI} ^/author/younes/page/.*$
+RewriteRule ^.*$ https://top-halal.fr/? [L,R=301]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/2012/.*$ [or]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/2013/.*$ [or]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/2014/.*$ [or]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/2015/.*$
+RewriteRule ^.*$ https://top-halal.fr/muslim-gourmet? [L,R=301]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/category/.*$
+RewriteRule ^.*$ https://top-halal.fr/muslim-gourmet? [L,R=301]
+rewritecond %{REQUEST_URI} ^/muslim-gourmet/author/.*$
+RewriteRule ^.*$ https://top-halal.fr/muslim-gourmet? [L,R=301]
+RewriteRule ^muslim-gourmet/a-propos/$ https://top-halal.fr/muslim-gourmet? [L,R=301]
+RewriteRule ^bons-plans/.*$ https://top-halal.fr/? [L,R=301]
+################ REDIRECTIONS NOUVELLE VERSION #######################
+Redirectpermanent /mosquee-de-paris/le-medecin-technicien-ou-magicien https://top-halal.fr/mosquee-de-paris/medecin-technicien-ou-magicien
+Redirectpermanent /mosquee-de-paris/lutilisation-des-techniques-genetiques https://top-halal.fr/mosquee-de-paris/utilisation-techniques-genetiques-islam
+Redirectpermanent /mosquee-de-paris/lobligation-de-se-soigner-en-islam https://top-halal.fr/mosquee-de-paris/obligation-de-se-soigner-islam
+Redirectpermanent /mosquee-de-paris/journee-nationale-de-lutte-contre-le-cancer https://top-halal.fr/mosquee-de-paris/journee-lutte-contre-cancer
+Redirectpermanent /mosquee-de-paris/lenseignement-de-lislam-dans-les-mosquees https://top-halal.fr/mosquee-de-paris/enseignement-islam-mosquees
+Redirectpermanent /mosquee-de-paris/autres-interdits-de-lislam https://top-halal.fr/mosquee-de-paris/autres-interdits-islam
+Redirectpermanent /mosquee-de-paris/lislam-a-laube-du-21eme-siecle https://top-halal.fr/mosquee-de-paris/lislam-au-21eme-siecle
+Redirectpermanent /mosquee-de-paris/lislam-et-les-musulmans-de-france https://top-halal.fr/mosquee-de-paris/musulmans-france-islam
+Redirectpermanent /mosquee-de-paris/la-femme-dans-lislam https://top-halal.fr/mosquee-de-paris/femme-dans-islam
+Redirectpermanent /mosquee-de-paris/musulmans-et-chretiens-avons-nous-le-meme-dieu https://top-halal.fr/mosquee-de-paris/musulmans-chretiens-meme-dieu
+Redirectpermanent /mosquee-de-paris/les-produits-alimentaires https://top-halal.fr/mosquee-de-paris/produits-alimentaires
+Redirectpermanent /mosquee-de-paris/le-film-blasphematoire-et-provocateur-sur-lislam https://top-halal.fr/mosquee-de-paris/film-blasphematoire
+Redirectpermanent /mosquee-de-paris/iftar-avec-le-president-de-la-republique-nicolas-sarkozy https://top-halal.fr/mosquee-de-paris/iftar-president-republique-nicolas-sarkozy
+Redirectpermanent /mosquee-de-paris/alimentation-et-islam-les-interdits https://top-halal.fr/mosquee-de-paris/alimentation-islam-et-interdits
+Redirectpermanent /mosquee-de-paris/bioethique-et-jurisprudence-islamique https://top-halal.fr/mosquee-de-paris/bioethique-jurisprudence-islamique
+Redirectpermanent /mosquee-de-paris/la-dignite-de-lhomme-dans-la-societe-moderne https://top-halal.fr/mosquee-de-paris/dignite-homme-societe-moderne
+Redirectpermanent /mosquee-de-paris/la-mecque-la-kaaba-et-les-origines-de-lislam https://top-halal.fr/mosquee-de-paris/mecque-kaaba-origines-islam
+Redirectpermanent /mosquee-de-paris/la-symbolique-de-la-mosquee-de-paris https://top-halal.fr/mosquee-de-paris/le-symbole
+Redirectpermanent /mosquee-de-paris/la-symbolique-du-sinai-ou-lepreuve-de-la-montagne https://top-halal.fr/mosquee-de-paris/symbolique-sinai-ou-epreuve-montagne
+Redirectpermanent /mosquee-de-paris/les-raisons-de-la-victoire-a-la-bataille-de-badr https://top-halal.fr/mosquee-de-paris/raisons-victoire-bataille-badr
+Redirectpermanent /mosquee-de-paris/lesclavage-et-lislam https://top-halal.fr/mosquee-de-paris/esclavage-et-islam
+Redirectpermanent /mosquee-de-paris/lislam-et-lenvironnement https://top-halal.fr/mosquee-de-paris/islam-et-environnement
+Redirectpermanent /mosquee-de-paris/notre-dieu-allah https://top-halal.fr/mosquee-de-paris/dieu-allah
+Redirectpermanent /mosquee-de-paris/signification-de-lhomme-et-prehistoire https://top-halal.fr/mosquee-de-paris/signification-homme-prehistoire
+Redirectpermanent /nouveaux-food-trucks-hong-kong-par-16-opérateurs	https://top-halal.fr/nouveaux-food-trucks-a-hong-kong-par-16-operateurs
+Redirectpermanent /position-chrétien-nourriture-halal https://top-halal.fr/position-chretien-nourriture-halal
+Redirectpermanent /halal-à-savoir https://top-halal.fr/en-bref
+Redirectpermanent /mosquee-de-paris/averroes–science-et-foi https://top-halal.fr/mosquee-de-paris/averroes-science-et-foi
+Redirectpermanent /blog-archive.html https://top-halal.fr/
+Redirectpermanent /Doit-on-accepter-violence-dans-abattoirs https://top-halal.fr/violence-abattoirs
+Redirectpermanent /expansion-industrie-halal-coree https://top-halal.fr/expansion-industrie-halal-coree-sud
+Redirectpermanent /halal-il-faut-savoir https://top-halal.fr/en-bref
+Redirectpermanent /Halal-snack-pack-nourriture-qui-nous-reunit https://top-halal.fr/halal-snack-pack-nourriture
+Redirectpermanent /industrie-halal-vraie-evolution-en-france https://top-halal.fr/industrie-halal-vraie-evolution-france
+Redirectpermanent /langs/ https://top-halal.fr/
+Redirectpermanent /mosquee-de-paris/institut-al-ghazali https://top-halal.fr/mosquee-de-paris/formation-imams-al-ghazali
+Redirectpermanent /mosquee-de-paris/le-hammam-de-la-mosquee https://top-halal.fr/mosquee-de-paris/hammam
+Redirectpermanent /mosquee-de-paris/moise-dans-islam https://top-halal.fr/mosquee-de-paris/moise-dans-lislam
+Redirectpermanent /muslim-gourmet/au-soleil-mister-kebab/amp https://top-halal.fr/au-soleil-mister-kebab
+Redirectpermanent /muslim-gourmet/blog-archive.html https://top-halal.fr/
+Redirectpermanent /muslim-gourmet/de-lafrique-aux-antilles-le-djembe/amp https://top-halal.fr/de-lafrique-aux-antilles-le-djembe
+Redirectpermanent /muslim-gourmet/la-turquie-a-montpellier-mega-star-kebab/amp https://top-halal.fr/la-turquie-a-montpellier-mega-star-kebab
+Redirectpermanent /nouveaux-food-trucks-hong-kong-par-16-oprrateurs https://top-halal.fr/nouveaux-food-trucks-a-hong-kong-par-16-operateurs
+Redirectpermanent /Nouvelle-boucherie-halal-High-Wycombe https://top-halal.fr/nouvelle-boucherie-halal-high-wycombe
+Redirectpermanent /nouvelle-boucherie-halal-High-Wycombe https://top-halal.fr/nouvelle-boucherie-halal-high-wycombe
+Redirectpermanent /wp-co https://top-halal.fr/
+Redirectpermanent /wp-contenu/uploads/2014/06/1453280_1395554670 https://top-halal.fr/
+Redirectpermanent /restaurants/hallal/fumoir https://top-halal.fr/
+Redirectpermanent /restaurants/le-havre https://top-halal.fr/restos/le-havre
+Redirectpermanent /restaurants/saint-brice-sous-foret https://top-halal.fr/restos/saint-brice-sous-foret
+Redirectpermanent /restaurants/saint-germain-les-corbeil https://top-halal.fr/restos/saint-germain-les-corbeil
+Redirectpermanent /restaurants/villeneuve-saint-georges https://top-halal.fr/restos/villeneuve-saint-georges
+Redirectpermanent /restaurants/voulx https://top-halal.fr/restos/voulx
+Redirectpermanent /restaurants/vouziers https://top-halal.fr/restos/vouziers
+Redirectpermanent /restaurants/wasquehal https://top-halal.fr/restos/wasquehal
+Redirectpermanent /restaurants/acheres https://top-halal.fr/restos/acheres
+Redirectpermanent /restaurants/appthemes https://top-halal.fr/
+Redirectpermanent /restaurants/asnieres-sur-seine https://top-halal.fr/restos/asnieres-sur-seine
+Redirectpermanent /restaurants/aubonne https://top-halal.fr/restos/aubonne
+Redirectpermanent /restaurants/bagneux https://top-halal.fr/restos/bagneux
+Redirectpermanent /restaurants/beach--2 https://top-halal.fr/resto/beach-kebab
+Redirectpermanent /restaurants/burger-trip-restaurant-de-qualite https://top-halal.fr/resto/burger-trip
+Redirectpermanent /restaurants/cesson-sevigne https://top-halal.fr/restos/cesson-sevigne
+Redirectpermanent /restaurants/chez-tanty https://top-halal.fr/
+Redirectpermanent /restaurants/cours-lieutaud https://top-halal.fr/restos/cours-lieutaud
+Redirectpermanent /restaurants/epinay-sur-seine https://top-halal.fr/restos/epinay-sur-seine
+Redirectpermanent /restaurants/sainte-genevieve-des-bois https://top-halal.fr/restos/sainte-genevieve-des-bois
+Redirectpermanent /restaurant/test3 https://top-halal.fr/
+Redirectpermanent /restaurants/__trashed-16 https://top-halal.fr/
+RewriteRule ^restaurants/-$ https://top-halal.fr/? [L,R=301]
+RewriteRule ^restaurants$ https://top-halal.fr/? [L,R=301]
+Redirectpermanent /resto/-de-la-place-fontbarlettes https://top-halal.fr/resto/kebab-de-la-place-fontbarlettes
+Redirectpermanent /resto/acheres https://top-halal.fr/restos/acheres
+Redirectpermanent /resto/asnieres-sur-seine https://top-halal.fr/restos/asnieres-sur-seine
+Redirectpermanent /resto/aubonne https://top-halal.fr/restos/aubonne
+Redirectpermanent /resto/bagneux https://top-halal.fr/restos/bagneux
+Redirectpermanent /resto/break-time-3 https://top-halal.fr/resto/break-time
+Redirectpermanent /resto/cours-lieutaud https://top-halal.fr/restos/cours-lieutaud
+Redirectpermanent /resto/crepe-tower-2 https://top-halal.fr/resto/crepe-tower
+Redirectpermanent /resto/enk-2 https://top-halal.fr/resto/enk
+Redirectpermanent /resto/epinay-sur-seine https://top-halal.fr/restos/epinay-sur-seine
+Redirectpermanent /resto/kidals-food-3 https://top-halal.fr/resto/kidals-food
+Redirectpermanent /resto/lathanor-pizza-bio-2 https://top-halal.fr/resto/lathanor-pizza-bio
+Redirectpermanent /resto/le-havre https://top-halal.fr/restos/le-havre
+Redirectpermanent /resto/montigny-les-cormeilles https://top-halal.fr/restos/montigny-les-cormeilles
+Redirectpermanent /resto/nouveau-restaurant-test https://top-halal.fr/
+Redirectpermanent /resto/pizza--au-cabano https://top-halal.fr/resto/pizza-kebab-au-cabano
+Redirectpermanent /resto/qg-restaurant https://top-halal.fr/resto/restaurant-qg
+Redirectpermanent /resto/saint-brice-sous-foret https://top-halal.fr/restos/saint-brice-sous-foret
+Redirectpermanent /resto/saint-germain-les-corbeil https://top-halal.fr/restos/saint-germain-les-corbeil
+Redirectpermanent /resto/sainte-genevieve-des-bois https://top-halal.fr/restos/sainte-genevieve-des-bois
+Redirectpermanent /resto/test3 https://top-halal.fr/
+Redirectpermanent /resto/villeneuve-saint-georges https://top-halal.fr/restos/villeneuve-saint-georges
+Redirectpermanent /resto/voulx https://top-halal.fr/restos/voulx
+Redirectpermanent /resto/vouziers https://top-halal.fr/restos/vouziers
+Redirectpermanent /resto/vrigne-aux-bois https://top-halal.fr/restos/vrigne-aux-bois
+Redirectpermanent /resto/wasquehal https://top-halal.fr/restos/wasquehal
+Redirectpermanent /restos/a-la-mode-libanaise https://top-halal.fr/resto/a-la-mode-libanaise
+Redirectpermanent /restos/a-lescale https://top-halal.fr/resto/a-lescale
+Redirectpermanent /restos/afriknfusion https://top-halal.fr/resto/afriknfusion
+Redirectpermanent /restos/alambra https://top-halal.fr/resto/alambra
+Redirectpermanent /restos/allchicken-montreuil https://top-halal.fr/resto/allchicken-montreuil
+Redirectpermanent /restos/allo-pizza-service https://top-halal.fr/resto/allo-pizza-service
+Redirectpermanent /restos/alloasia https://top-halal.fr/resto/alloasia
+Redirectpermanent /restos/alto-uno https://top-halal.fr/resto/alto-uno
+Redirectpermanent /restos/anarkali https://top-halal.fr/resto/anarkali
+Redirectpermanent /restos/andiamo-pizza https://top-halal.fr/resto/andiamo-pizza
+Redirectpermanent /restos/aquarium https://top-halal.fr/resto/aquarium
+Redirectpermanent /restos/as-pizza https://top-halal.fr/resto/as-pizza
+Redirectpermanent /restos/asia-delices https://top-halal.fr/resto/asia-delices
+Redirectpermanent /restos/asian-food https://top-halal.fr/resto/asian-food
+Redirectpermanent /restos/asian-mix https://top-halal.fr/resto/asian-mix
+Redirectpermanent /restos/asiatexpress https://top-halal.fr/resto/asiatexpress
+Redirectpermanent /restos/atlas-couscous https://top-halal.fr/resto/atlas-couscous
+Redirectpermanent /restos/au-beausoleil https://top-halal.fr/resto/au-beausoleil
+Redirectpermanent /restos/au-brin-dolivier https://top-halal.fr/resto/au-brin-dolivier
+Redirectpermanent /restos/au-chicca-pitta https://top-halal.fr/resto/au-chicca-pitta
+Redirectpermanent /restos/au-poulet-braise https://top-halal.fr/resto/au-poulet-braise
+Redirectpermanent /restos/au-sushi https://top-halal.fr/resto/au-sushi
+Redirectpermanent /restos/au-vieux-four https://top-halal.fr/resto/au-vieux-four
+Redirectpermanent /restos/augusta-pizza https://top-halal.fr/resto/augusta-pizza
+Redirectpermanent /restos/aux-delices-ottomans https://top-halal.fr/resto/aux-delices-ottomans
+Redirectpermanent /restos/aux-deux-etoiles https://top-halal.fr/resto/aux-deux-etoiles
+Redirectpermanent /restos/baili https://top-halal.fr/resto/baili
+Redirectpermanent /restos/balbigny-kebab https://top-halal.fr/resto/balbigny-kebab
+Redirectpermanent /restos/bay-kebab https://top-halal.fr/resto/bay-kebab
+Redirectpermanent /restos/beyrouthexpress https://top-halal.fr/resto/beyrouthexpress
+Redirectpermanent /restos/bhai-bhai https://top-halal.fr/resto/bhai-bhai
+Redirectpermanent /restos/bolly-bolly https://top-halal.fr/resto/bolly-bolly
+Redirectpermanent /restos/bollywood-lounge https://top-halal.fr/resto/bollywood-lounge
+Redirectpermanent /restos/burger-trip https://top-halal.fr/resto/burger-trip
+Redirectpermanent /restos/casa-di-napoli https://top-halal.fr/resto/casa-di-napoli
+Redirectpermanent /restos/casa-di-tacos https://top-halal.fr/resto/casa-di-tacos
+Redirectpermanent /restos/chez-nanou https://top-halal.fr/resto/chez-nanou
+Redirectpermanent /restos/chic-pizza https://top-halal.fr/resto/chic-pizza
+Redirectpermanent /restos/chicken-bel https://top-halal.fr/resto/chicken-bel
+Redirectpermanent /restos/chicken-by-night https://top-halal.fr/resto/chicken-by-night
+Redirectpermanent /restos/chickn-rice https://top-halal.fr/resto/chickn-rice
+Redirectpermanent /restos/chiken-points https://top-halal.fr/resto/chiken-points
+Redirectpermanent /restos/chikenworld https://top-halal.fr/resto/chikenworld
+Redirectpermanent /restos/chilis https://top-halal.fr/resto/chilis
+Redirectpermanent /restos/craken-creperie https://top-halal.fr/resto/craken-creperie
+Redirectpermanent /restos/crepe-tower https://top-halal.fr/resto/crepe-tower
+Redirectpermanent /restos/crousti-coq https://top-halal.fr/resto/crousti-coq
+Redirectpermanent /restos/daar-djerba https://top-halal.fr/resto/daar-djerba
+Redirectpermanent /restos/daily-grill https://top-halal.fr/resto/daily-grill
+Redirectpermanent /restos/dar-di-pasta https://top-halal.fr/resto/dar-di-pasta
+Redirectpermanent /restos/dare-wok https://top-halal.fr/resto/dare-wok
+Redirectpermanent /restos/darna https://top-halal.fr/resto/darna
+Redirectpermanent /restos/delice-de-bagneux https://top-halal.fr/resto/delice-de-bagneux
+Redirectpermanent /restos/delice-du-maroc https://top-halal.fr/resto/delice-du-maroc
+Redirectpermanent /restos/delicity https://top-halal.fr/resto/delicity
+Redirectpermanent /restos/diffa-pizza https://top-halal.fr/resto/diffa-pizza
+Redirectpermanent /restos/doctor-pizz https://top-halal.fr/resto/doctor-pizz
+Redirectpermanent /restos/dolce-vita https://top-halal.fr/resto/dolce-vita
+Redirectpermanent /restos/dragon-wok https://top-halal.fr/resto/dragon-wok
+Redirectpermanent /restos/easy-pizza https://top-halal.fr/resto/easy-pizza
+Redirectpermanent /restos/eden-sushi https://top-halal.fr/resto/eden-sushi
+Redirectpermanent /restos/ekko-pizza https://top-halal.fr/resto/ekko-pizza
+Redirectpermanent /restos/el-daya https://top-halal.fr/resto/el-daya
+Redirectpermanent /restos/el-forno https://top-halal.fr/resto/el-forno
+Redirectpermanent /restos/el-medina https://top-halal.fr/resto/el-medina
+Redirectpermanent /restos/emre-snack https://top-halal.fr/resto/emre-snack
+Redirectpermanent /restos/enk https://top-halal.fr/resto/enk
+Redirectpermanent /restos/familys-pizza https://top-halal.fr/resto/familys-pizza
+Redirectpermanent /restos/fastthai https://top-halal.fr/resto/fastthai
+Redirectpermanent /restos/fch-the-french-chicken-house https://top-halal.fr/resto/fch-the-french-chicken-house
+Redirectpermanent /restos/figue-olive https://top-halal.fr/resto/figue-olive
+Redirectpermanent /restos/fine-lalla https://top-halal.fr/resto/fine-lalla
+Redirectpermanent /restos/first-coffee https://top-halal.fr/resto/first-coffee
+Redirectpermanent /restos/french-touch https://top-halal.fr/resto/french-touch
+Redirectpermanent /restos/freschezza https://top-halal.fr/resto/freschezza
+Redirectpermanent /restos/golden-food-toulouse https://top-halal.fr/resto/golden-food-toulouse
+Redirectpermanent /restos/halikarnas-pantin https://top-halal.fr/resto/halikarnas-pantin
+Redirectpermanent /restos/happy-sushi https://top-halal.fr/resto/happy-sushi
+Redirectpermanent /restos/hawassi https://top-halal.fr/resto/hawassi
+Redirectpermanent /restos/he-pates-moi https://top-halal.fr/resto/he-pates-moi
+Redirectpermanent /restos/hilao-chicken https://top-halal.fr/resto/hilao-chicken
+Redirectpermanent /restos/i-love-asie https://top-halal.fr/resto/i-love-asie
+Redirectpermanent /restos/ifrikiya https://top-halal.fr/resto/ifrikiya
+Redirectpermanent /restos/imperial-sushi https://top-halal.fr/resto/imperial-sushi
+Redirectpermanent /restos/indian-food https://top-halal.fr/resto/indian-food
+Redirectpermanent /restos/indian-lunch https://top-halal.fr/resto/indian-lunch
+Redirectpermanent /restos/infinity-sushi https://top-halal.fr/resto/infinity-sushi
+Redirectpermanent /restos/kidals-food https://top-halal.fr/resto/kidals-food
+Redirectpermanent /restos/king-star-crepe https://top-halal.fr/resto/king-star-crepe
+Redirectpermanent /restos/kom-a-la-maison https://top-halal.fr/resto/kom-a-la-maison
+Redirectpermanent /restos/kydam-pizza-pasta https://top-halal.fr/resto/kydam-pizza-pasta
+Redirectpermanent /restos/la-baraque-a-frites https://top-halal.fr/resto/la-baraque-a-frites
+Redirectpermanent /restos/la-barricade https://top-halal.fr/resto/la-barricade
+Redirectpermanent /restos/la-belle-colombe https://top-halal.fr/resto/la-belle-colombe
+Redirectpermanent /restos/la-belle-dorient https://top-halal.fr/resto/la-belle-dorient
+Redirectpermanent /restos/la-branche https://top-halal.fr/resto/la-branche
+Redirectpermanent /restos/la-casa-di-manza https://top-halal.fr/resto/la-casa-di-manza
+Redirectpermanent /restos/la-casa-poulet-braise https://top-halal.fr/resto/la-casa-poulet-braise
+Redirectpermanent /restos/la-mie-marie https://top-halal.fr/resto/la-mie-marie
+Redirectpermanent /restos/la-palme https://top-halal.fr/resto/la-palme
+Redirectpermanent /restos/la-petite-braise https://top-halal.fr/resto/la-petite-braise
+Redirectpermanent /restos/la-petite-pause https://top-halal.fr/resto/la-petite-pause
+Redirectpermanent /restos/la-petite-venise https://top-halal.fr/resto/la-petite-venise
+Redirectpermanent /restos/la-riviera https://top-halal.fr/resto/la-riviera
+Redirectpermanent /restos/la-table-fleurie https://top-halal.fr/resto/la-table-fleurie
+Redirectpermanent /restos/la-troika-libanaise https://top-halal.fr/resto/la-troika-libanaise
+Redirectpermanent /restos/ladresse https://top-halal.fr/resto/ladresse
+Redirectpermanent /restos/lalqila https://top-halal.fr/resto/lalqila
+Redirectpermanent /restos/lardoise https://top-halal.fr/resto/lardoise
+Redirectpermanent /restos/layal https://top-halal.fr/resto/layal
+Redirectpermanent /restos/le-bagdad-cafe https://top-halal.fr/resto/le-bagdad-cafe
+Redirectpermanent /restos/le-bollywood https://top-halal.fr/resto/le-bollywood
+Redirectpermanent /restos/le-carre-rouge https://top-halal.fr/resto/le-carre-rouge
+Redirectpermanent /restos/le-cedre-oriental https://top-halal.fr/resto/le-cedre-oriental
+Redirectpermanent /restos/le-comptoir https://top-halal.fr/resto/le-comptoir
+Redirectpermanent /restos/le-confidentiel https://top-halal.fr/resto/le-confidentiel
+Redirectpermanent /restos/le-djembe https://top-halal.fr/resto/le-djembe
+Redirectpermanent /restos/le-filao https://top-halal.fr/resto/le-filao
+Redirectpermanent /restos/le-finest https://top-halal.fr/resto/le-finest
+Redirectpermanent /restos/le-frenchy https://top-halal.fr/resto/le-frenchy
+Redirectpermanent /restos/le-hall-restaurant https://top-halal.fr/resto/le-hall-restaurant
+Redirectpermanent /restos/le-jardin-du-maroc https://top-halal.fr/resto/le-jardin-du-maroc
+Redirectpermanent /restos/le-jumeyrah https://top-halal.fr/resto/le-jumeyrah
+Redirectpermanent /restos/le-karachi https://top-halal.fr/resto/le-karachi
+Redirectpermanent /restos/le-lobia https://top-halal.fr/resto/le-lobia
+Redirectpermanent /restos/le-maharajah https://top-halal.fr/resto/le-maharajah
+Redirectpermanent /restos/le-marceau https://top-halal.fr/resto/le-marceau
+Redirectpermanent /restos/le-medaillon https://top-halal.fr/resto/le-medaillon
+Redirectpermanent /restos/le-miyanis https://top-halal.fr/resto/le-miyanis
+Redirectpermanent /restos/le-mosaic https://top-halal.fr/resto/le-mosaic
+Redirectpermanent /restos/le-napolitain https://top-halal.fr/resto/le-napolitain
+Redirectpermanent /restos/le-nioumre https://top-halal.fr/resto/le-nioumre
+Redirectpermanent /restos/le-onzieme https://top-halal.fr/resto/le-onzieme
+Redirectpermanent /restos/le-petit-gourmet https://top-halal.fr/resto/le-petit-gourmet
+Redirectpermanent /restos/le-plazza-sushi https://top-halal.fr/resto/le-plazza-sushi
+Redirectpermanent /restos/le-rhumel https://top-halal.fr/resto/le-rhumel
+Redirectpermanent /restos/le-sarrazin https://top-halal.fr/resto/le-sarrazin
+Redirectpermanent /restos/le-selam https://top-halal.fr/resto/le-selam
+Redirectpermanent /restos/le-shems https://top-halal.fr/resto/le-shems
+Redirectpermanent /restos/le-shimla https://top-halal.fr/resto/le-shimla
+Redirectpermanent /restos/le-tacos https://top-halal.fr/resto/le-tacos
+Redirectpermanent /restos/le-taliani https://top-halal.fr/resto/le-taliani
+Redirectpermanent /restos/le-temps-dun-delice https://top-halal.fr/resto/le-temps-dun-delice
+Redirectpermanent /restos/le-venise https://top-halal.fr/resto/le-venise
+Redirectpermanent /restos/le-village-indien https://top-halal.fr/resto/le-village-indien
+Redirectpermanent /restos/le-wanted https://top-halal.fr/resto/le-wanted
+Redirectpermanent /restos/le-wok-cafe https://top-halal.fr/resto/le-wok-cafe
+Redirectpermanent /restos/le-wok-racine https://top-halal.fr/resto/le-wok-racine
+Redirectpermanent /restos/le-wok-saint-germain https://top-halal.fr/resto/le-wok-saint-germain
+Redirectpermanent /restos/lempire-du-kebab https://top-halal.fr/resto/lempire-du-kebab
+Redirectpermanent /restos/les-delices-de-puteaux-zaouit https://top-halal.fr/resto/les-delices-de-puteaux-zaouit
+Redirectpermanent /restos/les-enfants-terribles https://top-halal.fr/resto/les-enfants-terribles
+Redirectpermanent /restos/lescapade-triolo https://top-halal.fr/resto/lescapade-triolo
+Redirectpermanent /restos/linedit https://top-halal.fr/resto/linedit
+Redirectpermanent /restos/little-wok https://top-halal.fr/resto/little-wok
+Redirectpermanent /restos/livraison-de-nuit https://top-halal.fr/resto/livraison-de-nuit
+Redirectpermanent /restos/lobby-lounge https://top-halal.fr/resto/lobby-lounge
+Redirectpermanent /restos/lunch-club https://top-halal.fr/resto/lunch-club
+Redirectpermanent /restos/lyon-fast https://top-halal.fr/resto/lyon-fast
+Redirectpermanent /restos/ma-poule-grillee https://top-halal.fr/resto/ma-poule-grillee
+Redirectpermanent /restos/mac-ankara https://top-halal.fr/resto/mac-ankara
+Redirectpermanent /restos/made-mex https://top-halal.fr/resto/made-mex
+Redirectpermanent /restos/maxi-tacos https://top-halal.fr/resto/maxi-tacos
+Redirectpermanent /restos/megna https://top-halal.fr/resto/megna
+Redirectpermanent /restos/miam-burger-marseille https://top-halal.fr/resto/miam-burger-marseille
+Redirectpermanent /restos/mixn-wok https://top-halal.fr/resto/mixn-wok
+Redirectpermanent /restos/mondial-pizza https://top-halal.fr/resto/mondial-pizza
+Redirectpermanent /restos/montecristo-marrakech https://top-halal.fr/resto/montecristo-marrakech
+Redirectpermanent /restos/montmartroy https://top-halal.fr/resto/montmartroy
+Redirectpermanent /restos/montreuil-express https://top-halal.fr/resto/montreuil-express
+Redirectpermanent /restos/mr-pasta https://top-halal.fr/resto/mr-pasta
+Redirectpermanent /restos/mundocrep https://top-halal.fr/resto/mundocrep
+Redirectpermanent /restos/nems-sushi https://top-halal.fr/resto/nems-sushi
+Redirectpermanent /restos/new-delice-de-bagneux https://top-halal.fr/resto/new-delice-de-bagneux
+Redirectpermanent /restos/new-pondichery https://top-halal.fr/resto/new-pondichery
+Redirectpermanent /restos/new-taj-mahal https://top-halal.fr/resto/new-taj-mahal
+Redirectpermanent /restos/ninou-tacos https://top-halal.fr/resto/ninou-tacos
+Redirectpermanent /restos/ninous-pizzeria https://top-halal.fr/resto/ninous-pizzeria
+Redirectpermanent /restos/nouilles-n-wok https://top-halal.fr/resto/nouilles-n-wok
+Redirectpermanent /restos/noujoum https://top-halal.fr/resto/noujoum
+Redirectpermanent /restos/o-bon-coin https://top-halal.fr/resto/o-bon-coin
+Redirectpermanent /restos/o-dukes https://top-halal.fr/resto/o-dukes
+Redirectpermanent /restos/o-kyoto https://top-halal.fr/resto/o-kyoto
+Redirectpermanent /restos/o-mafe https://top-halal.fr/resto/o-mafe
+Redirectpermanent /restos/o-resto-dasie https://top-halal.fr/resto/o-resto-dasie
+Redirectpermanent /restos/occo-chicken https://top-halal.fr/resto/occo-chicken
+Redirectpermanent /restos/oriental-tacosn-chicken https://top-halal.fr/resto/oriental-tacosn-chicken
+Redirectpermanent /restos/orina-food https://top-halal.fr/resto/orina-food
+Redirectpermanent /restos/osushic https://top-halal.fr/resto/osushic
+Redirectpermanent /restos/otacos https://top-halal.fr/resto/otacos
+Redirectpermanent /restos/oujda https://top-halal.fr/resto/oujda
+Redirectpermanent /restos/palais-des-roses https://top-halal.fr/resto/palais-des-roses
+Redirectpermanent /restos/pantin-food https://top-halal.fr/resto/pantin-food
+Redirectpermanent /restos/papa-mario-pizza https://top-halal.fr/resto/papa-mario-pizza
+Redirectpermanent /restos/paparazzi https://top-halal.fr/resto/paparazzi
+Redirectpermanent /restos/paparazzi-express https://top-halal.fr/resto/paparazzi-express
+Redirectpermanent /restos/paparazzi-sushi https://top-halal.fr/resto/paparazzi-sushi
+Redirectpermanent /restos/paris-french-cantine https://top-halal.fr/resto/paris-french-cantine
+Redirectpermanent /restos/pasta-gusty https://top-halal.fr/resto/pasta-gusty
+Redirectpermanent /restos/pasta-nina https://top-halal.fr/resto/pasta-nina
+Redirectpermanent /restos/pastasandwich https://top-halal.fr/resto/pastasandwich
+Redirectpermanent /restos/pates-a-crepes https://top-halal.fr/resto/pates-a-crepes
+Redirectpermanent /restos/pekin-express https://top-halal.fr/resto/pekin-express
+Redirectpermanent /restos/pepper-grill https://top-halal.fr/resto/pepper-grill
+Redirectpermanent /restos/pizza-mozart https://top-halal.fr/resto/pizza-mozart
+Redirectpermanent /restos/pizza-odessa https://top-halal.fr/resto/pizza-odessa
+Redirectpermanent /restos/quick https://top-halal.fr/
+Redirectpermanent /restos/quick-halal-villeneuve-saint-georges https://top-halal.fr/resto/quick-halal-villeneuve-saint-georges
+Redirectpermanent /restos/quick-hallal-toulouse-basso-cambo https://top-halal.fr/resto/quick-hallal-toulouse-basso-cambo
+Redirectpermanent /restos/rapidos-tacos https://top-halal.fr/resto/rapidos-tacos
+Redirectpermanent /restos/restaurant-chennai https://top-halal.fr/resto/restaurant-chennai
+Redirectpermanent /restos/restaurant-mado-le-terminal https://top-halal.fr/resto/restaurant-mado-le-terminal
+Redirectpermanent /restos/restaurant-pondicherry https://top-halal.fr/resto/restaurant-pondicherry
+Redirectpermanent /restos/restaurant-qg https://top-halal.fr/resto/restaurant-qg
+Redirectpermanent /restos/restaurant-riad-marrakech https://top-halal.fr/resto/restaurant-riad-marrakech
+Redirectpermanent /restos/roanne-kebab https://top-halal.fr/resto/roanne-kebab
+Redirectpermanent /restos/rocket https://top-halal.fr/resto/rocket
+Redirectpermanent /restos/royaume-des-saveurs https://top-halal.fr/resto/royaume-des-saveurs
+Redirectpermanent /restos/rush-hour https://top-halal.fr/resto/rush-hour
+Redirectpermanent /restos/s-pizza https://top-halal.fr/resto/s-pizza
+Redirectpermanent /restos/safary-west https://top-halal.fr/resto/safary-west
+Redirectpermanent /restos/sahil https://top-halal.fr/resto/sahil
+Redirectpermanent /restos/saint-ouen-kebab https://top-halal.fr/resto/saint-ouen-kebab
+Redirectpermanent /restos/saj-al-reef-restaurant-libanais-certifiee-achahada https://top-halal.fr/resto/saj-al-reef-restaurant-libanais-certifiee-achahada
+Redirectpermanent /restos/salima-traiteur https://top-halal.fr/resto/salima-traiteur
+Redirectpermanent /restos/samourai https://top-halal.fr/resto/samourai
+Redirectpermanent /restos/sarrazin-coffee https://top-halal.fr/resto/sarrazin-coffee
+Redirectpermanent /restos/saveurs-dasie https://top-halal.fr/resto/saveurs-dasie
+Redirectpermanent /restos/select-sushi https://top-halal.fr/resto/select-sushi
+Redirectpermanent /restos/shainez https://top-halal.fr/resto/shainez
+Redirectpermanent /restos/sheezan https://top-halal.fr/resto/sheezan
+Redirectpermanent /restos/simpli-kebab https://top-halal.fr/resto/simpli-kebab
+Redirectpermanent /restos/snack-down https://top-halal.fr/resto/snack-down
+Redirectpermanent /restos/snackshop https://top-halal.fr/resto/snackshop
+Redirectpermanent /restos/so-lounge-restaurant https://top-halal.fr/resto/so-lounge-restaurant
+Redirectpermanent /restos/so-suchi https://top-halal.fr/resto/so-suchi
+Redirectpermanent /restos/soleil-liban https://top-halal.fr/resto/soleil-liban
+Redirectpermanent /restos/som-tam-thai https://top-halal.fr/resto/som-tam-thai
+Redirectpermanent /restos/sorami-kebab https://top-halal.fr/resto/sorami-kebab
+Redirectpermanent /restos/speed-tacos https://top-halal.fr/resto/speed-tacos
+Redirectpermanent /restos/spicy-tandoori https://top-halal.fr/resto/spicy-tandoori
+Redirectpermanent /restos/sushi-day https://top-halal.fr/resto/sushi-day
+Redirectpermanent /restos/sushi-plus https://top-halal.fr/resto/sushi-plus
+Redirectpermanent /restos/sushi-times https://top-halal.fr/resto/sushi-times
+Redirectpermanent /restos/sushi-town https://top-halal.fr/resto/sushi-town
+Redirectpermanent /restos/sushi-wan https://top-halal.fr/resto/sushi-wan
+Redirectpermanent /restos/sushi-white https://top-halal.fr/resto/sushi-white
+Redirectpermanent /restos/sushi-wok https://top-halal.fr/resto/sushi-wok
+Redirectpermanent /restos/sushibaze https://top-halal.fr/resto/sushibaze
+Redirectpermanent /restos/sushimax https://top-halal.fr/resto/sushimax
+Redirectpermanent /restos/sushione https://top-halal.fr/resto/sushione
+Redirectpermanent /restos/sushiplaza-halal https://top-halal.fr/resto/sushiplaza-halal
+Redirectpermanent /restos/tacos-du-forez https://top-halal.fr/resto/tacos-du-forez
+Redirectpermanent /restos/tafraout https://top-halal.fr/resto/tafraout
+Redirectpermanent /restos/tagine-et-tradition https://top-halal.fr/resto/tagine-et-tradition
+Redirectpermanent /restos/tandoori-house https://top-halal.fr/resto/tandoori-house
+Redirectpermanent /restos/tavolo https://top-halal.fr/resto/tavolo
+Redirectpermanent /restos/tel-pizza https://top-halal.fr/resto/tel-pizza
+Redirectpermanent /restos/tesmine https://top-halal.fr/resto/tesmine
+Redirectpermanent /restos/thai-bamboo https://top-halal.fr/resto/thai-bamboo
+Redirectpermanent /restos/thai-night-livraison-de-nuit https://top-halal.fr/resto/thai-night-livraison-de-nuit
+Redirectpermanent /restos/thai-wok https://top-halal.fr/resto/thai-wok
+Redirectpermanent /restos/the-french-wok https://top-halal.fr/resto/the-french-wok
+Redirectpermanent /restos/the-grill-house https://top-halal.fr/resto/the-grill-house
+Redirectpermanent /restos/the-pacific https://top-halal.fr/resto/the-pacific
+Redirectpermanent /restos/tingis https://top-halal.fr/resto/tingis
+Redirectpermanent /restos/tip-top-burger-pizz https://top-halal.fr/resto/tip-top-burger-pizz
+Redirectpermanent /restos/todays-burger-chicken https://top-halal.fr/resto/todays-burger-chicken
+Redirectpermanent /restos/traiteur-wing-wah https://top-halal.fr/resto/traiteur-wing-wah
+Redirectpermanent /restos/tresors-dasie https://top-halal.fr/resto/tresors-dasie
+Redirectpermanent /restos/triolopizza https://top-halal.fr/resto/triolopizza
+Redirectpermanent /restos/tunistunis https://top-halal.fr/resto/tunistunis
+Redirectpermanent /restos/un-mexicain-a-marseille https://top-halal.fr/resto/un-mexicain-a-marseille
+Redirectpermanent /restos/web-pizza https://top-halal.fr/resto/web-pizza
+Redirectpermanent /restos/why-not-sushi https://top-halal.fr/resto/why-not-sushi
+Redirectpermanent /restos/wok-and-go https://top-halal.fr/resto/wok-and-go
+Redirectpermanent /restos/yakamoze https://top-halal.fr/resto/yakamoze
+Redirectpermanent /restos/yasmin https://top-halal.fr/resto/yasmin
+Redirectpermanent /restos/zaeka https://top-halal.fr/resto/zaeka
+Redirectpermanent /restos/zagora https://top-halal.fr/resto/zagora
+Redirectpermanent /restos/zarda-food https://top-halal.fr/resto/zarda-food
+RewriteRule ^inscription-gratuite.*$ https://top-halal.fr/ajouter-un-restaurant? [R=301,L]
+RewriteRule ^login.*$ https://top-halal.fr/ajouter-un-restaurant? [R=301,L]
+RewriteRule ^mon-compte/(avis.*|restaurants.*)$ https://top-halal.fr/ajouter-un-restaurant? [R=301,L]
+RewriteRule ^(.*/tag/.*|tag/.*)$ https://top-halal.fr/? [R=301,L]
+RewriteRule ^restaurants/revendiquer/.*$ https://top-halal.fr/? [R=301,L]
+Redirectpermanent /restaurants-par-theme https://top-halal.fr/guide-top-halal
+Redirectpermanent /ajouter-un-evenement https://top-halal.fr/ajouter-un-restaurant
+RewriteCond %{REQUEST_URI} !^/restaurants/sainte-genevieve-des-bois$
+RewriteCond %{REQUEST_URI} !^/restaurants/le-havre$
+RewriteCond %{REQUEST_URI} !^/restaurants/saint-brice-sous-foret$
+RewriteCond %{REQUEST_URI} !^/restaurants/saint-germain-les-corbeil$
+RewriteCond %{REQUEST_URI} !^/restaurants/villeneuve-saint-georges$
+RewriteCond %{REQUEST_URI} !^/restaurants/voulx$
+RewriteCond %{REQUEST_URI} !^/restaurants/vouziers$
+RewriteCond %{REQUEST_URI} !^/restaurants/wasquehal$
+RewriteCond %{REQUEST_URI} !^/restaurants/acheres$
+RewriteCond %{REQUEST_URI} !^/restaurants/appthemes$
+RewriteCond %{REQUEST_URI} !^/restaurants/asnieres-sur-seine$
+RewriteCond %{REQUEST_URI} !^/restaurants/aubonne$
+RewriteCond %{REQUEST_URI} !^/restaurants/bagneux$
+RewriteCond %{REQUEST_URI} !^/restaurants/beach--2$
+RewriteCond %{REQUEST_URI} !^/restaurants/burger-trip-restaurant-de-qualite$
+RewriteCond %{REQUEST_URI} !^/restaurants/cesson-sevigne$
+RewriteCond %{REQUEST_URI} !^/restaurants/chez-tanty$
+RewriteCond %{REQUEST_URI} !^/restaurants/cours-lieutaud$
+RewriteCond %{REQUEST_URI} !^/restaurants/epinay-sur-seine$
+RewriteRule ^restaurants/([a-z0-9\-]*)$ https://top-halal.fr/resto/$1 [R=301,L]
+RewriteRule ^restaurant/([a-z\-]*)$ https://top-halal.fr/restos/$1 [R=301,L]
+RewriteRule ^restaurants/page/.*$ https://top-halal.fr/restos/paris? [R=301,L]
+RewriteRule ^restaurants/hallal/acces-handicape.*$ https://top-halal.fr/service/acces-handicape? [R=301,L]
+RewriteRule ^restaurants/hallal/ambiance-musicale.*$ https://top-halal.fr/service/ambiance-musicale? [R=301,L]
+RewriteRule ^restaurants/hallal/beau-decor.*$ https://top-halal.fr/service/beau-decor? [R=301,L]
+RewriteRule ^restaurants/hallal/branche.*$ https://top-halal.fr/service/branche? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-italienne.*$ https://top-halal.fr/specialites/cuisine-italienne? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-africaine.*$ https://top-halal.fr/specialites/cuisine-africaine? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-algerienne.*$ https://top-halal.fr/specialites/cuisine-algerienne? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-chicken.*$ https://top-halal.fr/specialites/cuisine-chicken? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-chinoise.*$ https://top-halal.fr/specialites/cuisine-chinoise? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-creperie.*$ https://top-halal.fr/specialites/cuisine-creperie? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-fast-food.*$ https://top-halal.fr/specialites/cuisine-fast-food? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-francaise.*$ https://top-halal.fr/specialites/cuisine-francaise? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-indienne.*$ https://top-halal.fr/specialites/cuisine-indienne? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-japonaise.*$ https://top-halal.fr/specialites/cuisine-japonaise? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-libanaise.*$ https://top-halal.fr/specialites/cuisine-libanaise? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-pizzeria.*$ https://top-halal.fr/specialites/cuisine-pizzeria? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-thailandaise.*$ https://top-halal.fr/specialites/cuisine-thailandaise? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-marocaine.*$ https://top-halal.fr/specialites/cuisine-marocaine? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-tunisienne.*$ https://top-halal.fr/specialites/cuisine-tunisienne? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-turque.*$ https://top-halal.fr/specialites/cuisine-turque? [R=301,L]
+RewriteRule ^restaurants/hallal/etablissement-certifie.*$ https://top-halal.fr/service/certifie-halal? [R=301,L]
+RewriteRule ^restaurants/hallal/kebab-frites.*$ https://top-halal.fr/specialites/kebab-frites? [R=301,L]
+RewriteRule ^restaurants/hallal/mauricien.*$ https://top-halal.fr/? [R=301,L]
+RewriteRule ^restaurants/hallal/original.*$ https://top-halal.fr/service/original? [R=301,L]
+RewriteRule ^restaurants/hallal/romantique.*$ https://top-halal.fr/service/romantique? [R=301,L]
+RewriteRule ^restaurants/hallal/salle-de-priere.*$ https://top-halal.fr/service/salle-de-priere? [R=301,L]
+RewriteRule ^restaurants/hallal/sans-alcool.*$ https://top-halal.fr/service/sans-alcool? [R=301,L]
+RewriteRule ^restaurants/hallal/terrasse.*$ https://top-halal.fr/service/terrasse? [R=301,L]
+RewriteRule ^restaurants/hallal/traiteur.*$ https://top-halal.fr/service/traiteur? [R=301,L]
+RewriteRule ^restaurants/hallal/vente-a-emporter.*$ https://top-halal.fr/service/vente-a-emporter? [R=301,L]
+RewriteRule ^restaurants/hallal/wi-fi.*$ https://top-halal.fr/service/wi-fi? [R=301,L]
+RewriteRule ^restaurants/hallal/salon-de-the.*$ https://top-halal.fr/specialites/salon-de-the? [R=301,L]
+RewriteRule ^restaurants/hallal/specialites-variees.*$ https://top-halal.fr/specialites/variees? [R=301,L]
+RewriteCond %{QUERY_STRING} ^location=([a-z\-]*)&.*$
+RewriteRule ^.*$ https://top-halal.fr/restos/%1? [R=301,L]
+RewriteCond %{QUERY_STRING} ^location=([a-z\-]*)$
+RewriteRule ^.*$ https://top-halal.fr/restos/%1? [R=301,L]
+RewriteRule ^(.*)/comment-page-[0-9]$ https://top-halal.fr/$1 [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-egyptienne.*$ https://top-halal.fr/specialites/variees? [R=301,L]
+RewriteRule ^restaurants/hallal/cuisine-iranienne.*$ https://top-halal.fr/specialites/variees? [R=301,L]
+RewriteRule ^restaurants/hallal/vietnamien.*$ https://top-halal.fr/specialites/variees? [R=301,L]
+RewriteRule ^restaurants/hallal/coreen.*$ https://top-halal.fr/specialites/variees? [R=301,L]
+RewriteRule ^restaurants/hallal/africainee.*$ https://top-halal.fr/specialites/cuisine-africaine? [R=301,L]
+
+RewriteRule ^mosquee-de-paris/islam$ https://top-halal.fr/mosquee-de-paris/quest-ce-que-lislam? [L,R=301]
