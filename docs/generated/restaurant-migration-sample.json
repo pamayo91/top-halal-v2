@@ -1,0 +1,916 @@
+{
+    "generated_at": "2026-08-25T14:10:40+00:00",
+    "mode": "apply",
+    "selection": {
+        "13453": [
+            "published_classic",
+            "multiple_categories",
+            "gps"
+        ],
+        "13465": [
+            "multiple_features"
+        ],
+        "13567": [
+            "gallery"
+        ],
+        "13454": [
+            "hours",
+            "unusual_meta"
+        ],
+        "21293": [
+            "incomplete_location"
+        ],
+        "21333": [
+            "claimed"
+        ],
+        "22184": [
+            "pending"
+        ],
+        "13455": [
+            "published_fallback_7"
+        ],
+        "13456": [
+            "published_fallback_8"
+        ],
+        "13457": [
+            "published_fallback_9"
+        ]
+    },
+    "restaurants": [
+        {
+            "source": {
+                "legacy_wp_id": 13453,
+                "selection_reason": [
+                    "published_classic",
+                    "multiple_categories",
+                    "gps"
+                ],
+                "status": "publish",
+                "slug": "effes",
+                "title": "Effes",
+                "meta_keys": [
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "listing-category": 3,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13453,
+                    "name": "Effes",
+                    "slug": "effes",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": false,
+                    "has_contact_email": false,
+                    "latitude": "50.1066316",
+                    "longitude": "1.8328573"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 674,
+                        "name": "Fast-food",
+                        "slug": "cuisine-fast-food",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 679,
+                        "name": "Kebab Frites",
+                        "slug": "kebab-frites",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 694,
+                        "name": "Turque",
+                        "slug": "cuisine-turque",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 739,
+                        "name": "Abbeville",
+                        "slug": "abbeville",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13453
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 13465,
+                "selection_reason": [
+                    "multiple_features"
+                ],
+                "status": "publish",
+                "slug": "so-asia",
+                "title": "So Asia",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "features": 4,
+                    "listing-category": 2,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13465,
+                    "name": "So Asia",
+                    "slug": "so-asia",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": true,
+                    "has_contact_email": true,
+                    "latitude": "48.9622243",
+                    "longitude": "2.0708556"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 701,
+                        "name": "Vente à emporter",
+                        "slug": "vente-a-emporter",
+                        "taxonomy": "features",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 702,
+                        "name": "Wi-Fi",
+                        "slug": "wi-fi",
+                        "taxonomy": "features",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 703,
+                        "name": "Accès handicapé",
+                        "slug": "acces-handicape",
+                        "taxonomy": "features",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 705,
+                        "name": "Sans alcool",
+                        "slug": "sans-alcool",
+                        "taxonomy": "features",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 671,
+                        "name": "Chinoise",
+                        "slug": "cuisine-chinoise",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 678,
+                        "name": "Japonaise",
+                        "slug": "cuisine-japonaise",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 733,
+                        "name": "Acheres",
+                        "slug": "acheres",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13465
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 13567,
+                "selection_reason": [
+                    "gallery"
+                ],
+                "status": "publish",
+                "slug": "hayat-2",
+                "title": "HAYAT",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "gallery_image_ids",
+                    "_thumbnail_id",
+                    "lp_detail_page_ads",
+                    "lp_top_in_search_page_ads",
+                    "post_views_count",
+                    "listing_rate",
+                    "listing_reviewed",
+                    "lp_random_ads"
+                ],
+                "term_counts": {
+                    "listing-category": 1,
+                    "location": 1
+                },
+                "gallery_attachment_ids": [
+                    11807
+                ]
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13567,
+                    "name": "HAYAT",
+                    "slug": "hayat-2",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": true,
+                    "has_contact_email": true,
+                    "latitude": "48.7895556",
+                    "longitude": "2.4256291"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 676,
+                        "name": "Indienne",
+                        "slug": "cuisine-indienne",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 736,
+                        "name": "Alfortville",
+                        "slug": "alfortville",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": [
+                    {
+                        "legacy_attachment_id": 11807,
+                        "sort_order": 0,
+                        "status": "pending"
+                    }
+                ]
+            },
+            "anomalies": [
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13567
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 13454,
+                "selection_reason": [
+                    "hours",
+                    "unusual_meta"
+                ],
+                "status": "publish",
+                "slug": "chez-dalan",
+                "title": "Chez Dalan",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "_edit_lock",
+                    "_edit_last",
+                    "lp_listingpro_options_fields",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "listing-category": 3,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13454,
+                    "name": "Chez Dalan",
+                    "slug": "chez-dalan",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": false,
+                    "has_contact_email": false,
+                    "latitude": "50.1080799",
+                    "longitude": "1.8370869"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 674,
+                        "name": "Fast-food",
+                        "slug": "cuisine-fast-food",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 679,
+                        "name": "Kebab Frites",
+                        "slug": "kebab-frites",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 694,
+                        "name": "Turque",
+                        "slug": "cuisine-turque",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 739,
+                        "name": "Abbeville",
+                        "slug": "abbeville",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13454
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 21293,
+                "selection_reason": [
+                    "incomplete_location"
+                ],
+                "status": "publish",
+                "slug": "the-french-tacos",
+                "title": "the french tacos",
+                "meta_keys": [
+                    "lp_listingpro_options_fields",
+                    "lp_listingpro_options",
+                    "post_views_count",
+                    "_edit_lock",
+                    "_edit_last",
+                    "_yoast_wpseo_primary_listing-category",
+                    "_yoast_wpseo_primary_location",
+                    "_vc_post_settings"
+                ],
+                "term_counts": {
+                    "listing-category": 1,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 21293,
+                    "name": "the french tacos",
+                    "slug": "the-french-tacos",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": true,
+                    "has_contact_email": true,
+                    "latitude": "43.5729842",
+                    "longitude": "3.8619426"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 681,
+                        "name": "Marocaine",
+                        "slug": "cuisine-marocaine",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 1906,
+                        "name": "Montpellier",
+                        "slug": "montpellier",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 21293
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 21333,
+                "selection_reason": [
+                    "claimed"
+                ],
+                "status": "publish",
+                "slug": "couscous-chef",
+                "title": "Couscous Chef",
+                "meta_keys": [
+                    "lp_listingpro_options_fields",
+                    "lp_listingpro_options",
+                    "listing_rate",
+                    "gallery_image_ids",
+                    "post_views_count",
+                    "_yoast_wpseo_estimated-reading-time-minutes",
+                    "_edit_lock",
+                    "_edit_last",
+                    "_yoast_wpseo_primary_listing-category",
+                    "_yoast_wpseo_primary_location",
+                    "listing_reviewed",
+                    "claimed",
+                    "plan_id"
+                ],
+                "term_counts": {
+                    "listing-category": 1,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 21333,
+                    "name": "Couscous Chef",
+                    "slug": "couscous-chef",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": true,
+                    "has_contact_email": false,
+                    "latitude": "48.9134796",
+                    "longitude": "2.2979228"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 681,
+                        "name": "Marocaine",
+                        "slug": "cuisine-marocaine",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 1401,
+                        "name": "Gennevilliers",
+                        "slug": "gennevilliers",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 21333
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 22184,
+                "selection_reason": [
+                    "pending"
+                ],
+                "status": "pending",
+                "slug": "",
+                "title": "Fresh Burritos Angers",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options_fields",
+                    "lp_listingpro_options",
+                    "_thumbnail_id",
+                    "gallery_image_ids",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "listing-category": 1,
+                    "location": 1
+                },
+                "gallery_attachment_ids": [
+                    22186,
+                    22187,
+                    22188,
+                    22189,
+                    22190,
+                    22191,
+                    22192,
+                    22193,
+                    22194,
+                    22195
+                ]
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 22184,
+                    "name": "Fresh Burritos Angers",
+                    "slug": "fresh-burritos-angers",
+                    "status": "pending",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": true,
+                    "has_contact_email": false,
+                    "latitude": "47.469877",
+                    "longitude": "-0.548868"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 732,
+                        "name": "Mexicaine",
+                        "slug": "cuisine-mexicaine",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 775,
+                        "name": "Angers",
+                        "slug": "angers",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": [
+                    {
+                        "legacy_attachment_id": 22186,
+                        "sort_order": 0,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22187,
+                        "sort_order": 1,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22188,
+                        "sort_order": 2,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22189,
+                        "sort_order": 3,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22190,
+                        "sort_order": 4,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22191,
+                        "sort_order": 5,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22192,
+                        "sort_order": 6,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22193,
+                        "sort_order": 7,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22194,
+                        "sort_order": 8,
+                        "status": "pending"
+                    },
+                    {
+                        "legacy_attachment_id": 22195,
+                        "sort_order": 9,
+                        "status": "pending"
+                    }
+                ]
+            },
+            "anomalies": [
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 22184
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 13455,
+                "selection_reason": [
+                    "published_fallback_7"
+                ],
+                "status": "publish",
+                "slug": "la-strada",
+                "title": "La Strada",
+                "meta_keys": [
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "_edit_lock",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "listing-category": 3,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13455,
+                    "name": "La Strada",
+                    "slug": "la-strada",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": false,
+                    "has_contact_email": false,
+                    "latitude": "50.1095196",
+                    "longitude": "1.8391408"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 674,
+                        "name": "Fast-food",
+                        "slug": "cuisine-fast-food",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 679,
+                        "name": "Kebab Frites",
+                        "slug": "kebab-frites",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 694,
+                        "name": "Turque",
+                        "slug": "cuisine-turque",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 739,
+                        "name": "Abbeville",
+                        "slug": "abbeville",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13455
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 13456,
+                "selection_reason": [
+                    "published_fallback_8"
+                ],
+                "status": "publish",
+                "slug": "izmir-3",
+                "title": "Izmir",
+                "meta_keys": [
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "_edit_lock",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "listing-category": 3,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13456,
+                    "name": "Izmir",
+                    "slug": "izmir-3",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": false,
+                    "has_contact_email": false,
+                    "latitude": "50.1049676",
+                    "longitude": "1.8351987"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 674,
+                        "name": "Fast-food",
+                        "slug": "cuisine-fast-food",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 679,
+                        "name": "Kebab Frites",
+                        "slug": "kebab-frites",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 694,
+                        "name": "Turque",
+                        "slug": "cuisine-turque",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 739,
+                        "name": "Abbeville",
+                        "slug": "abbeville",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13456
+            },
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_id": 13457,
+                "selection_reason": [
+                    "published_fallback_9"
+                ],
+                "status": "publish",
+                "slug": "etoile-distanbul",
+                "title": "Etoile d'Istanbul",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "fave_agents",
+                    "fave_property_map_address",
+                    "fave_property_location",
+                    "_edit_lock",
+                    "post_views_count"
+                ],
+                "term_counts": {
+                    "listing-category": 3,
+                    "location": 1
+                },
+                "gallery_attachment_ids": []
+            },
+            "transformed": {
+                "restaurant": {
+                    "legacy_wp_id": 13457,
+                    "name": "Etoile d'Istanbul",
+                    "slug": "etoile-distanbul",
+                    "status": "published",
+                    "is_claimed": false,
+                    "has_address": true,
+                    "has_postal_code": false,
+                    "has_city_name": false,
+                    "has_phone": false,
+                    "has_contact_email": false,
+                    "latitude": "50.1026486",
+                    "longitude": "1.8252937"
+                },
+                "terms": [
+                    {
+                        "legacy_term_id": 674,
+                        "name": "Fast-food",
+                        "slug": "cuisine-fast-food",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 679,
+                        "name": "Kebab Frites",
+                        "slug": "kebab-frites",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 694,
+                        "name": "Turque",
+                        "slug": "cuisine-turque",
+                        "taxonomy": "listing-category",
+                        "legacy_parent_term_id": null
+                    },
+                    {
+                        "legacy_term_id": 739,
+                        "name": "Abbeville",
+                        "slug": "abbeville",
+                        "taxonomy": "location",
+                        "legacy_parent_term_id": null
+                    }
+                ],
+                "hours": [],
+                "media": []
+            },
+            "anomalies": [
+                "no_gallery_media",
+                "no_recognized_opening_hours"
+            ],
+            "destination": {
+                "connection": "mariadb",
+                "restaurant_legacy_wp_id": 13457
+            },
+            "result": "persisted"
+        }
+    ],
+    "summary": {
+        "inspected": 10,
+        "persisted": 10,
+        "failed": 0,
+        "anomalies": 18
+    }
+}

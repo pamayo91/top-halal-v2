@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-08-25
+- Added the controlled Restaurant/ListingPro pilot schema, models and read-only `legacy:migrate-restaurants` command.
+- Ran the deterministic ten-restaurant dry-run and applied it twice on preproduction; no duplicate restaurant, slug or relationship was created.
+- Recorded the sanitized restaurant migration report and the selected legacy IDs. No articles, pages, comments, reviews, users, advertising or AI data was migrated.
+- Added automated coverage for complete and incomplete listings, multi-relations, UTF-8, status, idempotence, read-only legacy access and transaction rollback.
 - Documented the Git branch strategy and SSH/Git-based preproduction deployment workflow.
 - Added French deployment summary in `docs/DEPLOIEMENT.md`.
 - Updated project status for partial SSH access and pending private GitHub repository setup.

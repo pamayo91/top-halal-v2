@@ -21,6 +21,14 @@
 - `tp_terms` + `tp_term_taxonomy.taxonomy = features` -> restaurant features
 - `tp_terms` + `tp_term_taxonomy.taxonomy = location` -> normalized geography candidates
 - `tp_posts.post_type = attachment` -> media records and file reconciliation
+
+### Restaurant pilot implementation
+- V2 uses compact `categories`, `features` and hierarchical `locations` tables rather than separate region/department/city tables. A location parent preserves legacy WordPress hierarchy where available.
+- `restaurant_category`, `restaurant_feature` and `restaurant_location` preserve many-to-many ListingPro terms.
+- `restaurant_opening_hours` stores recognized ListingPro schedules and retains only the technical legacy key alongside parsed times; no raw contact data is exported in reports.
+- `restaurant_media` records gallery attachment IDs and legacy paths as pending reconciliation, without copying uploads or exposing legacy source URLs.
+- The validated pilot selection is `13453`, `13454`, `13455`, `13456`, `13457`, `13465`, `13567`, `21293`, `21333`, `22184`. It covers published, pending, claimed, multiple-category, multiple-feature, gallery, GPS and unusual ListingPro metadata cases.
+- The selected legacy records did not contain enabled/parseable business hours. This is an explicit pilot anomaly, not an inferred schedule.
 - `tp_posts.post_type = post` -> articles
 - `tp_posts.post_type = page` -> pages
 - approved/pending `tp_comments.comment_type = comment` -> editorial comments
