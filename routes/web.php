@@ -29,5 +29,5 @@ Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId)
 })->whereIn('type', ['post', 'page']);
 
 Route::post('/_preview/{type}/{legacyId}/comments', [PreviewCommentController::class, 'store'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:10,1')
     ->whereIn('type', ['post', 'page']);
