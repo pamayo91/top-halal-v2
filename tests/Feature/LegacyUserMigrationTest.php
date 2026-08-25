@@ -48,7 +48,7 @@ class LegacyUserMigrationTest extends TestCase
     {
         $writes = [];
         DB::connection('legacy_wp')->listen(function ($query) use (&$writes): void {
-            if (preg_match('/^\s*(insert|update|delete|alter|drop)/i', $query->sql)) {
+            if ($query->connectionName === 'legacy_wp' && preg_match('/^\s*(insert|update|delete|alter|drop)/i', $query->sql)) {
                 $writes[] = $query->sql;
             }
         });

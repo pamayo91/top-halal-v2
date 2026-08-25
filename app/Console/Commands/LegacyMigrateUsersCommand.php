@@ -41,6 +41,9 @@ class LegacyMigrateUsersCommand extends Command
             if ($this->option('apply') && $row->user_email !== '') {
                 DB::transaction(function () use ($row): void {
                     $user = User::firstOrNew(['legacy_wp_user_id' => $row->ID]);
+                    if ($user->exists) {
+                        return;
+                    }
                     $user->forceFill([
                         'legacy_wp_user_id' => $row->ID,
                         'name' => trim($row->display_name) ?: 'Utilisateur',
