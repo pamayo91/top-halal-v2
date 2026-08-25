@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\QueuedResetPasswordNotification;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -56,7 +56,7 @@ class AuthenticationAndClaimsTest extends TestCase
         Notification::fake();
         $user = User::factory()->create(['must_change_password' => true]);
         $this->post('/forgot-password', ['email' => $user->email])->assertSessionHas('status');
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, QueuedResetPasswordNotification::class);
 
         $token = Password::createToken($user);
         $this->post('/reset-password', ['token' => $token, 'email' => $user->email, 'password' => 'changed-password-123', 'password_confirmation' => 'changed-password-123'])
