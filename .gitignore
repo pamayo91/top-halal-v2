@@ -22,6 +22,7 @@ legacy/private/
 /storage/logs/*
 /bootstrap/cache/*.php
 .phpunit.result.cache
+error_log
 
 # IDE / OS
 .DS_Store

@@ -1,6 +1,6 @@
 {
   "summary": {
-    "source_file": "/mnt/data/top-halal-v2-starter/legacy/redirects.htaccess",
+    "source_file": "legacy\\redirects.htaccess",
     "line_count": 499,
     "redirect_records": 460,
     "static_exact": 395,

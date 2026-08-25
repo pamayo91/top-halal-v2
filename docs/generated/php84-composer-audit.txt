@@ -1,0 +1,52 @@
+PHP 8.4 and Composer audit (read-only)
+======================================
+Date: 2026-08-25T11:35:07+02:00
+
+PHP binary: /opt/alt/php84/usr/bin/php
+PHP 8.4.24 (cli) (built: Aug  6 2026 08:41:26) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.4.24, Copyright (c) Zend Technologies
+
+Composer under explicit PHP 8.4
+--------------------------------
+Composer version 2.10.2 2026-07-01 11:24:45
+PHP version 8.4.24 (/opt/alt/php84/usr/bin/php)
+Run the "diagnose" command to get more detailed diagnostics output.
+
+PHP 8.4 modules
+---------------
+phar               OK
+ctype              OK
+curl               OK
+dom                OK
+fileinfo           OK
+filter             OK
+hash               OK
+mbstring           OK
+openssl            OK
+pcre               OK
+PDO                OK
+session            OK
+tokenizer          OK
+xml                OK
+pdo_mysql          OK
+intl               OK
+zip                OK
+
+Recommended/project modules
+---------------------------
+opcache            CHECK_MISSING
+exif               OK
+redis              OK
+imagick            OK
+gd                 OK
+pcntl              OK
+
+PHP 8.4 ini values
+------------------
+memory_limit=512M
+upload_max_filesize=512M
+post_max_size=512M
+max_execution_time=0
+
+OK: PHP 8.4 required extensions and Composer are functional.

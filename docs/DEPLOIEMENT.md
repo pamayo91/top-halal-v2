@@ -47,13 +47,22 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 - Audit consolide: `docs/generated/server-audit.txt`.
 - PHP par defaut: 8.1.34.
 - PHP 8.4 detecte: `/opt/alt/php84/usr/bin/php`.
-- Blocage: Composer ne peut pas fonctionner avec PHP 8.4 car l'extension PHAR manque.
-- Extensions PHP 8.4 manquantes a corriger avant Laravel: `dom`, `fileinfo`, `mbstring`, `zip`, `intl`, `opcache`, `redis`, `imagick`, `gd`.
+- Composer fonctionne avec PHP 8.4 explicite.
+- Extensions PHP 8.4 requises pour Laravel: OK.
+- `opcache` reste a activer avant validation performance.
 - Node/npm absents du PATH SSH.
 
-## Chemins a confirmer avant clone/deploiement
-- Chemin applicatif propose: `/home/meyo5199/top-halal-v2`.
-- DocumentRoot Apache propose apres configuration: `/home/meyo5199/top-halal-v2/public`.
+## Validation actuelle
+- Laravel 13 genere officiellement avec Composer sur la preproduction.
+- Tests PHP passes dans un repertoire temporaire isole avec `/opt/alt/php84/usr/bin/php artisan test`.
+- Commande `legacy:inventory` enregistree dans Artisan.
+- Test navigateur/Playwright preproduction en attente du deploiement et de l'exposition Apache.
+- Connexions MariaDB application et legacy en attente des vrais identifiants preproduction.
+
+## Chemins confirmes avant clone/deploiement
+- Chemin applicatif confirme: `/home/meyo5199/top-halal-v2`.
+- DocumentRoot Apache futur confirme: `/home/meyo5199/top-halal-v2/public`.
+- Le DocumentRoot n'a pas encore ete modifie.
 - Dossier actuel detecte pour le sous-domaine: `/home/meyo5199/dev.top-halal.fr.meyo5199.odns.fr`.
 
 ## Automatisation future

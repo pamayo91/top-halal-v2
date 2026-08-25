@@ -1,6 +1,6 @@
 # Legacy redirect inventory
 
-Source: `/mnt/data/top-halal-v2-starter/legacy/redirects.htaccess`
+Source: `legacy\redirects.htaccess`
 
 ## Summary
 
