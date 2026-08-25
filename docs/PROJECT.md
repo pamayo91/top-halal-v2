@@ -27,6 +27,13 @@ These numbers are a baseline only. The migration command must produce authoritat
 - Cron available.
 - No Docker.
 
+## Preproduction data sources
+- Laravel V2 uses a distinct MariaDB database: `meyo5199_top_halal_v2`.
+- Legacy WordPress data is read directly from the existing `meyo5199_th` database through a dedicated SELECT-only user.
+- Legacy WordPress table prefix: `tp_`.
+- The legacy SQL dump under `legacy/` is a safety/reference snapshot only and is not the primary source for now.
+- No WordPress content import has started.
+
 ## Bootstrap requirement
 The Laravel application must be initialized through the official Composer workflow on the appropriate preproduction/development environment after the preproduction server audit has been run and reviewed. Do not create or commit a hand-made Laravel source skeleton to work around missing PHP or Composer on the local Windows workstation.
 

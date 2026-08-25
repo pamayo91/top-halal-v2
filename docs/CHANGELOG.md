@@ -17,6 +17,8 @@
 - Re-ran the `.htaccess` inventory and confirmed the parser matches all active rule lines in the supplied file.
 - Cloned `develop` to the confirmed preproduction application path and installed Composer dependencies with explicit PHP 8.4, without changing DocumentRoot or creating `.env`.
 - Updated the legacy database plan to use the existing `meyo5199_th` database through a dedicated SELECT-only user with WordPress prefix `tp_`.
+- Configured preproduction `.env` server-side only, generated `APP_KEY`, verified V2 DB read/write, verified legacy SELECT-only enforcement, and ran initial Laravel migrations only on the V2 database.
+- Verified preproduction Laravel with `artisan about`, `migrate:status`, `route:list` and PHPUnit under explicit PHP 8.4.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.

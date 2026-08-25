@@ -3,7 +3,7 @@
 ## Source handling
 - Use the existing live Top-Halal MariaDB database `meyo5199_th` as the legacy source through a dedicated read-only database user.
 - The legacy application connection must never use the current WordPress credentials because they may have write permissions.
-- The dedicated legacy user must have only `SELECT` on `meyo5199_th`.*.
+- The dedicated legacy user `meyo5199_top_halal_legacy_readonly` must have only `SELECT` on `meyo5199_th`.*.
 - The WordPress table prefix is `tp_`.
 - `meyo5199_th.sql.gz` remains under `legacy/` only as a safety/reference snapshot for now.
 - The dump is Git-ignored and must never be committed.
@@ -20,6 +20,8 @@ Before any legacy inventory or migration planning command uses the legacy connec
 - `DELETE` is refused;
 - `ALTER` is refused;
 - `DROP` is refused.
+
+Preproduction verification on 2026-08-25 confirmed all of the above. No WordPress import command has been run.
 
 ## Core mapping
 - WordPress posts of ListingPro listing type -> restaurants.

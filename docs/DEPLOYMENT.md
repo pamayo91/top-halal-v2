@@ -70,10 +70,12 @@ Use `/opt/alt/php84/usr/bin/php` explicitly for Composer, Artisan, tests, deploy
 - PHP tests: passed in an isolated preproduction temp directory using `/opt/alt/php84/usr/bin/php artisan test`.
 - Artisan command registration: `legacy:inventory` appears in `artisan list`.
 - Preproduction clone: `develop` is cloned at `/home/meyo5199/top-halal-v2` and Composer dependencies are installed.
-- Preproduction environment file: not created yet; pending real DB/app settings.
-- Browser/Playwright preproduction validation: pending until the app is cloned/deployed and Apache exposes Laravel `public/`.
-- MariaDB application connection: configured through placeholders, pending real preproduction credentials.
-- Legacy connection: must point to the existing `meyo5199_th` database using a dedicated SELECT-only user and prefix `tp_`; pending credentials and read-only enforcement tests.
+- Preproduction environment file: created server-side only with permissions `600`; secrets are not in Git or documentation.
+- MariaDB application connection: `meyo5199_top_halal_v2` read/write verified with the dedicated app user.
+- Legacy connection: points to existing `meyo5199_th` using dedicated SELECT-only user and prefix `tp_`; SELECT works and INSERT/UPDATE/DELETE/ALTER/DROP are denied.
+- Laravel migrations: initial framework migrations ran only on the V2 database.
+- Server verification: `artisan about`, `migrate:status`, `route:list` and PHPUnit passed under explicit PHP 8.4.
+- Browser/Playwright preproduction validation: pending until Apache exposes Laravel `public/`.
 
 ## Apache Layout
 - Confirmed application path before first clone/deploy: `/home/meyo5199/top-halal-v2`.

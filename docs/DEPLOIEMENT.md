@@ -56,12 +56,14 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 - Laravel 13 genere officiellement avec Composer sur la preproduction.
 - Branche `develop` clonee dans `/home/meyo5199/top-halal-v2`.
 - Dependances Composer installees avec PHP 8.4 explicite.
-- Fichier `.env` preproduction non cree pour le moment; en attente des vrais parametres DB/application.
+- Fichier `.env` preproduction cree uniquement sur le serveur avec permissions `600`; aucun secret dans Git ou la documentation.
+- Connexion V2 `meyo5199_top_halal_v2` verifiee en lecture/ecriture.
+- Connexion legacy `meyo5199_th` verifiee en lecture seule: SELECT OK, INSERT/UPDATE/DELETE/ALTER/DROP refuses.
+- Migrations Laravel initiales lancees uniquement sur la base V2.
 - Tests PHP passes dans un repertoire temporaire isole avec `/opt/alt/php84/usr/bin/php artisan test`.
+- Verification serveur OK: `artisan about`, `migrate:status`, `route:list` et PHPUnit.
 - Commande `legacy:inventory` enregistree dans Artisan.
 - Test navigateur/Playwright preproduction en attente du deploiement et de l'exposition Apache.
-- Connexion MariaDB application en attente des vrais identifiants preproduction.
-- Connexion legacy: doit pointer vers la base existante `meyo5199_th` avec un utilisateur dedie en lecture seule et le prefixe `tp_`; tests de refus d'ecriture obligatoires avant utilisation.
 
 ## Chemins confirmes avant clone/deploiement
 - Chemin applicatif confirme: `/home/meyo5199/top-halal-v2`.
