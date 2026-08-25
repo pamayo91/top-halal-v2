@@ -13,6 +13,7 @@ class LegacyMigrateRestaurantsCommand extends Command
         {--dry-run : Inspect only; this is the default behaviour}
         {--apply : Persist to the V2 database after inspection}
         {--limit=10 : Maximum deterministic sample size (never defaults to a full import)}
+        {--ids= : Comma-separated explicit legacy restaurant IDs for a reviewed sample}
         {--out=docs/generated/restaurant-migration-sample : Output path without extension}';
 
     protected $description = 'Migrate a deterministic, limited ListingPro restaurant sample from the read-only legacy database.';
@@ -24,7 +25,9 @@ class LegacyMigrateRestaurantsCommand extends Command
         if ($limit < 1 || $limit > 10) { $this->error('--limit must be between 1 and 10 for this controlled migration.'); return self::FAILURE; }
         $apply = (bool) $this->option('apply');
         $migrator = app(LegacyRestaurantMigrator::class);
-        $selection = $migrator->sample($limit);
+        $ids = array_values(array_unique(array_filter(array_map('intval', explode(',', (string) $this->option('ids'))))));
+        if ($ids !== [] && count($ids) > $limit) { $this->error('--ids exceeds --limit.'); return self::FAILURE; }
+        $selection = $ids === [] ? $migrator->sample($limit) : collect($ids)->mapWithKeys(fn (int $id) => [$id => ['explicit_reviewed_sample']])->all();
         $report = ['generated_at' => now()->toIso8601String(), 'mode' => $apply ? 'apply' : 'dry-run', 'selection' => $selection, 'restaurants' => [], 'summary' => ['inspected' => 0, 'persisted' => 0, 'failed' => 0, 'anomalies' => 0]];
 
         foreach ($selection as $id => $reasons) {
