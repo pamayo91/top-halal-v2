@@ -9,6 +9,7 @@ use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
 use App\Http\Controllers\{AccountController, AuthController, ClaimModerationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
+use App\Http\Controllers\MediaController;
 
 Route::get('/', function () {
     return view('home');
@@ -20,6 +21,7 @@ Route::get('/health', function () {
         'service' => 'top-halal-v2',
     ]);
 })->name('health');
+Route::get('/media/{asset}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->whereNumber('width')->name('media.show');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));
