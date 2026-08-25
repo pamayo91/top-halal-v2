@@ -20,11 +20,14 @@ class MediaDeliveryTest extends TestCase
             'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('a', 64), 'status' => 'ready',
         ]);
 
-        $this->get(route('media.show', $asset))
+        $response = $this->get(route('media.show', $asset))
             ->assertOk()
             ->assertHeader('Content-Type', 'image/jpeg')
-            ->assertHeader('Cache-Control', 'public, max-age=31536000, immutable')
             ->assertHeader('X-Content-Type-Options', 'nosniff');
+
+        $this->assertStringContainsString('public', (string) $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('max-age=31536000', (string) $response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('immutable', (string) $response->headers->get('Cache-Control'));
     }
 
     public function test_it_serves_only_an_existing_requested_webp_variant(): void
