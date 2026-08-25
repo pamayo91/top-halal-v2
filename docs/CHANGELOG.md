@@ -15,6 +15,7 @@
 - Added MariaDB and read-only legacy WordPress connection placeholders, `/health`, a neutral Blade homepage, PHPUnit coverage and Playwright smoke-test scaffolding.
 - Added `legacy:inventory` for safe aggregate legacy WordPress inventory reports.
 - Re-ran the `.htaccess` inventory and confirmed the parser matches all active rule lines in the supplied file.
+- Cloned `develop` to the confirmed preproduction application path and installed Composer dependencies with explicit PHP 8.4, without changing DocumentRoot or creating `.env`.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.

@@ -54,6 +54,9 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 
 ## Validation actuelle
 - Laravel 13 genere officiellement avec Composer sur la preproduction.
+- Branche `develop` clonee dans `/home/meyo5199/top-halal-v2`.
+- Dependances Composer installees avec PHP 8.4 explicite.
+- Fichier `.env` preproduction non cree pour le moment; en attente des vrais parametres DB/application.
 - Tests PHP passes dans un repertoire temporaire isole avec `/opt/alt/php84/usr/bin/php artisan test`.
 - Commande `legacy:inventory` enregistree dans Artisan.
 - Test navigateur/Playwright preproduction en attente du deploiement et de l'exposition Apache.
