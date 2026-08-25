@@ -29,7 +29,7 @@ class LegacyCommentsTest extends TestCase
     {
         $this->legacy()->table('comments')->insert([$this->row(1, 0, 'Bonjour <strong>été</strong>'), $this->row(2, 1, 'Réponse https://top-halal.fr')]);
         $writes = [];
-        $this->legacy()->listen(function ($query) use (&$writes): void { if (preg_match('/^\s*(insert|update|delete|alter|drop)/i', $query->sql)) $writes[] = $query->sql; });
+        $this->legacy()->listen(function ($query) use (&$writes): void { if ($query->connectionName === 'legacy_wp' && preg_match('/^\s*(insert|update|delete|alter|drop)/i', $query->sql)) $writes[] = $query->sql; });
         $this->artisan('legacy:migrate-comments', ['--ids' => '1,2', '--apply' => true])->assertExitCode(0);
         $this->artisan('legacy:migrate-comments', ['--ids' => '1,2', '--apply' => true])->assertExitCode(0);
 
