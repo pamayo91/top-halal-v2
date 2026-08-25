@@ -4,7 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Article;
 use App\Models\Comment;
 use App\Models\Page;
+use App\Models\Restaurant;
+use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
+use App\Http\Controllers\PreviewRestaurantReviewController;
 
 Route::get('/', function () {
     return view('home');
@@ -31,3 +34,10 @@ Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId)
 Route::post('/_preview/{type}/{legacyId}/comments', [PreviewCommentController::class, 'store'])
     ->middleware('throttle:10,1')
     ->whereIn('type', ['post', 'page']);
+
+Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
+    $restaurant = Restaurant::where('legacy_wp_id', $legacyId)->firstOrFail();
+    $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
+    return view('restaurant-preview', ['restaurant' => $restaurant, 'reviews' => $reviews, 'aggregate' => $restaurant->approvedReviewAggregate()]);
+});
+Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');

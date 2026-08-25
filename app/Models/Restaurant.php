@@ -26,4 +26,10 @@ class Restaurant extends Model
     public function locations(): BelongsToMany { return $this->belongsToMany(Location::class, 'restaurant_location'); }
     public function openingHours(): HasMany { return $this->hasMany(RestaurantOpeningHour::class); }
     public function media(): HasMany { return $this->hasMany(RestaurantMedia::class); }
+    public function reviews(): HasMany { return $this->hasMany(RestaurantReview::class); }
+    public function approvedReviewAggregate(): array
+    {
+        $aggregate = $this->reviews()->where('status', 'approved')->selectRaw('count(*) as count, avg(rating) as average')->first();
+        return ['count' => (int) ($aggregate->count ?? 0), 'average' => $aggregate->average === null ? null : round((float) $aggregate->average, 2)];
+    }
 }
