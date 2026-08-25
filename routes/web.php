@@ -8,6 +8,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
+use App\Http\Controllers\{AccountController, AuthController, ClaimModerationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
 
 Route::get('/', function () {
     return view('home');
@@ -41,3 +42,32 @@ Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
     return view('restaurant-preview', ['restaurant' => $restaurant, 'reviews' => $reviews, 'aggregate' => $restaurant->approvedReviewAggregate()]);
 });
 Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');
+
+Route::middleware('guest')->group(function (): void {
+    Route::get('/login', [AuthController::class, 'create'])->name('login');
+    Route::post('/login', [AuthController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1')->name('register.store');
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('throttle:5,1')->name('password.email');
+    Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->middleware('throttle:5,1')->name('password.store');
+});
+
+Route::middleware('auth')->group(function (): void {
+    Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
+    Route::get('/change-password', [PasswordChangeController::class, 'edit'])->name('password.change');
+    Route::put('/change-password', [PasswordChangeController::class, 'update'])->name('password.change.store');
+
+    Route::middleware('password.change.required')->group(function (): void {
+        Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
+        Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
+        Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
+        Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
+        Route::get('/account/restaurants/{restaurant}/edit', [OwnerRestaurantController::class, 'edit'])->name('owner.restaurants.edit');
+        Route::put('/account/restaurants/{restaurant}', [OwnerRestaurantController::class, 'update'])->name('owner.restaurants.update');
+        Route::get('/admin/claims', [ClaimModerationController::class, 'index'])->name('admin.claims.index');
+        Route::patch('/admin/claims/{claim}/approve', [ClaimModerationController::class, 'approve'])->name('admin.claims.approve');
+        Route::patch('/admin/claims/{claim}/reject', [ClaimModerationController::class, 'reject'])->name('admin.claims.reject');
+    });
+});
