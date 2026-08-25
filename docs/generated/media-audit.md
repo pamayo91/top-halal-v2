@@ -1,4 +1,7 @@
-# Media audit\n\n```json\n{
+# Media audit
+
+```json
+{
     "attachments": 2239,
     "physical_files": 39742,
     "present": 1824,
@@ -15,7 +18,8 @@
     },
     "featured_images": 277,
     "restaurant_galleries": 248,
-    "inline_debt": 3,
+    "inline_debt": 535,
     "duplicates": 135,
     "anomalies": []
-}\n```\n
+}
+```

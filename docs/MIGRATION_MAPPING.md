@@ -22,6 +22,11 @@
 - `tp_terms` + `tp_term_taxonomy.taxonomy = location` -> normalized geography candidates
 - `tp_posts.post_type = attachment` -> media records and file reconciliation
 
+### Media pilot implementation
+- The legacy audit reconciled 2,239 attachments with 1,824 readable physical sources, 415 missing sources and 135 duplicate checksums. It also found 535 inline image references across legacy editorial content; they are reported as debt and are not silently rendered from WordPress.
+- The reviewed media IDs `10432`, `11463`, `11807` and `22736` support the existing content/listing pilot. Their originals are copied into private V2 storage by SHA-256 path and retain `legacy_attachment_id`; the second apply creates no duplicate asset or variant.
+- V2 generated eight non-upscaled WebP variants. Public `/media/{asset}/{width?}` returns only V2 storage with exact MIME, immutable cache and `nosniff`; an unavailable requested width returns 404.
+
 ### Restaurant pilot implementation
 - V2 uses compact `categories`, `features` and hierarchical `locations` tables rather than separate region/department/city tables. A location parent preserves legacy WordPress hierarchy where available.
 - `restaurant_category`, `restaurant_feature` and `restaurant_location` preserve many-to-many ListingPro terms.

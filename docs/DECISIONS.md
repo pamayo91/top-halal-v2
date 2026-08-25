@@ -31,3 +31,6 @@ Performance must be designed in from the first templates/components and validate
 
 ### D010 — Living specification
 Codex must update project status/specifications as it develops and tests features.
+
+### D011 — Controlled V2 media pipeline
+Media is reconciled through explicit, idempotent attachment pilots. V2 stores originals privately by checksum, generates local responsive WebP variants for supported raster formats, and never renders a legacy upload URL. Missing files and unselected inline media remain auditable debt rather than inferred or silently discarded.
