@@ -155,7 +155,7 @@ class LegacyRestaurantMigrator
     }
     private function metaCandidateRegex(string $meta, string $pattern): ?int
     {
-        return DB::connection($this->connection)->table($meta.' as meta')->join($this->prefix().'posts as post', 'post.ID', '=', 'meta.post_id')->where('post.post_type', 'listing')->whereRaw('meta.meta_value REGEXP ?', [$pattern])->orderBy('meta.post_id')->value('meta.post_id');
+        return DB::connection($this->connection)->table($meta.' as meta')->join($this->prefix().'posts as post', 'post.ID', '=', 'meta.post_id')->where('post.post_type', 'listing')->where('meta.meta_value', 'REGEXP', $pattern)->orderBy('meta.post_id')->value('meta.post_id');
     }
     private function prefix(): string { return ''; }
 
