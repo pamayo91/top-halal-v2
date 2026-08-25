@@ -34,6 +34,9 @@ Thumbs.db
 /test-results/
 /coverage/
 
+# Generated audit scratch files
+/docs/generated/server-audit-*.txt
+
 # Python
 __pycache__/
 *.py[cod]

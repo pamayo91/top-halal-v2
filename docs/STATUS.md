@@ -9,11 +9,12 @@ Last updated: 2026-08-25
 | Legacy SQL inventory | BASELINE | Must be reproduced by migration tooling |
 | htaccess redirect inventory | IN PROGRESS | Parser included; application importer not built yet |
 | Preprod SSH access | PARTIAL | SSH alias `top-halal-preprod` configured locally; still need deploy path, web vhost/URL details and database credentials/scope |
-| Server audit | BLOCKED | Must run `scripts/server-audit.sh` directly on preprod and save output to `docs/generated/server-audit.txt` before Laravel bootstrap |
+| Server audit | DONE_WITH_BLOCKERS | Audit saved to `docs/generated/server-audit.txt`; default PHP is 8.1.34, PHP 8.4 exists at `/opt/alt/php84/usr/bin/php` but lacks required extensions/PHAR for Composer |
 | Git repository | WAITING | Local Git initialized with `origin` set to `git@github.com:pamayo91/top-halal-v2.git`; local branches `main` and `develop` exist; push is blocked until this workstation has GitHub SSH access |
-| Preprod GitHub deploy key | WAITING | Dedicated deploy key generated on preprod; public key must be added manually to GitHub before server-side clone/pull |
+| Preprod GitHub deploy key | DONE | Dedicated deploy key works with `git@github-tophalal:pamayo91/top-halal-v2.git`; server-side read access tested |
 | Preprod deployment strategy | DECIDED | Deploy via SSH and Git pull from `develop`; app checkout must be outside DocumentRoot and Apache must expose only Laravel `public/` |
-| Laravel bootstrap | BLOCKED | Must be created by official Composer install in the appropriate environment after server audit; no manual Laravel skeleton |
+| Preprod paths | NEEDS_CONFIRMATION | Proposed app path: `/home/meyo5199/top-halal-v2`; proposed Apache DocumentRoot after setup: `/home/meyo5199/top-halal-v2/public`; current subdomain folder detected: `/home/meyo5199/dev.top-halal.fr.meyo5199.odns.fr` |
+| Laravel bootstrap | BLOCKED | Must be created by official Composer install after PHP 8.4 CLI has Composer-required extensions, including PHAR, DOM, mbstring, fileinfo and zip; no manual Laravel skeleton |
 | Legacy DB import connection | TODO | Read-only legacy DB connection |
 | Migration: restaurants | TODO | |
 | Migration: taxonomies/geography | TODO | |

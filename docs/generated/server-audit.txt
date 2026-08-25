@@ -1,0 +1,210 @@
+Top-Halal V2 server audit (read-only)
+=====================================
+Host: belette.o2switch.net
+Date: 2026-08-25T11:13:03+02:00
+
+PHP                                OK: 8.1.34
+PHP ext: ctype                     OK: enabled
+PHP ext: curl                      OK: enabled
+PHP ext: dom                       OK: enabled
+PHP ext: fileinfo                  OK: enabled
+PHP ext: filter                    OK: enabled
+PHP ext: hash                      OK: enabled
+PHP ext: mbstring                  OK: enabled
+PHP ext: openssl                   OK: enabled
+PHP ext: pcre                      OK: enabled
+PHP ext: PDO                       OK: enabled
+PHP ext: session                   OK: enabled
+PHP ext: tokenizer                 OK: enabled
+PHP ext: xml                       OK: enabled
+PHP ext: pdo_mysql                 OK: enabled
+PHP ext: opcache                   CHECK: not enabled (recommended/conditional)
+PHP ext: intl                      OK: enabled
+PHP ext: exif                      OK: enabled
+PHP ext: zip                       OK: enabled
+PHP ext: redis                     OK: enabled
+PHP ext: imagick                   OK: enabled
+PHP ext: gd                        OK: enabled
+PHP ext: pcntl                     OK: enabled
+memory_limit=512M
+upload_max_filesize=512M
+post_max_size=512M
+max_execution_time=0
+composer                           OK: Composer version 2.10.2 2026-07-01 11:24:45
+git                                OK: git version 2.48.2
+node                               CHECK: not found
+npm                                CHECK: not found
+curl                               OK: curl 7.61.1 (x86_64-redhat-linux-gnu) libcurl/7.61.1 OpenSSL/1.1.1k zlib/1.2.11 brotli/1.0.6 libidn2/2.2.0 libpsl/0.20.2 (+libidn2/2.2.0) libssh/0.9.6/openssl/zlib nghttp2/1.33.0
+MariaDB client                     OK: mariadb from 11.4.13-MariaDB, client 15.2 for Linux (x86_64) using  EditLine wrapper
+Apache                             CHECK: control binary not found in PATH
+Redis                              CHECK: not installed/detected (recommended for cache/queues)
+systemd                            CHECK: not detected
+Supervisor                         CHECK: not detected (systemd is a valid alternative)
+Cron                               OK: crontab command available
+
+Filesystem / current user
+User: uid=1017(meyo5199) gid=1020(meyo5199) groups=1020(meyo5199)
+PWD: /home/meyo5199
+/dev/md30       3.6T  2.0T  1.5T  57% /home/meyo5199
+
+Notes
+- This script makes no configuration changes.
+- Run as the deployment user first; use elevated privileges only for a separate admin audit if needed.
+
+
+
+Additional targeted checks (read-only)
+========================================
+Date: 2026-08-25T11:13:34+02:00
+
+Shell/PATH
+----------
+SHELL=/bin/bash
+PATH=/usr/local/cpanel/3rdparty/lib/path-bin:/usr/share/Modules/bin:/usr/local/cpanel/3rdparty/lib/path-bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+
+PHP candidate binaries
+----------------------
+php -> /usr/local/bin/php :: 8.1.34
+php84 -> not found
+php8.4 -> not found
+/opt/alt/php84/usr/bin/php -> /opt/alt/php84/usr/bin/php :: 8.4.24
+/opt/cpanel/ea-php84/root/usr/bin/php -> not found
+/usr/local/bin/ea-php84 -> not found
+/usr/bin/php84 -> not found
+
+Composer binary
+---------------
+/usr/local/bin/composer
+Composer version 2.10.2 2026-07-01 11:24:45
+
+GitHub SSH alias
+----------------
+user git
+hostname github.com
+port 22
+identitiesonly yes
+identityfile ~/.ssh/top-halal-v2-github-deploy
+Hi pamayo91/top-halal-v2! You've successfully authenticated, but GitHub does not provide shell access.
+
+
+
+Web and Apache path checks (read-only)
+======================================
+Date: 2026-08-25T11:13:51+02:00
+
+GitHub SSH alias retest
+-----------------------
+Hi pamayo91/top-halal-v2! You've successfully authenticated, but GitHub does not provide shell access.
+
+Web path candidates
+-------------------
+HOME=/home/meyo5199
+drwxr-x--- 5 meyo5199 nobody 4096 Aug 25 10:05 /home/meyo5199/public_html
+missing /home/meyo5199/dev.top-halal.fr
+drwxr-x--- 3 meyo5199 nobody 4096 Aug 25 09:58 /home/meyo5199/dev.top-halal.fr.meyo5199.odns.fr
+lrwxrwxrwx 1 meyo5199 meyo5199 11 Feb 26  2020 /home/meyo5199/www -> public_html
+missing /home/meyo5199/top-halal-v2
+missing /home/meyo5199/apps
+
+Top-level home directories
+--------------------------
+/home/meyo5199/.htpasswds/dev.foo.fr
+/home/meyo5199/.htpasswds/dev2.foo.fr
+/home/meyo5199/.htpasswds/public_html
+/home/meyo5199/.htpasswds/top-halal.fr
+/home/meyo5199/0000000dev.foo.fr
+/home/meyo5199/000000dev2.foo.fr
+/home/meyo5199/dev.foo.fr
+/home/meyo5199/dev.top-halal.fr.meyo5199.odns.fr
+/home/meyo5199/dev2.foo.fr
+/home/meyo5199/etc/dev2.foo.fr
+/home/meyo5199/etc/top-halal.fr
+/home/meyo5199/mail/dev2.foo.fr
+/home/meyo5199/mail/top-halal.fr
+/home/meyo5199/public_html
+/home/meyo5199/top-halal.fr
+
+Domain info commands
+--------------------
+---
+apiversion: 3
+func: list_domains
+module: DomainInfo
+result:
+  data:
+    addon_domains:
+      - fanafoot.com
+      - foo.fr
+      - top-halal.fr
+    main_domain: meyo5199.odns.fr
+    parked_domains: []
+    sub_domains:
+      - dev.foo.fr
+      - dev2.foo.fr
+      - prix.foo.fr
+      - wikileaks.err.foo.fr
+      - zotero.foo.fr
+      - dtc.foo.fr
+      - wikimedia.foo.fr
+      - monurl.foo.fr
+      - nuze.foo.fr
+      - drone.foo.fr
+      - dev.top-halal.fr.meyo5199.odns.fr
+  errors: ~
+  messages: ~
+  metadata: {}
+  status: 1
+  warnings: ~
+
+Apache/user config visibility
+-----------------------------
+missing /home/meyo5199/.cpanel/datastore/ApacheTLS
+missing /home/meyo5199/.cpanel/datastore/main
+
+
+
+PHP 8.4 targeted checks (read-only)
+===================================
+Date: 2026-08-25T11:14:10+02:00
+
+PHP84 binary: /opt/alt/php84/usr/bin/php
+PHP 8.4.24 (cli) (built: Aug  6 2026 08:41:26) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.4.24, Copyright (c) Zend Technologies
+
+Composer under PHP 8.4
+----------------------
+PHP's phar extension is missing. Composer requires it to run. Enable the extension or recompile php without --disable-phar then try again.
+
+PHP 8.4 required/recommended extensions
+---------------------------------------
+ctype              OK
+curl               OK
+dom                MISSING
+fileinfo           MISSING
+filter             OK
+hash               OK
+mbstring           MISSING
+openssl            OK
+pcre               OK
+PDO                OK
+session            OK
+tokenizer          OK
+xml                OK
+pdo_mysql          OK
+opcache            MISSING
+intl               MISSING
+exif               OK
+zip                MISSING
+redis              MISSING
+imagick            MISSING
+gd                 MISSING
+pcntl              OK
+
+PHP 8.4 ini values
+------------------
+memory_limit=512M
+upload_max_filesize=512M
+post_max_size=512M
+max_execution_time=0
+

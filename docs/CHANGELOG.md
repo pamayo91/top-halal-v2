@@ -6,6 +6,8 @@
 - Updated project status for partial SSH access and pending private GitHub repository setup.
 - Configured local Git `origin` for the private GitHub repository and generated a dedicated preproduction GitHub deploy key.
 - Created local `main` and `develop` branches; remote push is pending GitHub SSH authorization for this workstation.
+- Ran the real preproduction server audit and saved the consolidated result to `docs/generated/server-audit.txt`.
+- Recorded PHP 8.4/Composer extension blockers and the preproduction GitHub SSH alias status.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.

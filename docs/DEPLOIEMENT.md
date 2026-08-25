@@ -37,8 +37,23 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 
 ## Etat GitHub
 - Repository: `git@github.com:pamayo91/top-halal-v2.git`.
+- URL a utiliser depuis le serveur de preproduction: `git@github-tophalal:pamayo91/top-halal-v2.git`.
 - Cle privee de deploiement: conservee uniquement sur le serveur de preproduction dans `~/.ssh/top-halal-v2-github-deploy`.
-- Acces GitHub depuis la preproduction: en attente de l'ajout manuel de la cle publique dans GitHub.
+- Acces GitHub depuis la preproduction: authentification SSH testee avec succes.
+- Push depuis le poste Codex: bloque tant qu'une cle SSH GitHub autorisee en ecriture n'est pas disponible localement.
+
+## Audit preproduction
+- Audit consolide: `docs/generated/server-audit.txt`.
+- PHP par defaut: 8.1.34.
+- PHP 8.4 detecte: `/opt/alt/php84/usr/bin/php`.
+- Blocage: Composer ne peut pas fonctionner avec PHP 8.4 car l'extension PHAR manque.
+- Extensions PHP 8.4 manquantes a corriger avant Laravel: `dom`, `fileinfo`, `mbstring`, `zip`, `intl`, `opcache`, `redis`, `imagick`, `gd`.
+- Node/npm absents du PATH SSH.
+
+## Chemins a confirmer avant clone/deploiement
+- Chemin applicatif propose: `/home/meyo5199/top-halal-v2`.
+- DocumentRoot Apache propose apres configuration: `/home/meyo5199/top-halal-v2/public`.
+- Dossier actuel detecte pour le sous-domaine: `/home/meyo5199/dev.top-halal.fr.meyo5199.odns.fr`.
 
 ## Automatisation future
 Un script `scripts/deploy-preprod.sh` sera prepare apres l'audit serveur, quand les chemins, binaires, permissions, workers et besoins Node/Composer seront confirmes.
