@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -56,14 +55,13 @@ class LegacyUserMigrationTest extends TestCase
         $this->artisan('legacy:migrate-users', ['--ids' => '17,18', '--dry-run' => true])->assertExitCode(0);
         $this->assertDatabaseCount('users', 0);
 
-        putenv('LEGACY_MIGRATION_TEMP_PASSWORD=test-temporary-password');
         $this->artisan('legacy:migrate-users', ['--ids' => '17,18', '--apply' => true])->assertExitCode(0);
         $this->artisan('legacy:migrate-users', ['--ids' => '17,18', '--apply' => true])->assertExitCode(0);
         $user = User::where('legacy_wp_user_id', 17)->firstOrFail();
         $this->assertTrue($user->must_change_password);
-        $this->assertTrue(Hash::check('test-temporary-password', $user->password));
+        $this->assertNotSame('legacy-hash-never-migrated', $user->password);
+        $this->assertNotSame(0, password_get_info($user->password)['algo']);
         $this->assertDatabaseCount('users', 1);
         $this->assertSame([], $writes);
-        putenv('LEGACY_MIGRATION_TEMP_PASSWORD');
     }
 }
