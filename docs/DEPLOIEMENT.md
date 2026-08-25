@@ -37,10 +37,11 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 
 ## Etat GitHub
 - Repository: `git@github.com:pamayo91/top-halal-v2.git`.
+- URL utilisee depuis le poste Codex: `git@github-tophalal-codex:pamayo91/top-halal-v2.git`.
 - URL a utiliser depuis le serveur de preproduction: `git@github-tophalal:pamayo91/top-halal-v2.git`.
 - Cle privee de deploiement: conservee uniquement sur le serveur de preproduction dans `~/.ssh/top-halal-v2-github-deploy`.
 - Acces GitHub depuis la preproduction: authentification SSH testee avec succes.
-- Push depuis le poste Codex: bloque tant qu'une cle SSH GitHub autorisee en ecriture n'est pas disponible localement.
+- Push depuis le poste Codex: bloque tant que la cle publique `top-halal-v2-codex-write` n'est pas ajoutee dans GitHub avec droit d'ecriture.
 
 ## Audit preproduction
 - Audit consolide: `docs/generated/server-audit.txt`.

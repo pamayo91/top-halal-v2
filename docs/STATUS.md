@@ -10,7 +10,7 @@ Last updated: 2026-08-25
 | htaccess redirect inventory | IN PROGRESS | Parser included; application importer not built yet |
 | Preprod SSH access | PARTIAL | SSH alias `top-halal-preprod` configured locally; still need deploy path, web vhost/URL details and database credentials/scope |
 | Server audit | DONE_WITH_BLOCKERS | Audit saved to `docs/generated/server-audit.txt`; default PHP is 8.1.34, PHP 8.4 exists at `/opt/alt/php84/usr/bin/php` but lacks required extensions/PHAR for Composer |
-| Git repository | WAITING | Local Git initialized with `origin` set to `git@github.com:pamayo91/top-halal-v2.git`; local branches `main` and `develop` exist; push is blocked until this workstation has GitHub SSH access |
+| Git repository | WAITING | Local Git initialized with `origin` set to `git@github-tophalal-codex:pamayo91/top-halal-v2.git`; local branches `main` and `develop` exist; push is blocked until the Codex workstation public key is added to GitHub with write access |
 | Preprod GitHub deploy key | DONE | Dedicated deploy key works with `git@github-tophalal:pamayo91/top-halal-v2.git`; server-side read access tested |
 | Preprod deployment strategy | DECIDED | Deploy via SSH and Git pull from `develop`; app checkout must be outside DocumentRoot and Apache must expose only Laravel `public/` |
 | Preprod paths | NEEDS_CONFIRMATION | Proposed app path: `/home/meyo5199/top-halal-v2`; proposed Apache DocumentRoot after setup: `/home/meyo5199/top-halal-v2/public`; current subdomain folder detected: `/home/meyo5199/dev.top-halal.fr.meyo5199.odns.fr` |

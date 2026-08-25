@@ -11,6 +11,7 @@
 
 ## Git Strategy
 - Remote repository: private GitHub repository at `git@github.com:pamayo91/top-halal-v2.git`.
+- Codex workstation remote URL: `git@github-tophalal-codex:pamayo91/top-halal-v2.git`.
 - Preproduction server remote URL: `git@github-tophalal:pamayo91/top-halal-v2.git`.
 - `main`: stable branch for future production-ready code.
 - `develop`: preproduction integration branch.
@@ -18,7 +19,7 @@
 - Codex workflow: edit code, run targeted local tests, commit, push to GitHub, SSH to preproduction, pull `develop`, run deployment steps, then validate preproduction with browser/Playwright.
 
 ## Required Manual GitHub Actions
-- Grant this workstation GitHub SSH push access before Codex can push local commits.
+- Add the generated Codex workstation public key to GitHub with write access before Codex can push local commits.
 - Confirm whether branch protection is desired for `main` and `develop`.
 - Confirm who may merge `develop` into `main`; production promotion must stay explicit.
 
