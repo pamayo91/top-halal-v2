@@ -1,0 +1,3 @@
+<?php namespace App\Services;
+use Illuminate\Support\Facades\DB;
+class LegacyContentReader { public function read(string $type,int $id):array { $d=DB::connection('legacy_wp');$p=$d->table('posts')->where('ID',$id)->where('post_type',$type)->first();if(!$p)throw new \RuntimeException('Legacy content not found.');$m=$d->table('postmeta')->where('post_id',$id)->pluck('meta_value','meta_key')->all();$terms=$d->table('term_relationships as r')->join('term_taxonomy as x','x.term_taxonomy_id','=','r.term_taxonomy_id')->join('terms as t','t.term_id','=','x.term_id')->where('r.object_id',$id)->whereIn('x.taxonomy',['category','post_tag'])->select('t.term_id','t.name','t.slug','x.taxonomy')->get()->all();return ['post'=>$p,'meta'=>$m,'terms'=>$terms];}}

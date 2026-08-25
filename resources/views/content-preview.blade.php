@@ -1,0 +1,1 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>{{ $content->title }}</title></head><body><main><h1>{{ $content->title }}</h1>{!! $content->content_html !!}</main></body></html>
