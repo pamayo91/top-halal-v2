@@ -75,7 +75,9 @@ Use `/opt/alt/php84/usr/bin/php` explicitly for Composer, Artisan, tests, deploy
 - Legacy connection: points to existing `meyo5199_th` using dedicated SELECT-only user and prefix `tp_`; SELECT works and INSERT/UPDATE/DELETE/ALTER/DROP are denied.
 - Laravel migrations: initial framework migrations ran only on the V2 database.
 - Server verification: `artisan about`, `migrate:status`, `route:list` and PHPUnit passed under explicit PHP 8.4.
-- Browser/Playwright preproduction validation: pending until Apache exposes Laravel `public/`.
+- Browser/Playwright preproduction validation: HTTP desktop/mobile smoke passed against the exposed preproduction URL.
+- HTTPS validation: blocked by an untrusted/self-signed certificate on `https://dev.top-halal.fr.meyo5199.odns.fr/`; Chromium reports `ERR_CERT_AUTHORITY_INVALID` and curl reports an untrusted root.
+- Sensitive public path checks: `.env`, `composer.json`, `artisan`, `storage/`, `vendor/` and `.git/` are not publicly readable.
 
 ## Apache Layout
 - Confirmed application path before first clone/deploy: `/home/meyo5199/top-halal-v2`.

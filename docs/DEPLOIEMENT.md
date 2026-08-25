@@ -63,7 +63,9 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 - Tests PHP passes dans un repertoire temporaire isole avec `/opt/alt/php84/usr/bin/php artisan test`.
 - Verification serveur OK: `artisan about`, `migrate:status`, `route:list` et PHPUnit.
 - Commande `legacy:inventory` enregistree dans Artisan.
-- Test navigateur/Playwright preproduction en attente du deploiement et de l'exposition Apache.
+- Test navigateur/Playwright HTTP preproduction OK en desktop et mobile.
+- HTTPS bloque par un certificat non approuve/self-signed sur `https://dev.top-halal.fr.meyo5199.odns.fr/`.
+- Chemins sensibles non lisibles publiquement: `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/`.
 
 ## Chemins confirmes avant clone/deploiement
 - Chemin applicatif confirme: `/home/meyo5199/top-halal-v2`.

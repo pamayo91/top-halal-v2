@@ -34,6 +34,7 @@ Last updated: 2026-08-25
 | AI provider abstraction | TODO | OpenAI + alternative providers |
 | Automated news workflow | TODO | Disclosure configurable |
 | SEO validation | TODO | |
-| Playwright E2E | SCAFFOLDED | `tests/e2e/preprod-smoke.spec.ts` added; cannot run against preprod until Apache exposes Laravel `public/` |
+| Playwright E2E | PARTIAL | HTTP preprod smoke passes on desktop/mobile; HTTPS is blocked by an untrusted/self-signed certificate (`ERR_CERT_AUTHORITY_INVALID`) |
+| Public exposure checks | DONE_WITH_HTTPS_BLOCKER | `/`, `/health`, 404 and sensitive paths checked; `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/` are not publicly readable; HTTPS certificate must be fixed |
 | PageSpeed/CWV gates | TODO | Representative templates |
 | Production cutover | TODO | Full migration + delta + URL/redirect validation |

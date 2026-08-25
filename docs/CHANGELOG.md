@@ -19,6 +19,8 @@
 - Updated the legacy database plan to use the existing `meyo5199_th` database through a dedicated SELECT-only user with WordPress prefix `tp_`.
 - Configured preproduction `.env` server-side only, generated `APP_KEY`, verified V2 DB read/write, verified legacy SELECT-only enforcement, and ran initial Laravel migrations only on the V2 database.
 - Verified preproduction Laravel with `artisan about`, `migrate:status`, `route:list` and PHPUnit under explicit PHP 8.4.
+- Expanded Playwright smoke coverage for desktop/mobile, 404 and sensitive public paths.
+- Validated the exposed preproduction app over HTTP and recorded the HTTPS certificate blocker.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.
