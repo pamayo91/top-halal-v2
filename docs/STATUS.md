@@ -21,7 +21,7 @@ Last updated: 2026-08-25
 | Migration: restaurants | DONE (pilot) | Ten deterministic listings migrated and idempotence verified. Opening-hours audit found no usable legacy schedule; no full import authorized. |
 | Migration: taxonomies/geography | DONE (pilot) | Categories, features and hierarchical locations migrated only for the ten restaurant records. |
 | Migration: articles/pages | DONE (pilot) | Five posts and five pages migrated idempotently; PHP and Playwright desktop/mobile validations are green. |
-| Migration: comments | IN PROGRESS | Controlled audit/pilot code is ready locally; legacy and V2 server execution is blocked by the preprod SSH session stalling after host-key negotiation. No comments were migrated. |
+| Migration: comments | DONE (pilot) | Aggregate audit completed; ten deterministic approved/pending editorial comments migrated idempotently to migrated articles/pages only. Spam, pingbacks, reviews and all non-pilot comments remain untouched. |
 | Migration: reviews | TODO | ListingPro reviews separate from comments |
 | Redirect manager | TODO | Exact + regex/query rules + htaccess import |
 | Public design system | TODO | Simple, modern, mobile-first, CWV-first |

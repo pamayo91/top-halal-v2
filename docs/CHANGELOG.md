@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-08-25
+- Added the controlled WordPress editorial-comments pilot: aggregate read-only audit, V2 `comments` table/model, idempotent `legacy:migrate-comments`, temporary moderation command and protected preview form.
+- Audited 20,196 legacy comments and migrated only ten deterministic comments (nine approved, one pending) to the existing article/page pilot. Spam, pingbacks, review comments and all non-pilot records remain untouched.
+- Added comments migration reports and inline legacy-media debt reports. The three removed inline legacy images remain traceable; no physical media was copied.
+- Verified the comments pilot with 15 PHP tests and 28 desktop/mobile Playwright tests. The browser test data was deleted after validation.
 - Added the V2 editorial pilot schema, reader/transformer/sanitizer pipeline, technical preview route and controlled `legacy:migrate-content` command.
 - Migrated only five articles and five pages; legacy scripts/non-allowlisted iframes are removed and Visual Composer is converted to clean HTML.
 - Restored Playwright by using Codex's bundled Node runtime and validated all ten editorial previews on desktop and mobile.

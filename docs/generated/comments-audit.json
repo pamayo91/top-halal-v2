@@ -1,0 +1,110 @@
+{
+    "total": 20196,
+    "status_and_type": [
+        {
+            "comment_approved": "0",
+            "comment_type": "comment",
+            "count": 15
+        },
+        {
+            "comment_approved": "1",
+            "comment_type": "comment",
+            "count": 713
+        },
+        {
+            "comment_approved": "1",
+            "comment_type": "review",
+            "count": 1
+        },
+        {
+            "comment_approved": "spam",
+            "comment_type": "comment",
+            "count": 19465
+        },
+        {
+            "comment_approved": "spam",
+            "comment_type": "pingback",
+            "count": 2
+        }
+    ],
+    "post_types": [
+        {
+            "post_type": "page",
+            "count": 17605
+        },
+        {
+            "post_type": "post",
+            "count": 2589
+        },
+        {
+            "post_type": "attachment",
+            "count": 1
+        },
+        {
+            "post_type": "missing",
+            "count": 1
+        }
+    ],
+    "parented": 561,
+    "max_thread_depth": 4,
+    "missing_posts": 1,
+    "legacy_users": 15,
+    "guest_comments": 20181,
+    "commentmeta": [
+        {
+            "meta_key": "antispam_bee_iphash",
+            "count": 15588
+        },
+        {
+            "meta_key": "akismet_history",
+            "count": 213
+        },
+        {
+            "meta_key": "akismet_result",
+            "count": 121
+        },
+        {
+            "meta_key": "jabber_published",
+            "count": 52
+        },
+        {
+            "meta_key": "_elasticsearch_indexed_on",
+            "count": 52
+        },
+        {
+            "meta_key": "email_notification_notqueued",
+            "count": 20
+        },
+        {
+            "meta_key": "akismet_as_submitted",
+            "count": 11
+        },
+        {
+            "meta_key": "email_notification_jobid",
+            "count": 8
+        },
+        {
+            "meta_key": "email_notification_queued",
+            "count": 8
+        },
+        {
+            "meta_key": "comment_like_count",
+            "count": 1
+        },
+        {
+            "meta_key": "akismet_user_result",
+            "count": 1
+        },
+        {
+            "meta_key": "akismet_user",
+            "count": 1
+        }
+    ],
+    "signals": {
+        "url_like_content": 14423,
+        "html_content": 12221,
+        "author_urls": 3925,
+        "email_present": 18867,
+        "phone_like_content": 1354
+    }
+}

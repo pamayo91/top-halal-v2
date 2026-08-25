@@ -40,6 +40,7 @@
 - approved/pending `tp_comments.comment_type = comment` -> editorial comments
 - Editorial comments retain `legacy_wp_comment_id`, `legacy_wp_post_id`, optional `legacy_user_id`, parent/reply relation and original dates. They attach only to already migrated pilot articles/pages; unsupported or absent targets are reported, never guessed.
 - Legacy comment HTML is converted to plain text. Existing URL-like text remains non-clickable; all new V2 comments reject URL-like input server-side.
+- Comments pilot: `2`, `3`, `6`, `7`, `8`, `417`, `556`, `600`, `601`, `2425`. It covers page/article targets, two complete reply threads, a legacy user reference, guests, UTF-8, one historical URL stored as text, and one pending comment. There was no human HTML sample among the pilot’s eligible records; global HTML is reported by the audit and is not imported as executable markup.
 - `tp_posts.post_type = lp-reviews` -> restaurant reviews
 - ListingPro claim posts `lp-claims` -> future claim records
 - Yoast postmeta/indexable tables -> SEO metadata candidates
@@ -62,6 +63,7 @@
 ## Anomalies And Special Data
 - 63 posts contain Visual Composer shortcodes and need conversion or anomaly reporting.
 - 14,423 comments contain URL-like content; legacy comments may be preserved as safe text, but new comments must reject URLs.
+- The comments audit counted 20,196 records: 713 approved human comments, 15 pending human comments, 19,465 spam comments, two spam pingbacks and one separate review. It also identified one missing legacy post and a maximum historical reply depth of four.
 - 19,466 spam comments must not migrate.
 - ListingPro stores important structured data in serialized/meta option fields, especially `lp_listingpro_options`.
 - Yoast data is present in postmeta and dedicated Yoast tables.

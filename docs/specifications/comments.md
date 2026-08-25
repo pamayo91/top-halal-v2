@@ -9,6 +9,7 @@
 - The read-only source is queried exclusively through `legacy_wp`. The migrator supports an explicit `--apply`; its default and `--dry-run` never write V2.
 - Legacy user HTML is converted to text and escaped on rendering. Existing URL-like text is retained as non-clickable text for historical fidelity; only new submissions reject URLs.
 - The temporary moderation backend is `comments:moderate {id} --status=approved|rejected|spam` or `--delete`, pending the dedicated admin module.
+- The validated pilot IDs are `2,3,6,7,8,417,556,600,601,2425`; it is deliberately not a bulk migration.
 
 ## New comments
 Fields: author name, email, content; optional authenticated user relationship.
@@ -26,3 +27,4 @@ Fields: author name, email, content; optional authenticated user relationship.
 - HTML/XSS payload -> never executable.
 - Rate limit/honeypot behavior.
 - Thread hierarchy preserved after migration.
+- Read-only source, dry-run, idempotence, pending visibility and temporary moderation command are covered by feature tests; Playwright validates valid and forbidden submissions on preproduction at desktop and mobile sizes.

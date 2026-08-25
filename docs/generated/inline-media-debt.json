@@ -1,0 +1,36 @@
+{
+    "scope": "currently migrated editorial pilot only",
+    "physical_media_copied": false,
+    "items": [
+        {
+            "content_type": "post",
+            "legacy_wp_id": 27,
+            "position": 1,
+            "source_url": "https:\/\/top-halal.fr\/wp-content\/uploads\/2013\/01\/rouleaux-300x225.jpg",
+            "legacy_path": "\/wp-content\/uploads\/2013\/01\/rouleaux-300x225.jpg",
+            "legacy_attachment_id": null,
+            "context_excerpt": ">. Au menu : Rouleaux de printemps,",
+            "action": "not_migrated_physical_media_pending_reconciliation"
+        },
+        {
+            "content_type": "post",
+            "legacy_wp_id": 104,
+            "position": 1,
+            "source_url": "https:\/\/top-halal.fr\/wp-content\/uploads\/2013\/01\/img_0159-1024x1024.jpg",
+            "legacy_path": "\/wp-content\/uploads\/2013\/01\/img_0159-1024x1024.jpg",
+            "legacy_attachment_id": null,
+            "context_excerpt": "la reduc vous passe sous le nez, nooormal. Comme dirait le grand philosophe B2Oba c'est pas halal tout ça !",
+            "action": "not_migrated_physical_media_pending_reconciliation"
+        },
+        {
+            "content_type": "page",
+            "legacy_wp_id": 11554,
+            "position": 1,
+            "source_url": "https:\/\/top-halal.fr\/wp-content\/uploads\/2023\/04\/mosquee-paris-aid-el-fitr.jpg",
+            "legacy_path": "\/wp-content\/uploads\/2023\/04\/mosquee-paris-aid-el-fitr.jpg",
+            "legacy_attachment_id": 22736,
+            "context_excerpt": "span>Le Jeudi 21 avril 2023",
+            "action": "not_migrated_physical_media_pending_reconciliation"
+        }
+    ]
+}
