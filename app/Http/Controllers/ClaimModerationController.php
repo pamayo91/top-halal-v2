@@ -6,6 +6,7 @@ use App\Models\RestaurantClaim;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Notifications\ClaimStatusNotification;
 
 class ClaimModerationController extends Controller
 {
@@ -28,6 +29,7 @@ class ClaimModerationController extends Controller
         if ($claim->user->role === 'user') {
             $claim->user->update(['role' => 'restaurant_owner']);
         }
+        $claim->user->notify(new ClaimStatusNotification($claim, 'approved'));
 
         return redirect()->route('admin.claims.index')->with('status', 'Demande approuvée.');
     }
@@ -38,6 +40,7 @@ class ClaimModerationController extends Controller
         abort_unless($claim->status === 'pending', 422);
         $data = $request->validate(['admin_note' => ['nullable', 'string', 'max:1000']]);
         $claim->update(['status' => 'rejected', 'admin_note' => $data['admin_note'] ?? null, 'reviewed_at' => now(), 'reviewed_by' => $request->user()->id]);
+        $claim->user->notify(new ClaimStatusNotification($claim, 'rejected'));
 
         return redirect()->route('admin.claims.index')->with('status', 'Demande refusée.');
     }

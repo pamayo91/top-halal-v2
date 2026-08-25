@@ -8,7 +8,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, ClaimModerationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
+use App\Http\Controllers\{AccountController, AuthController, ClaimModerationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
 
 Route::get('/', function () {
     return view('home');
@@ -58,6 +58,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
     Route::get('/change-password', [PasswordChangeController::class, 'edit'])->name('password.change');
     Route::put('/change-password', [PasswordChangeController::class, 'update'])->name('password.change.store');
+    Route::get('/verify-email', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])->middleware('throttle:6,1')->name('verification.send');
 
     Route::middleware('password.change.required')->group(function (): void {
         Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');

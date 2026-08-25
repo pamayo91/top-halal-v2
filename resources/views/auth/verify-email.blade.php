@@ -1,0 +1,1 @@
+<x-layouts.app title="Vérifier votre adresse e-mail"><h1>Vérifiez votre adresse e-mail</h1><p>Un lien temporaire a été envoyé à votre adresse e-mail.</p><form method="post" action="{{ route('verification.send') }}">@csrf<button type="submit">Renvoyer le lien</button></form></x-layouts.app>

@@ -7,6 +7,7 @@ use App\Models\RestaurantClaim;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Notifications\ClaimStatusNotification;
 
 class RestaurantClaimController extends Controller
 {
@@ -26,6 +27,7 @@ class RestaurantClaimController extends Controller
         if (! $claim->wasRecentlyCreated) {
             return back()->withErrors(['claim' => 'Une demande existe déjà pour ce restaurant.']);
         }
+        $request->user()->notify(new ClaimStatusNotification($claim, 'submitted'));
 
         return redirect()->route('claims.show', $claim)->with('status', 'Demande envoyée pour modération.');
     }

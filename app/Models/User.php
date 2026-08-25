@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\VerifyEmailNotification;
+use App\Notifications\QueuedResetPasswordNotification;
 
 #[Fillable(['name', 'email', 'password', 'role', 'status', 'must_change_password'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -33,4 +35,6 @@ class User extends Authenticatable
 
     public function claims() { return $this->hasMany(RestaurantClaim::class); }
     public function ownedRestaurants() { return $this->belongsToMany(Restaurant::class, 'restaurant_claims', 'user_id', 'restaurant_id')->wherePivot('status', 'approved'); }
+    public function sendEmailVerificationNotification(): void { $this->notify(new VerifyEmailNotification()); }
+    public function sendPasswordResetNotification($token): void { $this->notify(new QueuedResetPasswordNotification($token)); }
 }

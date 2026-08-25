@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\PasswordChangedNotification;
 use Illuminate\View\View;
 
 class PasswordChangeController extends Controller
@@ -25,6 +26,7 @@ class PasswordChangeController extends Controller
             'password' => Hash::make($data['password']),
             'must_change_password' => false,
         ])->save();
+        $request->user()->notify(new PasswordChangedNotification());
         $request->session()->regenerate();
 
         return redirect()->route('account.dashboard')->with('status', 'Mot de passe mis à jour.');
