@@ -28,6 +28,12 @@ class AuthenticationAndClaimsTest extends TestCase
         $this->assertGuest();
         $this->post('/login', ['email' => $user->email, 'password' => 'wrong-password'])->assertSessionHasErrors('email');
         $this->post('/login', ['email' => $user->email, 'password' => 'password-long-123'])->assertRedirect('/account');
+
+        $this->post('/logout');
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post('/login', ['email' => 'limited@example.test', 'password' => 'wrong-password'])->assertSessionHasErrors('email');
+        }
+        $this->post('/login', ['email' => 'limited@example.test', 'password' => 'wrong-password'])->assertStatus(429);
     }
 
     public function test_legacy_user_is_forced_to_change_password_and_cannot_bypass_it(): void
