@@ -26,3 +26,16 @@ for (const path of previews) {
     expect(networkErrors).toEqual([]);
   });
 }
+
+test('technical preview comment form is protected and keeps submissions pending', async ({ page }) => {
+  const response = await page.goto('/_preview/post/27');
+  expect(response?.status()).toBe(200);
+  await page.locator('input[name="name"]').fill('Codex test');
+  await page.locator('input[name="email"]').fill('codex-comment-test@example.invalid');
+  await page.locator('textarea[name="content"]').fill('Commentaire de validation sans lien.');
+  await page.getByRole('button', { name: 'Envoyer' }).click();
+  await expect(page.getByRole('status')).toContainText('en attente de modération');
+  await page.locator('textarea[name="content"]').fill('https://example.invalid');
+  await page.getByRole('button', { name: 'Envoyer' }).click();
+  await expect(page.getByRole('alert')).toContainText('liens et URLs');
+});

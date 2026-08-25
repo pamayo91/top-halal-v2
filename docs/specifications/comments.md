@@ -5,6 +5,10 @@
 - Preserve dates and parent/reply hierarchy.
 - Do not migrate spam comments.
 - Keep a `legacy_wp_comment_id` for reconciliation.
+- Accept only WordPress normal `comment`/empty types with status `1` or `0`; explicitly exclude spam, trash, pingbacks, trackbacks and ListingPro `review` comments.
+- The read-only source is queried exclusively through `legacy_wp`. The migrator supports an explicit `--apply`; its default and `--dry-run` never write V2.
+- Legacy user HTML is converted to text and escaped on rendering. Existing URL-like text is retained as non-clickable text for historical fidelity; only new submissions reject URLs.
+- The temporary moderation backend is `comments:moderate {id} --status=approved|rejected|spam` or `--delete`, pending the dedicated admin module.
 
 ## New comments
 Fields: author name, email, content; optional authenticated user relationship.
@@ -14,7 +18,7 @@ Fields: author name, email, content; optional authenticated user relationship.
 - Email is private.
 - Add honeypot + rate limiting + CSRF + spam controls.
 - Support threaded replies via `parent_id`.
-- Admin can approve, reject, mark spam, delete, edit when justified, and reply.
+- Admin can approve, reject, mark spam and delete through the temporary technical command; a full authenticated interface belongs to the future accounts/admin scope.
 
 ## Tests
 - Valid comment -> pending -> approve -> visible.

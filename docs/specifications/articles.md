@@ -14,3 +14,6 @@ No page-builder dependency. Use a constrained set of lightweight content blocks 
 
 ## AI visibility
 AI source/provenance stays internal even when public disclosure is disabled.
+## Inline legacy media debt
+
+During the controlled editorial pilot, direct `top-halal.fr/wp-content` inline images are removed from stored V2 HTML rather than being rendered from WordPress. `legacy:audit-inline-media` records the legacy source URL/path, content type and ID, ordinal position, nearby context and resolved attachment ID when available. This is a media-reconciliation backlog only: no physical file is copied in this phase.

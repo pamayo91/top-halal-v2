@@ -38,6 +38,8 @@
 - Yoast metadata has precedence when present; AIOSEO is reported for later reconciliation. Legacy JSON-LD is not imported.
 - Visual Composer rows/columns are removed, column text retained, messages become semantic asides, sidebars are removed and raw HTML is decoded then sanitized. Scripts and non-allowlisted iframes are removed.
 - approved/pending `tp_comments.comment_type = comment` -> editorial comments
+- Editorial comments retain `legacy_wp_comment_id`, `legacy_wp_post_id`, optional `legacy_user_id`, parent/reply relation and original dates. They attach only to already migrated pilot articles/pages; unsupported or absent targets are reported, never guessed.
+- Legacy comment HTML is converted to plain text. Existing URL-like text remains non-clickable; all new V2 comments reject URL-like input server-side.
 - `tp_posts.post_type = lp-reviews` -> restaurant reviews
 - ListingPro claim posts `lp-claims` -> future claim records
 - Yoast postmeta/indexable tables -> SEO metadata candidates
@@ -64,6 +66,7 @@
 - ListingPro stores important structured data in serialized/meta option fields, especially `lp_listingpro_options`.
 - Yoast data is present in postmeta and dedicated Yoast tables.
 - A small amount of AIOSEO postmeta exists and should be reconciled after Yoast precedence is defined.
+- Inline legacy `wp-content` images removed from the editorial pilot are tracked in `docs/generated/inline-media-debt.*` for a future media reconciliation; physical media remains out of scope.
 - No orphan postmeta or orphan term relationship rows were detected in the inventory.
 
 ## Limited Test Migration Plan

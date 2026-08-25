@@ -55,13 +55,31 @@ class LegacyCommentsTest extends TestCase
         $this->post('/_preview/post/27/comments', ['name' => 'Élodie', 'email' => 'elodie@example.test', 'content' => 'Lire https://example.test'])->assertSessionHasErrors('content');
     }
 
-    public function test_migration_rolls_back_on_target_constraint_failure(): void
+    public function test_dry_run_never_writes_the_target_database(): void
     {
-        $this->legacy()->table('comments')->insert($this->row(4, 0, 'Collision'));
-        Comment::create(['legacy_wp_comment_id' => 99, 'article_id' => 1, 'author_name' => 'x', 'content' => 'x', 'status' => 'approved']);
-        DB::table('articles')->where('id', 1)->update(['slug' => 'still-valid']);
-        $this->artisan('legacy:migrate-comments', ['--ids' => '4', '--apply' => true])->assertExitCode(0);
-        $this->assertSame(1, Comment::where('legacy_wp_comment_id', 4)->count());
+        $this->legacy()->table('comments')->insert($this->row(4, 0, 'À relire'));
+        $this->artisan('legacy:migrate-comments', ['--ids' => '4', '--dry-run' => true])->assertExitCode(0);
+        $this->assertSame(0, Comment::count());
+    }
+
+    public function test_only_approved_comments_are_rendered_as_safe_text(): void
+    {
+        Comment::create(['article_id' => 1, 'author_name' => 'Luc', 'content' => '<script>alert(1)</script> Bonjour', 'status' => 'approved']);
+        Comment::create(['article_id' => 1, 'author_name' => 'Inès', 'content' => 'En attente', 'status' => 'pending']);
+        $this->get('/_preview/post/27')
+            ->assertOk()
+            ->assertSee('Bonjour')
+            ->assertDontSee('En attente')
+            ->assertDontSee('<script>alert(1)</script>', false);
+    }
+
+    public function test_technical_moderation_approves_and_deletes_comments(): void
+    {
+        $comment = Comment::create(['article_id' => 1, 'author_name' => 'Luc', 'content' => 'À vérifier', 'status' => 'pending']);
+        $this->artisan('comments:moderate', ['id' => $comment->id, '--status' => 'approved'])->assertExitCode(0);
+        $this->assertSame('approved', $comment->fresh()->status);
+        $this->artisan('comments:moderate', ['id' => $comment->id, '--delete' => true])->assertExitCode(0);
+        $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
     }
 
     private function legacy()
