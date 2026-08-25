@@ -82,7 +82,7 @@ class LegacyMigrateAllCommand extends Command
     private function migrateClaims(string $phase): void
     {
         $counts=['source'=>0,'examined'=>0,'migrated'=>0,'existing'=>0,'ignored'=>0,'anomalies'=>0,'errors'=>0];
-        DB::connection('legacy_wp')->table('posts')->where('post_type','lp-claims')->orderBy('ID')->chunkById($this->batch,function($rows)use(&$counts,$phase){foreach($rows as $row){$counts['source']++;$counts['examined']++;$counts['ignored']++;$counts['anomalies']++;$this->anomaly($phase,$row->ID,'no_reliable_claimant_user','warning',['legacy_restaurant_id'=>null,'legacy_status'=>$row->post_status,'legacy_date'=>$row->post_date_gmt]);}});
+        DB::connection('legacy_wp')->table('posts')->where('post_type','lp-claims')->orderBy('ID')->chunkById($this->batch,function($rows)use(&$counts,$phase){foreach($rows as $row){$counts['source']++;$counts['examined']++;$counts['ignored']++;$counts['anomalies']++;$this->anomaly($phase,$row->ID,'no_reliable_claimant_user','warning',['legacy_restaurant_id'=>null,'legacy_status'=>$row->post_status,'legacy_date'=>$row->post_date_gmt]);}} ,'ID','ID');
         $this->finish($phase,$counts,PHP_INT_MAX);
     }
 
