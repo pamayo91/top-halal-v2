@@ -93,7 +93,7 @@ class LegacyRestaurantMigratorTest extends TestCase
     {
         $legacy = DB::connection('legacy_test');
         $legacy->table('posts')->insert(['ID' => $id, 'post_author' => 7, 'post_date_gmt' => '2025-01-01 12:00:00', 'post_modified_gmt' => '2025-02-01 12:00:00', 'post_content' => 'Cuisine halal [vc_row]propre[/vc_row]', 'post_title' => $title, 'post_status' => $status, 'post_name' => $slug, 'post_type' => 'listing', 'guid' => '', 'post_excerpt' => '']);
-        $options = $complete ? serialize(['address' => '12 rue de l’Opéra', 'phone' => '0102030405', 'email' => 'contact@example.test', 'latitude' => '48.8566', 'longitude' => '2.3522', 'monday' => '09:00 - 18:00']) : serialize(['address' => 'Incomplète']);
+        $options = $complete ? serialize(['address' => '12 rue de l’Opéra', 'phone' => '0102030405', 'email' => 'contact@example.test', 'latitude' => '48.8566', 'longitude' => '2.3522', 'business_hours' => serialize(['monday' => '09:00 - 18:00'])]) : serialize(['address' => 'Incomplète']);
         $meta = [['post_id' => $id, 'meta_key' => 'lp_listingpro_options', 'meta_value' => $options]];
         if ($complete) { $meta[] = ['post_id' => $id, 'meta_key' => 'gallery_image_ids', 'meta_value' => '900']; $legacy->table('posts')->insert(['ID' => 900, 'post_author' => 0, 'post_date_gmt' => '2025-01-01 12:00:00', 'post_modified_gmt' => '2025-01-01 12:00:00', 'post_content' => '', 'post_title' => '', 'post_status' => 'inherit', 'post_name' => '', 'post_type' => 'attachment', 'guid' => 'https://legacy.test/uploads/image.jpg', 'post_excerpt' => 'Photo été']); }
         if ($claimed) $meta[] = ['post_id' => $id, 'meta_key' => 'claimed', 'meta_value' => '1'];

@@ -178,6 +178,7 @@ class LegacyRestaurantMigrator
     /** @return array<string, string> */
     private function flattenValue(mixed $value, string $path): array
     {
+        if (is_string($value)) $value = $this->decode($value);
         if (! is_array($value)) return [$path => is_scalar($value) ? trim((string) $value) : ''];
         $result = [];
         foreach ($value as $key => $child) $result += $this->flattenValue($child, $path.'.'.$key);
