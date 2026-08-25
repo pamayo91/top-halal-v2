@@ -63,7 +63,7 @@ class LegacyMigrateCommentsCommand extends Command
                         $report['anomalies'][] = ['legacy_wp_comment_id' => (int) $row->comment_ID, 'code' => 'parent_not_in_selected_scope'];
                         continue;
                     }
-                    Comment::whereKey($mapped[(int) $row->comment_ID])->update(['parent_id' => $mapped[(int) $row->comment_parent]);
+                    Comment::whereKey($mapped[(int) $row->comment_ID])->update(['parent_id' => $mapped[(int) $row->comment_parent]]);
                 }
             });
         }

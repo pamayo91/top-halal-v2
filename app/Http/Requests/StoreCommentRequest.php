@@ -12,7 +12,7 @@ class StoreCommentRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email:rfc,dns', 'max:255'],
+            'email' => ['required', 'email:rfc', 'max:255'],
             'content' => ['required', 'string', 'min:2', 'max:2000', function (string $attribute, mixed $value, \Closure $fail): void {
                 $text = html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 if (preg_match('/https?:\/\/|www\.|<\s*\/?a\b|(?:[a-z0-9-]+\.)+(?:fr|com|net|org|io|co|eu)\b/i', $text)) $fail('Les liens et URLs ne sont pas autorisés dans les commentaires.');
