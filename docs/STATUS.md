@@ -20,7 +20,6 @@ Last updated: 2026-08-25
 | Legacy DB connection | DONE | Existing `meyo5199_th` database uses dedicated SELECT-only user and WordPress prefix `tp_`; SELECT works and INSERT/UPDATE/DELETE/ALTER/DROP are denied |
 | Migration: restaurants | DONE (pilot) | Ten deterministic listings migrated and idempotence verified. Opening-hours audit found no usable legacy schedule; no full import authorized. |
 | Migration: taxonomies/geography | DONE (pilot) | Categories, features and hierarchical locations migrated only for the ten restaurant records. |
-| Migration: articles/pages | TODO | |
 | Migration: articles/pages | DONE (pilot) | Five posts and five pages migrated idempotently; Visual Composer, scripts and unsafe iframe handling validated. Playwright rerun awaits local Node PATH repair. |
 | Migration: comments | TODO | No spam; no links in new comments |
 | Migration: reviews | TODO | ListingPro reviews separate from comments |
