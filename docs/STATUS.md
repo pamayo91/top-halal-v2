@@ -27,7 +27,7 @@ Last updated: 2026-08-25
 | Public design system | TODO | Simple, modern, mobile-first, CWV-first |
 | Restaurant frontend | TODO | |
 | Search/geolocation | TODO | MariaDB spatial capabilities to be validated in implementation |
-| Accounts/claims | TODO | |
+| Accounts/claims | DONE (pilot) | Auth Laravel, changement obligatoire des comptes legacy, claims et modération technique validés ; aucune migration massive utilisateur autorisée. |
 | Admin/moderation | TODO | |
 | Advertising | TODO | Native/sponsored placements |
 | Email | TODO | Provider/config/queue/logging/templates |

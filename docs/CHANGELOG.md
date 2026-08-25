@@ -1,6 +1,11 @@
 # Changelog
 
 ## 2026-08-25
+- Added and validated the controlled Users/Auth/Claims pilot: registration, login/logout, password reset request/reset, CSRF/session protection and email/IP rate limiting.
+- Added mandatory password replacement for migrated legacy users; old WordPress hashes are never imported and the server-only temporary secret is never documented or logged.
+- Added pending/approve/reject restaurant claims, backend restaurant ownership Policy and minimal technical moderation views. E2E accounts, claims and restaurants were deleted after validation.
+- Migrated only ten deterministic legacy user identities and confirmed a second run creates no duplicates or password rewrites.
+- Validated the complete flow on HTTPS preproduction with 23 PHP tests / 135 assertions and Playwright desktop/mobile.
 - Added and validated the controlled ListingPro restaurant-reviews pilot: audit, V2 table/model, migration command, moderation command, approved-only aggregate and technical restaurant preview.
 - Audited 84 legacy reviews; migrated only eight valid deterministic reviews. Three records without a valid listing relation and four without ratings remain reported and skipped.
 - Added the controlled WordPress editorial-comments pilot: aggregate read-only audit, V2 `comments` table/model, idempotent `legacy:migrate-comments`, temporary moderation command and protected preview form.

@@ -47,6 +47,12 @@
 - Yoast postmeta/indexable tables -> SEO metadata candidates
 - AIOSEO postmeta rows -> secondary SEO metadata candidates
 
+### Users and claims pilot implementation
+- Audit: 545 legacy users (1 email missing), 52 `lp-claims`, tous au statut legacy `pending`; les champs `claimer` observés sont nuls. Aucune association historique fiable n'est inférée.
+- Pilot users: legacy IDs `1, 3, 4, 5, 6, 7, 8, 9, 10, 11`, sélection déterministe (administrateur historique puis premiers comptes avec e-mail). Les dix comptes V2 conservent `legacy_wp_user_id`.
+- Aucun hash WordPress n'est migré. Chaque nouveau compte pilote reçoit uniquement un hash Laravel du secret temporaire configuré sur le serveur et `must_change_password = true`; la relance ne modifie jamais un compte déjà migré.
+- Les claims V2 sont créés par un utilisateur authentifié puis modérés. Seul un claim `approved` donne le rôle `restaurant_owner` et l'autorisation backend de gérer le restaurant concerné.
+
 ## Initial Business Schema Proposal
 - `restaurants`: identity, slug, status, legacy IDs, owner/user link, address fields, geo coordinates, contact fields, halal/certification fields, moderation and publication timestamps.
 - `restaurant_details`: parsed ListingPro options, hours, pricing, private external URLs, social/contact metadata not exposed directly in public HTML.

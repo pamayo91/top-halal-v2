@@ -3,14 +3,22 @@ import { expect, test } from '@playwright/test';
 const projectKey = (name: string) => name.includes('mobile') ? 'mobile' : 'desktop';
 const password = 'E2e-test-password-2026';
 const restaurantId = process.env.E2E_RESTAURANT_ID;
+const rejectRestaurantId = process.env.E2E_REJECT_RESTAURANT_ID;
+const runId = process.env.E2E_RUN_ID;
+
+test.setTimeout(90_000);
 
 test('authentication, mandatory password change, claims and permissions', async ({ page }, testInfo) => {
   expect(restaurantId).toBeTruthy();
+  expect(rejectRestaurantId).toBeTruthy();
+  expect(runId).toBeTruthy();
   const key = projectKey(testInfo.project.name);
-  const prefix = `e2e-${key}`;
+  const prefix = `e2e-${runId}-${key}`;
   const consoleErrors: string[] = [];
   const networkErrors: string[] = [];
-  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  page.on('console', message => {
+    if (message.type() === 'error' && !message.text().includes('status of 403')) consoleErrors.push(message.text());
+  });
   page.on('requestfailed', request => networkErrors.push(`${request.method()} ${request.url()}`));
 
   await page.goto('/register');
@@ -61,11 +69,11 @@ test('authentication, mandatory password change, claims and permissions', async 
   await page.locator('input[name="password"]').fill(password);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.goto(`/restaurants/${restaurantId}/claim`);
-  await page.locator('textarea[name="message"]').fill('Demande E2E de validation.');
+  await page.locator('textarea[name="message"]').fill(`Demande E2E ${key} de validation.`);
   await page.getByRole('button', { name: 'Envoyer la demande' }).click();
   await expect(page.locator('[data-claim-status]')).toContainText('pending');
-  await page.goto(`/account/restaurants/${restaurantId}/edit`);
-  await expect(page.locator('h1')).not.toContainText('Modifier');
+  const ownerDenied = await page.evaluate((url) => fetch(url).then(response => response.status), `/account/restaurants/${restaurantId}/edit`);
+  expect(ownerDenied).toBe(403);
   await page.getByRole('button', { name: 'Déconnexion' }).click();
 
   await page.goto('/login');
@@ -74,7 +82,7 @@ test('authentication, mandatory password change, claims and permissions', async 
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.goto('/admin/claims');
   await expect(page.getByRole('heading', { name: 'Demandes en attente' })).toBeVisible();
-  await page.getByRole('button', { name: 'Approuver' }).click();
+  await page.locator('article').filter({ hasText: `Demande E2E ${key} de validation.` }).getByRole('button', { name: 'Approuver' }).click();
   await expect(page.getByRole('status')).toContainText('approuvée');
   await page.getByRole('button', { name: 'Déconnexion' }).click();
 
@@ -90,8 +98,31 @@ test('authentication, mandatory password change, claims and permissions', async 
   await page.locator('input[name="email"]').fill(`${prefix}-third@example.invalid`);
   await page.locator('input[name="password"]').fill(password);
   await page.getByRole('button', { name: 'Se connecter' }).click();
-  const denied = await page.goto(`/account/restaurants/${restaurantId}/edit`);
-  expect(denied?.status()).toBe(403);
+  await page.goto(`/restaurants/${rejectRestaurantId}/claim`);
+  await page.locator('textarea[name="message"]').fill(`Demande E2E ${key} à refuser.`);
+  await page.getByRole('button', { name: 'Envoyer la demande' }).click();
+  const rejectedClaimUrl = page.url();
+  await page.getByRole('button', { name: 'Déconnexion' }).click();
+
+  await page.goto('/login');
+  await page.locator('input[name="email"]').fill(`${prefix}-admin@example.invalid`);
+  await page.locator('input[name="password"]').fill(password);
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+  await page.goto('/admin/claims');
+  const rejection = page.locator('article').filter({ hasText: `Demande E2E ${key} à refuser.` });
+  await rejection.locator('input[name="admin_note"]').fill('Justificatif absent.');
+  await rejection.getByRole('button', { name: 'Refuser' }).click();
+  await expect(page.getByRole('status')).toContainText('refusée');
+  await page.getByRole('button', { name: 'Déconnexion' }).click();
+
+  await page.goto('/login');
+  await page.locator('input[name="email"]').fill(`${prefix}-third@example.invalid`);
+  await page.locator('input[name="password"]').fill(password);
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+  await page.goto(rejectedClaimUrl);
+  await expect(page.locator('[data-claim-status]')).toContainText('rejected');
+  const denied = await page.evaluate((url) => fetch(url).then(response => response.status), `/account/restaurants/${restaurantId}/edit`);
+  expect(denied).toBe(403);
 
   expect(consoleErrors).toEqual([]);
   expect(networkErrors).toEqual([]);
