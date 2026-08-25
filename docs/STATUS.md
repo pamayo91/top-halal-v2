@@ -10,7 +10,7 @@ Last updated: 2026-08-25
 | htaccess redirect inventory | IN PROGRESS | Parser included; application importer not built yet |
 | Preprod SSH access | PARTIAL | SSH alias `top-halal-preprod` configured locally; still need deploy path, web vhost/URL details and database credentials/scope |
 | Server audit | BLOCKED | Must run `scripts/server-audit.sh` directly on preprod and save output to `docs/generated/server-audit.txt` before Laravel bootstrap |
-| Git repository | IN PROGRESS | Local Git initialized with `origin` set to `git@github.com:pamayo91/top-halal-v2.git`; planned branches are `main` and `develop` |
+| Git repository | WAITING | Local Git initialized with `origin` set to `git@github.com:pamayo91/top-halal-v2.git`; local branches `main` and `develop` exist; push is blocked until this workstation has GitHub SSH access |
 | Preprod GitHub deploy key | WAITING | Dedicated deploy key generated on preprod; public key must be added manually to GitHub before server-side clone/pull |
 | Preprod deployment strategy | DECIDED | Deploy via SSH and Git pull from `develop`; app checkout must be outside DocumentRoot and Apache must expose only Laravel `public/` |
 | Laravel bootstrap | BLOCKED | Must be created by official Composer install in the appropriate environment after server audit; no manual Laravel skeleton |
