@@ -22,13 +22,13 @@ class LegacyRestaurantMigratorTest extends TestCase
         config()->set('database.connections.legacy_test', [...config('database.connections.sqlite'), 'prefix' => 'wp_']);
         DB::purge('legacy_test');
         $schema = Schema::connection('legacy_test');
-        $schema->create('wp_posts', function (Blueprint $table): void {
+        $schema->create('posts', function (Blueprint $table): void {
             $table->unsignedBigInteger('ID')->primary(); $table->unsignedBigInteger('post_author')->default(0); $table->string('post_date_gmt'); $table->string('post_modified_gmt'); $table->string('post_content'); $table->string('post_title'); $table->string('post_status'); $table->string('post_name'); $table->string('post_type'); $table->string('guid')->default(''); $table->text('post_excerpt')->default('');
         });
-        $schema->create('wp_postmeta', function (Blueprint $table): void { $table->id('meta_id'); $table->unsignedBigInteger('post_id'); $table->string('meta_key'); $table->text('meta_value'); });
-        $schema->create('wp_terms', function (Blueprint $table): void { $table->unsignedBigInteger('term_id')->primary(); $table->string('name'); $table->string('slug'); });
-        $schema->create('wp_term_taxonomy', function (Blueprint $table): void { $table->unsignedBigInteger('term_taxonomy_id')->primary(); $table->unsignedBigInteger('term_id'); $table->string('taxonomy'); $table->unsignedBigInteger('parent')->default(0); });
-        $schema->create('wp_term_relationships', function (Blueprint $table): void { $table->unsignedBigInteger('object_id'); $table->unsignedBigInteger('term_taxonomy_id'); });
+        $schema->create('postmeta', function (Blueprint $table): void { $table->id('meta_id'); $table->unsignedBigInteger('post_id'); $table->string('meta_key'); $table->text('meta_value'); });
+        $schema->create('terms', function (Blueprint $table): void { $table->unsignedBigInteger('term_id')->primary(); $table->string('name'); $table->string('slug'); });
+        $schema->create('term_taxonomy', function (Blueprint $table): void { $table->unsignedBigInteger('term_taxonomy_id')->primary(); $table->unsignedBigInteger('term_id'); $table->string('taxonomy'); $table->unsignedBigInteger('parent')->default(0); });
+        $schema->create('term_relationships', function (Blueprint $table): void { $table->unsignedBigInteger('object_id'); $table->unsignedBigInteger('term_taxonomy_id'); });
         $this->migrator = new LegacyRestaurantMigrator('legacy_test');
     }
 
