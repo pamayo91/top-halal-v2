@@ -26,7 +26,7 @@ class LegacyUserMigrationTest extends TestCase
             $table->string('user_registered');
             $table->string('user_pass');
         });
-        Schema::connection('legacy_wp')->table('users')->insert([
+        DB::connection('legacy_wp')->table('users')->insert([
             ['ID' => 17, 'display_name' => 'Élodie', 'user_email' => 'elodie@example.test', 'user_registered' => '2020-01-02 03:04:05', 'user_pass' => 'legacy-hash-never-migrated'],
             ['ID' => 18, 'display_name' => 'Sans e-mail', 'user_email' => '', 'user_registered' => '2020-01-02 03:04:05', 'user_pass' => 'legacy-hash-never-migrated'],
         ]);
