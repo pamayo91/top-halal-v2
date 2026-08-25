@@ -24,17 +24,17 @@ class LegacyRestaurantMigrator
         $posts = $prefix.'posts';
         $meta = $prefix.'postmeta';
         $terms = $prefix.'term_relationships';
-        $base = fn () => DB::connection($this->connection)->table($posts)->where('post_type', 'listing');
+        $base = fn () => DB::connection($this->connection)->table($posts.' as post')->where('post.post_type', 'listing');
         $choices = [
-            'published_classic' => $base()->where('post_status', 'publish')->orderBy('ID')->value('ID'),
+            'published_classic' => $base()->where('post.post_status', 'publish')->orderBy('post.ID')->value('post.ID'),
             'multiple_categories' => $this->termCandidate($terms, 'listing-category', 2),
             'multiple_features' => $this->termCandidate($terms, 'features', 2),
             'gallery' => $this->metaCandidate($meta, 'gallery_image_ids'),
             'hours' => $this->metaCandidate($meta, 'lp_listingpro_options'),
             'gps' => $this->metaCandidate($meta, 'fave_property_location'),
-            'incomplete_location' => $base()->where('post_status', 'publish')->whereNotExists(fn ($query) => $query->selectRaw('1')->from($meta)->whereColumn('post_id', "$posts.ID")->whereIn('meta_key', ['fave_property_location', 'latitude']))->orderBy('ID')->value('ID'),
-            'claimed' => $base()->whereExists(fn ($query) => $query->selectRaw('1')->from($meta)->whereColumn('post_id', "$posts.ID")->where('meta_key', 'claimed')->where('meta_value', '1'))->orderBy('ID')->value('ID'),
-            'pending' => $base()->where('post_status', 'pending')->orderBy('ID')->value('ID'),
+            'incomplete_location' => $base()->where('post.post_status', 'publish')->whereNotExists(fn ($query) => $query->selectRaw('1')->from($meta)->whereColumn('post_id', 'post.ID')->whereIn('meta_key', ['fave_property_location', 'latitude']))->orderBy('post.ID')->value('post.ID'),
+            'claimed' => $base()->whereExists(fn ($query) => $query->selectRaw('1')->from($meta)->whereColumn('post_id', 'post.ID')->where('meta_key', 'claimed')->where('meta_value', '1'))->orderBy('post.ID')->value('post.ID'),
+            'pending' => $base()->where('post.post_status', 'pending')->orderBy('post.ID')->value('post.ID'),
             'unusual_meta' => $this->metaCandidate($meta, 'lp_listingpro_options_fields'),
         ];
 
@@ -45,7 +45,7 @@ class LegacyRestaurantMigrator
             }
         }
 
-        foreach ($base()->where('post_status', 'publish')->orderBy('ID')->pluck('ID') as $id) {
+        foreach ($base()->where('post.post_status', 'publish')->orderBy('post.ID')->pluck('post.ID') as $id) {
             if (count($selected) >= $limit) break;
             if (! in_array((int) $id, $selected, true)) $selected['published_fallback_'.count($selected)] = (int) $id;
         }
@@ -155,7 +155,7 @@ class LegacyRestaurantMigrator
     {
         return DB::connection($this->connection)->table($meta.' as meta')->join($this->prefix().'posts as post', 'post.ID', '=', 'meta.post_id')->where('post.post_type', 'listing')->where('meta.meta_key', $key)->where('meta.meta_value', '!=', '')->orderBy('meta.post_id')->value('meta.post_id');
     }
-    private function prefix(): string { return (string) config("database.connections.{$this->connection}.prefix", 'tp_'); }
+    private function prefix(): string { return ''; }
 
     /** @return array<int, array<string, mixed>> */
     private function attachments(ConnectionInterface $connection, string $prefix, string $value): array
