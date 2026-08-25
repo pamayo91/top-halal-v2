@@ -9,6 +9,7 @@ class LegacyCommentAuditor
     public function audit(): array
     {
         $db = DB::connection('legacy_wp');
+        $prefix = $db->getTablePrefix();
         $all = $db->table('comments')->select('comment_ID', 'comment_parent')->get();
         $parents = $all->pluck('comment_parent', 'comment_ID')->map(fn ($value) => (int) $value)->all();
         $maxDepth = 0;
@@ -21,7 +22,10 @@ class LegacyCommentAuditor
         return [
             'total' => $all->count(),
             'status_and_type' => $db->table('comments')->selectRaw('comment_approved, comment_type, count(*) as count')->groupBy('comment_approved', 'comment_type')->orderBy('comment_approved')->get()->map(fn ($row) => (array) $row)->all(),
-            'post_types' => $db->table('comments as c')->leftJoin('posts as p', 'p.ID', '=', 'c.comment_post_ID')->selectRaw("coalesce(p.post_type, 'missing') as post_type, count(*) as count")->groupBy('post_type')->orderByDesc('count')->get()->map(fn ($row) => (array) $row)->all(),
+            'post_types' => $db->table('comments')
+                ->leftJoin('posts', 'posts.ID', '=', 'comments.comment_post_ID')
+                ->selectRaw("coalesce(`{$prefix}posts`.`post_type`, 'missing') as post_type, count(*) as count")
+                ->groupBy('post_type')->orderByDesc('count')->get()->map(fn ($row) => (array) $row)->all(),
             'parented' => $db->table('comments')->where('comment_parent', '>', 0)->count(),
             'max_thread_depth' => $maxDepth,
             'missing_posts' => $db->table('comments as c')->leftJoin('posts as p', 'p.ID', '=', 'c.comment_post_ID')->whereNull('p.ID')->count(),
