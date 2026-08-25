@@ -1,0 +1,179 @@
+{
+    "mode": "apply",
+    "items": [
+        {
+            "source": {
+                "legacy_wp_review_id": 21100,
+                "legacy_restaurant_id": 18819,
+                "legacy_user_id": 56,
+                "status": "publish",
+                "date_gmt": "2017-12-11 18:55:42",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "rating"
+                ]
+            },
+            "destination_restaurant_id": 12,
+            "rating": 3,
+            "title_present": false,
+            "content_length": 271,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 21102,
+                "legacy_restaurant_id": 18039,
+                "legacy_user_id": 58,
+                "status": "publish",
+                "date_gmt": "2017-12-11 18:57:24",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "rating"
+                ]
+            },
+            "destination_restaurant_id": 11,
+            "rating": 1,
+            "title_present": false,
+            "content_length": 503,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 21106,
+                "legacy_restaurant_id": 13567,
+                "legacy_user_id": 62,
+                "status": "publish",
+                "date_gmt": "2017-12-11 19:01:54",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "rating"
+                ]
+            },
+            "destination_restaurant_id": 3,
+            "rating": 5,
+            "title_present": false,
+            "content_length": 10,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 21134,
+                "legacy_restaurant_id": 15874,
+                "legacy_user_id": 90,
+                "status": "publish",
+                "date_gmt": "2017-12-11 19:33:56",
+                "meta_keys": [
+                    "_vc_post_settings",
+                    "lp_listingpro_options",
+                    "rating"
+                ]
+            },
+            "destination_restaurant_id": 13,
+            "rating": 4,
+            "title_present": false,
+            "content_length": 317,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 21309,
+                "legacy_restaurant_id": 21300,
+                "legacy_user_id": 113,
+                "status": "publish",
+                "date_gmt": "2018-02-18 21:10:36",
+                "meta_keys": [
+                    "rating",
+                    "lp_listingpro_options"
+                ]
+            },
+            "destination_restaurant_id": 14,
+            "rating": 5,
+            "title_present": true,
+            "content_length": 289,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 21443,
+                "legacy_restaurant_id": 21435,
+                "legacy_user_id": 1,
+                "status": "publish",
+                "date_gmt": "2018-04-26 18:37:40",
+                "meta_keys": [
+                    "rating",
+                    "_vc_post_settings",
+                    "lp_listingpro_options"
+                ]
+            },
+            "destination_restaurant_id": 17,
+            "rating": 4,
+            "title_present": true,
+            "content_length": 44,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 21612,
+                "legacy_restaurant_id": 21583,
+                "legacy_user_id": 196,
+                "status": "publish",
+                "date_gmt": "2019-11-04 17:08:44",
+                "meta_keys": [
+                    "rating",
+                    "lp_listingpro_options"
+                ]
+            },
+            "destination_restaurant_id": 15,
+            "rating": 4,
+            "title_present": true,
+            "content_length": 69,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        },
+        {
+            "source": {
+                "legacy_wp_review_id": 22470,
+                "legacy_restaurant_id": 18476,
+                "legacy_user_id": 268,
+                "status": "publish",
+                "date_gmt": "2022-10-26 19:29:51",
+                "meta_keys": [
+                    "rating",
+                    "lp_listingpro_options"
+                ]
+            },
+            "destination_restaurant_id": 16,
+            "rating": 1,
+            "title_present": true,
+            "content_length": 120,
+            "status": "approved",
+            "transformation": "legacy_html_to_text_and_escaped_output",
+            "anomalies": [],
+            "result": "persisted"
+        }
+    ],
+    "anomalies": []
+}

@@ -42,6 +42,7 @@
 - Legacy comment HTML is converted to plain text. Existing URL-like text remains non-clickable; all new V2 comments reject URL-like input server-side.
 - Comments pilot: `2`, `3`, `6`, `7`, `8`, `417`, `556`, `600`, `601`, `2425`. It covers page/article targets, two complete reply threads, a legacy user reference, guests, UTF-8, one historical URL stored as text, and one pending comment. There was no human HTML sample among the pilot’s eligible records; global HTML is reported by the audit and is not imported as executable markup.
 - `tp_posts.post_type = lp-reviews` -> restaurant reviews
+- ListingPro `lp-reviews` use serialized `lp_listingpro_options.rating` and `.listing_id`; only ratings 1–5 with an already migrated, certain listing target are imported. Pilot review IDs: `21100,21102,21106,21134,21309,21443,21612,22470`.
 - ListingPro claim posts `lp-claims` -> future claim records
 - Yoast postmeta/indexable tables -> SEO metadata candidates
 - AIOSEO postmeta rows -> secondary SEO metadata candidates
@@ -69,6 +70,7 @@
 - Yoast data is present in postmeta and dedicated Yoast tables.
 - A small amount of AIOSEO postmeta exists and should be reconciled after Yoast precedence is defined.
 - Inline legacy `wp-content` images removed from the editorial pilot are tracked in `docs/generated/inline-media-debt.*` for a future media reconciliation; physical media remains out of scope.
+- Review IDs `21098`, `21147` and `21502` have no valid listing target; four reviews lack ratings. They remain audit anomalies, never arbitrarily attached.
 - No orphan postmeta or orphan term relationship rows were detected in the inventory.
 
 ## Limited Test Migration Plan

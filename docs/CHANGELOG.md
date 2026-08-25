@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-08-25
+- Added and validated the controlled ListingPro restaurant-reviews pilot: audit, V2 table/model, migration command, moderation command, approved-only aggregate and technical restaurant preview.
+- Audited 84 legacy reviews; migrated only eight valid deterministic reviews. Three records without a valid listing relation and four without ratings remain reported and skipped.
 - Added the controlled WordPress editorial-comments pilot: aggregate read-only audit, V2 `comments` table/model, idempotent `legacy:migrate-comments`, temporary moderation command and protected preview form.
 - Audited 20,196 legacy comments and migrated only ten deterministic comments (nine approved, one pending) to the existing article/page pilot. Spam, pingbacks, review comments and all non-pilot records remain untouched.
 - Added comments migration reports and inline legacy-media debt reports. The three removed inline legacy images remain traceable; no physical media was copied.
