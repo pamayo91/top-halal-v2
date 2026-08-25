@@ -34,6 +34,14 @@ These numbers are a baseline only. The migration command must produce authoritat
 - The legacy SQL dump under `legacy/` is a safety/reference snapshot only and is not the primary source for now.
 - No WordPress content import has started.
 
+## Current preproduction status
+- Public preproduction URL: `https://dev.top-halal.fr/`.
+- Apache DocumentRoot points to Laravel `public/`.
+- HTTPS, HTTP-to-HTTPS redirect, `/health`, cookies/session, noindex headers, robots blocking and sensitive path protections are validated.
+- WordPress/ListingPro inventory has been generated through read-only legacy access.
+- The next migration step is a reviewed sample only, not a full import.
+- The first sample must stay limited to 10 restaurants, 5 articles, a few pages, threaded comments and restaurant reviews until validation approves broader migration.
+
 ## Bootstrap requirement
 The Laravel application must be initialized through the official Composer workflow on the appropriate preproduction/development environment after the preproduction server audit has been run and reviewed. Do not create or commit a hand-made Laravel source skeleton to work around missing PHP or Composer on the local Windows workstation.
 

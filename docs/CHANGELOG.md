@@ -21,6 +21,10 @@
 - Verified preproduction Laravel with `artisan about`, `migrate:status`, `route:list` and PHPUnit under explicit PHP 8.4.
 - Expanded Playwright smoke coverage for desktop/mobile, 404 and sensitive public paths.
 - Validated the exposed preproduction app over HTTP and recorded the HTTPS certificate blocker.
+- Validated the exposed preproduction app over HTTPS after certificate/domain setup.
+- Added preproduction noindex protections through `X-Robots-Tag` and `robots.txt`.
+- Ran the read-only legacy inventory against `meyo5199_th` and added inventory/analysis reports.
+- Drafted the initial WordPress/ListingPro mapping, business schema proposal and limited sample migration plan.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.

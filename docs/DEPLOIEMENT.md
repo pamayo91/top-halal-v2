@@ -63,8 +63,9 @@ Ce document resume la strategie de deploiement demandee pour Top-Halal V2. Le do
 - Tests PHP passes dans un repertoire temporaire isole avec `/opt/alt/php84/usr/bin/php artisan test`.
 - Verification serveur OK: `artisan about`, `migrate:status`, `route:list` et PHPUnit.
 - Commande `legacy:inventory` enregistree dans Artisan.
-- Test navigateur/Playwright HTTP preproduction OK en desktop et mobile.
-- HTTPS bloque par un certificat non approuve/self-signed sur `https://dev.top-halal.fr.meyo5199.odns.fr/`.
+- Test navigateur/Playwright HTTPS preproduction OK en desktop et mobile sur `https://dev.top-halal.fr/`.
+- Redirection HTTP vers HTTPS active.
+- Protection anti-indexation active: `X-Robots-Tag: noindex, nofollow` et `robots.txt` bloque tout crawl.
 - Chemins sensibles non lisibles publiquement: `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/`.
 
 ## Chemins confirmes avant clone/deploiement

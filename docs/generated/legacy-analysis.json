@@ -1,0 +1,468 @@
+{
+    "listing_meta_keys_top": [
+        {
+            "meta_key": "lp_listingpro_options",
+            "total": 7704
+        },
+        {
+            "meta_key": "post_views_count",
+            "total": 7682
+        },
+        {
+            "meta_key": "_vc_post_settings",
+            "total": 7662
+        },
+        {
+            "meta_key": "fave_agents",
+            "total": 7487
+        },
+        {
+            "meta_key": "fave_property_location",
+            "total": 7487
+        },
+        {
+            "meta_key": "fave_property_map_address",
+            "total": 7487
+        },
+        {
+            "meta_key": "lp_listingpro_options_fields",
+            "total": 4597
+        },
+        {
+            "meta_key": "_edit_lock",
+            "total": 4590
+        },
+        {
+            "meta_key": "_edit_last",
+            "total": 4560
+        },
+        {
+            "meta_key": "_yoast_wpseo_primary_listing-category",
+            "total": 4328
+        },
+        {
+            "meta_key": "_yoast_wpseo_primary_location",
+            "total": 4328
+        },
+        {
+            "meta_key": "_thumbnail_id",
+            "total": 249
+        },
+        {
+            "meta_key": "gallery_image_ids",
+            "total": 248
+        },
+        {
+            "meta_key": "_wp_old_date",
+            "total": 134
+        },
+        {
+            "meta_key": "_yoast_wpseo_primary_features",
+            "total": 120
+        },
+        {
+            "meta_key": "listing_reviewed",
+            "total": 83
+        },
+        {
+            "meta_key": "listing_rate",
+            "total": 82
+        },
+        {
+            "meta_key": "claimed",
+            "total": 25
+        },
+        {
+            "meta_key": "_wp_old_slug",
+            "total": 19
+        },
+        {
+            "meta_key": "plan_id",
+            "total": 18
+        },
+        {
+            "meta_key": "lp_random_ads",
+            "total": 15
+        },
+        {
+            "meta_key": "lp_detail_page_ads",
+            "total": 10
+        },
+        {
+            "meta_key": "lp_top_in_search_page_ads",
+            "total": 10
+        },
+        {
+            "meta_key": "_yoast_wpseo_estimated-reading-time-minutes",
+            "total": 7
+        },
+        {
+            "meta_key": "_yoast_wpseo_wordproof_timestamp",
+            "total": 4
+        }
+    ],
+    "review_meta_keys_top": [
+        {
+            "meta_key": "lp_listingpro_options",
+            "total": 84
+        },
+        {
+            "meta_key": "rating",
+            "total": 83
+        },
+        {
+            "meta_key": "_vc_post_settings",
+            "total": 49
+        },
+        {
+            "meta_key": "_edit_lock",
+            "total": 8
+        },
+        {
+            "meta_key": "gallery_image_ids",
+            "total": 2
+        },
+        {
+            "meta_key": "_edit_last",
+            "total": 2
+        }
+    ],
+    "option_prefixes_top": [
+        {
+            "option_prefix": "",
+            "total": 74
+        },
+        {
+            "option_prefix": "widget",
+            "total": 28
+        },
+        {
+            "option_prefix": "easy",
+            "total": 14
+        },
+        {
+            "option_prefix": "default",
+            "total": 9
+        },
+        {
+            "option_prefix": "duplicator",
+            "total": 9
+        },
+        {
+            "option_prefix": "wp",
+            "total": 9
+        },
+        {
+            "option_prefix": "auto",
+            "total": 6
+        },
+        {
+            "option_prefix": "comment",
+            "total": 6
+        },
+        {
+            "option_prefix": "wpseo",
+            "total": 6
+        },
+        {
+            "option_prefix": "cookie",
+            "total": 5
+        },
+        {
+            "option_prefix": "extendify",
+            "total": 5
+        },
+        {
+            "option_prefix": "theme",
+            "total": 5
+        },
+        {
+            "option_prefix": "akismet",
+            "total": 4
+        },
+        {
+            "option_prefix": "lp",
+            "total": 4
+        },
+        {
+            "option_prefix": "mailserver",
+            "total": 4
+        },
+        {
+            "option_prefix": "medium",
+            "total": 4
+        },
+        {
+            "option_prefix": "wpr",
+            "total": 4
+        },
+        {
+            "option_prefix": "action",
+            "total": 3
+        },
+        {
+            "option_prefix": "active",
+            "total": 3
+        },
+        {
+            "option_prefix": "CSCF",
+            "total": 3
+        },
+        {
+            "option_prefix": "image",
+            "total": 3
+        },
+        {
+            "option_prefix": "page",
+            "total": 3
+        },
+        {
+            "option_prefix": "show",
+            "total": 3
+        },
+        {
+            "option_prefix": "thumbnail",
+            "total": 3
+        },
+        {
+            "option_prefix": "use",
+            "total": 3
+        },
+        {
+            "option_prefix": "admin",
+            "total": 2
+        },
+        {
+            "option_prefix": "avatar",
+            "total": 2
+        },
+        {
+            "option_prefix": "blog",
+            "total": 2
+        },
+        {
+            "option_prefix": "category",
+            "total": 2
+        },
+        {
+            "option_prefix": "clean-and-simple-contact-form-by-meg-nicholas",
+            "total": 2
+        },
+        {
+            "option_prefix": "close",
+            "total": 2
+        },
+        {
+            "option_prefix": "comments",
+            "total": 2
+        },
+        {
+            "option_prefix": "db",
+            "total": 2
+        },
+        {
+            "option_prefix": "finished",
+            "total": 2
+        },
+        {
+            "option_prefix": "large",
+            "total": 2
+        },
+        {
+            "option_prefix": "listingpro",
+            "total": 2
+        },
+        {
+            "option_prefix": "loco",
+            "total": 2
+        },
+        {
+            "option_prefix": "moderation",
+            "total": 2
+        },
+        {
+            "option_prefix": "pmxi",
+            "total": 2
+        },
+        {
+            "option_prefix": "posts",
+            "total": 2
+        },
+        {
+            "option_prefix": "recently",
+            "total": 2
+        },
+        {
+            "option_prefix": "recovery",
+            "total": 2
+        },
+        {
+            "option_prefix": "redux",
+            "total": 2
+        },
+        {
+            "option_prefix": "rocket",
+            "total": 2
+        },
+        {
+            "option_prefix": "schema-ActionScheduler",
+            "total": 2
+        },
+        {
+            "option_prefix": "thread",
+            "total": 2
+        },
+        {
+            "option_prefix": "upload",
+            "total": 2
+        },
+        {
+            "option_prefix": "wp-all-import-pro",
+            "total": 2
+        },
+        {
+            "option_prefix": "wpb",
+            "total": 2
+        },
+        {
+            "option_prefix": "aioseop",
+            "total": 1
+        }
+    ],
+    "tables_matching_plugins": [
+        {
+            "table_name": "tp_listing_campaigns",
+            "table_rows": 9
+        },
+        {
+            "table_name": "tp_listing_stats_leads",
+            "table_rows": 79
+        },
+        {
+            "table_name": "tp_listing_stats_reviews",
+            "table_rows": 0
+        },
+        {
+            "table_name": "tp_listing_stats_views",
+            "table_rows": 4899
+        },
+        {
+            "table_name": "tp_yoast_expiring_store",
+            "table_rows": 0
+        },
+        {
+            "table_name": "tp_yoast_indexable",
+            "table_rows": 10522
+        },
+        {
+            "table_name": "tp_yoast_indexable_hierarchy",
+            "table_rows": 10805
+        },
+        {
+            "table_name": "tp_yoast_migrations",
+            "table_rows": 24
+        },
+        {
+            "table_name": "tp_yoast_primary_term",
+            "table_rows": 20
+        },
+        {
+            "table_name": "tp_yoast_seo_links",
+            "table_rows": 487
+        },
+        {
+            "table_name": "tp_yoast_seo_meta",
+            "table_rows": 809
+        }
+    ],
+    "sample_ids": {
+        "vc_shortcode_post_ids": [
+            5,
+            6,
+            7,
+            10,
+            38,
+            54,
+            59,
+            92,
+            96,
+            10362,
+            10380,
+            10394,
+            11497,
+            11554,
+            11557,
+            11562,
+            11590,
+            11594,
+            11597,
+            11600
+        ],
+        "comment_url_like_ids": [
+            149,
+            187,
+            375,
+            392,
+            417,
+            456,
+            599,
+            20925,
+            21104,
+            21105,
+            21106,
+            21107,
+            21109,
+            21110,
+            21111,
+            21112,
+            21113,
+            21114,
+            21115,
+            21117
+        ],
+        "lp_review_post_ids": [
+            21098,
+            21099,
+            21100,
+            21101,
+            21102,
+            21103,
+            21104,
+            21105,
+            21106,
+            21107,
+            21108,
+            21109,
+            21110,
+            21111,
+            21112,
+            21113,
+            21114,
+            21115,
+            21116,
+            21117
+        ],
+        "pending_listing_ids": [
+            22184,
+            22256,
+            22261,
+            22268,
+            22275,
+            22282,
+            22289,
+            22296,
+            22303,
+            22343,
+            22352,
+            22358,
+            22364,
+            22370,
+            22376,
+            22382,
+            22388,
+            22394,
+            22400,
+            22406
+        ]
+    }
+}

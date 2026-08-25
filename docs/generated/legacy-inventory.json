@@ -1,0 +1,344 @@
+{
+    "generated_at": "2026-08-25T13:50:07+00:00",
+    "connection": "legacy_wp",
+    "database": "meyo5199_th",
+    "table_prefix": "tp_",
+    "tables": [
+        {
+            "name": "tp_actionscheduler_actions",
+            "rows": 96
+        },
+        {
+            "name": "tp_actionscheduler_claims",
+            "rows": 0
+        },
+        {
+            "name": "tp_actionscheduler_groups",
+            "rows": 4
+        },
+        {
+            "name": "tp_actionscheduler_logs",
+            "rows": 282
+        },
+        {
+            "name": "tp_commentmeta",
+            "rows": 16076
+        },
+        {
+            "name": "tp_comments",
+            "rows": 20195
+        },
+        {
+            "name": "tp_duplicator_packages",
+            "rows": 0
+        },
+        {
+            "name": "tp_easywpsmtp_debug_events",
+            "rows": 2599
+        },
+        {
+            "name": "tp_easywpsmtp_tasks_meta",
+            "rows": 0
+        },
+        {
+            "name": "tp_links",
+            "rows": 0
+        },
+        {
+            "name": "tp_listing_campaigns",
+            "rows": 9
+        },
+        {
+            "name": "tp_listing_stats_leads",
+            "rows": 79
+        },
+        {
+            "name": "tp_listing_stats_reviews",
+            "rows": 0
+        },
+        {
+            "name": "tp_listing_stats_views",
+            "rows": 4899
+        },
+        {
+            "name": "tp_options",
+            "rows": 326
+        },
+        {
+            "name": "tp_pmxi_files",
+            "rows": 6
+        },
+        {
+            "name": "tp_pmxi_history",
+            "rows": 6
+        },
+        {
+            "name": "tp_pmxi_imports",
+            "rows": 6
+        },
+        {
+            "name": "tp_pmxi_posts",
+            "rows": 7487
+        },
+        {
+            "name": "tp_pmxi_templates",
+            "rows": 2
+        },
+        {
+            "name": "tp_postmeta",
+            "rows": 76575
+        },
+        {
+            "name": "tp_posts",
+            "rows": 10395
+        },
+        {
+            "name": "tp_social_users",
+            "rows": 0
+        },
+        {
+            "name": "tp_termmeta",
+            "rows": 37
+        },
+        {
+            "name": "tp_terms",
+            "rows": 2678
+        },
+        {
+            "name": "tp_term_relationships",
+            "rows": 30089
+        },
+        {
+            "name": "tp_term_taxonomy",
+            "rows": 2678
+        },
+        {
+            "name": "tp_usermeta",
+            "rows": 8257
+        },
+        {
+            "name": "tp_users",
+            "rows": 545
+        },
+        {
+            "name": "tp_wpaie_file_manager",
+            "rows": 3
+        },
+        {
+            "name": "tp_wpr_above_the_fold",
+            "rows": 1432
+        },
+        {
+            "name": "tp_wpr_lazy_render_content",
+            "rows": 1471
+        },
+        {
+            "name": "tp_wpr_rocket_cache",
+            "rows": 0
+        },
+        {
+            "name": "tp_wpr_rucss_used_css",
+            "rows": 0
+        },
+        {
+            "name": "tp_yoast_expiring_store",
+            "rows": 0
+        },
+        {
+            "name": "tp_yoast_indexable",
+            "rows": 10522
+        },
+        {
+            "name": "tp_yoast_indexable_hierarchy",
+            "rows": 10805
+        },
+        {
+            "name": "tp_yoast_migrations",
+            "rows": 24
+        },
+        {
+            "name": "tp_yoast_primary_term",
+            "rows": 20
+        },
+        {
+            "name": "tp_yoast_seo_links",
+            "rows": 487
+        },
+        {
+            "name": "tp_yoast_seo_meta",
+            "rows": 809
+        }
+    ],
+    "post_types_statuses": [
+        {
+            "post_type": "attachment",
+            "post_status": "inherit",
+            "total": 2239
+        },
+        {
+            "post_type": "form-fields",
+            "post_status": "publish",
+            "total": 2
+        },
+        {
+            "post_type": "listing",
+            "post_status": "pending",
+            "total": 70
+        },
+        {
+            "post_type": "listing",
+            "post_status": "publish",
+            "total": 7633
+        },
+        {
+            "post_type": "listing",
+            "post_status": "reported",
+            "total": 1
+        },
+        {
+            "post_type": "listingpro_agent",
+            "post_status": "publish",
+            "total": 1
+        },
+        {
+            "post_type": "lp-claims",
+            "post_status": "publish",
+            "total": 52
+        },
+        {
+            "post_type": "lp-reviews",
+            "post_status": "publish",
+            "total": 84
+        },
+        {
+            "post_type": "nav_menu_item",
+            "post_status": "publish",
+            "total": 85
+        },
+        {
+            "post_type": "page",
+            "post_status": "publish",
+            "total": 90
+        },
+        {
+            "post_type": "page",
+            "post_status": "trash",
+            "total": 1
+        },
+        {
+            "post_type": "post",
+            "post_status": "auto-draft",
+            "total": 1
+        },
+        {
+            "post_type": "post",
+            "post_status": "draft",
+            "total": 1
+        },
+        {
+            "post_type": "post",
+            "post_status": "publish",
+            "total": 121
+        },
+        {
+            "post_type": "price_plan",
+            "post_status": "publish",
+            "total": 2
+        },
+        {
+            "post_type": "revision",
+            "post_status": "inherit",
+            "total": 11
+        },
+        {
+            "post_type": "wp_global_styles",
+            "post_status": "publish",
+            "total": 1
+        }
+    ],
+    "users": {
+        "count": 545
+    },
+    "comments_by_approval_type": [
+        {
+            "comment_approved": 0,
+            "comment_type": "comment",
+            "total": 15
+        },
+        {
+            "comment_approved": 1,
+            "comment_type": "comment",
+            "total": 713
+        },
+        {
+            "comment_approved": 1,
+            "comment_type": "review",
+            "total": 1
+        },
+        {
+            "comment_approved": "spam",
+            "comment_type": "comment",
+            "total": 19464
+        },
+        {
+            "comment_approved": "spam",
+            "comment_type": "pingback",
+            "total": 2
+        }
+    ],
+    "listingpro_reviews": {
+        "post_type_lp_reviews": 84,
+        "comment_type_reviews": 1
+    },
+    "taxonomies": [
+        {
+            "taxonomy": "category",
+            "total": 8
+        },
+        {
+            "taxonomy": "features",
+            "total": 13
+        },
+        {
+            "taxonomy": "list-tags",
+            "total": 4
+        },
+        {
+            "taxonomy": "listing-category",
+            "total": 22
+        },
+        {
+            "taxonomy": "location",
+            "total": 2003
+        },
+        {
+            "taxonomy": "nav_menu",
+            "total": 5
+        },
+        {
+            "taxonomy": "post_tag",
+            "total": 622
+        },
+        {
+            "taxonomy": "wp_theme",
+            "total": 1
+        }
+    ],
+    "media": {
+        "attachments": 2239
+    },
+    "seo_plugin_data_presence": {
+        "yoast_postmeta_rows": 8925,
+        "aioseo_postmeta_rows": 65,
+        "yoast_indexable_table": true,
+        "aioseo_posts_table": false
+    },
+    "anomalies": {
+        "missing_required_tables": [],
+        "spam_comments": 19466,
+        "comments_with_url_like_content": 14423,
+        "posts_with_visual_composer_shortcodes": 63,
+        "orphan_postmeta_rows": 0,
+        "orphan_term_relationship_rows": 0
+    }
+}

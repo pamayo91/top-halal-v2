@@ -34,7 +34,10 @@ Last updated: 2026-08-25
 | AI provider abstraction | TODO | OpenAI + alternative providers |
 | Automated news workflow | TODO | Disclosure configurable |
 | SEO validation | TODO | |
-| Playwright E2E | PARTIAL | HTTP preprod smoke passes on desktop/mobile; HTTPS is blocked by an untrusted/self-signed certificate (`ERR_CERT_AUTHORITY_INVALID`) |
-| Public exposure checks | DONE_WITH_HTTPS_BLOCKER | `/`, `/health`, 404 and sensitive paths checked; `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/` are not publicly readable; HTTPS certificate must be fixed |
+| Playwright E2E | DONE | HTTPS preprod smoke passes on desktop/mobile for homepage, `/health`, 404, noindex, robots, cookies and sensitive paths |
+| Public exposure checks | DONE | `/`, `/health`, 404 and sensitive paths checked; `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/` are not publicly readable |
+| Preproduction indexing protection | DONE | `X-Robots-Tag: noindex, nofollow` is active and `robots.txt` disallows all crawling |
+| Legacy inventory | DONE | `legacy:inventory` ran against `meyo5199_th` via SELECT-only `legacy_wp`; reports are in `docs/generated/` |
+| Migration mapping | DRAFTED | Initial WordPress/ListingPro mapping, schema proposal and limited sample plan documented in `docs/MIGRATION_MAPPING.md` |
 | PageSpeed/CWV gates | TODO | Representative templates |
 | Production cutover | TODO | Full migration + delta + URL/redirect validation |
