@@ -19,7 +19,6 @@
 - Codex workflow: edit code, run targeted local tests, commit, push to GitHub, SSH to preproduction, pull `develop`, run deployment steps, then validate preproduction with browser/Playwright.
 
 ## Required Manual GitHub Actions
-- Add the generated Codex workstation public key to GitHub with write access before Codex can push local commits.
 - Confirm whether branch protection is desired for `main` and `develop`.
 - Confirm who may merge `develop` into `main`; production promotion must stay explicit.
 
@@ -43,6 +42,11 @@ Create `scripts/deploy-preprod.sh` after the server audit confirms final paths, 
 - Public key generated: yes.
 - Private key handling: remains only on the preproduction server and must never be committed or displayed.
 - GitHub status: read authentication tested successfully through the `github-tophalal` SSH alias.
+
+## Codex Workstation GitHub Key
+- Key location on workstation: `~/.ssh/top-halal-v2-github-codex-write`.
+- Private key handling: remains outside the repository and must never be committed or displayed.
+- GitHub status: write authentication tested successfully through the `github-tophalal-codex` SSH alias.
 
 ## Server Audit Findings
 - Audit artifact: `docs/generated/server-audit.txt`.

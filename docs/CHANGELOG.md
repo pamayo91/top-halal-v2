@@ -9,6 +9,7 @@
 - Ran the real preproduction server audit and saved the consolidated result to `docs/generated/server-audit.txt`.
 - Recorded PHP 8.4/Composer extension blockers and the preproduction GitHub SSH alias status.
 - Generated a dedicated Codex workstation SSH key and configured the local Git remote through the `github-tophalal-codex` alias.
+- Pushed local `main` and `develop` branches to GitHub after write access was enabled.
 
 ## 2026-08-24
 - Created initial Codex handoff/starter documentation.
