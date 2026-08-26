@@ -1,13 +1,13 @@
 # Audit sitemap V2 — URLs hors restaurants
 
-Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il décrit le sitemap effectif avant correction.
+Généré le 2026-08-26T13:26:03+00:00. Cet audit est en lecture seule ; il décrit le sitemap effectif avant correction.
 
 ## Synthèse
 
 - URLs auditées hors restaurants : **2262**
 - À conserver : **2251**
-- À retirer du sitemap : **9**
-- À supprimer/rediriger : **2**
+- À retirer du sitemap : **2**
+- À supprimer/rediriger : **9**
 
 ## Détail exhaustif
 
@@ -58,7 +58,7 @@ Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/grand-festival-nourriture-halal | article | 12605 | published | oui | oui | https://dev.top-halal.fr/grand-festival-nourriture-halal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/halal-ou-non-le-nouveau-dilemme-du-marche | article | 12548 | published | oui | oui | https://dev.top-halal.fr/halal-ou-non-le-nouveau-dilemme-du-marche | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/halal-snack-pack-nourriture | article | 12711 | published | oui | oui | https://dev.top-halal.fr/halal-snack-pack-nourriture | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/hello | article | 22922 | draft | non | non | https://dev.top-halal.fr/hello | RETIRER DU SITEMAP | Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection. |
+| https://dev.top-halal.fr/hello | article | 22922 | redirected | non | non | https://dev.top-halal.fr/hello | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/industrie-halal-vraie-evolution-france | article | 12708 | published | oui | oui | https://dev.top-halal.fr/industrie-halal-vraie-evolution-france | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/japon-malaisie-developpement-industrie-halal | article | 12529 | published | oui | oui | https://dev.top-halal.fr/japon-malaisie-developpement-industrie-halal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/kebab-mister-doner | article | 21638 | published | oui | oui | https://dev.top-halal.fr/kebab-mister-doner | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
@@ -2181,7 +2181,7 @@ Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/averroes-science-et-foi | page | 11688 | published | oui | oui | https://dev.top-halal.fr/averroes-science-et-foi | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/bioethique-jurisprudence-islamique | page | 11590 | published | oui | oui | https://dev.top-halal.fr/bioethique-jurisprudence-islamique | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/blog | page | 13 | published | oui | oui | https://dev.top-halal.fr/blog | RETIRER DU SITEMAP | Contenu vide : revue métier avant toute suppression ou redirection. |
-| https://dev.top-halal.fr/blog-2 | page | 35 | published | oui | oui | https://dev.top-halal.fr/blog-2 | RETIRER DU SITEMAP | Contenu vide : revue métier avant toute suppression ou redirection. |
+| https://dev.top-halal.fr/blog-2 | page | 35 | redirected | non | non | https://dev.top-halal.fr/blog-2 | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/boutique-al-hidayah | page | 10380 | published | oui | oui | https://dev.top-halal.fr/boutique-al-hidayah | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/burger-king-hallal | page | 12025 | published | oui | oui | https://dev.top-halal.fr/burger-king-hallal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/certification-halal | page | 11623 | published | oui | oui | https://dev.top-halal.fr/certification-halal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
@@ -2192,7 +2192,7 @@ Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/dignite-homme-societe-moderne | page | 11641 | published | oui | oui | https://dev.top-halal.fr/dignite-homme-societe-moderne | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/edit-listing | page | 21297 | published | oui | oui | https://dev.top-halal.fr/edit-listing | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/enseignement-islam-mosquees | page | 11612 | published | oui | oui | https://dev.top-halal.fr/enseignement-islam-mosquees | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/erreur-paiement | page | 9 | published | oui | oui | https://dev.top-halal.fr/erreur-paiement | RETIRER DU SITEMAP | Contenu vide : revue métier avant toute suppression ou redirection. |
+| https://dev.top-halal.fr/erreur-paiement | page | 9 | redirected | non | non | https://dev.top-halal.fr/erreur-paiement | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/esclavage-et-islam | page | 11679 | published | oui | oui | https://dev.top-halal.fr/esclavage-et-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/fast-food-halal-a-clichy-sous-bois | page | 10421 | published | oui | oui | https://dev.top-halal.fr/fast-food-halal-a-clichy-sous-bois | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/femme-dans-islam | page | 11681 | published | oui | oui | https://dev.top-halal.fr/femme-dans-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
@@ -2204,7 +2204,7 @@ Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/halal-expo-2011-abatoirs-ets-gourault | page | 10531 | published | oui | oui | https://dev.top-halal.fr/halal-expo-2011-abatoirs-ets-gourault | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/halshop-supermarche-100-halal | page | 10471 | published | oui | oui | https://dev.top-halal.fr/halshop-supermarche-100-halal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/hammam | page | 11789 | published | oui | oui | https://dev.top-halal.fr/hammam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/home | page | 12755 | published | non | oui | https://dev.top-halal.fr/home | SUPPRIMER-REDIRIGER | Décision validée : redirection 301 vers `/`, non indexable et exclue du sitemap. |
+| https://dev.top-halal.fr/home | page | 12755 | redirected | non | non | https://dev.top-halal.fr/home | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/horaires-prieres | page | 11815 | published | oui | oui | https://dev.top-halal.fr/horaires-prieres | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/iftar-president-republique-nicolas-sarkozy | page | 11645 | published | oui | oui | https://dev.top-halal.fr/iftar-president-republique-nicolas-sarkozy | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/islam-et-environnement | page | 11606 | published | oui | oui | https://dev.top-halal.fr/islam-et-environnement | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
@@ -2236,10 +2236,10 @@ Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/musulmans-france-islam | page | 11659 | published | oui | oui | https://dev.top-halal.fr/musulmans-france-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/obligation-de-se-soigner-islam | page | 11602 | published | oui | oui | https://dev.top-halal.fr/obligation-de-se-soigner-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/paris-halal-expo-2014 | page | 10496 | published | oui | oui | https://dev.top-halal.fr/paris-halal-expo-2014 | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/payment-checkout | page | 10 | published | oui | oui | https://dev.top-halal.fr/payment-checkout | RETIRER DU SITEMAP | Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection. |
-| https://dev.top-halal.fr/payment-fail | page | 21262 | published | oui | oui | https://dev.top-halal.fr/payment-fail | RETIRER DU SITEMAP | Contenu vide : revue métier avant toute suppression ou redirection. |
-| https://dev.top-halal.fr/payment-success | page | 8 | published | oui | oui | https://dev.top-halal.fr/payment-success | RETIRER DU SITEMAP | Contenu vide : revue métier avant toute suppression ou redirection. |
-| https://dev.top-halal.fr/payment-success-2 | page | 21298 | published | non | oui | https://dev.top-halal.fr/payment-success-2 | SUPPRIMER-REDIRIGER | Décision validée : redirection 301 vers `/`, non indexable et exclue du sitemap. |
+| https://dev.top-halal.fr/payment-checkout | page | 10 | redirected | non | non | https://dev.top-halal.fr/payment-checkout | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
+| https://dev.top-halal.fr/payment-fail | page | 21262 | redirected | non | non | https://dev.top-halal.fr/payment-fail | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
+| https://dev.top-halal.fr/payment-success | page | 8 | redirected | non | non | https://dev.top-halal.fr/payment-success | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
+| https://dev.top-halal.fr/payment-success-2 | page | 21298 | redirected | non | non | https://dev.top-halal.fr/payment-success-2 | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/planete-muslim | page | 10487 | published | oui | oui | https://dev.top-halal.fr/planete-muslim | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/polemique-autour-des-hamburgers-halal-de-quick | page | 10443 | published | oui | oui | https://dev.top-halal.fr/polemique-autour-des-hamburgers-halal-de-quick | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/pricing-plan | page | 7 | published | oui | oui | https://dev.top-halal.fr/pricing-plan | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
@@ -2258,7 +2258,7 @@ Généré le 2026-08-26T13:19:30+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/signification-du-mot-halal | page | 59 | published | oui | oui | https://dev.top-halal.fr/signification-du-mot-halal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/signification-homme-prehistoire | page | 11677 | published | oui | oui | https://dev.top-halal.fr/signification-homme-prehistoire | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/statut-imam | page | 11557 | published | oui | oui | https://dev.top-halal.fr/statut-imam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/submit-listing | page | 21070 | published | oui | oui | https://dev.top-halal.fr/submit-listing | RETIRER DU SITEMAP | Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection. |
+| https://dev.top-halal.fr/submit-listing | page | 21070 | redirected | non | non | https://dev.top-halal.fr/submit-listing | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/symbolique-sinai-ou-epreuve-montagne | page | 11661 | published | oui | oui | https://dev.top-halal.fr/symbolique-sinai-ou-epreuve-montagne | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/united-drinks-au-paris-halal-expo-2011 | page | 10585 | published | oui | oui | https://dev.top-halal.fr/united-drinks-au-paris-halal-expo-2011 | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/utilisation-techniques-genetiques-islam | page | 11597 | published | oui | oui | https://dev.top-halal.fr/utilisation-techniques-genetiques-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
