@@ -13,6 +13,10 @@ class ApplySitemapCleanupCommand extends Command
 
     public function handle(): int
     {
+        if (! $this->option('dry-run')) {
+            Page::where('slug', 'blog')->update(['seo_robots' => null]);
+            Page::where('slug', 'mon-compte')->update(['status' => 'published', 'seo_robots' => 'noindex,follow']);
+        }
         $rules = [
             '/home' => '/', '/payment-success-2' => '/', '/blog-2' => '/blog', '/erreur-paiement' => '/',
             '/payment-checkout' => '/', '/payment-fail' => '/', '/payment-success' => '/', '/submit-listing' => '/', '/hello' => '/',
@@ -27,6 +31,8 @@ class ApplySitemapCleanupCommand extends Command
             $this->line("{$source} → {$destination}".($content ? ' (record retained, redirected)' : ' (redirect-only)'));
         }
         if (! $this->option('dry-run')) app(RedirectResolver::class)->clearCache();
+        $this->line('/blog (published, indexable, sitemap)');
+        $this->line('/mon-compte (published, noindex, excluded from sitemap)');
         return self::SUCCESS;
     }
 }

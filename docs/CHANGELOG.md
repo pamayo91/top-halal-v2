@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-08-26
+- Confirmed the distinct retained-page policy: `/blog` is indexable and listed in the sitemap; `/mon-compte` remains available without redirect but is `noindex,follow` and excluded from the sitemap. Sitemap generation now excludes every editorial record carrying a `noindex` directive.
 - Applied the approved non-restaurant sitemap cleanup without deleting migration records: retained `/blog` and `/mon-compte`; marked nine technical/duplicate paths as redirected, excluded them from sitemap eligibility and added exact 301 rules (`/blog-2` → `/blog`, all other approved removals → `/`).
 - Validated the structural SEO release on preproduction: migration/import/audits passed (454 application rules, 3 Apache-owned infrastructure rules, no persisted conflicts/loops/chains; 121 articles, 90 pages and 7,633 restaurants mapped with no editorial slug collision). Full PHP suite passes: 40 tests, 186 assertions. Browser checks passed for exact, regex and query redirects, 404, canonical restaurant markup and console errors.
 - Added the structural SEO foundation: canonical route contract, trailing-slash normalization, public 404/410 responses, sitemap/robots, visible breadcrumbs and native JSON-LD. Restaurant JSON-LD emits a single approved-review AggregateRating only when visible.

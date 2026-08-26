@@ -49,7 +49,7 @@ class AuditNonRestaurantSitemapCommand extends Command
     private function addEditorial(callable $add, object $item, string $type): void
     {
         $path = '/'.$item->slug; $status = $item->status; $indexable = $status === 'published' && ! Str::contains((string) $item->seo_robots, 'noindex');
-        $sitemap = $status === 'published'; $slug = Str::lower($item->slug);
+        $sitemap = $indexable; $slug = Str::lower($item->slug);
         $explicitHome = $slug === 'home'; $explicitPayment = $slug === 'payment-success-2';
         $approvedKeep = in_array($slug, ['blog', 'mon-compte'], true);
         $suspect = ! $approvedKeep && ($explicitHome || $explicitPayment || Str::contains($slug, ['payment', 'checkout', 'login', 'register', 'account', 'dashboard', 'submit-listing', 'claim', 'listingpro', 'test', 'demo', 'search']));
@@ -58,7 +58,8 @@ class AuditNonRestaurantSitemapCommand extends Command
         $canonicalMismatch = $legacyCanonical !== '' && rtrim(parse_url($legacyCanonical, PHP_URL_PATH) ?: '/', '/') !== rtrim($path, '/');
         if ($status === 'redirected') [$recommendation, $reason] = ['SUPPRIMER-REDIRIGER', 'Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active.'];
         elseif ($explicitHome || $explicitPayment) [$recommendation, $reason] = ['SUPPRIMER-REDIRIGER', 'Décision validée : redirection 301 vers `/`, non indexable et exclue du sitemap.'];
-        elseif ($approvedKeep) [$recommendation, $reason] = ['CONSERVER', 'Conservation explicitement validée ; contenu à compléter dans la future phase front.'];
+        elseif ($slug === 'mon-compte') [$recommendation, $reason] = ['CONSERVER', 'Conservation explicitement validée : accessible, noindex et exclue du sitemap.'];
+        elseif ($approvedKeep) [$recommendation, $reason] = ['CONSERVER', 'Conservation explicitement validée : indexable et présente dans le sitemap.'];
         elseif ($suspect || $empty || ! $indexable || $canonicalMismatch) [$recommendation, $reason] = ['RETIRER DU SITEMAP', $canonicalMismatch ? 'Canonical legacy divergent détecté : revue métier requise avant toute suppression ou redirection.' : ($empty ? 'Contenu vide : revue métier avant toute suppression ou redirection.' : 'Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection.')];
         else [$recommendation, $reason] = ['CONSERVER', 'Contenu éditorial publié sans signal technique détecté.'];
         $add($path, $type, $item->legacy_wp_id, $status, $indexable && ! $explicitHome && ! $explicitPayment, $sitemap, $recommendation, $reason);
