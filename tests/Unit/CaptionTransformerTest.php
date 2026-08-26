@@ -13,6 +13,7 @@ class CaptionTransformerTest extends TestCase
         $result = (new ContentTransformer)->transform($html)['html'];
         $this->assertStringContainsString('<figure class="legacy-caption">', $result);
         $this->assertStringContainsString('<figcaption>pitas au fromage</figcaption>', $result);
+        $this->assertStringContainsString('<img src="/image.jpg" width="225" height="300">', $result);
         $this->assertStringNotContainsString('[caption', $result);
         $this->assertStringNotContainsString('[/caption]', $result);
     }
