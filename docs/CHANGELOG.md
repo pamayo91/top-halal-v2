@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-08-26
+- Validated the structural SEO release on preproduction: migration/import/audits passed (454 application rules, 3 Apache-owned infrastructure rules, no persisted conflicts/loops/chains; 121 articles, 90 pages and 7,633 restaurants mapped with no editorial slug collision). Full PHP suite passes: 40 tests, 186 assertions. Browser checks passed for exact, regex and query redirects, 404, canonical restaurant markup and console errors.
 - Added the structural SEO foundation: canonical route contract, trailing-slash normalization, public 404/410 responses, sitemap/robots, visible breadcrumbs and native JSON-LD. Restaurant JSON-LD emits a single approved-review AggregateRating only when visible.
 - Added the database-backed redirect engine, deterministic `.htaccess` inventory importer, cache invalidation, exact/regex/query matching, priority/activation/hit metrics and duplicate/conflict/loop/chain audit command. Host, HTTPS and legacy-domain redirects remain Apache-owned.
 - Removed all legacy Google AdSense content from migrated articles/pages, including direct `<ins class="adsbygoogle">` slots and the fragmented Base64/URL-encoded legacy payload. The rescan finds zero `adsbygoogle`, `googlesyndication` or `ca-pub-` markers in V2 editorial HTML.

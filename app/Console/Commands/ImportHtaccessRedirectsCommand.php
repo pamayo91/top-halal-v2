@@ -19,7 +19,8 @@ class ImportHtaccessRedirectsCommand extends Command
             if ($record['infrastructure']) { $report['infrastructure'][] = $record['line']; continue; }
             [$source, $query, $review] = $this->compileConditions($record);
             if ($review) { $report['review'][] = $record['line']; continue; }
-            $key = implode('|', [$record['kind'], $source, $query]);
+            // Legacy Apache paths were served case-insensitively; detect those collisions before MariaDB's collation merges them.
+            $key = implode('|', [$record['kind'], mb_strtolower($source), mb_strtolower((string) $query)]);
             if (isset($seen[$key])) { $report['duplicates'][] = $record['line']; continue; }
             $seen[$key] = true;
             $destination = $record['destination_path'];
