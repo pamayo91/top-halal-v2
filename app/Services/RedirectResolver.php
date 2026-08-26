@@ -15,7 +15,8 @@ class RedirectResolver
     {
         $path = '/'.ltrim(rawurldecode($request->path()), '/');
         $path = $path === '/.' ? '/' : $path;
-        $query = $request->getQueryString() ?? '';
+        // Apache RewriteCond sees the raw query string; Laravel's normalized accessor may reorder keys.
+        $query = (string) ($request->server('QUERY_STRING') ?? '');
         $loadRules = fn () => [
             'exact' => RedirectRule::query()->where('is_active', true)->where('match_type', 'exact')->orderBy('priority')->orderBy('id')->get()->all(),
             'regex' => RedirectRule::query()->where('is_active', true)->where('match_type', 'regex')->orderBy('priority')->orderBy('id')->get()->all(),
