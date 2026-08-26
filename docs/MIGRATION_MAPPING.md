@@ -30,7 +30,7 @@
 ### Full inline-media reconciliation
 - `legacy:migrate-all --only=media` rescans transformed legacy HTML for absolute and root-relative `/wp-content` / `/wp-contenu` images. It does not blindly import the physical upload tree.
 - Each readable inline source is copied/reused by checksum, linked through `content_media.media_asset_id`, and rewritten with V2 `src`, `srcset`, intrinsic dimensions and lazy loading. A source with no readable file is removed only after it is recorded as an anomaly.
-- The full editorial scan found 695 inline references: 280 resolvable references (152 distinct content/media relations) and 415 physically unavailable sources. No V2 content HTML retains a legacy upload URL.
+- The final editorial scan found 695 inline references. The additional `wp-contenu/uploads` tree recovered 412 of the 415 initially unavailable sources; three are confirmed local/public 404 anomalies. The final V2 state contains 562 distinct inline content/media relations and no legacy upload URL.
 - Legacy post `27` has four inline references (`rouleaux-300x225.jpg`, `img_0147.jpg`, `img_0150.jpg`, `img_0149.jpg`). Their attachment rows and physical sources are absent, so each is an explicit `missing_physical_source` anomaly and no V2 relation is invented.
 
 ### Restaurant pilot implementation

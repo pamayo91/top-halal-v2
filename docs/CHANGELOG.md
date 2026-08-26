@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-08-26
+- Completed the full legacy-to-V2 migration: final idempotence run `ab6713de-164a-4216-b320-4cb143e1b184` created no entity. The PHP suite is green (31 tests, 158 assertions), all V2 media originals/variants exist, and no migrated HTML references `wp-content` or `wp-contenu`.
+- Reclassified the 415 apparent inline-media losses: 412 were recovered read-only from the additional legacy `wp-contenu/uploads` tree; three URLs return 404 locally and publicly and remain explicit anomalies.
 - Fixed the full-migration inline-media regression: the migration had stripped editorial images before its media phase and only considered WordPress-standard relations. It now rescans complete editorial HTML, including root-relative legacy upload paths, copies/reuses readable sources, creates V2 content-media relations and writes safe V2 `src`, `srcset`, dimensions and lazy-loading attributes.
 - Reconciled 695 inline references: 280 readable references are represented by 152 idempotent V2 content-media links; 415 unavailable physical sources remain explicit migration anomalies. No migrated article or page retains a public `wp-content` or `wp-contenu` upload reference.
 - Investigated legacy post 27: all four expected inline images have neither a surviving attachment row nor a readable legacy file. They are reported as `missing_physical_source`, not rendered through legacy WordPress.

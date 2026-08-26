@@ -23,7 +23,7 @@ Last updated: 2026-08-25
 | Migration: articles/pages | DONE (pilot) | Five posts and five pages migrated idempotently; PHP and Playwright desktop/mobile validations are green. |
 | Migration: comments | DONE (pilot) | Aggregate audit completed; ten deterministic approved/pending editorial comments migrated idempotently to migrated articles/pages only. Spam, pingbacks, reviews and all non-pilot comments remain untouched. |
 | Migration: reviews | DONE (pilot) | Eight deterministic ListingPro reviews migrated idempotently; three malformed/unrated links reported and skipped. |
-| Migration: media | IN PROGRESS (full migration) | The inline-media reconciliation now scans absolute and root-relative `wp-content`/`wp-contenu` references in all 122 articles and 90 pages. 280 usable references are rewritten to V2 media (152 distinct content-media relations); 415 sources are genuinely unavailable and recorded as anomalies. Final full-migration validation remains in progress. |
+| Migration: media | DONE (full migration) | Final idempotence run `ab6713de-164a-4216-b320-4cb143e1b184` created no record. 412 former missing inline sources were recovered from the local `wp-contenu` legacy tree; only three 404 sources remain explicit anomalies. No V2 HTML references legacy uploads. |
 | Redirect manager | TODO | Exact + regex/query rules + htaccess import |
 | Public design system | TODO | Simple, modern, mobile-first, CWV-first |
 | Restaurant frontend | TODO | |
