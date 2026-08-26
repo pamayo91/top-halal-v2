@@ -10,6 +10,7 @@ use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
 use App\Http\Controllers\{AccountController, AuthController, ClaimModerationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
 
 Route::get('/', function () {
     return view('home');
@@ -21,6 +22,8 @@ Route::get('/health', function () {
         'service' => 'top-halal-v2',
     ]);
 })->name('health');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/media/{asset}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->whereNumber('width')->name('media.show');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
@@ -76,3 +79,9 @@ Route::middleware('auth')->group(function (): void {
         Route::patch('/admin/claims/{claim}/reject', [ClaimModerationController::class, 'reject'])->name('admin.claims.reject');
     });
 });
+
+Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
+Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name('locations.show');
+Route::get('/specialites/{slug}', [PublicContentController::class, 'category'])->name('categories.show');
+Route::get('/service/{slug}', [PublicContentController::class, 'feature'])->name('features.show');
+Route::get('/{slug}', [PublicContentController::class, 'editorial'])->where('slug', '[a-z0-9-]+')->name('editorial.show');

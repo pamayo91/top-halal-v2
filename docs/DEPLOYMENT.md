@@ -34,6 +34,9 @@
 9. Run health check and targeted smoke/E2E tests against the preproduction URL.
 10. If validation fails, stop and fix before considering deployment complete.
 
+## SEO structural deployment addition
+After approval to deploy this release to preproduction, run the explicit PHP 8.4 Artisan commands in this order: `migrate --force`, `redirects:import-htaccess`, `redirects:audit`, then application cache commands. Do not move content redirects back to Apache; only preserve the existing host/HTTPS rules. Validate representative exact, regex and query redirects plus sitemap, robots, 404 and a restaurant aggregate-rating page in Playwright before promotion.
+
 ## Future Automation
 Create `scripts/deploy-preprod.sh` after the server audit confirms final paths, PHP/Composer locations, Node/npm needs, worker manager and Apache setup. The script should automate the target deployment flow without embedding secrets.
 

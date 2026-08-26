@@ -24,7 +24,7 @@ Last updated: 2026-08-25
 | Migration: comments | DONE (pilot) | Aggregate audit completed; ten deterministic approved/pending editorial comments migrated idempotently to migrated articles/pages only. Spam, pingbacks, reviews and all non-pilot comments remain untouched. |
 | Migration: reviews | DONE (pilot) | Eight deterministic ListingPro reviews migrated idempotently; three malformed/unrated links reported and skipped. |
 | Migration: media | DONE (full migration) | Final idempotence run `ab6713de-164a-4216-b320-4cb143e1b184` created no record. 412 former missing inline sources were recovered from the local `wp-contenu` legacy tree; only three 404 sources remain explicit anomalies. No V2 HTML references legacy uploads. |
-| Redirect manager | TODO | Exact + regex/query rules + htaccess import |
+| Redirect manager | IMPLEMENTED — VALIDATION PENDING | Database exact/regex/query engine, deterministic importer, counters, cache and audit command added locally; preproduction migration/import/browser validation remains required. |
 | Public design system | TODO | Simple, modern, mobile-first, CWV-first |
 | Restaurant frontend | TODO | |
 | Search/geolocation | TODO | MariaDB spatial capabilities to be validated in implementation |
@@ -34,7 +34,7 @@ Last updated: 2026-08-25
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |
 | Automated news workflow | TODO | Disclosure configurable |
-| SEO validation | TODO | |
+| SEO structural / routes | IMPLEMENTED — VALIDATION PENDING | Canonical routes, slash policy, sitemap, robots, 404/410, breadcrumbs, JSON-LD and facet policy are in code/docs; final design is out of scope. |
 | Playwright E2E | DONE | HTTPS preprod smoke passes on desktop/mobile for homepage, `/health`, 404, noindex, robots, cookies and sensitive paths |
 | Public exposure checks | DONE | `/`, `/health`, 404 and sensitive paths checked; `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/` are not publicly readable |
 | Preproduction indexing protection | DONE | `X-Robots-Tag: noindex, nofollow` is active and `robots.txt` disallows all crawling |

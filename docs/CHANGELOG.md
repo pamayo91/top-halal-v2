@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2026-08-26
+- Added the structural SEO foundation: canonical route contract, trailing-slash normalization, public 404/410 responses, sitemap/robots, visible breadcrumbs and native JSON-LD. Restaurant JSON-LD emits a single approved-review AggregateRating only when visible.
+- Added the database-backed redirect engine, deterministic `.htaccess` inventory importer, cache invalidation, exact/regex/query matching, priority/activation/hit metrics and duplicate/conflict/loop/chain audit command. Host, HTTPS and legacy-domain redirects remain Apache-owned.
 - Removed all legacy Google AdSense content from migrated articles/pages, including direct `<ins class="adsbygoogle">` slots and the fragmented Base64/URL-encoded legacy payload. The rescan finds zero `adsbygoogle`, `googlesyndication` or `ca-pub-` markers in V2 editorial HTML.
 - Completed the full legacy-to-V2 migration: final idempotence run `ab6713de-164a-4216-b320-4cb143e1b184` created no entity. The PHP suite is green (31 tests, 158 assertions), all V2 media originals/variants exist, and no migrated HTML references `wp-content` or `wp-contenu`.
 - Reclassified the 415 apparent inline-media losses: 412 were recovered read-only from the additional legacy `wp-contenu/uploads` tree; three URLs return 404 locally and publicly and remain explicit anomalies.

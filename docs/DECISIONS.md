@@ -34,3 +34,6 @@ Codex must update project status/specifications as it develops and tests feature
 
 ### D011 — Controlled V2 media pipeline
 Media is reconciled through explicit, idempotent attachment pilots. V2 stores originals privately by checksum, generates local responsive WebP variants for supported raster formats, and never renders a legacy upload URL. Missing files and unselected inline media remain auditable debt rather than inferred or silently discarded.
+
+### D012 — SEO URL and removal policy
+Canonical public paths are slashless (except `/`) and use the restaurant, location, taxonomy and editorial route contract in `specifications/seo.md`. Deleted legacy URLs default to a 301 toward the best equivalent and, ultimately, `/`; 404/410 require an explicit technical or product justification.
