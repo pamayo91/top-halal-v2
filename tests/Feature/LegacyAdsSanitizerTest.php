@@ -11,8 +11,9 @@ class LegacyAdsSanitizerTest extends TestCase
     {
         $ad = '<p><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><ins class="adsbygoogle" data-ad-client="ca-pub-2607759447209855"></ins></p>';
         $encoded = base64_encode(urlencode($ad));
+        $fragmented = 'JTNDcCUzRS'.base64_encode(' adsbygoogle ca-pub-2607759447209855 ').'JTNDJTJGcCUzRQ';
 
-        $result = app(ContentSanitizer::class)->sanitize($ad.$encoded);
+        $result = app(ContentSanitizer::class)->sanitize($ad.$encoded.$fragmented);
 
         $this->assertStringNotContainsString('adsbygoogle', $result['html']);
         $this->assertStringNotContainsString('ca-pub-', $result['html']);
