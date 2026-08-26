@@ -55,7 +55,8 @@ class AuditNonRestaurantSitemapCommand extends Command
         $empty = blank(trim(strip_tags((string) $item->content_html)));
         $legacyCanonical = trim((string) $item->seo_canonical);
         $canonicalMismatch = $legacyCanonical !== '' && rtrim(parse_url($legacyCanonical, PHP_URL_PATH) ?: '/', '/') !== rtrim($path, '/');
-        if ($explicitHome || $explicitPayment) [$recommendation, $reason] = ['SUPPRIMER-REDIRIGER', 'Décision validée : redirection 301 vers `/`, non indexable et exclue du sitemap.'];
+        if ($status === 'redirected') [$recommendation, $reason] = ['SUPPRIMER-REDIRIGER', 'Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active.'];
+        elseif ($explicitHome || $explicitPayment) [$recommendation, $reason] = ['SUPPRIMER-REDIRIGER', 'Décision validée : redirection 301 vers `/`, non indexable et exclue du sitemap.'];
         elseif ($suspect || $empty || ! $indexable || $canonicalMismatch) [$recommendation, $reason] = ['RETIRER DU SITEMAP', $canonicalMismatch ? 'Canonical legacy divergent détecté : revue métier requise avant toute suppression ou redirection.' : ($empty ? 'Contenu vide : revue métier avant toute suppression ou redirection.' : 'Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection.')];
         else [$recommendation, $reason] = ['CONSERVER', 'Contenu éditorial publié sans signal technique détecté.'];
         $add($path, $type, $item->legacy_wp_id, $status, $indexable && ! $explicitHome && ! $explicitPayment, $sitemap, $recommendation, $reason);

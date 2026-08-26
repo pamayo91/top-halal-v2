@@ -25,3 +25,6 @@ External website/social/reservation URLs must not be present in public HTML or J
 Before cutover, crawl/check all known historical URLs and redirect rules. Report unexpected 404/5xx, chains, loops and destination mismatches.
 
 Run `seo:audit-legacy-urls` after the full migration to write the deterministic content/listing URL mapping and fail on published page/article slug collisions. Run `redirects:audit` after importing historical rules, then crawl the combined report on preproduction before cutover.
+
+## Approved technical-page cleanup (2026-08-26)
+`/blog` and `/mon-compte` remain published pending content work. The migrated records for `/home`, `/payment-success-2`, `/blog-2`, `/erreur-paiement`, `/payment-checkout`, `/payment-fail`, `/payment-success`, `/submit-listing` and `/hello` are retained for reconciliation but marked `redirected`, excluded from the sitemap and covered by an exact 301. `/blog-2` redirects to `/blog`; all remaining paths redirect to `/` under the approved ultimate fallback policy.
