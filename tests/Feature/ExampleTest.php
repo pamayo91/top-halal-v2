@@ -7,12 +7,12 @@ use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    public function test_homepage_returns_neutral_bootstrap_page(): void
+    public function test_homepage_returns_public_search_page(): void
     {
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('Top Halal V2');
+        $response->assertSee('Trouvez votre restaurant halal, simplement.');
     }
 
     public function test_health_endpoint_returns_success(): void

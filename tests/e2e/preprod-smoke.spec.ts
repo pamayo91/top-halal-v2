@@ -23,7 +23,7 @@ test('preproduction homepage and health endpoint respond cleanly', async ({ page
 
   const response = await page.goto('/');
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole('heading', { name: 'Top Halal V2' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Trouvez votre restaurant halal, simplement.' })).toBeVisible();
 
   const health = await request.get('/health');
   await expect(health).toBeOK();
