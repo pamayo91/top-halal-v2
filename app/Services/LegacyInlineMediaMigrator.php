@@ -146,8 +146,10 @@ class LegacyInlineMediaMigrator
             $asset = $resolved[$source];
             $alt = '';
             if (preg_match('/\balt=["\']([^"\']*)["\']/i', $match[0], $altMatch)) $alt = e(html_entity_decode($altMatch[1]));
+            $legacyWidth = preg_match('/\bwidth=["\'](\d+)["\']/i', $match[0], $widthMatch) ? min((int) $widthMatch[1], $asset->width) : $asset->width;
+            $legacyHeight = preg_match('/\bheight=["\'](\d+)["\']/i', $match[0], $heightMatch) ? (int) $heightMatch[1] : (int) round($asset->height * $legacyWidth / $asset->width);
             $srcset = $asset->variants()->orderBy('width')->get()->map(fn ($variant) => '/media/'.$asset->id.'/'.$variant->width.' '.$variant->width.'w')->implode(', ');
-            return '<img src="/media/'.$asset->id.'"'.($srcset ? ' srcset="'.$srcset.'" sizes="(max-width: 100vw) 100vw, '.$asset->width.'px"' : '').' width="'.$asset->width.'" height="'.$asset->height.'" loading="lazy" alt="'.$alt.'">';
+            return '<img class="content-inline-image" src="/media/'.$asset->id.'"'.($srcset ? ' srcset="'.$srcset.'" sizes="(max-width: '.$legacyWidth.'px) 100vw, '.$legacyWidth.'px"' : '').' width="'.$legacyWidth.'" height="'.$legacyHeight.'" loading="lazy" alt="'.$alt.'">';
         }, $html);
         $html = preg_replace_callback('/\bhref=["\']((?:https?:\/\/(?:www\.)?top-halal\.fr)?\/wp-conten(?:t|u)[^"\']*)["\']/i', function (array $match) use ($resolved): string {
             $source = html_entity_decode($match[1]);
