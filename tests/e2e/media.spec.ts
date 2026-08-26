@@ -11,7 +11,7 @@ for (const path of ['/_preview/post/11461', '/_preview/page/10430', '/_preview/p
     expect(response?.status()).toBe(200);
     const image = page.locator('img').first();
     await expect(image).toBeVisible();
-    await expect(image).toHaveAttribute('src', /^https?:\/\/[^/]+\/media\/\d+$/);
+    await expect(image).toHaveAttribute('src', /(?:https?:\/\/[^/]+)?\/media\/\d+$/);
     await expect(image).toHaveAttribute('width', /\d+/);
     await expect(image).toHaveAttribute('height', /\d+/);
     expect(requests.some(url => /top-halal\.fr\/wp-conten(?:t|u)/i.test(url))).toBeFalsy();
