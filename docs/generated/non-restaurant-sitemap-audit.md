@@ -1,6 +1,6 @@
 # Audit sitemap V2 — URLs hors restaurants
 
-Généré le 2026-08-26T13:26:34+00:00. Cet audit est en lecture seule ; il décrit le sitemap effectif avant correction.
+Généré le 2026-08-26T14:14:48+00:00. Cet audit est en lecture seule ; il décrit le sitemap effectif avant correction.
 
 ## Synthèse
 
@@ -2180,7 +2180,7 @@ Généré le 2026-08-26T13:26:34+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/autres-interdits-islam | page | 11655 | published | oui | oui | https://dev.top-halal.fr/autres-interdits-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/averroes-science-et-foi | page | 11688 | published | oui | oui | https://dev.top-halal.fr/averroes-science-et-foi | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/bioethique-jurisprudence-islamique | page | 11590 | published | oui | oui | https://dev.top-halal.fr/bioethique-jurisprudence-islamique | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/blog | page | 13 | published | oui | oui | https://dev.top-halal.fr/blog | CONSERVER | Conservation explicitement validée ; contenu à compléter dans la future phase front. |
+| https://dev.top-halal.fr/blog | page | 13 | published | oui | oui | https://dev.top-halal.fr/blog | CONSERVER | Conservation explicitement validée : indexable et présente dans le sitemap. |
 | https://dev.top-halal.fr/blog-2 | page | 35 | redirected | non | non | https://dev.top-halal.fr/blog-2 | SUPPRIMER-REDIRIGER | Enregistrement migré conservé pour traçabilité ; URL couverte par une redirection 301 active. |
 | https://dev.top-halal.fr/boutique-al-hidayah | page | 10380 | published | oui | oui | https://dev.top-halal.fr/boutique-al-hidayah | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/burger-king-hallal | page | 12025 | published | oui | oui | https://dev.top-halal.fr/burger-king-hallal | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
@@ -2230,7 +2230,7 @@ Généré le 2026-08-26T13:26:34+00:00. Cet audit est en lecture seule ; il déc
 | https://dev.top-halal.fr/mission-foods | page | 10579 | published | oui | oui | https://dev.top-halal.fr/mission-foods | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/modifier-un-restaurant | page | 6 | published | oui | oui | https://dev.top-halal.fr/modifier-un-restaurant | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/moise-dans-lislam | page | 11663 | published | oui | oui | https://dev.top-halal.fr/moise-dans-lislam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
-| https://dev.top-halal.fr/mon-compte | page | 4 | published | oui | oui | https://dev.top-halal.fr/mon-compte | CONSERVER | Conservation explicitement validée ; contenu à compléter dans la future phase front. |
+| https://dev.top-halal.fr/mon-compte | page | 4 | published | non | non | https://dev.top-halal.fr/mon-compte | CONSERVER | Conservation explicitement validée : accessible, noindex et exclue du sitemap. |
 | https://dev.top-halal.fr/mosquee-de-paris | page | 11554 | published | oui | oui | https://dev.top-halal.fr/mosquee-de-paris | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/musulmans-chretiens-meme-dieu | page | 11617 | published | oui | oui | https://dev.top-halal.fr/musulmans-chretiens-meme-dieu | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
 | https://dev.top-halal.fr/musulmans-france-islam | page | 11659 | published | oui | oui | https://dev.top-halal.fr/musulmans-france-islam | CONSERVER | Contenu éditorial publié sans signal technique détecté. |
