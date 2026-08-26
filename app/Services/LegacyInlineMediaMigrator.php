@@ -128,7 +128,7 @@ class LegacyInlineMediaMigrator
     /** @return list<array{src:string,tag:string}> */
     private function images(string $html): array
     {
-        preg_match_all('/<img\b[^>]*\bsrc=["\']([^"\']*top-halal\.fr\/wp-conten(?:t|u)[^"\']*)["\'][^>]*>/i', $html, $matches, PREG_SET_ORDER);
+        preg_match_all('/<img\b[^>]*\bsrc=["\']((?:https?:\/\/(?:www\.)?top-halal\.fr)?\/wp-conten(?:t|u)[^"\']*)["\'][^>]*>/i', $html, $matches, PREG_SET_ORDER);
         return array_map(fn (array $match) => ['src' => html_entity_decode($match[1]), 'tag' => $match[0]], $matches);
     }
 
@@ -140,7 +140,7 @@ class LegacyInlineMediaMigrator
     /** @param array<string,MediaAsset> $resolved */
     private function rewrite(string $html, array $resolved): string
     {
-        $html = preg_replace_callback('/<img\b[^>]*\bsrc=["\']([^"\']*top-halal\.fr\/wp-conten(?:t|u)[^"\']*)["\'][^>]*>/i', function (array $match) use ($resolved): string {
+        $html = preg_replace_callback('/<img\b[^>]*\bsrc=["\']((?:https?:\/\/(?:www\.)?top-halal\.fr)?\/wp-conten(?:t|u)[^"\']*)["\'][^>]*>/i', function (array $match) use ($resolved): string {
             $source = html_entity_decode($match[1]);
             if (! isset($resolved[$source])) return '';
             $asset = $resolved[$source];
@@ -149,7 +149,7 @@ class LegacyInlineMediaMigrator
             $srcset = $asset->variants()->orderBy('width')->get()->map(fn ($variant) => '/media/'.$asset->id.'/'.$variant->width.' '.$variant->width.'w')->implode(', ');
             return '<img src="/media/'.$asset->id.'"'.($srcset ? ' srcset="'.$srcset.'" sizes="(max-width: 100vw) 100vw, '.$asset->width.'px"' : '').' width="'.$asset->width.'" height="'.$asset->height.'" loading="lazy" alt="'.$alt.'">';
         }, $html);
-        return preg_replace_callback('/\bhref=["\']([^"\']*top-halal\.fr\/wp-conten(?:t|u)[^"\']*)["\']/i', function (array $match) use ($resolved): string {
+        return preg_replace_callback('/\bhref=["\']((?:https?:\/\/(?:www\.)?top-halal\.fr)?\/wp-conten(?:t|u)[^"\']*)["\']/i', function (array $match) use ($resolved): string {
             $source = html_entity_decode($match[1]);
             return isset($resolved[$source]) ? 'href="/media/'.$resolved[$source]->id.'"' : '';
         }, $html);
