@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Top Halal V2</title>
+        <title>Top Halal V2</title>
+        <link rel="canonical" href="{{ route('home') }}">
 </head>
 <body>
     <main>
