@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-08-26
+- Fixed the full-migration inline-media regression: the migration had stripped editorial images before its media phase and only considered WordPress-standard relations. It now rescans complete editorial HTML, including root-relative legacy upload paths, copies/reuses readable sources, creates V2 content-media relations and writes safe V2 `src`, `srcset`, dimensions and lazy-loading attributes.
+- Reconciled 695 inline references: 280 readable references are represented by 152 idempotent V2 content-media links; 415 unavailable physical sources remain explicit migration anomalies. No migrated article or page retains a public `wp-content` or `wp-contenu` upload reference.
+- Investigated legacy post 27: all four expected inline images have neither a surviving attachment row nor a readable legacy file. They are reported as `missing_physical_source`, not rendered through legacy WordPress.
+- Added sanitizer coverage for absolute and relative legacy upload images, and replaced hard-coded pilot preview media with generic featured-media rendering.
+
 ## 2026-08-25
 - Completed the controlled Media pilot: audited 2,239 legacy attachments, copied four reviewed assets into V2 storage, generated eight WebP variants and confirmed idempotence on a second apply.
 - Added safe media delivery (exact MIME, immutable cache, `nosniff`, unavailable width = 404), PHP coverage and desktop/mobile preproduction validation. The `wp-content` and `wp-contenu` spellings are both removed from migrated pilot HTML, so previews no longer request legacy uploads.

@@ -27,6 +27,12 @@
 - The reviewed media IDs `10432`, `11463`, `11807` and `22736` support the existing content/listing pilot. Their originals are copied into private V2 storage by SHA-256 path and retain `legacy_attachment_id`; the second apply creates no duplicate asset or variant.
 - V2 generated eight non-upscaled WebP variants. Public `/media/{asset}/{width?}` returns only V2 storage with exact MIME, immutable cache and `nosniff`; an unavailable requested width returns 404.
 
+### Full inline-media reconciliation
+- `legacy:migrate-all --only=media` rescans transformed legacy HTML for absolute and root-relative `/wp-content` / `/wp-contenu` images. It does not blindly import the physical upload tree.
+- Each readable inline source is copied/reused by checksum, linked through `content_media.media_asset_id`, and rewritten with V2 `src`, `srcset`, intrinsic dimensions and lazy loading. A source with no readable file is removed only after it is recorded as an anomaly.
+- The full editorial scan found 695 inline references: 280 resolvable references (152 distinct content/media relations) and 415 physically unavailable sources. No V2 content HTML retains a legacy upload URL.
+- Legacy post `27` has four inline references (`rouleaux-300x225.jpg`, `img_0147.jpg`, `img_0150.jpg`, `img_0149.jpg`). Their attachment rows and physical sources are absent, so each is an explicit `missing_physical_source` anomaly and no V2 relation is invented.
+
 ### Restaurant pilot implementation
 - V2 uses compact `categories`, `features` and hierarchical `locations` tables rather than separate region/department/city tables. A location parent preserves legacy WordPress hierarchy where available.
 - `restaurant_category`, `restaurant_feature` and `restaurant_location` preserve many-to-many ListingPro terms.
@@ -80,7 +86,7 @@
 - ListingPro stores important structured data in serialized/meta option fields, especially `lp_listingpro_options`.
 - Yoast data is present in postmeta and dedicated Yoast tables.
 - A small amount of AIOSEO postmeta exists and should be reconciled after Yoast precedence is defined.
-- Inline legacy `wp-content` and `wp-contenu` images removed from the editorial pilot are tracked in `docs/generated/inline-media-debt.*` for a future media reconciliation; physical media remains out of scope.
+- Inline legacy `wp-content` and `wp-contenu` images are reconciled in the full media phase. Only a genuinely unreadable source remains an explicit anomaly; public V2 HTML never retains its legacy upload URL.
 - Review IDs `21098`, `21147` and `21502` have no valid listing target; four reviews lack ratings. They remain audit anomalies, never arbitrarily attached.
 - No orphan postmeta or orphan term relationship rows were detected in the inventory.
 

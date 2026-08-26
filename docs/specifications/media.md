@@ -9,6 +9,8 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - `legacy:audit-media` lit exclusivement la connexion `legacy_wp` et produit des comptes, types MIME, références, doublons de contenu et anomalies sans exposer de chemin ou de donnée personnelle dans le rapport.
 - `legacy:migrate-media` exige de un à dix identifiants d’attachments explicitement revus. `--dry-run` ne copie rien; `--apply` est idempotent et écrit un rapport de réconciliation.
 - Chaque attachment garde son `legacy_attachment_id`. Les sources absentes, non rasterisables et les doublons sont signalés; rien n’est inventé ni servi depuis l’héritage.
+- Le migrateur complet analyse aussi les images inline réellement référencées dans les HTML d’articles/pages, y compris les chemins relatifs `/wp-content` et `/wp-contenu` sans relation WordPress standard. Une source lisible est copiée puis remplacée par une URL V2 ; une source absente est une anomalie explicite et n’est jamais laissée dans le HTML public.
+- `content_media.media_asset_id` relie featured et inline à l’asset V2. `legacy_attachment_id` peut être nul seulement pour un fichier HTML legacy sans attachment WordPress survivant.
 - Les fichiers sont stockés sous leur checksum SHA-256. Deux attachments identiques conservent chacun leur `legacy_attachment_id` tout en partageant le même fichier physique.
 
 ## Diffusion et performance
