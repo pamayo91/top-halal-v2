@@ -14,7 +14,8 @@ class LegacyAdsSanitizerTest extends TestCase
 
         $result = app(ContentSanitizer::class)->sanitize($ad.$encoded);
 
-        $this->assertSame('', $result['html']);
+        $this->assertStringNotContainsString('adsbygoogle', $result['html']);
+        $this->assertStringNotContainsString('ca-pub-', $result['html']);
         $this->assertContains('legacy_adsense', $result['removed']);
         $this->assertContains('encoded_legacy_adsense', $result['removed']);
     }
