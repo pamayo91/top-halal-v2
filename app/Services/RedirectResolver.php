@@ -19,29 +19,30 @@ class RedirectResolver
         $path = $path === '/.' ? '/' : $path;
         // Apache RewriteCond sees the raw query string; Laravel's normalized accessor may reorder keys.
         $query = (string) ($request->server('QUERY_STRING') ?? '');
+        $columns = ['id', 'source_path', 'match_type', 'query_pattern', 'destination', 'status_code', 'preserve_query'];
         $loadRules = fn () => [
-            'exact' => RedirectRule::query()->where('is_active', true)->where('match_type', 'exact')->orderBy('priority')->orderBy('id')->get()->all(),
-            'regex' => RedirectRule::query()->where('is_active', true)->where('match_type', 'regex')->orderBy('priority')->orderBy('id')->get()->all(),
+            'exact' => RedirectRule::query()->where('is_active', true)->where('match_type', 'exact')->orderBy('priority')->orderBy('id')->get($columns)->map->getAttributes()->all(),
+            'regex' => RedirectRule::query()->where('is_active', true)->where('match_type', 'regex')->orderBy('priority')->orderBy('id')->get($columns)->map->getAttributes()->all(),
         ];
         $rules = app()->environment('testing') ? $loadRules() : Cache::rememberForever(self::CACHE_KEY, $loadRules);
 
         foreach (array_merge($rules['exact'], $rules['regex']) as $rule) {
             $matches = [];
-            $matched = $rule->match_type === 'exact'
-                ? $path === $rule->source_path
-                : @preg_match($this->pattern($rule->source_path), ltrim($path, '/'), $matches) === 1;
-            if (! $matched || ($rule->query_pattern && @preg_match($this->pattern($rule->query_pattern), $query, $queryMatches) !== 1)) continue;
+            $matched = $rule['match_type'] === 'exact'
+                ? $path === $rule['source_path']
+                : @preg_match($this->pattern($rule['source_path']), ltrim($path, '/'), $matches) === 1;
+            if (! $matched || ($rule['query_pattern'] && @preg_match($this->pattern($rule['query_pattern']), $query, $queryMatches) !== 1)) continue;
 
-            $destination = $rule->destination;
-            if ($rule->match_type === 'regex') {
-                $destination = preg_replace($this->pattern($rule->source_path), $destination, ltrim($path, '/'), 1) ?? $destination;
+            $destination = $rule['destination'];
+            if ($rule['match_type'] === 'regex') {
+                $destination = preg_replace($this->pattern($rule['source_path']), $destination, ltrim($path, '/'), 1) ?? $destination;
             }
             foreach ($queryMatches ?? [] as $key => $value) if (is_int($key)) $destination = str_replace('%'.$key, $value, $destination);
-            if ($rule->preserve_query && $query !== '') $destination .= (str_contains($destination, '?') ? '&' : '?').$query;
+            if ($rule['preserve_query'] && $query !== '') $destination .= (str_contains($destination, '?') ? '&' : '?').$query;
             if ($this->normalisePath($destination) === $path && ! $query) continue;
 
-            RedirectRule::whereKey($rule->id)->increment('hit_count', 1, ['last_hit_at' => now()]);
-            return ['destination' => $destination, 'status' => $rule->status_code];
+            RedirectRule::whereKey($rule['id'])->increment('hit_count', 1, ['last_hit_at' => now()]);
+            return ['destination' => $destination, 'status' => $rule['status_code']];
         }
         return null;
     }
