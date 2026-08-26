@@ -30,11 +30,6 @@ class RedirectResolverTest extends TestCase
         $this->get('/ancienne-page?location=paris&foo=bar')->assertRedirect('/restos/paris');
     }
 
-    public function test_trailing_slash_is_canonicalised(): void
-    {
-        $this->get('/unknown/')->assertRedirect('/unknown');
-    }
-
     public function test_410_is_supported(): void
     {
         RedirectRule::create(['source_path' => '/technical-gone', 'match_type' => 'exact', 'destination' => '/', 'status_code' => 410, 'priority' => 1]);

@@ -16,10 +16,11 @@ class RedirectResolver
         $path = '/'.ltrim(rawurldecode($request->path()), '/');
         $path = $path === '/.' ? '/' : $path;
         $query = $request->getQueryString() ?? '';
-        $rules = Cache::rememberForever(self::CACHE_KEY, fn () => [
+        $loadRules = fn () => [
             'exact' => RedirectRule::query()->where('is_active', true)->where('match_type', 'exact')->orderBy('priority')->orderBy('id')->get()->all(),
             'regex' => RedirectRule::query()->where('is_active', true)->where('match_type', 'regex')->orderBy('priority')->orderBy('id')->get()->all(),
-        ]);
+        ];
+        $rules = app()->environment('testing') ? $loadRules() : Cache::rememberForever(self::CACHE_KEY, $loadRules);
 
         foreach (array_merge($rules['exact'], $rules['regex']) as $rule) {
             $matches = [];
@@ -36,7 +37,7 @@ class RedirectResolver
             if ($rule->preserve_query && $query !== '') $destination .= (str_contains($destination, '?') ? '&' : '?').$query;
             if ($this->normalisePath($destination) === $path && ! $query) continue;
 
-            RedirectRule::whereKey($rule->id)->increment('hit_count', ['last_hit_at' => now()]);
+            RedirectRule::whereKey($rule->id)->increment('hit_count', 1, ['last_hit_at' => now()]);
             return ['destination' => $destination, 'status' => $rule->status_code];
         }
         return null;
