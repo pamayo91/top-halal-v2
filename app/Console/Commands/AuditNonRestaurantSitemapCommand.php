@@ -30,11 +30,17 @@ class AuditNonRestaurantSitemapCommand extends Command
         }
 
         usort($rows, fn (array $a, array $b) => [$a['type'], $a['url']] <=> [$b['type'], $b['url']]);
+        $duplicates = collect($rows)->groupBy('url')->filter(fn ($group) => $group->count() > 1);
         $summary = collect($rows)->groupBy('recommendation')->map->count()->all();
         $lines = ['# Audit sitemap V2 — URLs hors restaurants', '', 'Généré le '.now()->toAtomString().'. Cet audit est en lecture seule ; il décrit le sitemap effectif avant correction.', '', '## Synthèse', '', '- URLs auditées hors restaurants : **'.count($rows).'**', '- À conserver : **'.($summary['CONSERVER'] ?? 0).'**', '- À retirer du sitemap : **'.($summary['RETIRER DU SITEMAP'] ?? 0).'**', '- À supprimer/rediriger : **'.($summary['SUPPRIMER-REDIRIGER'] ?? 0).'**', '', '## Détail exhaustif', '', '| URL | Type | legacy_wp_id | Statut V2 | Indexable | Sitemap | Canonical | Recommandation | Raison |', '| --- | --- | ---: | --- | --- | --- | --- | --- | --- |'];
         foreach ($rows as $row) $lines[] = '| '.implode(' | ', [
             $this->cell($row['url']), $row['type'], $row['legacyId'] ?? '—', $row['status'], $row['indexable'] ? 'oui' : 'non', $row['inSitemap'] ? 'oui' : 'non', $this->cell($row['canonical']), $row['recommendation'], $this->cell($row['reason']),
         ]).' |';
+        $lines[] = '';
+        $lines[] = '## Anomalies structurelles';
+        $lines[] = '';
+        $lines[] = '- URLs publiques dupliquées : **'.$duplicates->count().'**.';
+        foreach ($duplicates as $url => $group) $lines[] = '- `'.$url.'` : '.$group->pluck('type')->implode(', ').'.';
         File::put(base_path($this->option('out')), implode("\n", $lines)."\n");
         $this->info(count($rows).' URLs hors restaurants auditées.');
         return self::SUCCESS;
@@ -47,8 +53,10 @@ class AuditNonRestaurantSitemapCommand extends Command
         $explicitHome = $slug === 'home'; $explicitPayment = $slug === 'payment-success-2';
         $suspect = $explicitHome || $explicitPayment || Str::contains($slug, ['payment', 'checkout', 'login', 'register', 'account', 'dashboard', 'submit-listing', 'claim', 'listingpro', 'test', 'demo', 'search']);
         $empty = blank(trim(strip_tags((string) $item->content_html)));
+        $legacyCanonical = trim((string) $item->seo_canonical);
+        $canonicalMismatch = $legacyCanonical !== '' && rtrim(parse_url($legacyCanonical, PHP_URL_PATH) ?: '/', '/') !== rtrim($path, '/');
         if ($explicitHome || $explicitPayment) [$recommendation, $reason] = ['SUPPRIMER-REDIRIGER', 'Décision validée : redirection 301 vers `/`, non indexable et exclue du sitemap.'];
-        elseif ($suspect || $empty || ! $indexable) [$recommendation, $reason] = ['RETIRER DU SITEMAP', $empty ? 'Contenu vide : revue métier avant toute suppression ou redirection.' : 'Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection.'];
+        elseif ($suspect || $empty || ! $indexable || $canonicalMismatch) [$recommendation, $reason] = ['RETIRER DU SITEMAP', $canonicalMismatch ? 'Canonical legacy divergent détecté : revue métier requise avant toute suppression ou redirection.' : ($empty ? 'Contenu vide : revue métier avant toute suppression ou redirection.' : 'Page technique/suspecte ou non indexable : revue métier requise avant suppression/redirection.')];
         else [$recommendation, $reason] = ['CONSERVER', 'Contenu éditorial publié sans signal technique détecté.'];
         $add($path, $type, $item->legacy_wp_id, $status, $indexable && ! $explicitHome && ! $explicitPayment, $sitemap, $recommendation, $reason);
     }
