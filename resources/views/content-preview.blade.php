@@ -1,13 +1,7 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>{{ $content->title }}</title></head><body><main><h1>{{ $content->title }}</h1>
-@php($media = \App\Models\MediaAsset::whereIn('legacy_attachment_id', [10432, 11463, 22736])->get()->keyBy('legacy_attachment_id'))
-@if ($type === 'post' && $content->legacy_wp_id === 11461 && isset($media[11463]))
-<img src="{{ route('media.show', $media[11463]) }}" srcset="{{ route('media.show', [$media[11463], 480]) }} 480w" width="{{ $media[11463]->width }}" height="{{ $media[11463]->height }}" alt="{{ $media[11463]->alt_text }}">
-@endif
-@if ($type === 'page' && $content->legacy_wp_id === 10430 && isset($media[10432]))
-<img src="{{ route('media.show', $media[10432]) }}" srcset="{{ route('media.show', [$media[10432], 480]) }} 480w" width="{{ $media[10432]->width }}" height="{{ $media[10432]->height }}" alt="{{ $media[10432]->alt_text }}">
-@endif
-@if ($type === 'page' && $content->legacy_wp_id === 11554 && isset($media[22736]))
-<img src="{{ route('media.show', $media[22736]) }}" srcset="{{ route('media.show', [$media[22736], 480]) }} 480w" width="{{ $media[22736]->width }}" height="{{ $media[22736]->height }}" loading="lazy" alt="{{ $media[22736]->alt_text }}">
+@php($featured = \App\Models\ContentMedia::query()->where('content_type', $type)->where('content_id', $content->id)->where('role', 'featured')->whereNotNull('media_asset_id')->with('asset.variants')->first()?->asset)
+@if ($featured)
+<img src="{{ route('media.show', $featured) }}" srcset="{{ $featured->variants->sortBy('width')->map(fn($variant) => route('media.show', [$featured, $variant->width]).' '.$variant->width.'w')->implode(', ') }}" sizes="(max-width: 100vw) 100vw, {{ $featured->width }}px" width="{{ $featured->width }}" height="{{ $featured->height }}" alt="{{ $featured->alt_text }}">
 @endif
 {!! $content->content_html !!}
 <section aria-labelledby="comments-title"><h2 id="comments-title">Commentaires</h2>

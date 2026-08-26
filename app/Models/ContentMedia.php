@@ -1,1 +1,1 @@
-<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; class ContentMedia extends Model {protected $guarded=[];}
+<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; class ContentMedia extends Model {protected $guarded=[]; public function asset(){return $this->belongsTo(MediaAsset::class,'media_asset_id');}}
