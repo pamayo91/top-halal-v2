@@ -1,1 +1,4 @@
-//
+const menu = document.querySelector('.menu-toggle');
+const mobileNav = document.querySelector('#mobile-nav');
+menu?.addEventListener('click', () => { const open = menu.getAttribute('aria-expanded') === 'true'; menu.setAttribute('aria-expanded', String(!open)); mobileNav.hidden = open; });
+document.querySelector('#near-me')?.addEventListener('click', () => { const button = document.querySelector('#near-me'); if (!navigator.geolocation) { button.textContent = 'Position non disponible'; return; } button.disabled = true; button.textContent = 'Localisation…'; navigator.geolocation.getCurrentPosition(({coords}) => { const form = document.querySelector('#near-me-form'); form.querySelector('[name=lat]').value = coords.latitude; form.querySelector('[name=lng]').value = coords.longitude; form.submit(); }, () => { button.disabled = false; button.textContent = 'Position indisponible'; }, {enableHighAccuracy:false, timeout:8000, maximumAge:300000}); });

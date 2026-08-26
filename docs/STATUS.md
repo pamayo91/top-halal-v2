@@ -25,9 +25,9 @@ Last updated: 2026-08-25
 | Migration: reviews | DONE (pilot) | Eight deterministic ListingPro reviews migrated idempotently; three malformed/unrated links reported and skipped. |
 | Migration: media | DONE (full migration) | Final idempotence run `ab6713de-164a-4216-b320-4cb143e1b184` created no record. 412 former missing inline sources were recovered from the local `wp-contenu` legacy tree; only three 404 sources remain explicit anomalies. No V2 HTML references legacy uploads. |
 | Redirect manager | DONE | 454 application rules active after import; 3 infrastructure rules remain Apache-owned, one normalized duplicate and two manual-review rules are reported. Preproduction exact/regex/query browser checks and PHP suite are green. |
-| Public design system | TODO | Simple, modern, mobile-first, CWV-first |
-| Restaurant frontend | TODO | |
-| Search/geolocation | TODO | MariaDB spatial capabilities to be validated in implementation |
+| Public design system | IN PROGRESS | Blade SSR mobile-first, design tokens locaux, navigation et gabarits publics construits ; validation préprod à exécuter |
+| Restaurant frontend | IN PROGRESS | Accueil, blog, collections, fiches, galerie, avis/commentaires et sortie opaque implémentés ; validation préprod à exécuter |
+| Search/geolocation | IN PROGRESS | Recherche V2 texte/ville/catégories/services et action volontaire « autour de moi » implémentées ; validation préprod à exécuter |
 | Accounts/claims | DONE (pilot) | Auth Laravel, changement obligatoire des comptes legacy, claims et modération technique validés ; aucune migration massive utilisateur autorisée. |
 | Admin/moderation | TODO | |
 | Advertising | TODO | Native/sponsored placements |

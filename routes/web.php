@@ -10,11 +10,10 @@ use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
 use App\Http\Controllers\{AccountController, AuthController, ClaimModerationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+Route::get('/', [PublicContentController::class, 'home'])->name('home');
 
 Route::get('/health', function () {
     return response()->json([
@@ -25,6 +24,7 @@ Route::get('/health', function () {
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/media/{asset}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->whereNumber('width')->name('media.show');
+Route::get('/sortie/{token}', RestaurantOutboundController::class)->where('token', '[A-Za-z0-9_-]{20,64}')->name('restaurants.outbound');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));
@@ -80,8 +80,13 @@ Route::middleware('auth')->group(function (): void {
     });
 });
 
+Route::get('/blog', [PublicContentController::class, 'blog'])->name('blog.index');
+Route::get('/restaurants', [PublicContentController::class, 'index'])->name('restaurants.index');
+Route::post('/restaurants/autour-de-moi', [PublicContentController::class, 'nearMe'])->middleware('throttle:20,1')->name('restaurants.near-me');
 Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
+Route::post('/resto/{slug}/avis', [PublicContentController::class, 'storeReview'])->middleware('throttle:10,1')->name('restaurants.reviews.store');
 Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name('locations.show');
 Route::get('/specialites/{slug}', [PublicContentController::class, 'category'])->name('categories.show');
 Route::get('/service/{slug}', [PublicContentController::class, 'feature'])->name('features.show');
+Route::post('/{slug}/commentaires', [PublicContentController::class, 'storeComment'])->middleware('throttle:10,1')->where('slug', '[a-z0-9-]+')->name('editorial.comments.store');
 Route::get('/{slug}', [PublicContentController::class, 'editorial'])->where('slug', '[a-z0-9-]+')->name('editorial.show');

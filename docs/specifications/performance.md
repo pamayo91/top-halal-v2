@@ -27,3 +27,10 @@ At minimum:
 - search/filter flow.
 
 Performance regression must be diagnosed before milestone completion.
+
+## Front public
+
+- La CSS et le JavaScript public sont un seul couple d’assets Vite locaux ; le JavaScript ne sert qu’au menu mobile et à l’action volontaire de géolocalisation.
+- Aucun script, font, iframe cartographique, carrousel ou tracker tiers n’est chargé par les gabarits publics.
+- La première image d’une fiche a une priorité haute ; les vignettes, galerie et images éditoriales hors LCP sont différées et réservent leurs dimensions.
+- Les layouts mobile passent à une colonne sans injection asynchrone, ce qui préserve la stabilité visuelle.
