@@ -11,7 +11,13 @@ class ResolveLegacyRedirect
     public function handle(Request $request, Closure $next): mixed
     {
         // V2 discovery endpoints intentionally supersede an obsolete legacy fallback rule.
-        if (in_array($request->path(), ['restaurants', 'restaurants/autour-de-moi'], true) || $request->is('bo', 'bo/*')) return $next($request);
+        // Authentication and account routes are application endpoints, never
+        // historical content. Resolving them through the legacy table can
+        // break the login flow before Laravel has a chance to authenticate.
+        if (
+            in_array($request->path(), ['restaurants', 'restaurants/autour-de-moi', 'login', 'register', 'forgot-password', 'change-password', 'verify-email'], true)
+            || $request->is('bo', 'bo/*', 'reset-password/*', 'verify-email/*', 'email/verification-notification', 'account', 'account/*', 'claims', 'claims/*')
+        ) return $next($request);
         $resolved = app(RedirectResolver::class)->resolve($request);
         if (! $resolved) return $next($request);
         return $resolved['status'] === 410

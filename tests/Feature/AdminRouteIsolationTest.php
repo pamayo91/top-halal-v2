@@ -7,4 +7,9 @@ class AdminRouteIsolationTest extends TestCase
     {
         $this->get('/bo')->assertRedirect('/login');
     }
+
+    public function test_login_route_is_never_resolved_as_a_legacy_redirect(): void
+    {
+        $this->get('/login')->assertOk();
+    }
 }
