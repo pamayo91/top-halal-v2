@@ -18,7 +18,7 @@ class PublicContentController extends Controller
             'featuredRestaurants' => $this->publishedRestaurants()->latest('legacy_published_at')->limit(6)->get(),
             'cities' => Location::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(12)->get(),
             'categories' => Category::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(10)->get(),
-            'articles' => Article::where('status', 'published')->latest('legacy_published_at')->limit(3)->get(),
+            'articles' => Article::where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->limit(3)->get(),
         ]);
     }
 
@@ -38,7 +38,7 @@ class PublicContentController extends Controller
         return redirect()->route('restaurants.index', ['lat' => round((float) $data['lat'], 5), 'lng' => round((float) $data['lng'], 5)]);
     }
 
-    public function blog(): View { return view('public.blog.index', ['articles' => Article::where('status', 'published')->latest('legacy_published_at')->paginate(12)]); }
+    public function blog(): View { return view('public.blog.index', ['articles' => Article::where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->paginate(12)]); }
 
     public function restaurant(string $slug): Response
     {
