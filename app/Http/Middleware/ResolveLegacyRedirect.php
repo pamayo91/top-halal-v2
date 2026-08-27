@@ -11,7 +11,7 @@ class ResolveLegacyRedirect
     public function handle(Request $request, Closure $next): mixed
     {
         // V2 discovery endpoints intentionally supersede an obsolete legacy fallback rule.
-        if (in_array($request->path(), ['restaurants', 'restaurants/autour-de-moi'], true)) return $next($request);
+        if (in_array($request->path(), ['restaurants', 'restaurants/autour-de-moi'], true) || $request->is('admin', 'admin/*')) return $next($request);
         $resolved = app(RedirectResolver::class)->resolve($request);
         if (! $resolved) return $next($request);
         return $resolved['status'] === 410
