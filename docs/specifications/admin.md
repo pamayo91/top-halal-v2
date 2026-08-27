@@ -6,6 +6,8 @@ Toutes les routes `/bo` exigent une session authentifiée, un mot de passe non b
 
 Après connexion, une URL `intended` historique ou non-back-office n’est jamais rejouée pour un administrateur : celui-ci arrive sur `/bo`. Cela évite qu’un ancien `/admin` stocké en session mène vers une redirection legacy publique.
 
+Un administrateur marqué `must_change_password` est dirigé vers le changement de mot de passe, puis vers `/bo` une fois ce changement terminé.
+
 ## Modules
 
 Le tableau de bord expose des compteurs réels. L’administration propose la gestion des restaurants (y compris les liens sortants, stockés uniquement côté serveur), la modération des avis/commentaires/claims, les utilisateurs, articles/pages HTML sanitizés, médias raster, redirections, taxonomies et réglages non secrets.
