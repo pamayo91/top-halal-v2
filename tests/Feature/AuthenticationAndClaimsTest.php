@@ -79,7 +79,7 @@ class AuthenticationAndClaimsTest extends TestCase
         $this->actingAs($other)->get('/claims/'.$claim->id)->assertForbidden();
         $this->actingAs($owner)->post('/restaurants/'.$restaurant->id.'/claim', ['message' => 'duplicate'])->assertSessionHasErrors('claim');
 
-        $this->actingAs($admin)->patch('/admin/claims/'.$claim->id.'/approve')->assertRedirect('/admin/claims');
+        $this->actingAs($admin)->patch('/bo/claims/'.$claim->id.'/approve')->assertRedirect('/bo/claims');
         $this->assertSame('approved', $claim->fresh()->status);
         $this->assertSame('restaurant_owner', $owner->fresh()->role);
         $this->actingAs($owner)->get('/account/restaurants/'.$restaurant->id.'/edit')->assertOk();
@@ -93,9 +93,9 @@ class AuthenticationAndClaimsTest extends TestCase
         $restaurant = $this->restaurant();
         $user = User::factory()->create();
         $claim = RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'status' => 'pending', 'submitted_at' => now()]);
-        $this->actingAs($user)->get('/admin/claims')->assertForbidden();
-        $this->actingAs($user)->patch('/admin/claims/'.$claim->id.'/approve')->assertForbidden();
-        $this->actingAs(User::factory()->create(['role' => 'admin']))->patch('/admin/claims/'.$claim->id.'/reject', ['admin_note' => 'Justificatif absent'])->assertRedirect('/admin/claims');
+        $this->actingAs($user)->get('/bo/claims')->assertForbidden();
+        $this->actingAs($user)->patch('/bo/claims/'.$claim->id.'/approve')->assertForbidden();
+        $this->actingAs(User::factory()->create(['role' => 'admin']))->patch('/bo/claims/'.$claim->id.'/reject', ['admin_note' => 'Justificatif absent'])->assertRedirect('/bo/claims');
         $this->assertSame('rejected', $claim->fresh()->status);
         $this->assertSame('user', $user->fresh()->role);
     }

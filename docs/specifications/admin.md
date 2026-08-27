@@ -2,7 +2,7 @@
 
 ## Accès
 
-Toutes les routes `/admin` exigent une session authentifiée, un mot de passe non bloqué et un utilisateur `admin` actif. Le middleware `admin` refuse les autres utilisateurs avec 403. Les formulaires web reposent sur la protection CSRF Laravel.
+Toutes les routes `/bo` exigent une session authentifiée, un mot de passe non bloqué et un utilisateur `admin` actif. Le middleware `admin` refuse les autres utilisateurs avec 403. Les formulaires web reposent sur la protection CSRF Laravel.
 
 ## Modules
 

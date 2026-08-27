@@ -80,7 +80,7 @@ test('authentication, mandatory password change, claims and permissions', async 
   await page.locator('input[name="email"]').fill(`${prefix}-admin@example.invalid`);
   await page.locator('input[name="password"]').fill(password);
   await page.getByRole('button', { name: 'Se connecter' }).click();
-  await page.goto('/admin/claims');
+  await page.goto('/bo/claims');
   await expect(page.getByRole('heading', { name: 'Demandes en attente' })).toBeVisible();
   await page.locator('article').filter({ hasText: `Demande E2E ${key} de validation.` }).getByRole('button', { name: 'Approuver' }).click();
   await expect(page.getByRole('status')).toContainText('approuvée');
@@ -108,7 +108,7 @@ test('authentication, mandatory password change, claims and permissions', async 
   await page.locator('input[name="email"]').fill(`${prefix}-admin@example.invalid`);
   await page.locator('input[name="password"]').fill(password);
   await page.getByRole('button', { name: 'Se connecter' }).click();
-  await page.goto('/admin/claims');
+  await page.goto('/bo/claims');
   const rejection = page.locator('article').filter({ hasText: `Demande E2E ${key} à refuser.` });
   await rejection.locator('input[name="admin_note"]').fill('Justificatif absent.');
   await rejection.getByRole('button', { name: 'Refuser' }).click();

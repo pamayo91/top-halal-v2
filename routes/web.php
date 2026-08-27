@@ -78,7 +78,7 @@ Route::middleware('auth')->group(function (): void {
     });
 });
 
-Route::prefix('admin')->middleware(['auth', 'password.change.required', 'admin'])->name('admin.')->group(function (): void {
+Route::prefix('bo')->middleware(['auth', 'password.change.required', 'admin'])->name('admin.')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('restaurants', [AdminRestaurantController::class, 'index'])->name('restaurants.index');
     Route::get('restaurants/create', [AdminRestaurantController::class, 'create'])->name('restaurants.create');

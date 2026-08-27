@@ -3,8 +3,8 @@ namespace Tests\Feature;
 use Tests\TestCase;
 class AdminRouteIsolationTest extends TestCase
 {
-    public function test_admin_prefix_is_never_resolved_as_a_legacy_redirect(): void
+    public function test_back_office_prefix_is_never_resolved_as_a_legacy_redirect(): void
     {
-        $this->get('/admin')->assertRedirect('/login');
+        $this->get('/bo')->assertRedirect('/login');
     }
 }
