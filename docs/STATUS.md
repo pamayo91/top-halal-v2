@@ -29,7 +29,7 @@ Last updated: 2026-08-25
 | Restaurant frontend | DONE | Accueil, blog, collections, fiches, galerie, avis/commentaires et sortie opaque, validés par PHP et navigateur |
 | Search/geolocation | DONE | Recherche V2 texte/ville/catégories/services et action volontaire « autour de moi », validées |
 | Accounts/claims | DONE (pilot) | Auth Laravel, changement obligatoire des comptes legacy, claims et modération technique validés ; aucune migration massive utilisateur autorisée. |
-| Admin/moderation | TODO | |
+| Admin/moderation | DONE (local implementation) | `/admin` protégé par rôle actif, dashboard, CRUD/modération, médiathèque, redirections, taxonomies, réglages et audit; validation préproduction Playwright reste à exécuter après déploiement. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |

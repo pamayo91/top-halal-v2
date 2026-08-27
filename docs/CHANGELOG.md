@@ -74,3 +74,9 @@
 - Added server audit utility.
 - Added legacy `.htaccess` redirect inventory utility and source file.
 - Recorded the preproduction audit and official Composer bootstrap as hard prerequisites before Laravel initialization.
+# Changelog
+
+## 2026-08-27
+
+- Added the secured V2 administration area, audit log and daily operational management screens.
+- Added admin feature coverage for authorization, restaurant CRUD, moderation, editorial sanitization and sensitive audit filtering.

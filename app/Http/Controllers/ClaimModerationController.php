@@ -7,21 +7,22 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Notifications\ClaimStatusNotification;
+use App\Services\AdminAudit;
 
 class ClaimModerationController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->ensureAdmin();
 
         return view('admin.claims.index', ['claims' => RestaurantClaim::query()
-            ->where('status', 'pending')
+            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->with(['restaurant', 'user'])
             ->orderBy('submitted_at')
-            ->get()]);
+            ->paginate(30)->withQueryString()]);
     }
 
-    public function approve(Request $request, RestaurantClaim $claim): RedirectResponse
+    public function approve(Request $request, RestaurantClaim $claim, AdminAudit $audit): RedirectResponse
     {
         $this->ensureAdmin();
         abort_unless($claim->status === 'pending', 422);
@@ -30,17 +31,19 @@ class ClaimModerationController extends Controller
             $claim->user->update(['role' => 'restaurant_owner']);
         }
         $claim->user->notify(new ClaimStatusNotification($claim, 'approved'));
+        $audit->record('claim.approved', $claim);
 
         return redirect()->route('admin.claims.index')->with('status', 'Demande approuvée.');
     }
 
-    public function reject(Request $request, RestaurantClaim $claim): RedirectResponse
+    public function reject(Request $request, RestaurantClaim $claim, AdminAudit $audit): RedirectResponse
     {
         $this->ensureAdmin();
         abort_unless($claim->status === 'pending', 422);
         $data = $request->validate(['admin_note' => ['nullable', 'string', 'max:1000']]);
         $claim->update(['status' => 'rejected', 'admin_note' => $data['admin_note'] ?? null, 'reviewed_at' => now(), 'reviewed_by' => $request->user()->id]);
         $claim->user->notify(new ClaimStatusNotification($claim, 'rejected'));
+        $audit->record('claim.rejected', $claim, ['admin_note' => $data['admin_note'] ?? null]);
 
         return redirect()->route('admin.claims.index')->with('status', 'Demande refusée.');
     }

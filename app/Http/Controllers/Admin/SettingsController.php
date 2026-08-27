@@ -1,0 +1,4 @@
+<?php
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller; use App\Models\Setting; use App\Services\AdminAudit; use Illuminate\Http\Request;
+class SettingsController extends Controller { public function edit(){return view('admin.settings',['settings'=>Setting::pluck('value','key')->all()]);}public function update(Request $r,AdminAudit $audit){$d=$r->validate(['site_name'=>'required|string|max:120','moderate_reviews'=>'nullable|boolean','moderate_comments'=>'nullable|boolean','ai_disclosure_default'=>'nullable|boolean']);foreach(['moderate_reviews','moderate_comments','ai_disclosure_default'] as $key)$d[$key]=$r->boolean($key);foreach($d as $key=>$value)Setting::updateOrCreate(['key'=>$key],['value'=>is_bool($value)?['enabled'=>$value]:['text'=>$value],'group'=>'general']);$audit->record('settings.updated','settings',array_keys($d));return back()->with('status','Paramètres enregistrés.');}}

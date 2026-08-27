@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class AdminAuditLog extends Model
+{
+    protected $guarded = [];
+    protected function casts(): array { return ['changes' => 'array']; }
+    public function admin() { return $this->belongsTo(User::class, 'admin_id'); }
+}

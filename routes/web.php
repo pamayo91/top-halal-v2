@@ -12,6 +12,7 @@ use App\Http\Controllers\{AccountController, AuthController, ClaimModerationCont
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
+use App\Http\Controllers\Admin\{ContentController as AdminContentController, DashboardController, MediaLibraryController, ModerationController, RedirectController, RestaurantController as AdminRestaurantController, SettingsController, TaxonomyController, UserController as AdminUserController};
 
 Route::get('/', [PublicContentController::class, 'home'])->name('home');
 
@@ -74,10 +75,30 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
         Route::get('/account/restaurants/{restaurant}/edit', [OwnerRestaurantController::class, 'edit'])->name('owner.restaurants.edit');
         Route::put('/account/restaurants/{restaurant}', [OwnerRestaurantController::class, 'update'])->name('owner.restaurants.update');
-        Route::get('/admin/claims', [ClaimModerationController::class, 'index'])->name('admin.claims.index');
-        Route::patch('/admin/claims/{claim}/approve', [ClaimModerationController::class, 'approve'])->name('admin.claims.approve');
-        Route::patch('/admin/claims/{claim}/reject', [ClaimModerationController::class, 'reject'])->name('admin.claims.reject');
     });
+});
+
+Route::prefix('admin')->middleware(['auth', 'password.change.required', 'admin'])->name('admin.')->group(function (): void {
+    Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('restaurants', [AdminRestaurantController::class, 'index'])->name('restaurants.index');
+    Route::get('restaurants/create', [AdminRestaurantController::class, 'create'])->name('restaurants.create');
+    Route::post('restaurants', [AdminRestaurantController::class, 'store'])->name('restaurants.store');
+    Route::get('restaurants/{restaurant}/edit', [AdminRestaurantController::class, 'edit'])->name('restaurants.edit');
+    Route::put('restaurants/{restaurant}', [AdminRestaurantController::class, 'update'])->name('restaurants.update');
+    Route::patch('restaurants/{restaurant}/archive', [AdminRestaurantController::class, 'archive'])->name('restaurants.archive');
+    Route::get('reviews', [ModerationController::class, 'reviews'])->name('reviews.index');
+    Route::patch('reviews/{review}', [ModerationController::class, 'reviewStatus'])->name('reviews.status');
+    Route::get('comments', [ModerationController::class, 'comments'])->name('comments.index');
+    Route::patch('comments/{comment}', [ModerationController::class, 'commentStatus'])->name('comments.status');
+    Route::get('claims', [ClaimModerationController::class, 'index'])->name('claims.index');
+    Route::patch('claims/{claim}/approve', [ClaimModerationController::class, 'approve'])->name('claims.approve');
+    Route::patch('claims/{claim}/reject', [ClaimModerationController::class, 'reject'])->name('claims.reject');
+    Route::get('users', [AdminUserController::class, 'index'])->name('users.index'); Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('users.update'); Route::post('users/{user}/reset-password', [AdminUserController::class, 'reset'])->name('users.reset');
+    Route::get('content/{type}', [AdminContentController::class, 'index'])->name('content.index'); Route::get('content/{type}/create', [AdminContentController::class, 'create'])->name('content.create'); Route::post('content/{type}', [AdminContentController::class, 'store'])->name('content.store'); Route::get('content/{type}/{id}/edit', [AdminContentController::class, 'edit'])->name('content.edit'); Route::put('content/{type}/{id}', [AdminContentController::class, 'update'])->name('content.update');
+    Route::get('media', [MediaLibraryController::class, 'index'])->name('media.index'); Route::post('media', [MediaLibraryController::class, 'store'])->name('media.store'); Route::put('media/{asset}', [MediaLibraryController::class, 'update'])->name('media.update');
+    Route::get('redirects', [RedirectController::class, 'index'])->name('redirects.index'); Route::get('redirects/create', [RedirectController::class, 'create'])->name('redirects.create'); Route::post('redirects', [RedirectController::class, 'store'])->name('redirects.store'); Route::get('redirects/{rule}/edit', [RedirectController::class, 'edit'])->name('redirects.edit'); Route::put('redirects/{rule}', [RedirectController::class, 'update'])->name('redirects.update'); Route::delete('redirects/{rule}', [RedirectController::class, 'destroy'])->name('redirects.destroy'); Route::post('redirects/test', [RedirectController::class, 'test'])->name('redirects.test');
+    Route::get('taxonomies/{type}', [TaxonomyController::class, 'index'])->name('taxonomies.index'); Route::post('taxonomies/{type}', [TaxonomyController::class, 'store'])->name('taxonomies.store'); Route::put('taxonomies/{type}/{id}', [TaxonomyController::class, 'update'])->name('taxonomies.update'); Route::delete('taxonomies/{type}/{id}', [TaxonomyController::class, 'destroy'])->name('taxonomies.destroy');
+    Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit'); Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
 Route::get('/blog', [PublicContentController::class, 'blog'])->name('blog.index');
