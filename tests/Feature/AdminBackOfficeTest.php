@@ -16,6 +16,14 @@ class AdminBackOfficeTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => 'admin']))->get('/bo')->assertOk();
     }
 
+    public function test_admin_login_discards_a_stale_legacy_intended_url(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->withSession(['url.intended' => 'https://dev.top-halal.fr/admin'])
+            ->post('/login', ['email' => $admin->email, 'password' => 'password'])
+            ->assertRedirect('/bo');
+    }
+
     public function test_admin_can_create_restaurant_without_exposing_external_url(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
