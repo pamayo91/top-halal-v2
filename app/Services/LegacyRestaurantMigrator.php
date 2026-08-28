@@ -68,6 +68,9 @@ class LegacyRestaurantMigrator
             ->select('term.term_id', 'term.name', 'term.slug', 'taxonomy.taxonomy', 'taxonomy.parent')
             ->orderBy('taxonomy.taxonomy')->orderBy('term.term_id')->get();
         $attachments = $this->attachments($connection, $prefix, $meta['gallery_image_ids'] ?? '');
+        if ($terms->where('taxonomy', 'location')->contains(fn ($term) => app(TaxonomyValueClassifier::class)->isMalicious($term->name))) {
+            $anomalies[] = 'malicious_location_term_excluded';
+        }
         $flat = $this->flattenMeta($meta);
         $anomalies = [];
         $description = $this->plainDescription((string) $post->post_content, $anomalies);
@@ -245,8 +248,9 @@ class LegacyRestaurantMigrator
     private function day(string $path): ?string { return preg_match('/(monday|lundi|tuesday|mardi|wednesday|mercredi|thursday|jeudi|friday|vendredi|saturday|samedi|sunday|dimanche)/i', $path, $match) ? Str::lower($match[1]) : null; }
 
     /** @param array<string, mixed> $term */
-    private function persistLocation(array $term, $terms): int
+    private function persistLocation(array $term, $terms): ?int
     {
+        if (app(TaxonomyValueClassifier::class)->isMalicious($term['name'])) return null;
         $parentId = null;
         if ($term['legacy_parent_term_id']) {
             $parent = $terms->firstWhere('legacy_term_id', $term['legacy_parent_term_id']);

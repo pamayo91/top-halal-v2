@@ -67,7 +67,7 @@ class RestaurantResource extends AdminResource
             TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {'published'=>'success','pending'=>'warning','reported'=>'danger','archived'=>'gray',default=>'info'})->sortable(),
             TextColumn::make('categories.name')->label('Catégories')->badge()->separator(',')->limitList(2),
             TextColumn::make('reviews_count')->label('Avis')->numeric()->sortable()->toggleable(),
-            TextColumn::make('updated_at')->label('Modifié')->since()->sortable()->toggleable(isToggledHiddenByDefault: true),
+            TextColumn::make('legacy_published_at')->label('Créé (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(),TextColumn::make('legacy_modified_at')->label('Modifié (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(isToggledHiddenByDefault: true),
         ])->filters([
             SelectFilter::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé','archived'=>'Archivé']),
             SelectFilter::make('location')->label('Ville / zone')->relationship('locations', 'name')->searchable()->preload(),
