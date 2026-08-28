@@ -66,27 +66,4 @@ test.describe('Filament administration', () => {
       await page.keyboard.press('Escape');
     }
   });
-
-  test('capture current review and comment dates on preproduction', async ({ page }) => {
-    await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
-    await page.locator('button[type="submit"]').click();
-    await expect(page).toHaveURL(/\/admin$/);
-
-    await page.goto('/admin/restaurant-reviews');
-    await expect(page.getByRole('table')).toBeVisible();
-    await page.screenshot({ path: 'test-results/preprod-restaurant-reviews-list.png', fullPage: true });
-    await page.getByRole('button', { name: 'Voir' }).first().click();
-    await expect(page.getByText('Date historique de l’avis', { exact: true })).toBeVisible();
-    await page.screenshot({ path: 'test-results/preprod-restaurant-review-detail.png', fullPage: true });
-    await page.keyboard.press('Escape');
-
-    await page.goto('/admin/comments');
-    await expect(page.getByRole('table')).toBeVisible();
-    await page.screenshot({ path: 'test-results/preprod-comments-list.png', fullPage: true });
-    await page.getByRole('button', { name: 'Voir' }).first().click();
-    await expect(page.getByText('Date historique du commentaire', { exact: true })).toBeVisible();
-    await page.screenshot({ path: 'test-results/preprod-comment-detail.png', fullPage: true });
-  });
 });
