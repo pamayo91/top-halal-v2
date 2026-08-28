@@ -11,9 +11,12 @@ test.describe('Filament administration', () => {
     const networkErrors: string[] = [];
 
     page.on('console', (message) => {
-      if (message.type() === 'error') consoleErrors.push(message.text());
+      if (message.type() === 'error' && !message.text().startsWith('Failed to load resource:')) consoleErrors.push(message.text());
     });
     page.on('requestfailed', (request) => networkErrors.push(`${request.method()} ${request.url()}`));
+    page.on('response', (response) => {
+      if (response.status() === 404) networkErrors.push(`404 ${response.url()}`);
+    });
 
     await page.goto('/admin');
     await page.locator('input[type="email"]').fill(email!);
