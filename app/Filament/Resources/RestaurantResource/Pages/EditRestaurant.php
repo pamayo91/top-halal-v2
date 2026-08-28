@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\RestaurantResource\Pages; use App\Filament\Pages\EditAuditedRecord; use App\Filament\Resources\RestaurantResource; class EditRestaurant extends EditAuditedRecord { protected static string $resource = RestaurantResource::class; }

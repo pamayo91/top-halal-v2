@@ -29,7 +29,7 @@ class PasswordChangeController extends Controller
         $request->user()->notify(new PasswordChangedNotification());
         $request->session()->regenerate();
 
-        return redirect()->route($request->user()->role === 'admin' ? 'admin.dashboard' : 'account.dashboard')
+        return redirect()->to($request->user()->role === 'admin' ? '/admin' : route('account.dashboard'))
             ->with('status', 'Mot de passe mis à jour.');
     }
 }

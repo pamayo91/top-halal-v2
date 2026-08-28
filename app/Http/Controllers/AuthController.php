@@ -33,7 +33,7 @@ class AuthController extends Controller
         }
 
         // Never replay a stale legacy intended URL after authentication. In
-        // particular, old cached `/admin` requests must not escape to a
+        // particular, a URL that is not part of the protected panel must not escape to a
         // historical public redirect after an administrator signs in.
         $intended = (string) $request->session()->pull('url.intended', '');
         $path = (string) (parse_url($intended, PHP_URL_PATH) ?: '');
@@ -41,9 +41,9 @@ class AuthController extends Controller
         $isLocalIntended = $host === '' || hash_equals($request->getHost(), $host);
 
         if ($request->user()->role === 'admin') {
-            return $isLocalIntended && str_starts_with($path, '/bo')
+            return $isLocalIntended && str_starts_with($path, '/admin')
                 ? redirect()->to($intended)
-                : redirect()->route('admin.dashboard');
+                : redirect()->to('/admin');
         }
 
         return redirect()->route('account.dashboard');

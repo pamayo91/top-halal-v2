@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\RestaurantClaimResource\Pages; use App\Filament\Resources\RestaurantClaimResource; use Filament\Resources\Pages\ListRecords; class ListRestaurantClaims extends ListRecords { protected static string $resource=RestaurantClaimResource::class; }

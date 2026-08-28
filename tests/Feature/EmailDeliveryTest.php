@@ -8,6 +8,7 @@ use App\Models\RestaurantClaim;
 use App\Models\User;
 use App\Notifications\ClaimStatusNotification;
 use App\Notifications\VerifyEmailNotification;
+use App\Services\ClaimModeration;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -32,7 +33,8 @@ class EmailDeliveryTest extends TestCase
         $this->actingAs($user)->post('/restaurants/'.$restaurant->id.'/claim', ['message' => 'Test']);
         $claim = RestaurantClaim::firstOrFail();
         Notification::assertSentTo($user, ClaimStatusNotification::class);
-        $this->actingAs($admin)->patch('/bo/claims/'.$claim->id.'/approve');
+        $this->actingAs($admin);
+        app(ClaimModeration::class)->approve($claim);
         Notification::assertSentToTimes($user, ClaimStatusNotification::class, 2);
     }
 

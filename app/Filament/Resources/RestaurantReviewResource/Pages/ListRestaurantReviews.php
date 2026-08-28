@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\RestaurantReviewResource\Pages; use App\Filament\Resources\RestaurantReviewResource; use Filament\Resources\Pages\ListRecords; class ListRestaurantReviews extends ListRecords { protected static string $resource=RestaurantReviewResource::class; }

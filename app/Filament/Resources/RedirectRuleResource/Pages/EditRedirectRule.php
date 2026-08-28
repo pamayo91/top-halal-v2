@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\RedirectRuleResource\Pages; use App\Filament\Pages\EditAuditedRecord; use App\Filament\Resources\RedirectRuleResource; class EditRedirectRule extends EditAuditedRecord {protected static string $resource=RedirectRuleResource::class;}

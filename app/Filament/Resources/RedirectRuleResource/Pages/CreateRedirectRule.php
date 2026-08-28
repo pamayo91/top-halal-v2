@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\RedirectRuleResource\Pages; use App\Filament\Pages\CreateAuditedRecord; use App\Filament\Resources\RedirectRuleResource; class CreateRedirectRule extends CreateAuditedRecord {protected static string $resource=RedirectRuleResource::class;protected function mutateFormDataBeforeCreate(array $data):array{$data['origin']='manual';return $data;}}

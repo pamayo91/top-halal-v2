@@ -5,7 +5,8 @@ class AdminRouteIsolationTest extends TestCase
 {
     public function test_back_office_prefix_is_never_resolved_as_a_legacy_redirect(): void
     {
-        $this->get('/bo')->assertRedirect('/login');
+        $this->get('/admin')->assertRedirect('/admin/login');
+        $this->get('/bo')->assertNotFound();
     }
 
     public function test_login_route_is_never_resolved_as_a_legacy_redirect(): void

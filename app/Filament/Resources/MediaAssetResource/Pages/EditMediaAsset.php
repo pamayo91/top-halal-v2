@@ -1,0 +1,1 @@
+<?php namespace App\Filament\Resources\MediaAssetResource\Pages; use App\Filament\Pages\EditAuditedRecord; use App\Filament\Resources\MediaAssetResource; class EditMediaAsset extends EditAuditedRecord {protected static string $resource=MediaAssetResource::class;}

@@ -6,6 +6,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
 use App\Models\User;
 use App\Notifications\QueuedResetPasswordNotification;
+use App\Services\ClaimModeration;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -79,7 +80,8 @@ class AuthenticationAndClaimsTest extends TestCase
         $this->actingAs($other)->get('/claims/'.$claim->id)->assertForbidden();
         $this->actingAs($owner)->post('/restaurants/'.$restaurant->id.'/claim', ['message' => 'duplicate'])->assertSessionHasErrors('claim');
 
-        $this->actingAs($admin)->patch('/bo/claims/'.$claim->id.'/approve')->assertRedirect('/bo/claims');
+        $this->actingAs($admin);
+        app(ClaimModeration::class)->approve($claim);
         $this->assertSame('approved', $claim->fresh()->status);
         $this->assertSame('restaurant_owner', $owner->fresh()->role);
         $this->actingAs($owner)->get('/account/restaurants/'.$restaurant->id.'/edit')->assertOk();
@@ -93,9 +95,9 @@ class AuthenticationAndClaimsTest extends TestCase
         $restaurant = $this->restaurant();
         $user = User::factory()->create();
         $claim = RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'status' => 'pending', 'submitted_at' => now()]);
-        $this->actingAs($user)->get('/bo/claims')->assertForbidden();
-        $this->actingAs($user)->patch('/bo/claims/'.$claim->id.'/approve')->assertForbidden();
-        $this->actingAs(User::factory()->create(['role' => 'admin']))->patch('/bo/claims/'.$claim->id.'/reject', ['admin_note' => 'Justificatif absent'])->assertRedirect('/bo/claims');
+        $this->actingAs($user)->get('/admin')->assertForbidden();
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        app(ClaimModeration::class)->reject($claim, 'Justificatif absent');
         $this->assertSame('rejected', $claim->fresh()->status);
         $this->assertSame('user', $user->fresh()->role);
     }

@@ -1,4 +1,0 @@
-<?php
-namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller; use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,Page,RedirectRule,Restaurant,RestaurantClaim,RestaurantReview,User};
-class DashboardController extends Controller { public function __invoke() { return view('admin.dashboard', ['counts'=>['restaurants'=>Restaurant::count(),'published'=>Restaurant::where('status','published')->count(),'pending_reviews'=>RestaurantReview::where('status','pending')->count(),'pending_comments'=>Comment::where('status','pending')->count(),'pending_claims'=>RestaurantClaim::where('status','pending')->count(),'users'=>User::count(),'articles'=>Article::count(),'pages'=>Page::count(),'media'=>MediaAsset::count(),'redirects'=>RedirectRule::count()], 'audits'=>AdminAuditLog::with('admin')->latest()->limit(10)->get()]); } }
