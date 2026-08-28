@@ -46,4 +46,18 @@ test.describe('Filament administration', () => {
     expect(consoleErrors).toEqual([]);
     expect(networkErrors).toEqual([]);
   });
+
+  test('review and comment detail dialogs show historical dates', async ({ page }) => {
+    await page.goto('/admin');
+    await page.locator('input[type="email"]').fill(email!);
+    await page.locator('input[type="password"]').fill(password!);
+    await page.locator('button[type="submit"]').click();
+
+    for (const [path, label] of [['/admin/restaurant-reviews', 'Date historique de l’avis'], ['/admin/comments', 'Date historique du commentaire']]) {
+      await page.goto(path);
+      await page.getByRole('button', { name: 'Voir' }).first().click();
+      await expect(page.getByText(label, { exact: true })).toBeVisible();
+      await page.keyboard.press('Escape');
+    }
+  });
 });
