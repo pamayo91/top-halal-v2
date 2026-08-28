@@ -1,0 +1,799 @@
+{
+    "generated_at": "2026-08-28T21:45:52+00:00",
+    "mode": "apply",
+    "before": {
+        "dates": {
+            "articles": {
+                "legacy_total": 123,
+                "legacy_created_available": 121,
+                "legacy_updated_available": 122,
+                "v2_total": 122,
+                "v2_legacy_created": 121,
+                "v2_legacy_updated": 122,
+                "v2_publication": 0,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 15:11:44",
+                    "last": "2026-08-25 21:23:56"
+                },
+                "legacy_key": "legacy_wp_id"
+            },
+            "pages": {
+                "legacy_total": 91,
+                "legacy_created_available": 91,
+                "legacy_updated_available": 91,
+                "v2_total": 90,
+                "v2_legacy_created": 90,
+                "v2_legacy_updated": 90,
+                "v2_publication": 0,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 15:11:44",
+                    "last": "2026-08-25 21:13:41"
+                },
+                "legacy_key": "legacy_wp_id"
+            },
+            "comments": {
+                "legacy_total": 728,
+                "legacy_created_available": 728,
+                "legacy_updated_available": 728,
+                "v2_total": 730,
+                "v2_with_legacy_identity": 728,
+                "v2_import_timestamps": {
+                    "first": "2013-02-09 22:21:50",
+                    "last": "2026-08-26 14:30:53"
+                },
+                "legacy_key": "comment_ID"
+            },
+            "reviews": {
+                "legacy_total": 84,
+                "legacy_created_available": 83,
+                "legacy_updated_available": 84,
+                "v2_total": 79,
+                "v2_with_legacy_identity": 77,
+                "v2_import_timestamps": {
+                    "first": "2017-12-11 18:54:34",
+                    "last": "2026-08-26 14:30:50"
+                },
+                "legacy_key": "ID"
+            },
+            "restaurants": {
+                "legacy_total": 7704,
+                "legacy_created_available": 7634,
+                "legacy_updated_available": 7636,
+                "v2_total": 7704,
+                "v2_legacy_created": 7634,
+                "v2_legacy_updated": 7636,
+                "v2_publication": null,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 14:10:40",
+                    "last": "2026-08-25 21:13:39"
+                },
+                "legacy_key": "legacy_wp_id"
+            },
+            "users": {
+                "legacy_total": 545,
+                "legacy_created_available": 545,
+                "legacy_updated_available": null,
+                "v2_total": 544,
+                "v2_with_legacy_identity": 544,
+                "v2_import_timestamps": {
+                    "first": "2017-08-17 17:57:23",
+                    "last": "2026-08-25 21:15:54"
+                },
+                "legacy_key": "ID"
+            },
+            "media": {
+                "legacy_total": 2239,
+                "legacy_created_available": 2239,
+                "legacy_updated_available": 2239,
+                "v2_total": 1459,
+                "v2_with_legacy_identity": 1048,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 20:02:58",
+                    "last": "2026-08-26 07:55:00"
+                },
+                "legacy_key": "ID"
+            }
+        },
+        "geography": {
+            "total": 2003,
+            "used": 1961,
+            "unused": 42,
+            "valid": 1971,
+            "suspect": [],
+            "malicious": [
+                {
+                    "id": 1970,
+                    "legacy_term_id": 2703,
+                    "name": "-1 OR 2+228-228-1=0+0+0+1 --",
+                    "slug": "1-or-2228-228-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1971,
+                    "legacy_term_id": 2704,
+                    "name": "-1 OR 2+151-151-1=0+0+0+1",
+                    "slug": "1-or-2151-151-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1972,
+                    "legacy_term_id": 2705,
+                    "name": "-1' OR 2+170-170-1=0+0+0+1 --",
+                    "slug": "1-or-2170-170-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1973,
+                    "legacy_term_id": 2706,
+                    "name": "-1' OR 2+478-478-1=0+0+0+1 or 'iBp5VbPs'='",
+                    "slug": "1-or-2478-478-10001-or-ibp5vbps",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1974,
+                    "legacy_term_id": 2707,
+                    "name": "-1\" OR 2+745-745-1=0+0+0+1 --",
+                    "slug": "1-or-2745-745-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1975,
+                    "legacy_term_id": 2708,
+                    "name": "-1; waitfor delay '0:0:15' --",
+                    "slug": "1-waitfor-delay-0015",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1976,
+                    "legacy_term_id": 2709,
+                    "name": "j3mFaN92'; waitfor delay '0:0:15' --",
+                    "slug": "j3mfan92-waitfor-delay-0015",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1977,
+                    "legacy_term_id": 2710,
+                    "name": "-5 OR 748=(SELECT 748 FROM PG_SLEEP(15))--",
+                    "slug": "5-or-748select-748-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1978,
+                    "legacy_term_id": 2711,
+                    "name": "-5) OR 738=(SELECT 738 FROM PG_SLEEP(15))--",
+                    "slug": "5-or-738select-738-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1979,
+                    "legacy_term_id": 2712,
+                    "name": "-1)) OR 147=(SELECT 147 FROM PG_SLEEP(15))--",
+                    "slug": "1-or-147select-147-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1980,
+                    "legacy_term_id": 2713,
+                    "name": "gmG59xgC' OR 715=(SELECT 715 FROM PG_SLEEP(15))--",
+                    "slug": "gmg59xgc-or-715select-715-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1981,
+                    "legacy_term_id": 2714,
+                    "name": "3ygNNNGQ') OR 127=(SELECT 127 FROM PG_SLEEP(15))--",
+                    "slug": "3ygnnngq-or-127select-127-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1982,
+                    "legacy_term_id": 2715,
+                    "name": "n92mCQhU')) OR 411=(SELECT 411 FROM PG_SLEEP(15))--",
+                    "slug": "n92mcqhu-or-411select-411-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1983,
+                    "legacy_term_id": 2716,
+                    "name": "1*DBMS_PIPE.RECEIVE_MESSAGE(CHR(99)||CHR(99)||CHR(99),15)",
+                    "slug": "1dbms-pipe-receive-messagechr99chr99chr9915",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1984,
+                    "legacy_term_id": 2717,
+                    "name": "1'||DBMS_PIPE.RECEIVE_MESSAGE(CHR(98)||CHR(98)||CHR(98),15)||'",
+                    "slug": "1dbms-pipe-receive-messagechr98chr98chr9815",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1985,
+                    "legacy_term_id": 2718,
+                    "name": "if(now()=sysdate(),sleep(15),0)",
+                    "slug": "ifnowsysdatesleep150",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1986,
+                    "legacy_term_id": 2719,
+                    "name": "0'XOR(if(now()=sysdate(),sleep(15),0))XOR'Z",
+                    "slug": "0xorifnowsysdatesleep150xorz",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1987,
+                    "legacy_term_id": 2720,
+                    "name": "(select(0)from(select(sleep(15)))v)\/*'+(select(0)from(select(sleep(15)))v)+'\"+(select(0)from(select(sleep(15)))v)+\"*\/",
+                    "slug": "select0fromselectsleep15v-select0fromselectsleep15vselect0fromselectsleep15v",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1988,
+                    "legacy_term_id": 2721,
+                    "name": "@@aCecp",
+                    "slug": "acecp",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1990,
+                    "legacy_term_id": 2723,
+                    "name": "-1 OR 2+834-834-1=0+0+0+1 --",
+                    "slug": "1-or-2834-834-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1991,
+                    "legacy_term_id": 2724,
+                    "name": "-1 OR 2+47-47-1=0+0+0+1",
+                    "slug": "1-or-247-47-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1992,
+                    "legacy_term_id": 2725,
+                    "name": "-1' OR 2+760-760-1=0+0+0+1 --",
+                    "slug": "1-or-2760-760-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1993,
+                    "legacy_term_id": 2726,
+                    "name": "-1' OR 2+968-968-1=0+0+0+1 or 'Rfy2Pr42'='",
+                    "slug": "1-or-2968-968-10001-or-rfy2pr42",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1994,
+                    "legacy_term_id": 2727,
+                    "name": "-1\" OR 2+790-790-1=0+0+0+1 --",
+                    "slug": "1-or-2790-790-10001",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1995,
+                    "legacy_term_id": 2728,
+                    "name": "Oj58QfQs'; waitfor delay '0:0:15' --",
+                    "slug": "oj58qfqs-waitfor-delay-0015",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1996,
+                    "legacy_term_id": 2729,
+                    "name": "-5 OR 927=(SELECT 927 FROM PG_SLEEP(15))--",
+                    "slug": "5-or-927select-927-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1997,
+                    "legacy_term_id": 2730,
+                    "name": "-5) OR 191=(SELECT 191 FROM PG_SLEEP(15))--",
+                    "slug": "5-or-191select-191-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1998,
+                    "legacy_term_id": 2731,
+                    "name": "-1)) OR 16=(SELECT 16 FROM PG_SLEEP(15))--",
+                    "slug": "1-or-16select-16-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 1999,
+                    "legacy_term_id": 2732,
+                    "name": "zz1YJNCI' OR 405=(SELECT 405 FROM PG_SLEEP(15))--",
+                    "slug": "zz1yjnci-or-405select-405-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 2000,
+                    "legacy_term_id": 2733,
+                    "name": "fiknrRpf') OR 914=(SELECT 914 FROM PG_SLEEP(15))--",
+                    "slug": "fiknrrpf-or-914select-914-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 2001,
+                    "legacy_term_id": 2734,
+                    "name": "aKkqPham')) OR 453=(SELECT 453 FROM PG_SLEEP(15))--",
+                    "slug": "akkqpham-or-453select-453-from-pg-sleep15",
+                    "parent_id": null,
+                    "restaurants": []
+                },
+                {
+                    "id": 2002,
+                    "legacy_term_id": 2735,
+                    "name": "@@tZu7Z",
+                    "slug": "tzu7z",
+                    "parent_id": null,
+                    "restaurants": []
+                }
+            ],
+            "empty": [],
+            "duplicates": [
+                [
+                    {
+                        "id": 1537,
+                        "legacy_term_id": 2264,
+                        "name": "Saint-ouen-l-aumone",
+                        "slug": "saint-ouen-l-aumone"
+                    },
+                    {
+                        "id": 1708,
+                        "legacy_term_id": 2435,
+                        "name": "Saint-Ouen-l'Aumone",
+                        "slug": "saint-ouen-laumone"
+                    }
+                ]
+            ]
+        },
+        "taxonomies": {
+            "categories": {
+                "total": 22,
+                "anomalies": []
+            },
+            "features": {
+                "total": 13,
+                "anomalies": []
+            },
+            "editorial_categories": {
+                "total": 3,
+                "anomalies": []
+            },
+            "editorial_tags": {
+                "total": 615,
+                "anomalies": []
+            }
+        }
+    },
+    "changes": {
+        "articles": 122,
+        "pages": 90,
+        "restaurants": 0,
+        "media": 1048,
+        "malicious_locations_removed": [
+            {
+                "id": 1970,
+                "legacy_term_id": 2703,
+                "name": "-1 OR 2+228-228-1=0+0+0+1 --",
+                "slug": "1-or-2228-228-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1971,
+                "legacy_term_id": 2704,
+                "name": "-1 OR 2+151-151-1=0+0+0+1",
+                "slug": "1-or-2151-151-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1972,
+                "legacy_term_id": 2705,
+                "name": "-1' OR 2+170-170-1=0+0+0+1 --",
+                "slug": "1-or-2170-170-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1973,
+                "legacy_term_id": 2706,
+                "name": "-1' OR 2+478-478-1=0+0+0+1 or 'iBp5VbPs'='",
+                "slug": "1-or-2478-478-10001-or-ibp5vbps",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1974,
+                "legacy_term_id": 2707,
+                "name": "-1\" OR 2+745-745-1=0+0+0+1 --",
+                "slug": "1-or-2745-745-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1975,
+                "legacy_term_id": 2708,
+                "name": "-1; waitfor delay '0:0:15' --",
+                "slug": "1-waitfor-delay-0015",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1976,
+                "legacy_term_id": 2709,
+                "name": "j3mFaN92'; waitfor delay '0:0:15' --",
+                "slug": "j3mfan92-waitfor-delay-0015",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1977,
+                "legacy_term_id": 2710,
+                "name": "-5 OR 748=(SELECT 748 FROM PG_SLEEP(15))--",
+                "slug": "5-or-748select-748-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1978,
+                "legacy_term_id": 2711,
+                "name": "-5) OR 738=(SELECT 738 FROM PG_SLEEP(15))--",
+                "slug": "5-or-738select-738-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1979,
+                "legacy_term_id": 2712,
+                "name": "-1)) OR 147=(SELECT 147 FROM PG_SLEEP(15))--",
+                "slug": "1-or-147select-147-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1980,
+                "legacy_term_id": 2713,
+                "name": "gmG59xgC' OR 715=(SELECT 715 FROM PG_SLEEP(15))--",
+                "slug": "gmg59xgc-or-715select-715-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1981,
+                "legacy_term_id": 2714,
+                "name": "3ygNNNGQ') OR 127=(SELECT 127 FROM PG_SLEEP(15))--",
+                "slug": "3ygnnngq-or-127select-127-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1982,
+                "legacy_term_id": 2715,
+                "name": "n92mCQhU')) OR 411=(SELECT 411 FROM PG_SLEEP(15))--",
+                "slug": "n92mcqhu-or-411select-411-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1983,
+                "legacy_term_id": 2716,
+                "name": "1*DBMS_PIPE.RECEIVE_MESSAGE(CHR(99)||CHR(99)||CHR(99),15)",
+                "slug": "1dbms-pipe-receive-messagechr99chr99chr9915",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1984,
+                "legacy_term_id": 2717,
+                "name": "1'||DBMS_PIPE.RECEIVE_MESSAGE(CHR(98)||CHR(98)||CHR(98),15)||'",
+                "slug": "1dbms-pipe-receive-messagechr98chr98chr9815",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1985,
+                "legacy_term_id": 2718,
+                "name": "if(now()=sysdate(),sleep(15),0)",
+                "slug": "ifnowsysdatesleep150",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1986,
+                "legacy_term_id": 2719,
+                "name": "0'XOR(if(now()=sysdate(),sleep(15),0))XOR'Z",
+                "slug": "0xorifnowsysdatesleep150xorz",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1987,
+                "legacy_term_id": 2720,
+                "name": "(select(0)from(select(sleep(15)))v)\/*'+(select(0)from(select(sleep(15)))v)+'\"+(select(0)from(select(sleep(15)))v)+\"*\/",
+                "slug": "select0fromselectsleep15v-select0fromselectsleep15vselect0fromselectsleep15v",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1988,
+                "legacy_term_id": 2721,
+                "name": "@@aCecp",
+                "slug": "acecp",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1990,
+                "legacy_term_id": 2723,
+                "name": "-1 OR 2+834-834-1=0+0+0+1 --",
+                "slug": "1-or-2834-834-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1991,
+                "legacy_term_id": 2724,
+                "name": "-1 OR 2+47-47-1=0+0+0+1",
+                "slug": "1-or-247-47-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1992,
+                "legacy_term_id": 2725,
+                "name": "-1' OR 2+760-760-1=0+0+0+1 --",
+                "slug": "1-or-2760-760-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1993,
+                "legacy_term_id": 2726,
+                "name": "-1' OR 2+968-968-1=0+0+0+1 or 'Rfy2Pr42'='",
+                "slug": "1-or-2968-968-10001-or-rfy2pr42",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1994,
+                "legacy_term_id": 2727,
+                "name": "-1\" OR 2+790-790-1=0+0+0+1 --",
+                "slug": "1-or-2790-790-10001",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1995,
+                "legacy_term_id": 2728,
+                "name": "Oj58QfQs'; waitfor delay '0:0:15' --",
+                "slug": "oj58qfqs-waitfor-delay-0015",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1996,
+                "legacy_term_id": 2729,
+                "name": "-5 OR 927=(SELECT 927 FROM PG_SLEEP(15))--",
+                "slug": "5-or-927select-927-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1997,
+                "legacy_term_id": 2730,
+                "name": "-5) OR 191=(SELECT 191 FROM PG_SLEEP(15))--",
+                "slug": "5-or-191select-191-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1998,
+                "legacy_term_id": 2731,
+                "name": "-1)) OR 16=(SELECT 16 FROM PG_SLEEP(15))--",
+                "slug": "1-or-16select-16-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 1999,
+                "legacy_term_id": 2732,
+                "name": "zz1YJNCI' OR 405=(SELECT 405 FROM PG_SLEEP(15))--",
+                "slug": "zz1yjnci-or-405select-405-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 2000,
+                "legacy_term_id": 2733,
+                "name": "fiknrRpf') OR 914=(SELECT 914 FROM PG_SLEEP(15))--",
+                "slug": "fiknrrpf-or-914select-914-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 2001,
+                "legacy_term_id": 2734,
+                "name": "aKkqPham')) OR 453=(SELECT 453 FROM PG_SLEEP(15))--",
+                "slug": "akkqpham-or-453select-453-from-pg-sleep15",
+                "parent_id": null,
+                "restaurants": []
+            },
+            {
+                "id": 2002,
+                "legacy_term_id": 2735,
+                "name": "@@tZu7Z",
+                "slug": "tzu7z",
+                "parent_id": null,
+                "restaurants": []
+            }
+        ]
+    },
+    "after": {
+        "dates": {
+            "articles": {
+                "legacy_total": 123,
+                "legacy_created_available": 121,
+                "legacy_updated_available": 122,
+                "v2_total": 122,
+                "v2_legacy_created": 121,
+                "v2_legacy_updated": 122,
+                "v2_publication": 121,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 15:11:44",
+                    "last": "2026-08-25 21:23:56"
+                },
+                "legacy_key": "legacy_wp_id"
+            },
+            "pages": {
+                "legacy_total": 91,
+                "legacy_created_available": 91,
+                "legacy_updated_available": 91,
+                "v2_total": 90,
+                "v2_legacy_created": 90,
+                "v2_legacy_updated": 90,
+                "v2_publication": 90,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 15:11:44",
+                    "last": "2026-08-25 21:13:41"
+                },
+                "legacy_key": "legacy_wp_id"
+            },
+            "comments": {
+                "legacy_total": 728,
+                "legacy_created_available": 728,
+                "legacy_updated_available": 728,
+                "v2_total": 730,
+                "v2_with_legacy_identity": 728,
+                "v2_import_timestamps": {
+                    "first": "2013-02-09 22:21:50",
+                    "last": "2026-08-26 14:30:53"
+                },
+                "legacy_key": "comment_ID"
+            },
+            "reviews": {
+                "legacy_total": 84,
+                "legacy_created_available": 83,
+                "legacy_updated_available": 84,
+                "v2_total": 79,
+                "v2_with_legacy_identity": 77,
+                "v2_import_timestamps": {
+                    "first": "2017-12-11 18:54:34",
+                    "last": "2026-08-26 14:30:50"
+                },
+                "legacy_key": "ID"
+            },
+            "restaurants": {
+                "legacy_total": 7704,
+                "legacy_created_available": 7634,
+                "legacy_updated_available": 7636,
+                "v2_total": 7704,
+                "v2_legacy_created": 7634,
+                "v2_legacy_updated": 7636,
+                "v2_publication": null,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 14:10:40",
+                    "last": "2026-08-25 21:13:39"
+                },
+                "legacy_key": "legacy_wp_id"
+            },
+            "users": {
+                "legacy_total": 545,
+                "legacy_created_available": 545,
+                "legacy_updated_available": null,
+                "v2_total": 544,
+                "v2_with_legacy_identity": 544,
+                "v2_import_timestamps": {
+                    "first": "2017-08-17 17:57:23",
+                    "last": "2026-08-25 21:15:54"
+                },
+                "legacy_key": "ID"
+            },
+            "media": {
+                "legacy_total": 2239,
+                "legacy_created_available": 2239,
+                "legacy_updated_available": 2239,
+                "v2_total": 1459,
+                "v2_with_legacy_identity": 1048,
+                "v2_import_timestamps": {
+                    "first": "2026-08-25 20:02:58",
+                    "last": "2026-08-26 07:55:00"
+                },
+                "legacy_key": "ID"
+            }
+        },
+        "geography": {
+            "total": 1971,
+            "used": 1961,
+            "unused": 10,
+            "valid": 1971,
+            "suspect": [],
+            "malicious": [],
+            "empty": [],
+            "duplicates": [
+                [
+                    {
+                        "id": 1537,
+                        "legacy_term_id": 2264,
+                        "name": "Saint-ouen-l-aumone",
+                        "slug": "saint-ouen-l-aumone"
+                    },
+                    {
+                        "id": 1708,
+                        "legacy_term_id": 2435,
+                        "name": "Saint-Ouen-l'Aumone",
+                        "slug": "saint-ouen-laumone"
+                    }
+                ]
+            ]
+        },
+        "taxonomies": {
+            "categories": {
+                "total": 22,
+                "anomalies": []
+            },
+            "features": {
+                "total": 13,
+                "anomalies": []
+            },
+            "editorial_categories": {
+                "total": 3,
+                "anomalies": []
+            },
+            "editorial_tags": {
+                "total": 615,
+                "anomalies": []
+            }
+        }
+    }
+}

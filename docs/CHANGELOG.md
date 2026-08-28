@@ -78,6 +78,9 @@
 
 ## 2026-08-27
 
+- Audited and repaired migrated-data integrity on preproduction: restored 121 historical article and 90 page publication dates, added legacy attachment dates, retained V2 audit timestamps, and added Filament date displays for content, moderation, users, media and restaurants.
+- Classified all 2,003 migrated geographic terms. Removed 32 manifest SQL-injection/fuzzing payloads that had no restaurant relationship; 1,961 valid location relationships were retained. Added idempotent reporting, future-import guards, admin validation and the geography “Sans restaurant” filter. Categories, features and editorial taxonomies had no matching anomaly.
+
 - Completed the Filament 5 `/admin` migration: legacy `/bo` routes, controllers and Blade views are removed; settings, audit log, moderation, media, redirect, taxonomy and user modules are in the panel. Preproduction PHP suite (51 tests, 229 assertions) and Filament desktop/mobile Playwright validation pass.
 - Added the secured V2 administration area, audit log and daily operational management screens.
 - Added admin feature coverage for authorization, restaurant CRUD, moderation, editorial sanitization and sensitive audit filtering.

@@ -22,6 +22,13 @@
 - `tp_terms` + `tp_term_taxonomy.taxonomy = location` -> normalized geography candidates
 - `tp_posts.post_type = attachment` -> media records and file reconciliation
 
+### Historical dates and taxonomy integrity
+- Editorial records preserve `post_date_gmt` in `legacy_published_at`, `post_modified_gmt` in `legacy_modified_at`, and use the same valid publication timestamp in `published_at`. V2 `created_at` and `updated_at` are not repurposed during the integrity repair.
+- Editorial comments and ListingPro reviews retain their historical creation date in `created_at`; their V2 `updated_at` remains available for later moderation. Approved legacy records retain their historical approval date in `approved_at`.
+- ListingPro restaurants preserve `post_date_gmt`/`post_modified_gmt` in `legacy_published_at`/`legacy_modified_at`; legacy users retain `user_registered` in their historical `created_at`.
+- Media assets retain attachment `post_date_gmt` and `post_modified_gmt` in `legacy_created_at` and `legacy_updated_at`; import timestamps are not presented as historical dates.
+- The taxonomy migration classifies values before persistence. Manifest SQL-injection/fuzzing payloads are excluded with a migration anomaly; plausible unusual geographical names are not rejected merely by a restrictive whitelist.
+
 ### Media pilot implementation
 - The legacy audit reconciled 2,239 attachments with 1,824 readable physical sources, 415 missing sources and 135 duplicate checksums. It also found 535 inline image references across legacy editorial content; they are reported as debt and are not silently rendered from WordPress.
 - The reviewed media IDs `10432`, `11463`, `11807` and `22736` support the existing content/listing pilot. Their originals are copied into private V2 storage by SHA-256 path and retain `legacy_attachment_id`; the second apply creates no duplicate asset or variant.

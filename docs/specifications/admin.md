@@ -14,6 +14,8 @@ Le tableau de bord expose des compteurs réels. L’administration propose la ge
 
 Chaque opération sensible est enregistrée dans `admin_audit_logs`, avec l’administrateur, l’objet, l’action et un résumé filtré des changements. Les mots de passe, tokens et URL sortantes ne sont jamais mis dans ce résumé.
 
+Les listes affichent les dates métier pertinentes en format français : publication et dernière modification legacy pour les contenus, date de commentaire/avis et date de modération, inscription utilisateur, dates legacy des médias et restaurants. La géographie affiche le parent/niveau, le nombre de restaurants et la date de modification ; son filtre « Sans restaurant » rend les termes inutilisés immédiatement identifiables. Les valeurs manifestement techniques ou malveillantes sont refusées à la saisie.
+
 ## Rôles
 
 - `user`: accès au compte et aux revendications personnelles.

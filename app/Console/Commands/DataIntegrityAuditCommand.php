@@ -238,6 +238,7 @@ class DataIntegrityAuditCommand extends Command
         $lines[] = '- Valides : '.$before['geography']['valid'].' ; suspectes : '.count($before['geography']['suspect']).' ; manifestement malveillantes : '.count($before['geography']['malicious']).' ; vides : '.count($before['geography']['empty']).'.';
         $lines[] = '- Doublons potentiels (non fusionnés automatiquement) : '.count($before['geography']['duplicates']).'.';
         $lines[] = '- Supprimées : '.count($changes['malicious_locations_removed']).'.';
+        $lines[] = '- Après correction : '.$after['geography']['total'].' lieux ; utilisées : '.$after['geography']['used'].' ; inutilisées : '.$after['geography']['unused'].' ; malveillantes restantes : '.count($after['geography']['malicious']).'.';
         foreach ($changes['malicious_locations_removed'] as $location) $lines[] = '- Supprimée V2 #'.$location['id'].' / legacy term #'.$location['legacy_term_id'].' : `'.$location['name'].'` (aucun restaurant associé).';
         foreach ($before['geography']['suspect'] as $location) $lines[] = '- Revue manuelle — suspecte V2 #'.$location['id'].' / legacy term #'.$location['legacy_term_id'].' : `'.$location['name'].'`.';
         foreach ($before['geography']['malicious'] as $location) if ($location['restaurants'] !== []) $lines[] = '- Revue manuelle — malveillante mais associée : V2 #'.$location['id'].' / legacy term #'.$location['legacy_term_id'].' ; restaurants : '.json_encode($location['restaurants'], JSON_UNESCAPED_UNICODE).'.';
