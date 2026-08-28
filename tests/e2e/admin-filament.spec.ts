@@ -28,6 +28,7 @@ test.describe('Filament administration', () => {
       ['/admin/articles', 'Articles'],
       ['/admin/restaurant-reviews', 'Avis'],
       ['/admin/restaurant-claims', 'Claims'],
+      ['/admin/redirect-rules', null],
       ['/admin/settings', 'Réglages'],
       ['/admin/admin-audit-logs', null],
     ]) {
