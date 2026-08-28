@@ -52,11 +52,14 @@ test.describe('Filament administration', () => {
     await page.locator('input[type="email"]').fill(email!);
     await page.locator('input[type="password"]').fill(password!);
     await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/admin$/);
 
     for (const [path, label] of [['/admin/restaurant-reviews', 'Date historique de l’avis'], ['/admin/comments', 'Date historique du commentaire']]) {
       await page.goto(path);
+      await expect(page.getByRole('table')).toContainText(/\d{1,2} [a-zéû]+ 20\d{2} à \d{2}:\d{2}/i);
       await page.getByRole('button', { name: 'Voir' }).first().click();
       await expect(page.getByText(label, { exact: true })).toBeVisible();
+      await expect(page.getByLabel(label)).not.toHaveValue('');
       await page.keyboard.press('Escape');
     }
   });
