@@ -9,7 +9,7 @@ class AdminAudit
 {
     public function record(string $action, Model|string $subject, array $changes = []): void
     {
-        $user = request()->user();
+        $user = request()->user() ?? auth()->user();
         if (!$user) return;
         AdminAuditLog::create([
             'admin_id' => $user->id, 'action' => $action,
