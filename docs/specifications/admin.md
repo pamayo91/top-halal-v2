@@ -2,11 +2,11 @@
 
 ## Accès
 
-Toutes les routes `/bo` exigent une session authentifiée, un mot de passe non bloqué et un utilisateur `admin` actif. Le middleware `admin` refuse les autres utilisateurs avec 403. Les formulaires web reposent sur la protection CSRF Laravel.
+Le panel Filament `/admin` exige une session authentifiée, un mot de passe non bloqué et un utilisateur `admin` actif. Le middleware `admin` refuse les autres utilisateurs avec 403. Les formulaires reposent sur la protection CSRF Laravel.
 
-Après connexion, une URL `intended` historique ou non-back-office n’est jamais rejouée pour un administrateur : celui-ci arrive sur `/bo`. Cela évite qu’un ancien `/admin` stocké en session mène vers une redirection legacy publique.
+Après connexion, une URL `intended` historique ou non-back-office n’est jamais rejouée pour un administrateur : celui-ci arrive sur `/admin`.
 
-Un administrateur marqué `must_change_password` est dirigé vers le changement de mot de passe, puis vers `/bo` une fois ce changement terminé.
+Un administrateur marqué `must_change_password` est dirigé vers le changement de mot de passe, puis vers `/admin` une fois ce changement terminé.
 
 ## Modules
 
