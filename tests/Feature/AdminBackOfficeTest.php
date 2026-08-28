@@ -50,6 +50,7 @@ class AdminBackOfficeTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']); $restaurant = $this->restaurant();
         $review = RestaurantReview::create(['restaurant_id' => $restaurant->id, 'author_name' => 'A', 'rating' => 5, 'content' => 'Très bien', 'status' => 'pending']);
         $comment = Comment::create(['article_id' => $this->article()->id, 'author_name' => 'B', 'content' => 'Merci', 'status' => 'pending']);
+        $this->actingAs($admin);
         \App\Filament\Resources\RestaurantReviewResource::moderate($review, 'approved');
         \App\Filament\Resources\CommentResource::moderate($comment, 'rejected');
         $this->assertSame('approved', $review->fresh()->status); $this->assertNotNull($review->fresh()->approved_at);
