@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{AdminAuditLog,Article,Comment,Restaurant,RestaurantClaim,RestaurantReview,User};
+use App\Models\{AdminAuditLog,Article,Comment,RedirectRule,Restaurant,RestaurantClaim,RestaurantReview,User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -33,6 +33,7 @@ class AdminBackOfficeTest extends TestCase
     public function test_admin_panel_exposes_all_operational_modules_and_legacy_back_office_is_gone(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
+        RedirectRule::create(['source_path' => '/ancienne-page', 'match_type' => 'exact', 'destination' => '/', 'status_code' => 301, 'priority' => 1000, 'is_active' => true]);
 
         foreach ([
             '/admin/articles', '/admin/pages', '/admin/media-assets', '/admin/restaurant-reviews',
