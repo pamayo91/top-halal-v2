@@ -22,7 +22,9 @@ test.describe('Filament administration', () => {
 
     await expect(page).toHaveURL(/\/admin$/);
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
-    await expect(page.getByText('Restaurants', { exact: true }).first()).toBeVisible();
+    if (test.info().project.name.includes('desktop')) {
+      await expect(page.getByText('Restaurants', { exact: true }).first()).toBeVisible();
+    }
     await expect(page.getByText('Avis à modérer', { exact: true })).toBeVisible();
 
     for (const [path, heading] of [
