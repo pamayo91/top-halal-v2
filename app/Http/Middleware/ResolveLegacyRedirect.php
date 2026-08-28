@@ -16,7 +16,7 @@ class ResolveLegacyRedirect
         // break the login flow before Laravel has a chance to authenticate.
         if (
             in_array($request->path(), ['restaurants', 'restaurants/autour-de-moi', 'login', 'register', 'forgot-password', 'change-password', 'verify-email'], true)
-            || $request->is('admin', 'admin/*', 'reset-password/*', 'verify-email/*', 'email/verification-notification', 'account', 'account/*', 'claims', 'claims/*')
+            || $request->is('admin', 'admin/*', 'bo', 'bo/*', 'reset-password/*', 'verify-email/*', 'email/verification-notification', 'account', 'account/*', 'claims', 'claims/*')
         ) return $next($request);
         $resolved = app(RedirectResolver::class)->resolve($request);
         if (! $resolved) return $next($request);

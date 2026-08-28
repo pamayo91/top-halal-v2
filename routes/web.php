@@ -48,6 +48,10 @@ Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
 });
 Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');
 
+// The former Blade back-office has been removed. Keep its reserved prefix
+// outside public editorial routing and legacy redirects.
+Route::any('/bo/{path?}', fn () => abort(404))->where('path', '.*');
+
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
     Route::post('/login', [AuthController::class, 'store'])->middleware('throttle:authentication')->name('login.store');
