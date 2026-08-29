@@ -18,6 +18,14 @@ class TextNormalizer
             $normalized = $decoded;
         }
 
+        // These Windows-1252 punctuation sequences are unambiguous and do not
+        // require treating the whole string as a legacy byte stream.
+        $normalized = str_replace(
+            ['â€™', 'â€œ', 'â€', 'â€“', 'â€”', 'Â '],
+            ['’', '“', '”', '–', '—', ' '],
+            $normalized,
+        );
+
         if (! $this->hasMojibake($normalized)) {
             return ['value' => $normalized, 'changed' => $normalized !== $original, 'ambiguous' => false];
         }
