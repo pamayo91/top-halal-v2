@@ -1,1 +1,1 @@
-<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; class EditorialCategory extends Model {protected $guarded=[];}
+<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; use Illuminate\Database\Eloquent\Relations\BelongsToMany; class EditorialCategory extends Model {protected $guarded=[]; public function articles(): BelongsToMany { return $this->belongsToMany(Article::class, 'article_category'); }}
