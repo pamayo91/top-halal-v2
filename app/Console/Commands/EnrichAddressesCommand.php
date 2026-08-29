@@ -1,0 +1,20 @@
+<?php
+namespace App\Console\Commands;
+use App\Models\Restaurant;
+use App\Services\Geocoding\{GeocodingConfidence,GeocodingService};
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+class EnrichAddressesCommand extends Command {
+ protected $signature='data:enrich-addresses {--dry-run : Never write} {--apply : Apply conservative enrichment} {--batch-size=100} {--ids=*} {--only-status=*} {--out=docs/generated/address-enrichment-report.md}';
+ protected $description='Conservatively enrich restaurant address metadata; legacy address and existing GPS are immutable.';
+ public function handle(GeocodingService $geo, GeocodingConfidence $confidence): int {
+  if(!$this->option('dry-run')&&!$this->option('apply')) { $this->error('Choose --dry-run or --apply.'); return self::FAILURE; } $run=(string)Str::uuid(); $apply=(bool)$this->option('apply'); $rows=Restaurant::query()->when($this->option('ids'),fn($q)=>$q->whereIn('id',$this->option('ids')))->when($this->option('only-status'),fn($q)=>$q->whereIn('geocoding_status',$this->option('only-status')))->orderBy('id')->get(); $all=[];
+  $clusters=$rows->filter(fn($r)=>$r->latitude!==null&&$r->longitude!==null)->groupBy(fn($r)=>$r->latitude.','.$r->longitude)->filter(fn($x)=>$x->count()>1)->flatten()->pluck('id')->flip();
+  foreach($rows as $r){ [$cp,$city]=$this->parts((string)$r->address); $response=trim((string)$r->address)?$geo->search($r->address):['ok'=>false,'features'=>[],'error'=>'empty_address']; $f=$response['features'][0]??[]; $d=$f&&$r->latitude!==null?$this->distance((float)$r->latitude,(float)$r->longitude,$f['latitude'],$f['longitude']):null; $decision=$confidence->decide($f,$d,$cp,$city,$r->latitude!==null,isset($clusters[$r->id]),false); $all[]=['id'=>$r->id,'status'=>$decision['status'],'reason'=>$decision['reason'],'distance'=>$d,'feature'=>$f];
+   if($apply){ $fields=['geocoding_provider'=>'geoplateforme','geocoding_source_id'=>$f['id']??null,'geocoding_precision'=>$f['type']??null,'geocoding_status'=>$decision['status'],'geocoding_score'=>$f['score']??null,'geocoding_distance_m'=>$d===null?null:(int)round($d),'geocoding_review_reason'=>$decision['reason'],'geocoded_at'=>now()]; if(in_array($decision['status'],['VERIFIED','HIGH_CONFIDENCE'],true)){ $fields+=['postal_code'=>$f['postcode'],'city_name'=>$f['city'],'city_code'=>$f['citycode'],'country_code'=>'FR','address_line1'=>$this->line1($f['label']??null)]; if($r->latitude===null&&($f['type']??null)==='housenumber'&&($f['score']??0)>=.80){$fields['latitude']=$f['latitude'];$fields['longitude']=$f['longitude'];} } $r->forceFill(array_filter($fields,fn($x)=>$x!==null))->save(); }
+  }
+  $summary=collect($all)->countBy('status')->all(); $lines=['# Rapport enrichissement adresses','',"Run UUID : `{$run}`",'Mode : `'.($apply?'apply':'dry-run').'`','', '## Totaux','', '- TOTAL : '.count($all)]; foreach(['VERIFIED','HIGH_CONFIDENCE','APPROXIMATE','REVIEW_REQUIRED','MANUAL','MISSING'] as $s)$lines[]="- {$s} : ".($summary[$s]??0); $lines[]='';$lines[]='- GPS existants conservés : '.count($all).'; GPS remplacés : 0.';$lines[]='- Les champs structurés ne sont appliqués qu’à VERIFIED/HIGH_CONFIDENCE ; `address` reste immuable.';$lines[]='';$lines[]='## Cas à revoir';foreach(collect($all)->where('status','REVIEW_REQUIRED')->take(100) as $x)$lines[]='- #'.$x['id'].' : '.$x['reason'].' ('.($x['distance']===null?'n/a':round($x['distance']).' m').')'; File::put(base_path($this->option('out')),implode("\n",$lines)."\n"); $this->info("{$run}: ".count($all).' processed; '.($summary['VERIFIED']??0).' verified.');return self::SUCCESS;
+ }
+ private function parts(string $a):array{return preg_match('/\\b((?:0[1-9]|[1-8]\\d|9[0-5]|97[1-8]|98[0-8])\\d{3})\\s+([^,;\\n]+)\\s*$/u',trim($a),$m)?[$m[1],trim($m[2])]:[null,null];} private function line1(?string $x):?string{return $x?preg_replace('/\\s+\\d{5}\\s+.*$/u','',$x):null;} private function distance(float $a,float $b,float $c,float $d):float{$x=sin(deg2rad($a))*sin(deg2rad($c))+cos(deg2rad($a))*cos(deg2rad($c))*cos(deg2rad($d-$b));return 6371000*acos(min(1,max(-1,$x)));}
+}

@@ -92,7 +92,7 @@ class PublicContentController extends Controller
         if ($city = $request->input('ville')) $query->where(fn (Builder $q) => $q->where('city_name', $city)->orWhereHas('locations', fn (Builder $locations) => $locations->where('slug', $city)));
         foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
         foreach (array_filter((array) $request->input('features', []), 'is_string') as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
-        if ($request->filled(['lat', 'lng'])) { $lat = (float) $request->input('lat'); $lng = (float) $request->input('lng'); $distance = '(6371 * acos(least(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))'; $query->whereNotNull('latitude')->whereNotNull('longitude')->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km'); } else $query->orderBy('name');
+        if ($request->filled(['lat', 'lng'])) { $lat = (float) $request->input('lat'); $lng = (float) $request->input('lng'); $distance = '(6371 * acos(least(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))'; $query->whereNotNull('latitude')->whereNotNull('longitude')->whereIn('geocoding_status',['VERIFIED','HIGH_CONFIDENCE','MANUAL'])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km'); } else $query->orderBy('name');
         return $query;
     }
 }
