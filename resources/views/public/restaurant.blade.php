@@ -1,5 +1,7 @@
 @php($aggregate = $restaurant->approvedReviewAggregate())
 @php($hero = $restaurant->media->first()?->asset)
+@php($heroVariant = $hero?->variants->where('width', '>=', 960)->sortBy('width')->first() ?? $hero?->variants->sortByDesc('width')->first())
+@php($heroUrl = $hero ? route('media.show', $heroVariant ? [$hero, $heroVariant->width] : $hero) : null)
 @php($displayAddress = $restaurant->address_line1 ?: preg_replace('/,?\s*France\s*$/iu', '', (string) $restaurant->address))
 @php($schema = array_filter(['@context'=>'https://schema.org','@type'=>'Restaurant','name'=>$restaurant->name,'address'=>$restaurant->address ? ['@type'=>'PostalAddress','streetAddress'=>$restaurant->address,'postalCode'=>$restaurant->postal_code,'addressLocality'=>$restaurant->city_name,'addressCountry'=>'FR'] : null,'telephone'=>$restaurant->phone,'aggregateRating'=>$aggregate['count'] ? ['@type'=>'AggregateRating','ratingValue'=>$aggregate['average'],'reviewCount'=>$aggregate['count'],'bestRating'=>5,'worstRating'=>1] : null]))
 <x-layouts.app :title="$restaurant->name.' | Top Halal'" :canonical="route('restaurants.show', $restaurant->slug)" robots="index,follow">
@@ -7,7 +9,7 @@
 <div class="shell"><nav class="breadcrumbs" aria-label="Fil d’Ariane"><a href="{{ route('home') }}">Accueil</a><span>/</span><a href="{{ route('restaurants.index') }}">Restaurants</a><span>/</span><span aria-current="page">{{ $restaurant->name }}</span></nav>
 <article class="restaurant-detail"><div class="restaurant-main"><p class="eyebrow">Restaurant halal @if($restaurant->city_name) · {{ $restaurant->city_name }} @endif</p><h1>{{ $restaurant->name }}</h1>
 @if($aggregate['count'])<p class="rating">★ {{ number_format($aggregate['average'],1,',','') }}/5 <a href="#avis">{{ $aggregate['count'] }} avis</a></p>@endif
-@if($hero && $hero->width && $hero->height)<img class="restaurant-hero" src="{{ route('media.show', [$hero, 960]) }}" width="{{ $hero->width }}" height="{{ $hero->height }}" fetchpriority="high" alt="{{ $hero->alt_text ?: $restaurant->name }}">@endif
+@if($hero && $hero->width && $hero->height)<img class="restaurant-hero" src="{{ $heroUrl }}" width="{{ $hero->width }}" height="{{ $hero->height }}" fetchpriority="high" alt="{{ $hero->alt_text ?: $restaurant->name }}">@endif
 @if($restaurant->description)<section class="prose"><h2>À propos</h2><p>{{ $restaurant->description }}</p></section>@endif
 @if($restaurant->categories->isNotEmpty() || $restaurant->features->isNotEmpty())<section><h2>Informations</h2><ul class="tags">@foreach($restaurant->categories as $category)<li>{{ $category->name }}</li>@endforeach @foreach($restaurant->features as $feature)<li>{{ $feature->name }}</li>@endforeach</ul></section>@endif
 </div><aside class="contact-card"><h2>Coordonnées</h2>@if($displayAddress)<p>{{ $displayAddress }}@if($restaurant->postal_code || $restaurant->city_name)<br>{{ $restaurant->postal_code }} {{ $restaurant->city_name }}@endif</p>@endif @if($restaurant->phone)<a class="button" href="tel:{{ preg_replace('/[^+0-9]/', '', $restaurant->phone) }}">Appeler</a>@endif @auth<a class="button button-secondary" href="{{ route('claims.create', $restaurant) }}">Revendiquer cette adresse</a>@endauth</aside></article>

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantOutboundLink, RestaurantReview};
+use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantMedia, RestaurantOutboundLink, RestaurantReview};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -66,5 +66,15 @@ class PublicFrontendTest extends TestCase
         ContentMedia::create(['content_type' => 'post', 'content_id' => $article->id, 'legacy_attachment_id' => 422, 'media_asset_id' => $asset->id, 'role' => 'featured']);
 
         $this->get('/article-illustre')->assertOk()->assertSee('article-featured-media', false)->assertSee(route('media.show', $asset), false);
+    }
+
+    public function test_restaurant_detail_falls_back_to_its_available_hero_variant(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 423, 'name' => 'Restaurant illustré', 'slug' => 'restaurant-illustre', 'status' => 'published']);
+        $asset = MediaAsset::create(['legacy_attachment_id' => 423, 'original_path' => 'media/originals/restaurant.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 1200, 'bytes' => 10, 'checksum' => str_repeat('d', 64), 'status' => 'ready']);
+        $asset->variants()->create(['format' => 'webp', 'width' => 480, 'height' => 720, 'path' => 'media/variants/restaurant-480.webp']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'legacy_attachment_id' => 423, 'sort_order' => 0, 'status' => 'ready']);
+
+        $this->get('/resto/restaurant-illustre')->assertOk()->assertSee(route('media.show', [$asset, 480]), false)->assertDontSee(route('media.show', [$asset, 960]), false);
     }
 }
