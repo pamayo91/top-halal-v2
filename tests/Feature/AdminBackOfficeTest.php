@@ -58,6 +58,17 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame('rejected', $comment->fresh()->status); $this->assertDatabaseCount('admin_audit_logs', 2);
     }
 
+    public function test_moderation_can_mark_comments_and_reviews_as_spam(): void
+    {
+        $restaurant = $this->restaurant();
+        $review = RestaurantReview::create(['restaurant_id' => $restaurant->id, 'author_name' => 'A', 'rating' => 1, 'content' => 'Spam', 'status' => 'pending']);
+        $comment = Comment::create(['article_id' => $this->article()->id, 'author_name' => 'B', 'content' => 'Spam', 'status' => 'pending']);
+        \App\Filament\Resources\RestaurantReviewResource::moderate($review, 'spam');
+        \App\Filament\Resources\CommentResource::moderate($comment, 'spam');
+        $this->assertSame('spam', $review->fresh()->status);
+        $this->assertSame('spam', $comment->fresh()->status);
+    }
+
     public function test_admin_can_create_sanitized_article_and_change_user_without_sensitive_data_in_audit(): void
     {
         $admin = User::factory()->create(['role' => 'admin']); $user = User::factory()->create();
