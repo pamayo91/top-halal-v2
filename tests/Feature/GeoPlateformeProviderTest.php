@@ -25,6 +25,6 @@ class GeoPlateformeProviderTest extends TestCase
     {
         Cache::flush(); Http::fake(['*' => Http::response([], 503)]);
         $result = app(GeoPlateformeProvider::class)->reverse(48.85, 2.35);
-        $this->assertFalse($result['ok']); $this->assertSame('RequestException', $result['error']);
+        $this->assertFalse($result['ok']); $this->assertSame('HTTP 503', $result['error']);
     }
 }

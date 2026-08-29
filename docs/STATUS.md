@@ -34,6 +34,7 @@ Last updated: 2026-08-29
 | Intégrité données migrées | DONE | Audit legacy/V2 des dates, reprise idempotente de `published_at` et des dates média, 32 payloads géographiques malveillants non associés supprimés de V2 ; rapport dans `docs/generated/data-integrity-audit.md`. |
 | Audit adresses / GPS | DONE (read-only) | Les 7 704 restaurants V2 et la source WordPress ont été audités sans modification métier ni géocodage. Le blocage principal est l’absence totale de remplissage des colonnes V2 `city_name`/`postal_code` : 4 234 paires CP/ville sont seulement extractibles de l’adresse brute. Rapport et échantillon dans `docs/generated/address-gps-audit.md` et `address-gps-sample.csv`. |
 | Pilote Géoplateforme | DONE (sans écriture métier) | 100 restaurants représentatifs interrogés via l’API publique BAN, avec cache, timeout et rate limit. Les résultats sont dans `docs/generated/geocoding-pilot.md`; aucune donnée restaurant, GPS ou Geography n’a été modifiée. |
+| Enrichissement adresses | DONE | Modèle additif, enrichissement Géoplateforme idempotent des 7 704 restaurants et filtrage de proximité par confiance géographique. Adresses historiques et GPS existants conservés ; rapport `docs/generated/address-enrichment-report.md`. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |
