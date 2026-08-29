@@ -18,7 +18,7 @@ class PublicContentController extends Controller
             'featuredRestaurants' => $this->publishedRestaurants()->latest('legacy_published_at')->limit(6)->get(),
             'cities' => Location::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(12)->get(),
             'categories' => Category::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(10)->get(),
-            'articles' => Article::where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->limit(3)->get(),
+            'articles' => Article::with(['categories', 'featuredMedia.asset.variants'])->where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->limit(3)->get(),
         ]);
     }
 
@@ -42,7 +42,7 @@ class PublicContentController extends Controller
     {
         $category = trim((string) $request->query('categorie'));
         $categories = \App\Models\EditorialCategory::query()->whereHas('articles', fn ($query) => $query->where('status', 'published'))->orderBy('name')->get();
-        $articles = Article::query()->with('categories')->where('status', 'published')->when($category !== '', fn ($query) => $query->whereHas('categories', fn ($categories) => $categories->where('slug', $category)))->orderByDesc('published_at')->orderByDesc('legacy_published_at')->paginate(12)->withQueryString();
+        $articles = Article::query()->with(['categories', 'featuredMedia.asset.variants'])->where('status', 'published')->when($category !== '', fn ($query) => $query->whereHas('categories', fn ($categories) => $categories->where('slug', $category)))->orderByDesc('published_at')->orderByDesc('legacy_published_at')->paginate(12)->withQueryString();
 
         return view('public.blog.index', compact('articles', 'categories', 'category'));
     }
