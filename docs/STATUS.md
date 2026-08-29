@@ -1,6 +1,6 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-08-28
+Last updated: 2026-08-29
 
 | Area | Status | Notes |
 |---|---|---|
@@ -32,6 +32,7 @@ Last updated: 2026-08-28
 | Admin/moderation | DONE | Filament 5 sur `/admin`, modules opérationnels, audit, réglages et modération validés par PHP et Playwright desktop/mobile sur préproduction. |
 | Qualité back-office | IN PROGRESS | Normalisation déterministe de texte plain-text, actions « Voir sur le site » et amélioration ciblée des recherches Filament en cours de validation. |
 | Intégrité données migrées | DONE | Audit legacy/V2 des dates, reprise idempotente de `published_at` et des dates média, 32 payloads géographiques malveillants non associés supprimés de V2 ; rapport dans `docs/generated/data-integrity-audit.md`. |
+| Audit adresses / GPS | DONE (read-only) | Les 7 704 restaurants V2 et la source WordPress ont été audités sans modification métier ni géocodage. Le blocage principal est l’absence totale de remplissage des colonnes V2 `city_name`/`postal_code` : 4 234 paires CP/ville sont seulement extractibles de l’adresse brute. Rapport et échantillon dans `docs/generated/address-gps-audit.md` et `address-gps-sample.csv`. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |

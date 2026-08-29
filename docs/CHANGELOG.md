@@ -81,6 +81,10 @@
 - Recorded the preproduction audit and official Composer bootstrap as hard prerequisites before Laravel initialization.
 # Changelog
 
+## 2026-08-29
+
+- Added `data:audit-addresses`, a deterministic, read-only address/GPS audit with a test proving it does not modify V2 or legacy data. The preproduction run audited all 7,704 restaurants and produced the address/GPS report plus a 100-record sample; no geocoding, address/GPS correction, or geography change was made.
+
 ## 2026-08-27
 
 - Audited and repaired migrated-data integrity on preproduction: restored 121 historical article and 90 page publication dates, added legacy attachment dates, retained V2 audit timestamps, and added Filament date displays for content, moderation, users, media and restaurants.
