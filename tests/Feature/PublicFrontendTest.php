@@ -28,4 +28,10 @@ class PublicFrontendTest extends TestCase
         $this->get('/sortie/'.$link->token)->assertRedirect('https://example.test/reservation');
         $this->assertSame(1, $link->fresh()->click_count);
     }
+
+    public function test_restaurant_title_is_not_double_encoded(): void
+    {
+        Restaurant::create(['legacy_wp_id' => 413, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published']);
+        $this->get('/resto/adams-burger')->assertOk()->assertSee("<title>Adam's Burger | Top Halal</title>", false)->assertDontSee('Adam&amp;#039;s Burger', false);
+    }
 }
