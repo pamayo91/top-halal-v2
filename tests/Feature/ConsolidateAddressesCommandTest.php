@@ -15,6 +15,8 @@ class ConsolidateAddressesCommandTest extends TestCase
     public function test_it_completes_an_approximate_address_without_changing_raw_address_or_gps(): void
     {
         $restaurant = Restaurant::create([
+            // Deliberately greater than the row count: batches must never use ID <= count().
+            'id' => 9000,
             'legacy_wp_id' => 22801,
             'name' => 'O Sha',
             'slug' => 'o-sha',
