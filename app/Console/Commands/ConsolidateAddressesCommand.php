@@ -1,4 +1,115 @@
 <?php
+
 namespace App\Console\Commands;
-use App\Models\Restaurant; use App\Services\Geocoding\GeocodingService; use Illuminate\Console\Command; use Illuminate\Support\Facades\File;
-class ConsolidateAddressesCommand extends Command {protected $signature='data:consolidate-addresses {--apply} {--dry-run} {--from-id=} {--to-id=} {--out=docs/generated/address-consolidation-report.md}';public function handle(GeocodingService $geo):int{$apply=(bool)$this->option('apply');$rows=Restaurant::whereIn('geocoding_status',['APPROXIMATE','REVIEW_REQUIRED'])->whereNotNull('latitude')->whereNotNull('longitude')->when($this->option('from-id'),fn($q)=>$q->where('id','>=',$this->option('from-id')))->when($this->option('to-id'),fn($q)=>$q->where('id','<=',$this->option('to-id')))->orderBy('id')->get();$all=Restaurant::whereNotNull('latitude')->whereNotNull('longitude')->get();$cluster=$all->groupBy(fn($r)=>$r->latitude.','.$r->longitude)->filter(fn($g)=>$g->count()>1)->flatten()->pluck('id')->flip();$n=['asked'=>0,'filled'=>0,'eligible'=>0];foreach($rows as $r){$x=$geo->reverse((float)$r->latitude,(float)$r->longitude)['features'][0]??null;$n['asked']++;if(!$x||!$x['postcode']||!$x['city']||!$x['citycode'])continue;$safe=!isset($cluster[$r->id])&&($x['type']==='housenumber'||$x['type']==='street');if($apply){$r->forceFill(['postal_code'=>$x['postcode'],'city_name'=>$x['city'],'city_code'=>$x['citycode'],'country_code'=>'FR','geocoding_provider'=>'geoplateforme','geocoding_source_id'=>$x['id'],'geocoding_precision'=>$x['type'],'geocoding_score'=>$x['score'],'geocoded_at'=>now(),'proximity_status'=>$safe?'ELIGIBLE':'REVIEW_REQUIRED'])->save();}$n['filled']++;if($safe)$n['eligible']++;}File::put(base_path($this->option('out')),"# Consolidation\n\n- Interroges: {$n['asked']}\n- Donnees administratives: {$n['filled']}\n- Proximity eligibles: {$n['eligible']}\n- GPS modifies: 0\n- Adresse historique modifiee: 0\n");$this->info(json_encode($n));return self::SUCCESS;}}
+
+use App\Models\Restaurant;
+use App\Services\Geocoding\GeocodingService;
+use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\File;
+
+class ConsolidateAddressesCommand extends Command
+{
+    protected $signature = 'data:consolidate-addresses
+        {--apply : Persist only currently missing structured fields}
+        {--dry-run : Do not persist anything}
+        {--from-id= : Inclusive restaurant ID lower bound}
+        {--to-id= : Inclusive restaurant ID upper bound}
+        {--ids= : Comma-separated restaurant IDs to process}
+        {--out=docs/generated/address-consolidation-report.md : Markdown report path}';
+
+    public function handle(GeocodingService $geo): int
+    {
+        $ids = collect(explode(',', (string) $this->option('ids')))
+            ->map(fn (string $id) => (int) trim($id))
+            ->filter()
+            ->values()
+            ->all();
+
+        $rows = Restaurant::query()
+            ->whereIn('geocoding_status', ['APPROXIMATE', 'REVIEW_REQUIRED'])
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->when($ids !== [], fn (Builder $query) => $query->whereIn('id', $ids))
+            ->when($ids === [], fn (Builder $query) => $query->where(function (Builder $query): void {
+                foreach (['address_line1', 'postal_code', 'city_name', 'city_code', 'country_code'] as $field) {
+                    $query->orWhereNull($field)->orWhere($field, '');
+                }
+            }))
+            ->when($this->option('from-id'), fn (Builder $query, $id) => $query->where('id', '>=', $id))
+            ->when($this->option('to-id'), fn (Builder $query, $id) => $query->where('id', '<=', $id))
+            ->orderBy('id')
+            ->get();
+
+        $clustered = Restaurant::query()->whereNotNull('latitude')->whereNotNull('longitude')->get()
+            ->groupBy(fn (Restaurant $restaurant) => $restaurant->latitude.','.$restaurant->longitude)
+            ->filter(fn ($group) => $group->count() > 1)
+            ->flatten()
+            ->pluck('id')
+            ->flip();
+
+        $stats = ['selected' => $rows->count(), 'asked' => 0, 'cached' => 0, 'filled' => 0, 'incomplete_provider_result' => 0, 'provider_errors' => 0];
+
+        foreach ($rows as $restaurant) {
+            $result = $geo->reverse((float) $restaurant->latitude, (float) $restaurant->longitude);
+            $stats['asked']++;
+            $stats['cached'] += (int) $result['cached'];
+
+            if (! $result['ok']) {
+                $stats['provider_errors']++;
+                $this->warn("Restaurant {$restaurant->id}: {$result['error']}");
+                continue;
+            }
+
+            $feature = $result['features'][0] ?? null;
+            if (! $feature || ! $feature['postcode'] || ! $feature['city'] || ! $feature['citycode']) {
+                $stats['incomplete_provider_result']++;
+                continue;
+            }
+
+            $line1 = $this->addressLine1($feature['label'] ?? null);
+            if (! $line1) {
+                $stats['incomplete_provider_result']++;
+                continue;
+            }
+
+            if ($this->option('apply')) {
+                $safe = ! isset($clustered[$restaurant->id]) && in_array($feature['type'], ['housenumber', 'street'], true);
+                $restaurant->forceFill([
+                    'address_line1' => $restaurant->address_line1 ?: $line1,
+                    'postal_code' => $restaurant->postal_code ?: $feature['postcode'],
+                    'city_name' => $restaurant->city_name ?: $feature['city'],
+                    'city_code' => $restaurant->city_code ?: $feature['citycode'],
+                    'country_code' => $restaurant->country_code ?: 'FR',
+                    // Metadata is informational; coordinates and the historical address are deliberately untouched.
+                    'geocoding_provider' => $restaurant->geocoding_provider ?: 'geoplateforme',
+                    'geocoding_source_id' => $restaurant->geocoding_source_id ?: $feature['id'],
+                    'geocoding_precision' => $restaurant->geocoding_precision ?: $feature['type'],
+                    'geocoding_score' => $restaurant->geocoding_score ?: $feature['score'],
+                    'geocoded_at' => $restaurant->geocoded_at ?: now(),
+                    'proximity_status' => $restaurant->proximity_status ?: ($safe ? 'ELIGIBLE' : 'REVIEW_REQUIRED'),
+                ])->save();
+            }
+
+            $stats['filled']++;
+        }
+
+        File::put(base_path($this->option('out')), "# Consolidation des adresses\n\n"
+            ."- Sélectionnés : {$stats['selected']}\n- Résultats Géoplateforme lus : {$stats['asked']}\n- Réponses cache : {$stats['cached']}\n- Fiches complétables : {$stats['filled']}\n- Résultats fournisseur incomplets : {$stats['incomplete_provider_result']}\n- Erreurs fournisseur : {$stats['provider_errors']}\n- GPS modifiés : 0\n- Adresse historique modifiée : 0\n");
+
+        $this->info(json_encode($stats));
+
+        return self::SUCCESS;
+    }
+
+    private function addressLine1(?string $label): ?string
+    {
+        if (! $label) {
+            return null;
+        }
+
+        $line = preg_replace('/\s+(?:\d{5}|97\d{3}|98\d{3})\s+.*$/u', '', $label);
+
+        return $line ? trim($line) : null;
+    }
+}
