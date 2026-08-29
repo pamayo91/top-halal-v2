@@ -31,7 +31,6 @@ class PublicUrl
     private function forComment(Comment $comment): ?string
     {
         $content = $comment->article ?? $comment->page;
-        $url = $content ? $this->for($content) : null;
-        return $url ? $url.'#comment-'.$comment->id : null;
+        return $content ? $this->for($content) : null;
     }
 }
