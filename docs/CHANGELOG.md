@@ -85,6 +85,7 @@
 
 ## 2026-08-29
 
+- Corrected the Phase 5 structured-address persistence path: administrative data is now written for `APPROXIMATE` records when available, `address_line1` is populated safely, and the batch is idempotent and targets only incomplete structured fields. Historical addresses and coordinates remain immutable. Added regression coverage for the O Sha-style forward/reverse street-number disagreement.
 - Added the read-only Géoplateforme/BAN geocoding pilot, provider abstraction, bounded cache/rate limit, response parsing and no-write coverage. The representative 100-restaurant preproduction pilot produced no restaurant or geography changes.
 - Added `data:audit-addresses`, a deterministic, read-only address/GPS audit with a test proving it does not modify V2 or legacy data. The preproduction run audited all 7,704 restaurants and produced the address/GPS report plus a 100-record sample; no geocoding, address/GPS correction, or geography change was made.
 
