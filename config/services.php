@@ -38,6 +38,7 @@ return [
     'geoplateforme' => [
         'base_url' => env('GEOPLATEFORME_BASE_URL', 'https://data.geopf.fr/geocodage'),
         'timeout' => env('GEOPLATEFORME_TIMEOUT', 5),
+        'rate_sleep_us' => env('GEOPLATEFORME_RATE_SLEEP_US', 250000),
         'user_agent' => env('GEOPLATEFORME_USER_AGENT', 'TopHalalV2-GeocodingPilot/1.0 contact@top-halal.fr'),
     ],
 

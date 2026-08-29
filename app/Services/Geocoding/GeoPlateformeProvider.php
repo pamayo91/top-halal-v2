@@ -31,7 +31,7 @@ class GeoPlateformeProvider implements GeocodingService
                 : ['ok' => false, 'query' => http_build_query($params), 'features' => [], 'error' => 'HTTP '.$response->status(), 'cached' => false];
         } catch (\Throwable $e) { $result = ['ok' => false, 'query' => http_build_query($params), 'features' => [], 'error' => class_basename($e), 'cached' => false]; }
         Cache::put($key, $result, now()->addDays(30));
-        usleep(250000); // Respectful pilot rate: maximum four uncached calls per second.
+        usleep((int) config('services.geoplateforme.rate_sleep_us', 250000)); // Shared worker budget is configured by the orchestrator.
         return $result;
     }
 
