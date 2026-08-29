@@ -2,7 +2,7 @@
 
 ## 2026-08-30
 
-- Standardized public listing thumbnails: article cards and the three homepage restaurant cards use fixed, responsive image frames with cropped images, so portrait source media can no longer change card height.
+- Standardized public listing thumbnails: article cards, the three homepage restaurant cards and the three-column restaurant directory use fixed, responsive image frames with cropped images, so portrait source media can no longer change card height.
 
 ## 2026-08-29
 
