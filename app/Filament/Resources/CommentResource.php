@@ -35,8 +35,8 @@ class CommentResource extends AdminResource
     {
         return $table->columns([
             TextColumn::make('created_at')->label('Date du commentaire')->dateTime('d/m/Y H:i')->sortable(),
-            TextColumn::make('content_title')->label('Contenu')->state(fn (Comment $c) => $c->article?->title ?? $c->page?->title ?? 'Contenu supprimé')->searchable(query: fn (Builder $q, string $search) => $q->whereHas('article', fn ($x) => $x->where('title', 'like', "%{$search}%"))->orWhereHas('page', fn ($x) => $x->where('title', 'like', "%{$search}%"))),
-            TextColumn::make('author_name')->label('Auteur')->searchable()->description(fn (Comment $c) => str($c->content)->limit(80))->wrap(),
+            TextColumn::make('content_title')->label('Contenu')->state(fn (Comment $c) => $c->article?->title ?? $c->page?->title ?? 'Contenu supprimé'),
+            TextColumn::make('author_name')->label('Auteur')->searchable(['author_name', 'content'])->description(fn (Comment $c) => str($c->content)->limit(80))->wrap(),
             TextColumn::make('status')->badge()->color(fn (string $state) => $state === 'approved' ? 'success' : ($state === 'pending' ? 'warning' : 'danger'))->sortable(),
         ])->filters([SelectFilter::make('status')->options(['pending' => 'En attente', 'approved' => 'Approuvé', 'rejected' => 'Refusé', 'spam' => 'Spam'])])
             ->recordActions([static::viewOnSiteAction(), Action::make('approve')->label('Approuver')->color('success')->visible(fn (Comment $c) => $c->status === 'pending')->action(fn (Comment $c) => static::moderate($c, 'approved')), Action::make('reject')->label('Refuser')->color('danger')->requiresConfirmation()->visible(fn (Comment $c) => $c->status === 'pending')->action(fn (Comment $c) => static::moderate($c, 'rejected')), Action::make('spam')->label('Marquer comme spam')->color('danger')->requiresConfirmation()->visible(fn (Comment $c) => $c->status === 'pending')->action(fn (Comment $c) => static::moderate($c, 'spam')), EditAction::make()->label('Voir')])
