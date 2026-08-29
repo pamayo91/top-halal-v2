@@ -43,11 +43,11 @@ class TextNormalizer
 
     private function hasMojibake(string $value): bool
     {
-        return preg_match('/(?:Ã.|Â.|â€|â€™|â€œ|â€|â€“|â€”)/u', $value) === 1;
+        return preg_match('/(?:Ã.|Â.|â€)/u', $value) === 1 || (str_contains($value, 'â') && str_contains($value, '€'));
     }
 
     private function mojibakeScore(string $value): int
     {
-        return preg_match_all('/(?:Ã.|Â.|â€|â€™|â€œ|â€|â€“|â€”)/u', $value) ?: 0;
+        return (preg_match_all('/(?:Ã.|Â.|â€)/u', $value) ?: 0) + ((str_contains($value, 'â') && str_contains($value, '€')) ? 1 : 0);
     }
 }
