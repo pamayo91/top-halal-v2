@@ -32,7 +32,7 @@ class ResolveAddressExceptionsCommand extends Command
             $applied = false;
 
             if ($this->option('apply') && $complete && $compatible && in_array($candidate['type'], ['housenumber', 'street'], true)) {
-                $line = $this->line($r->address, $candidate['label']);
+                $line = $this->structuredLine($r->address, $candidate['label']);
                 $fields = [
                     'address_line1' => $r->address_line1 ?: $line,
                     'postal_code' => $r->postal_code ?: $candidate['postcode'],
@@ -70,7 +70,7 @@ class ResolveAddressExceptionsCommand extends Command
         return 'résolu automatiquement';
     }
 
-    private function line(?string $raw, ?string $label): ?string
+    private function structuredLine(?string $raw, ?string $label): ?string
     {
         $raw = trim((string) strtok((string) $raw, ','));
         if (preg_match('/^\d+[\p{L}\d\s\-' . "'" . ']+$/u', $raw)) return $raw;
