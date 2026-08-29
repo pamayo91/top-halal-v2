@@ -38,7 +38,14 @@ class PublicContentController extends Controller
         return redirect()->route('restaurants.index', ['lat' => round((float) $data['lat'], 5), 'lng' => round((float) $data['lng'], 5)]);
     }
 
-    public function blog(): View { return view('public.blog.index', ['articles' => Article::where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->paginate(12)]); }
+    public function blog(Request $request): View
+    {
+        $category = trim((string) $request->query('categorie'));
+        $categories = \App\Models\EditorialCategory::query()->whereHas('articles', fn ($query) => $query->where('status', 'published'))->orderBy('name')->get();
+        $articles = Article::query()->with('categories')->where('status', 'published')->when($category !== '', fn ($query) => $query->whereHas('categories', fn ($categories) => $categories->where('slug', $category)))->orderByDesc('published_at')->orderByDesc('legacy_published_at')->paginate(12)->withQueryString();
+
+        return view('public.blog.index', compact('articles', 'categories', 'category'));
+    }
 
     public function restaurant(string $slug): Response
     {
