@@ -51,11 +51,14 @@ class TextNormalizer
 
     private function hasMojibake(string $value): bool
     {
-        return preg_match('/(?:Ã.|Â.|â€)/u', $value) === 1 || (str_contains($value, 'â') && str_contains($value, '€'));
+        return $this->mojibakeScore($value) > 0;
     }
 
     private function mojibakeScore(string $value): int
     {
-        return (preg_match_all('/(?:Ã.|Â.|â€)/u', $value) ?: 0) + ((str_contains($value, 'â') && str_contains($value, '€')) ? 1 : 0);
+        return substr_count($value, 'Ã©') + substr_count($value, 'Ã¨') + substr_count($value, 'Ãª')
+            + substr_count($value, 'Ã§') + substr_count($value, 'Ã´') + substr_count($value, 'Ã®')
+            + substr_count($value, 'Ã¹') + substr_count($value, 'Ã‰') + substr_count($value, 'Ã')
+            + substr_count($value, 'Â ');
     }
 }
