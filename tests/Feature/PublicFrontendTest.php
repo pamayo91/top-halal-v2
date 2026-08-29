@@ -32,6 +32,6 @@ class PublicFrontendTest extends TestCase
     public function test_restaurant_title_is_not_double_encoded(): void
     {
         Restaurant::create(['legacy_wp_id' => 413, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published']);
-        $this->get('/resto/adams-burger')->assertOk()->assertSee("<title>Adam's Burger | Top Halal</title>", false)->assertDontSee('Adam&amp;#039;s Burger', false);
+        $this->get('/resto/adams-burger')->assertOk()->assertSee('<title>Adam&#039;s Burger | Top Halal</title>', false)->assertDontSee('Adam&amp;#039;s Burger', false);
     }
 }
