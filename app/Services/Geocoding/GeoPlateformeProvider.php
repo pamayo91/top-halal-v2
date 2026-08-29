@@ -23,7 +23,7 @@ class GeoPlateformeProvider implements GeocodingService
         if (Cache::has($key)) return [...Cache::get($key), 'cached' => true];
         try {
             $response = Http::acceptJson()->withUserAgent(config('services.geoplateforme.user_agent'))
-                ->timeout((int) config('services.geoplateforme.timeout', 10))->retry(2, 500)
+                ->timeout((int) config('services.geoplateforme.timeout', 5))->retry(1, 250, throw: false)
                 ->get(rtrim(config('services.geoplateforme.base_url'), '/').'/'.$path, $params);
             $data = $response->json();
             $result = $response->successful() && is_array($data)
