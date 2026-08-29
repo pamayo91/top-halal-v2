@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-30
+
+- Standardized public listing thumbnails: article cards and the three homepage restaurant cards use fixed, responsive image frames with cropped images, so portrait source media can no longer change card height.
+
 ## 2026-08-29
 
 - Added independent address-confidence, GPS-precision and precise-proximity qualification. The proximity search now uses `proximity_status`; no historical coordinate or raw address was changed.
