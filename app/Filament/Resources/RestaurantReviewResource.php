@@ -32,7 +32,7 @@ class RestaurantReviewResource extends AdminResource
         return $table->columns([
             TextColumn::make('created_at')->label('Date de l’avis')->dateTime('d/m/Y H:i')->sortable(),
             TextColumn::make('restaurant.name')->label('Restaurant')->searchable()->sortable(),
-            TextColumn::make('author_name')->label('Auteur')->searchable()->description(fn (RestaurantReview $r) => str($r->content)->limit(80))->wrap(),
+            TextColumn::make('author_name')->label('Auteur')->searchable(['author_name', 'content'])->description(fn (RestaurantReview $r) => str($r->content)->limit(80))->wrap(),
             TextColumn::make('rating')->label('Note')->suffix('/5')->sortable(),
             TextColumn::make('status')->badge()->color(fn (string $state) => $state === 'approved' ? 'success' : ($state === 'pending' ? 'warning' : 'danger'))->sortable(),
         ])->filters([SelectFilter::make('status')->options(['pending' => 'En attente', 'approved' => 'Approuvé', 'rejected' => 'Refusé', 'spam' => 'Spam'])])
