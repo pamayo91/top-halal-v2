@@ -64,8 +64,8 @@ class RestaurantResource extends AdminResource
     {
         return $table->columns([
             ImageColumn::make('image')->label('')->getStateUsing(fn (Restaurant $r) => $r->media->first()?->asset ? route('media.show', $r->media->first()->asset) : null)->defaultImageUrl('/images/media-placeholder.svg')->circular(),
-            TextColumn::make('name')->label('Restaurant')->searchable(query: fn (Builder $q, string $search) => $q->where(fn (Builder $x) => $x->where('name', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%")->orWhere('address', 'like', "%{$search}%")->orWhere('phone', 'like', "%{$search}%")->orWhere('contact_email', 'like', "%{$search}%")))->sortable()->description(fn (Restaurant $r) => $r->slug),
-            TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: $r->locations->pluck('name')->join(', ') ?: '—')->searchable(query: fn (Builder $q, string $search) => $q->where('city_name', 'like', "%{$search}%")->orWhereHas('locations', fn (Builder $x) => $x->where('name', 'like', "%{$search}%"))),
+            TextColumn::make('name')->label('Restaurant')->searchable(['name', 'slug', 'address', 'phone', 'contact_email'])->sortable()->description(fn (Restaurant $r) => $r->slug),
+            TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: $r->locations->pluck('name')->join(', ') ?: '—')->searchable(['city_name']),
             TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {'published'=>'success','pending'=>'warning','reported'=>'danger','archived'=>'gray',default=>'info'})->sortable(),
             TextColumn::make('geocoding_status')->label('Géo')->badge()->color(fn (?string $state) => match ($state) {'VERIFIED'=>'success','HIGH_CONFIDENCE'=>'info','APPROXIMATE'=>'warning','REVIEW_REQUIRED'=>'danger','MANUAL'=>'primary',default=>'gray'}),
             TextColumn::make('address_exception_reason')->label('Adresse à traiter')->state(function (Restaurant $r): string {
