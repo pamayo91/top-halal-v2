@@ -37,6 +37,7 @@ Last updated: 2026-08-29
 | Enrichissement adresses | DONE | Modèle additif, enrichissement Géoplateforme idempotent des 7 704 restaurants et filtrage de proximité par confiance géographique. Adresses historiques et GPS existants conservés ; rapport `docs/generated/address-enrichment-report.md`. |
 | Qualification GPS / proximité | DONE | Confiance adresse, précision GPS et éligibilité « autour de moi » sont distinctes. Les coordonnées historiques restent inchangées ; rapport `docs/generated/location-qualification-report.md`. |
 | Consolidation adresses — correctif de persistance | DONE | Les champs administratifs et `address_line1` manquants sont maintenant persistés indépendamment de `APPROXIMATE`, sans modifier l’adresse historique ni les GPS. Le compteur Phase 5 de 5 022 était un compteur de réponses worker, pas un total BDD ; contrôle dans `docs/generated/address-consolidation-report.md`. |
+| Résolution des exceptions adresses | DONE | Phase 5.1 : 34 des 65 exceptions ont été structurées de façon sûre ; 31 restent explicitement classées (3 inutilisables, 3 ambiguës, 5 hors France, 20 suspectes/tests) dans `docs/generated/address-exceptions-report.md`. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |
