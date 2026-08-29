@@ -68,6 +68,12 @@ class RestaurantResource extends AdminResource
             TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: $r->locations->pluck('name')->join(', ') ?: '—')->searchable(query: fn (Builder $q, string $search) => $q->where('city_name', 'like', "%{$search}%")->orWhereHas('locations', fn (Builder $x) => $x->where('name', 'like', "%{$search}%"))),
             TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {'published'=>'success','pending'=>'warning','reported'=>'danger','archived'=>'gray',default=>'info'})->sortable(),
             TextColumn::make('geocoding_status')->label('Géo')->badge()->color(fn (?string $state) => match ($state) {'VERIFIED'=>'success','HIGH_CONFIDENCE'=>'info','APPROXIMATE'=>'warning','REVIEW_REQUIRED'=>'danger','MANUAL'=>'primary',default=>'gray'}),
+            TextColumn::make('address_exception_reason')->label('Adresse à traiter')->state(function (Restaurant $r): string {
+                if ($r->latitude === null || $r->longitude === null) return 'sans GPS';
+                if (in_array($r->geocoding_status, ['APPROXIMATE', 'REVIEW_REQUIRED'], true)) return 'géocodage incomplet';
+                if ($r->geocoding_status === 'MISSING') return 'données insuffisantes';
+                return 'ambigu';
+            })->badge()->color('warning')->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('categories.name')->label('Catégories')->badge()->separator(',')->limitList(2),
             TextColumn::make('reviews_count')->label('Avis')->numeric()->sortable()->toggleable(),
             TextColumn::make('legacy_published_at')->label('Créé (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(),TextColumn::make('legacy_modified_at')->label('Modifié (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(isToggledHiddenByDefault: true),
@@ -76,6 +82,7 @@ class RestaurantResource extends AdminResource
             SelectFilter::make('location')->label('Ville / zone')->relationship('locations', 'name')->searchable()->preload(),
             SelectFilter::make('geocoding_status')->label('Qualité géographique')->options(['VERIFIED'=>'Vérifiée','HIGH_CONFIDENCE'=>'Confiance élevée','APPROXIMATE'=>'Approximative','REVIEW_REQUIRED'=>'À vérifier','MANUAL'=>'Manuelle','MISSING'=>'Manquante']),
             Filter::make('missing_gps')->label('GPS manquant')->query(fn (Builder $q) => $q->where(fn($x)=>$x->whereNull('latitude')->orWhereNull('longitude'))), Filter::make('without_city_code')->label('Sans code INSEE')->query(fn (Builder $q) => $q->whereNull('city_code')),
+            Filter::make('address_to_process')->label('Adresse à traiter')->query(fn (Builder $q) => $q->where(function (Builder $missing): void { foreach (['address_line1', 'postal_code', 'city_name', 'city_code', 'country_code'] as $field) $missing->orWhereNull($field)->orWhere($field, ''); })),
             SelectFilter::make('category')->label('Catégorie')->relationship('categories', 'name')->searchable()->preload(),
             TernaryFilter::make('photo')->label('Photo')->queries(true: fn (Builder $q) => $q->whereHas('media.asset'), false: fn (Builder $q) => $q->whereDoesntHave('media.asset')),
             TernaryFilter::make('reviews')->label('Avis')->queries(true: fn (Builder $q) => $q->has('reviews'), false: fn (Builder $q) => $q->doesntHave('reviews')),
