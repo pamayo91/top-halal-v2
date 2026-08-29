@@ -62,7 +62,8 @@ class PublicContentController extends Controller
     {
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
         $comments = $content->comments()->where('status', 'approved')->oldest()->get();
-        return response()->view('public.editorial', compact('content', 'comments'));
+        $isArticle = $content instanceof Article;
+        return response()->view('public.editorial', compact('content', 'comments', 'isArticle'));
     }
 
     public function storeComment(StoreCommentRequest $request, string $slug): RedirectResponse
