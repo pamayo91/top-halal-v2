@@ -28,10 +28,11 @@ class ResolveAddressExceptionsCommand extends Command
             $complete = $candidate && $candidate['postcode'] && $candidate['city'] && $candidate['citycode'];
             $geography = $r->locations->pluck('name')->filter()->values()->all();
             $compatible = $geography === [] || ! $complete || collect($geography)->contains(fn ($name) => $confidence->sameCity($name, $candidate['city']));
-            $reason = $this->reason($r, $candidate, $complete, $compatible);
+            $special = $this->specialCase($r);
+            $reason = $special ?: $this->reason($r, $candidate, $complete, $compatible);
             $applied = false;
 
-            if ($this->option('apply') && $complete && $compatible && in_array($candidate['type'], ['housenumber', 'street'], true)) {
+            if ($this->option('apply') && ! $special && $complete && $compatible && in_array($candidate['type'], ['housenumber', 'street'], true)) {
                 $line = $this->structuredLine($r->address, $candidate['label']);
                 $fields = [
                     'address_line1' => $r->address_line1 ?: $line,
@@ -68,6 +69,15 @@ class ResolveAddressExceptionsCommand extends Command
         if (! $compatible) return 'ambigu : Geography incompatible';
         if (! in_array($candidate['type'], ['housenumber', 'street'], true)) return 'précision insuffisante : '.$candidate['type'];
         return 'résolu automatiquement';
+    }
+
+    private function specialCase(Restaurant $r): ?string
+    {
+        $address = mb_strtolower((string) $r->address);
+        if ($r->name === 'Mr.' && str_contains($address, '3137 laguna street')) return 'suspect/test hors France : 3137 Laguna Street (recommandation : revue manuelle, ne pas publier automatiquement)';
+        if (str_contains($address, 'morocco') || str_contains($address, 'marrakech')) return 'hors France : Géoplateforme/BAN non appropriée';
+        if (str_contains($address, 'monaco') || str_contains($address, 'monte-carlo')) return 'hors France : Monaco, code pays FR interdit';
+        return null;
     }
 
     private function structuredLine(?string $raw, ?string $label): ?string
