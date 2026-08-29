@@ -9,6 +9,6 @@
 - city_name structurées : 2608
 - city_code structurés : 2608
 - APPROXIMATE avant : 4834
-- Clusters restant à revoir : 567
-- Conflits Geography avant : 238 ; vrais conflits restants : 785
+- Clusters restant à revoir : 272
+- Conflits Geography avant : 238 ; vrais conflits restants après normalisation/citycode : 238.
 - MISSING : 24

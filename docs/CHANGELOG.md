@@ -2,6 +2,7 @@
 
 ## 2026-08-29
 
+- Added independent address-confidence, GPS-precision and precise-proximity qualification. The proximity search now uses `proximity_status`; no historical coordinate or raw address was changed.
 - Added controlled full address enrichment: structured address provenance, confidence statuses, Filament visibility and precise-radius eligibility. The full preproduction pass processed 7,704 restaurants without replacing historical addresses or existing GPS.
 - Added a deterministic plain-text normalizer for HTML entities and recognised UTF-8/Windows-1252 mojibake. Rich editorial HTML remains untouched; the migration paths and an idempotent audit command use the same normalizer.
 - Added environment-aware public URL resolution for Filament actions, including published content only and media previews, plus targeted search indexes for administrative lookups.
