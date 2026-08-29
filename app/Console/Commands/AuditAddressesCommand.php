@@ -94,7 +94,9 @@ class AuditAddressesCommand extends Command
     private function legacyInventory(string $connection): array
     {
         $db = DB::connection($connection); $prefix = $db->getTablePrefix();
-        $columns = fn (string $table) => array_map(fn ($x) => (array) $x, $db->select('SELECT column_name, column_type, is_nullable FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position', [$db->getDatabaseName(), $prefix.$table]));
+        $columns = $db->getDriverName() === 'sqlite'
+            ? fn (string $table) => collect($db->getSchemaBuilder()->getColumns($prefix.$table))->map(fn ($x) => ['column_name' => $x['name'], 'column_type' => $x['type'], 'is_nullable' => $x['nullable'] ? 'YES' : 'NO'])->all()
+            : fn (string $table) => array_map(fn ($x) => (array) $x, $db->select('SELECT column_name, column_type, is_nullable FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ordinal_position', [$db->getDatabaseName(), $prefix.$table]));
         $meta = $db->table('postmeta as m')->join('posts as p', 'p.ID', '=', 'm.post_id')->where('p.post_type', 'listing')->where(function ($q) { foreach (['address','city','town','postcode','postal','zip','latitude','longitude','location','map'] as $needle) $q->orWhere('m.meta_key', 'like', '%'.$needle.'%'); })->select('m.meta_key', DB::raw('COUNT(*) as occurrences'))->groupBy('m.meta_key')->orderByDesc('occurrences')->get()->map(fn ($x) => (array) $x)->all();
         return ['legacy_tables' => ['posts' => $columns('posts'), 'postmeta' => $columns('postmeta'), 'terms' => $columns('terms'), 'term_taxonomy' => $columns('term_taxonomy')], 'meta_key_candidates' => $meta, 'listing_count' => $db->table('posts')->where('post_type', 'listing')->count()];
     }
