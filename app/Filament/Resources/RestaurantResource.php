@@ -62,7 +62,7 @@ class RestaurantResource extends AdminResource
     {
         return $table->columns([
             ImageColumn::make('image')->label('')->getStateUsing(fn (Restaurant $r) => $r->media->first()?->asset ? route('media.show', $r->media->first()->asset) : null)->defaultImageUrl('/images/media-placeholder.svg')->circular(),
-            TextColumn::make('name')->label('Restaurant')->searchable()->sortable()->description(fn (Restaurant $r) => $r->slug),
+            TextColumn::make('name')->label('Restaurant')->searchable(query: fn (Builder $q, string $search) => $q->where(fn (Builder $x) => $x->where('name', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%")->orWhere('address', 'like', "%{$search}%")->orWhere('phone', 'like', "%{$search}%")->orWhere('contact_email', 'like', "%{$search}%")))->sortable()->description(fn (Restaurant $r) => $r->slug),
             TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: $r->locations->pluck('name')->join(', ') ?: '—')->searchable(query: fn (Builder $q, string $search) => $q->where('city_name', 'like', "%{$search}%")->orWhereHas('locations', fn (Builder $x) => $x->where('name', 'like', "%{$search}%"))),
             TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {'published'=>'success','pending'=>'warning','reported'=>'danger','archived'=>'gray',default=>'info'})->sortable(),
             TextColumn::make('categories.name')->label('Catégories')->badge()->separator(',')->limitList(2),
@@ -74,7 +74,7 @@ class RestaurantResource extends AdminResource
             SelectFilter::make('category')->label('Catégorie')->relationship('categories', 'name')->searchable()->preload(),
             TernaryFilter::make('photo')->label('Photo')->queries(true: fn (Builder $q) => $q->whereHas('media.asset'), false: fn (Builder $q) => $q->whereDoesntHave('media.asset')),
             TernaryFilter::make('reviews')->label('Avis')->queries(true: fn (Builder $q) => $q->has('reviews'), false: fn (Builder $q) => $q->doesntHave('reviews')),
-        ])->recordActions([EditAction::make(), Action::make('archive')->label('Archiver')->color('gray')->requiresConfirmation()->visible(fn (Restaurant $r) => $r->status !== 'archived')->action(function (Restaurant $r): void {$r->update(['status'=>'archived']); app(AdminAudit::class)->record('restaurant.archived', $r);})])
+        ])->recordActions([static::viewOnSiteAction(), EditAction::make(), Action::make('archive')->label('Archiver')->color('gray')->requiresConfirmation()->visible(fn (Restaurant $r) => $r->status !== 'archived')->action(function (Restaurant $r): void {$r->update(['status'=>'archived']); app(AdminAudit::class)->record('restaurant.archived', $r);})])
           ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});})])])
           ->emptyStateHeading('Aucun restaurant')->emptyStateDescription('Créez une première fiche ou ajustez les filtres.')->defaultSort('updated_at', 'desc');
     }

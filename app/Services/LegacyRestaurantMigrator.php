@@ -98,14 +98,14 @@ class LegacyRestaurantMigrator
                 'restaurant' => [
                     'legacy_wp_id' => (int) $post->ID,
                     'legacy_author_id' => (int) $post->post_author ?: null,
-                    'name' => trim((string) $post->post_title),
+                    'name' => app(TextNormalizer::class)->plainText(trim((string) $post->post_title)),
                     'slug' => $slug,
                     'description' => $description,
                     'status' => $this->status((string) $post->post_status),
                     'is_claimed' => $this->truthy($meta['claimed'] ?? null),
-                    'address' => $this->first($flat, ['address', 'map_address', 'fave_property_map_address']),
+                    'address' => $this->normalise($this->first($flat, ['address', 'map_address', 'fave_property_map_address'])),
                     'postal_code' => $this->first($flat, ['postcode', 'postal_code', 'zip']),
-                    'city_name' => $this->first($flat, ['city', 'town']),
+                    'city_name' => $this->normalise($this->first($flat, ['city', 'town'])),
                     'phone' => $this->first($flat, ['telephone', 'phone', 'mobile']),
                     'contact_email' => $this->first($flat, ['email']),
                     ...$coordinates,
@@ -213,6 +213,7 @@ class LegacyRestaurantMigrator
     }
 
     private function coordinate(?string $value, float $min, float $max): ?string { return $value !== null && is_numeric($value) && (float) $value >= $min && (float) $value <= $max ? $value : null; }
+    private function normalise(?string $value): ?string { return $value === null ? null : app(TextNormalizer::class)->plainText($value); }
     private function truthy(mixed $value): bool { return in_array(Str::lower((string) $value), ['1', 'true', 'yes', 'on'], true); }
     private function status(string $status): string { return match ($status) { 'publish' => 'published', 'pending' => 'pending', 'reported' => 'reported', default => 'draft' }; }
 
@@ -221,7 +222,7 @@ class LegacyRestaurantMigrator
     {
         if (str_contains($content, '[vc_')) $anomalies[] = 'visual_composer_shortcode_stripped';
         $text = trim(preg_replace('/\[[^\]]+\]/', '', strip_tags($content)) ?? '');
-        return $text === '' ? null : $text;
+        return $text === '' ? null : app(TextNormalizer::class)->plainText($text);
     }
 
     /** @param array<int, string> $anomalies */

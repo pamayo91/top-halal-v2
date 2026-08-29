@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-08-29
+
+- Added a deterministic plain-text normalizer for HTML entities and recognised UTF-8/Windows-1252 mojibake. Rich editorial HTML remains untouched; the migration paths and an idempotent audit command use the same normalizer.
+- Added environment-aware public URL resolution for Filament actions, including published content only and media previews, plus targeted search indexes for administrative lookups.
+
 ## 2026-08-26
 - Started the public frontend milestone: replaced technical public previews with a shared Blade design system, responsive header/navigation, homepage, blog index, directory search, taxonomy collections, restaurant detail/gallery, editorial comments and public review submission. Search uses only V2 fields and geolocation is initiated only after a visitor action.
 - Added an opaque, aggregate-counting restaurant outbound route (`/sortie/{token}`) and private destination table. Public templates never render external restaurant destinations.
