@@ -72,7 +72,7 @@ class PublicContentController extends Controller
 
     public function editorial(string $slug): Response
     {
-        $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
+        $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::with('featuredMedia.asset')->where('slug', $slug)->where('status', 'published')->firstOrFail();
         $comments = $content->comments()->where('status', 'approved')->oldest()->get();
         $isArticle = $content instanceof Article;
         return response()->view('public.editorial', compact('content', 'comments', 'isArticle'));

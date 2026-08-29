@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Article, Category, Comment, Feature, Location, Page, Restaurant, RestaurantOutboundLink, RestaurantReview};
+use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantOutboundLink, RestaurantReview};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -57,5 +57,14 @@ class PublicFrontendTest extends TestCase
         Comment::create(['article_id' => $article->id, 'author_name' => 'Samir', 'content' => 'Merci', 'status' => 'approved', 'created_at' => '2020-02-03 12:00:00']);
         $this->get('/resto/date-test')->assertOk()->assertSee('Publié le 3 février 2020');
         $this->get('/article-date')->assertOk()->assertSee('Publié le 3 février 2020');
+    }
+
+    public function test_article_detail_renders_its_featured_media(): void
+    {
+        $article = Article::create(['legacy_wp_id' => 422, 'original_title' => 'Article illustré', 'title' => 'Article illustré', 'slug' => 'article-illustre', 'legacy_url' => '/article-illustre', 'status' => 'published']);
+        $asset = MediaAsset::create(['legacy_attachment_id' => 422, 'original_path' => 'media/originals/article.jpg', 'mime' => 'image/jpeg', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
+        ContentMedia::create(['content_type' => 'post', 'content_id' => $article->id, 'legacy_attachment_id' => 422, 'media_asset_id' => $asset->id, 'role' => 'featured']);
+
+        $this->get('/article-illustre')->assertOk()->assertSee('article-featured-media', false)->assertSee(route('media.show', $asset), false);
     }
 }
