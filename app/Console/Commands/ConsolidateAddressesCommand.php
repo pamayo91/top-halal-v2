@@ -67,7 +67,7 @@ class ConsolidateAddressesCommand extends Command
                 continue;
             }
 
-            $line1 = $this->addressLine1($feature['label'] ?? null);
+            $line1 = $this->addressLine1($restaurant->address, $feature['label'] ?? null);
             if (! $line1) {
                 $stats['incomplete_provider_result']++;
                 continue;
@@ -102,13 +102,18 @@ class ConsolidateAddressesCommand extends Command
         return self::SUCCESS;
     }
 
-    private function addressLine1(?string $label): ?string
+    private function addressLine1(?string $historicalAddress, ?string $providerLabel): ?string
     {
-        if (! $label) {
+        $historicalLine = trim((string) strtok((string) $historicalAddress, ','));
+        if (preg_match('/^\d+[\p{L}\d\s\-' . "'" . ']+$/u', $historicalLine)) {
+            return $historicalLine;
+        }
+
+        if (! $providerLabel) {
             return null;
         }
 
-        $line = preg_replace('/\s+(?:\d{5}|97\d{3}|98\d{3})\s+.*$/u', '', $label);
+        $line = preg_replace('/\s+(?:\d{5}|97\d{3}|98\d{3})\s+.*$/u', '', $providerLabel);
 
         return $line ? trim($line) : null;
     }
