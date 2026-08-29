@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Category, Feature, Location, Restaurant, RestaurantOutboundLink};
+use App\Models\{Article, Category, Feature, Location, Page, Restaurant, RestaurantOutboundLink};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -33,5 +33,19 @@ class PublicFrontendTest extends TestCase
     {
         Restaurant::create(['legacy_wp_id' => 413, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published']);
         $this->get('/resto/adams-burger')->assertOk()->assertSee('<title>Adam&#039;s Burger | Top Halal</title>', false)->assertDontSee('Adam&amp;#039;s Burger', false);
+    }
+
+    public function test_every_dynamic_public_page_title_is_escaped_once(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 414, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published']);
+        $category = Category::create(['legacy_term_id' => 15, 'name' => "Cuisine d'Orient", 'slug' => 'orient']);
+        $feature = Feature::create(['legacy_term_id' => 16, 'name' => "Chef d'œuvre", 'slug' => 'chef-oeuvre']);
+        $location = Location::create(['legacy_term_id' => 17, 'name' => "L'Haÿ-les-Roses", 'slug' => 'lhay']);
+        $restaurant->categories()->attach($category); $restaurant->features()->attach($feature); $restaurant->locations()->attach($location);
+        Article::create(['legacy_wp_id' => 18, 'original_title' => "L'article", 'title' => "L'article", 'slug' => 'article-test', 'legacy_url' => '/article-test', 'status' => 'published']);
+        Page::create(['legacy_wp_id' => 19, 'original_title' => "La page d'accueil", 'title' => "La page d'accueil", 'slug' => 'page-test', 'legacy_url' => '/page-test', 'status' => 'published']);
+        foreach (['/resto/adams-burger', '/article-test', '/page-test', '/restos/lhay', '/specialites/orient', '/service/chef-oeuvre'] as $url) {
+            $this->get($url)->assertOk()->assertDontSee('&amp;#039;', false);
+        }
     }
 }
