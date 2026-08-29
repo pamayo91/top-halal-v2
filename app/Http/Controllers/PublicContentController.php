@@ -47,6 +47,11 @@ class PublicContentController extends Controller
         return view('public.blog.index', compact('articles', 'categories', 'category'));
     }
 
+    public function muslimGourmet(): View
+    {
+        return $this->blog(new Request(['categorie' => 'muslim-gourmet']));
+    }
+
     public function restaurant(string $slug): Response
     {
         $restaurant = $this->publishedRestaurants()->where('slug', $slug)->firstOrFail();

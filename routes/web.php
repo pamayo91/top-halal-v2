@@ -83,6 +83,7 @@ Route::middleware('auth')->group(function (): void {
 
 
 Route::get('/blog', [PublicContentController::class, 'blog'])->name('blog.index');
+Route::get('/muslim-gourmet', [PublicContentController::class, 'muslimGourmet'])->name('blog.muslim-gourmet');
 Route::get('/restaurants', [PublicContentController::class, 'index'])->name('restaurants.index');
 Route::post('/restaurants/autour-de-moi', [PublicContentController::class, 'nearMe'])->middleware('throttle:20,1')->name('restaurants.near-me');
 Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
