@@ -83,6 +83,7 @@
 
 ## 2026-08-29
 
+- Added the read-only Géoplateforme/BAN geocoding pilot, provider abstraction, bounded cache/rate limit, response parsing and no-write coverage. The representative 100-restaurant preproduction pilot produced no restaurant or geography changes.
 - Added `data:audit-addresses`, a deterministic, read-only address/GPS audit with a test proving it does not modify V2 or legacy data. The preproduction run audited all 7,704 restaurants and produced the address/GPS report plus a 100-record sample; no geocoding, address/GPS correction, or geography change was made.
 
 ## 2026-08-27
