@@ -100,6 +100,10 @@
 - Recorded the preproduction audit and official Composer bootstrap as hard prerequisites before Laravel initialization.
 # Changelog
 
+## 2026-08-30
+
+- Added a dependency-free local SVG icon set for restaurant services. All listed services now have a semantic visual marker on public restaurant cards and detail pages; the three domain-specific icons use the same 24px rounded-stroke language as the Lucide-derived set, and every icon remains paired with accessible text.
+
 ## 2026-08-29
 
 - Added the targeted Phase 5.1 exception resolver and Filament “Adresse à traiter” filter. It processes explicit/non-contiguous IDs, preserves historical addresses and existing GPS, and records per-record reasons. Thirty-four of the 65 incomplete records were safely structured; unresolved foreign, ambiguous, empty and suspected-test records remain reviewable.

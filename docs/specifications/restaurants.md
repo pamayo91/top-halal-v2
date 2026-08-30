@@ -18,6 +18,7 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 - Fast server-rendered content.
 - Core info and opening hours.
 - categories/features.
+- Services are rendered as local inline SVG icons plus their text labels. The icon set has no external dependency; three domain-specific icons (halal certification, prayer room and decor) follow the same 24px rounded-stroke style as the Lucide-derived icons.
 - reviews/aggregate where valid.
 - map/geographic JS loaded only when needed.
 - external outbound actions obfuscated server-side.

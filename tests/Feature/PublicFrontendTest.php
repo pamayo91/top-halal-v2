@@ -77,4 +77,17 @@ class PublicFrontendTest extends TestCase
 
         $this->get('/resto/restaurant-illustre')->assertOk()->assertSee(route('media.show', [$asset, 480]), false)->assertDontSee(route('media.show', [$asset, 960]), false);
     }
+
+    public function test_restaurant_services_render_local_svg_icons_with_their_text_labels(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 424, 'name' => 'Services test', 'slug' => 'services-test', 'status' => 'published']);
+        $services = collect(['Accès handicapé', 'Ambiance musicale', 'Beau décor', 'Branché', 'Certifié halal', 'Original', 'Romantique', 'Salle de prière', 'Sans alcool', 'Terrasse', 'Traiteur', 'Vente à emporter', 'Wi-Fi'])
+            ->map(fn (string $name, int $index) => Feature::create(['legacy_term_id' => 500 + $index, 'name' => $name, 'slug' => \Illuminate\Support\Str::slug($name)]));
+        $restaurant->features()->attach($services->pluck('id'));
+
+        $response = $this->get('/resto/services-test');
+
+        $response->assertOk()->assertSee('Services')->assertSee('service-list', false)->assertSee('viewBox="0 0 24 24"', false);
+        foreach ($services as $service) $response->assertSee($service->name);
+    }
 }
