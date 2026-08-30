@@ -2,6 +2,7 @@
 
 ## 2026-08-30
 
+- Ajout de l’action « Supprimer » sur la liste et la fiche restaurant Filament : elle archive la fiche de façon réversible et auditable, sans suppression définitive des données.
 - Phase 6A.2 : géocodage massif idempotent des adresses structurées sans GPS. 13 coordonnées ajoutées automatiquement (10 housenumber, 3 street), `proximity_status=ELIGIBLE` lorsque cohérent, aucun GPS préexistant modifié.
 - Phase 6A.1 : un déplacement de marqueur validé par un administrateur reste de précision `MANUAL` mais devient `ELIGIBLE` quand aucune anomalie ne subsiste. Une incompatibilité Geography reste `REVIEW_REQUIRED`. La provenance `admin_map` est maintenant distincte de la future proposition publique `public_map`.
 

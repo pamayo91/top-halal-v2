@@ -31,6 +31,26 @@ class RestaurantResource extends AdminResource
     public static function getGloballySearchableAttributes(): array { return ['name', 'city_name', 'slug']; }
     public static function getGlobalSearchResultDetails(Model $record): array { return ['Ville' => $record->city_name ?: $record->locations->pluck('name')->join(', ') ?: 'Non renseignée', 'Statut' => $record->status]; }
 
+    public static function archive(Restaurant $restaurant): void
+    {
+        $restaurant->update(['status' => 'archived']);
+        app(AdminAudit::class)->record('restaurant.archived', $restaurant, ['status' => 'archived']);
+    }
+
+    public static function archiveAction(): Action
+    {
+        return Action::make('archive')
+            ->label('Supprimer')
+            ->icon('heroicon-o-archive-box-x-mark')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Supprimer ce restaurant ?')
+            ->modalDescription('La fiche sera archivée et retirée des parcours publics. Ses données restent conservées et pourront être restaurées ultérieurement.')
+            ->modalSubmitActionLabel('Archiver la fiche')
+            ->visible(fn (Restaurant $restaurant) => $restaurant->status !== 'archived')
+            ->action(fn (Restaurant $restaurant) => static::archive($restaurant));
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([Tabs::make('Restaurant')->tabs([
@@ -114,7 +134,7 @@ class RestaurantResource extends AdminResource
             SelectFilter::make('category')->label('Catégorie')->relationship('categories', 'name')->searchable()->preload(),
             TernaryFilter::make('photo')->label('Photo')->queries(true: fn (Builder $q) => $q->whereHas('media.asset'), false: fn (Builder $q) => $q->whereDoesntHave('media.asset')),
             TernaryFilter::make('reviews')->label('Avis')->queries(true: fn (Builder $q) => $q->has('reviews'), false: fn (Builder $q) => $q->doesntHave('reviews')),
-        ])->recordActions([static::viewOnSiteAction(), EditAction::make(), Action::make('archive')->label('Archiver')->color('gray')->requiresConfirmation()->visible(fn (Restaurant $r) => $r->status !== 'archived')->action(function (Restaurant $r): void {$r->update(['status'=>'archived']); app(AdminAudit::class)->record('restaurant.archived', $r);})])
+        ])->recordActions([static::viewOnSiteAction(), EditAction::make(), static::archiveAction()])
           ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});})])])
           ->emptyStateHeading('Aucun restaurant')->emptyStateDescription('Créez une première fiche ou ajustez les filtres.')->defaultSort('updated_at', 'desc');
     }

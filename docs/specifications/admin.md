@@ -28,4 +28,4 @@ Les listes affichent les dates métier pertinentes en format français : publica
 - `restaurant_owner`: mêmes accès et édition uniquement des restaurants revendiqués et approuvés.
 - `admin`: accès complet au back-office.
 
-Les secrets restent dans `.env`; les réglages V2 ne contiennent que des valeurs non sensibles. Une suppression de restaurant est un archivage. Les taxonomies associées à des restaurants ne peuvent pas être supprimées.
+Les secrets restent dans `.env`; les réglages V2 ne contiennent que des valeurs non sensibles. L’action « Supprimer » disponible dans la liste et sur la fiche restaurant est un archivage réversible : elle retire la fiche des parcours publics, conserve les données et laisse une trace d’audit. Les taxonomies associées à des restaurants ne peuvent pas être supprimées.
