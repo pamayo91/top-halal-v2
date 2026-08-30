@@ -6,16 +6,16 @@
 <svg {{ $attributes->class('service-icon') }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
     @switch($icon)
         @case('acces-handicape')
-            <circle cx="11" cy="4" r="1"/><path d="M7 21l3-7 2 2 3 5M10 7v4h4l3 3M10 11H6l-2 5a5 5 0 0 0 9 3"/>
+            <circle cx="12" cy="4" r="2"/><path d="M10 7v5h5l2 7M10 12H7l-2 5a6 6 0 0 0 11 3M10 12l-1 7"/>
             @break
         @case('ambiance-musicale')
             <path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>
             @break
         @case('beau-decor')
-            <path d="M4 5h16v14H4zM8 2v4M16 18v4M18 4l1-1M5 19l1-1"/><path d="m12 8 .7 2.3L15 11l-2.3.7L12 14l-.7-2.3L9 11l2.3-.7z"/>
+            <path d="M8 21h8l-1.5-7h-5zM12 14V9M12 9c-3 0-4-2-4-4 3 0 4 2 4 4ZM12 9c3 0 4-2 4-4-3 0-4 2-4 4Z"/>
             @break
         @case('branche')
-            <path d="m13 2-9 12h7l-1 8 9-12h-7z"/>
+            <circle cx="6" cy="15" r="4"/><circle cx="18" cy="15" r="4"/><path d="M10 15h4M6 11V9M18 11V9M2 10l2 2M22 10l-2 2"/>
             @break
         @case('certifie-halal')
             <path d="M12 3 14 5.2l3-.2.8 2.8 2.5 1.6-1.1 2.8 1.1 2.8-2.5 1.6-.8 2.8-3-.2L12 21l-2-2.2-3 .2-.8-2.8-2.5-1.6 1.1-2.8-1.1-2.8 2.5-1.6L7 5l3 .2z"/><path d="M14.8 8.2a4.1 4.1 0 1 0 0 7.6 3.2 3.2 0 1 1 0-7.6Z"/>
@@ -30,7 +30,7 @@
             <path d="M5 21V9a7 7 0 0 1 14 0v12M3 21h18M9 21v-6a3 3 0 0 1 6 0v6M12 2v2"/>
             @break
         @case('sans-alcool')
-            <path d="M7 3h10l-1 7a4 4 0 0 1-8 0L7 3ZM12 14v6M8 21h8M4 4l16 16"/>
+            <path stroke-width="2.5" d="M8 3h8v8a4 4 0 0 1-4 4h0a4 4 0 0 1-4-4V3ZM12 15v6M8 21h8M3 3l18 18"/>
             @break
         @case('terrasse')
             <path d="M3 11h18M12 11v10M6 21h12M4 11a8 8 0 0 1 16 0"/>
