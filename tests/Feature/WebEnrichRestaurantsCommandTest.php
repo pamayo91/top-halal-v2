@@ -36,7 +36,7 @@ class WebEnrichRestaurantsCommandTest extends TestCase
     public function test_it_never_overwrites_existing_hours_and_routes_closures_to_review_without_mutation(): void
     {
         $restaurant=$this->restaurant(['description'=>'Bonne description existante.']); RestaurantOpeningHour::create(['restaurant_id'=>$restaurant->id,'day'=>'monday','opens_at'=>'09:00:00','closes_at'=>'18:00:00','is_closed'=>false,'legacy_key'=>'manual']);
-        $this->source(['state'=>'matched','sources'=>['official:1'],'closure'=>'confirmed','closure_sources'=>['official:1'],'hours'=>[['day'=>'monday','opens_at'=>'01:00:00','closes_at'=>'02:00:00','is_closed'=>false],'description'=>'Restaurant situé à Paris. Service sur place proposé.']);
+        $this->source(['state'=>'matched','sources'=>['official:1'],'closure'=>'confirmed','closure_sources'=>['official:1'],'hours'=>[['day'=>'monday','opens_at'=>'01:00:00','closes_at'=>'02:00:00','is_closed'=>false]],'description'=>'Restaurant situé à Paris. Service sur place proposé.']);
         $this->artisan('restaurants:web-enrich',['--limit'=>50,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
         $this->assertSame('CLOSED_CONFIRMED_REVIEW',RestaurantWebEnrichment::first()->status); $this->assertSame('Bonne description existante.',$restaurant->fresh()->description); $this->assertCount(1,$restaurant->fresh()->openingHours);
     }
