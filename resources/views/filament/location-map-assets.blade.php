@@ -24,4 +24,6 @@
     document.addEventListener('DOMContentLoaded', window.topHalalInitLocationMaps);
     document.addEventListener('livewire:navigated', window.topHalalInitLocationMaps);
     if (document.readyState !== 'loading') window.topHalalInitLocationMaps();
+    window.setTimeout(window.topHalalInitLocationMaps, 100);
+    window.setTimeout(window.topHalalInitLocationMaps, 750);
 </script>

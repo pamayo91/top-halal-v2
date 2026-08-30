@@ -20,6 +20,7 @@ test.describe('GPS auto-géocodés Filament', () => {
       await page.getByRole('tab', { name: 'Localisation' }).click();
       await expect(page.getByRole('spinbutton', { name: 'Latitude', exact: true })).toHaveValue(latitude);
       await expect(page.getByRole('spinbutton', { name: 'Longitude', exact: true })).toHaveValue(longitude);
+      expect(errors).toEqual([]);
       await expect(page.locator('[data-top-halal-location-map] .leaflet-marker-icon')).toBeVisible();
     }
     expect(errors).toEqual([]);
