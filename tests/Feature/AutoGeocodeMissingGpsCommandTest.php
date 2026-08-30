@@ -50,5 +50,5 @@ class AutoGeocodeMissingGpsCommandTest extends TestCase
         $this->assertSame('48.0000000', $restaurant->fresh()->latitude); $this->assertSame('2.0000000', $restaurant->fresh()->longitude);
     }
 
-    private function restaurant(array $attributes): Restaurant { return Restaurant::create($attributes + ['legacy_wp_id'=>random_int(1, 999999999), 'slug'=>'gps-'.str()->random(8), 'status'=>'published']); }
+    private function restaurant(array $attributes): Restaurant { return Restaurant::create($attributes + ['name'=>'GPS test '.str()->random(8), 'legacy_wp_id'=>random_int(1, 999999999), 'slug'=>'gps-'.str()->random(8), 'status'=>'published']); }
 }
