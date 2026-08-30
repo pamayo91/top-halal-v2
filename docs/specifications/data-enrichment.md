@@ -26,7 +26,10 @@ php artisan restaurants:web-enrich --prepare --limit=50
 php artisan restaurants:web-enrich --apply=/chemin/prive/preuves.json
 php artisan restaurants:web-enrich --limit=50 --dry-run
 php artisan restaurants:web-enrich --retry-errors --limit=50
+php artisan restaurants:web-enrich --retry-insufficient --limit=50
 php artisan restaurants:web-enrich --restaurant=9000
 ```
 
 La commande sans `--apply` réserve et exporte le prochain batch dans `storage/app/private/web-enrichment/`; Codex y ajoute les preuves avant l’application. Chaque application écrit `docs/generated/web-enrichment/batch-AAAAMMJJ-HHMMSS.csv`. Les statuts `CLOSED_*`, `CLOSURE_CONFLICT`, `SOURCE_CONFLICT` et `INSUFFICIENT_DATA` s’y filtrent directement; ils sont aussi filtrables par `restaurant_web_enrichments.status`.
+
+La confiance est indépendante par champ (`matching`, activité, horaires et description) avec les niveaux `HIGH`, `MEDIUM` ou `LOW`. Une source unique, récente, d’un site officiel ou d’une plateforme précise avec nom et adresse concordants peut suffire pour des horaires absents ou une description factuelle. Une fermeture reste soumise à une preuve plus stricte et à la revue humaine.

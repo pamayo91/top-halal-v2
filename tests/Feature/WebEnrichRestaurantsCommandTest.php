@@ -71,4 +71,11 @@ class WebEnrichRestaurantsCommandTest extends TestCase
         $this->assertSame('INSUFFICIENT_DATA',RestaurantWebEnrichment::first()->status);
         $this->assertSame('Bonne description existante.',$restaurant->fresh()->description);
     }
+
+    public function test_retry_insufficient_reserves_only_previously_insufficient_rows(): void
+    {
+        $restaurant=$this->restaurant(); RestaurantWebEnrichment::create(['restaurant_id'=>$restaurant->id,'legacy_wp_id'=>$restaurant->legacy_wp_id,'status'=>'INSUFFICIENT_DATA']);
+        $this->artisan('restaurants:web-enrich',['--retry-insufficient'=>true,'--limit'=>1])->assertSuccessful();
+        $audit=RestaurantWebEnrichment::first(); $this->assertSame('PROCESSING',$audit->status); $this->assertSame('INSUFFICIENT_DATA',$audit->previous_status);
+    }
 }
