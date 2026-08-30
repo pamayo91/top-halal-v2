@@ -41,6 +41,7 @@ Last updated: 2026-08-30
 | Composant adresse intelligent | DONE (Phase 6A) | Autocomplete Laravel/Géoplateforme, édition structurée Filament, carte Leaflet isolée, audit/provenance, correction manuelle et détection informative de doublons. Rapport : `docs/generated/address-component-validation.md`. |
 | Cohérence validation GPS manuelle | DONE (Phase 6A.1) | Une correction explicite par admin est `MANUAL` et peut être `ELIGIBLE`; les anomalies Geography conservent `REVIEW_REQUIRED`. La provenance future `public_map` reste non validante. |
 | Auto-géocodage GPS manquants | DONE (Phase 6A.2) | 13 des 36 fiches sans GPS ont été localisées automatiquement via Géoplateforme (10 housenumber, 3 street), sans modifier de GPS existant. 23 adresses restent inexploitablement structurées. Rapport : `docs/generated/missing-gps-autogeocoding-report.md`. |
+| Corbeille restaurants | DONE | La suppression admin est un soft delete réversible, avec restauration, suppression définitive et vidage audité de la Corbeille. Les anciennes fiches archivées ont été déplacées dans cette Corbeille. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |

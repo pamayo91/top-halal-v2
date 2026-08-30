@@ -58,20 +58,44 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame('rejected', $comment->fresh()->status); $this->assertDatabaseCount('admin_audit_logs', 2);
     }
 
-    public function test_restaurant_delete_action_archives_instead_of_permanently_deleting(): void
+    public function test_restaurant_delete_action_moves_the_record_to_the_trash(): void
     {
         $admin = User::factory()->create(['role' => 'admin']); $restaurant = $this->restaurant(); $this->actingAs($admin);
-        \App\Filament\Resources\RestaurantResource::archive($restaurant);
-        $this->assertSame('archived', $restaurant->fresh()->status);
-        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'restaurant.archived', 'subject_id' => $restaurant->id]);
+        \App\Filament\Resources\RestaurantResource::moveToTrash($restaurant);
+        $this->assertSoftDeleted('restaurants', ['id' => $restaurant->id]);
+        $this->assertNull(Restaurant::find($restaurant->id));
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'restaurant.trashed', 'subject_id' => $restaurant->id]);
     }
 
-    public function test_restaurant_bulk_delete_archives_each_selected_restaurant(): void
+    public function test_restaurant_bulk_delete_moves_each_selected_restaurant_to_the_trash(): void
     {
         $admin = User::factory()->create(['role' => 'admin']); $first = $this->restaurant(); $second = $this->restaurant(); $this->actingAs($admin);
-        \App\Filament\Resources\RestaurantResource::archiveMany([$first, $second]);
-        $this->assertSame('archived', $first->fresh()->status); $this->assertSame('archived', $second->fresh()->status);
+        \App\Filament\Resources\RestaurantResource::moveManyToTrash([$first, $second]);
+        $this->assertSoftDeleted('restaurants', ['id' => $first->id]); $this->assertSoftDeleted('restaurants', ['id' => $second->id]);
         $this->assertDatabaseCount('admin_audit_logs', 2);
+    }
+
+    public function test_trashed_restaurant_can_be_restored_or_permanently_deleted(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']); $restaurant = $this->restaurant(); $this->actingAs($admin);
+        \App\Filament\Resources\RestaurantResource::moveToTrash($restaurant);
+        \App\Filament\Resources\RestaurantResource::restore(Restaurant::onlyTrashed()->findOrFail($restaurant->id));
+        $this->assertNotNull(Restaurant::find($restaurant->id));
+
+        \App\Filament\Resources\RestaurantResource::moveToTrash($restaurant->fresh());
+        \App\Filament\Resources\RestaurantResource::forceDelete(Restaurant::onlyTrashed()->findOrFail($restaurant->id));
+        $this->assertDatabaseMissing('restaurants', ['id' => $restaurant->id]);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'restaurant.force_deleted', 'subject_id' => $restaurant->id]);
+    }
+
+    public function test_empty_trash_permanently_deletes_all_trashed_restaurants(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']); $first = $this->restaurant(); $second = $this->restaurant(); $this->actingAs($admin);
+        \App\Filament\Resources\RestaurantResource::moveManyToTrash([$first, $second]);
+        \App\Filament\Resources\RestaurantResource::emptyTrash();
+        $this->assertDatabaseMissing('restaurants', ['id' => $first->id]);
+        $this->assertDatabaseMissing('restaurants', ['id' => $second->id]);
+        $this->assertDatabaseCount('admin_audit_logs', 4);
     }
 
     public function test_moderation_can_mark_comments_and_reviews_as_spam(): void

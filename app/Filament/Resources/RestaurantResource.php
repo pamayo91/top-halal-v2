@@ -7,12 +7,12 @@ use App\Models\{Category, Feature, Location, Restaurant};
 use App\Services\AdminAudit;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\DuplicateRestaurantDetector;
-use Filament\Actions\{Action, BulkAction, BulkActionGroup, DeleteAction, EditAction};
+use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
 use Filament\Forms\Components\{Hidden, MarkdownEditor, Select, Textarea, TextInput};
 use Filament\Schemas\Components\{Section, Tabs, View};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\{ImageColumn, TextColumn};
-use Filament\Tables\Filters\{Filter, SelectFilter, TernaryFilter};
+use Filament\Tables\Filters\{Filter, SelectFilter, TernaryFilter, TrashedFilter};
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -31,29 +31,73 @@ class RestaurantResource extends AdminResource
     public static function getGloballySearchableAttributes(): array { return ['name', 'city_name', 'slug']; }
     public static function getGlobalSearchResultDetails(Model $record): array { return ['Ville' => $record->city_name ?: $record->locations->pluck('name')->join(', ') ?: 'Non renseignée', 'Statut' => $record->status]; }
 
-    public static function archive(Restaurant $restaurant): void
+    public static function moveToTrash(Restaurant $restaurant): void
     {
-        $restaurant->update(['status' => 'archived']);
-        app(AdminAudit::class)->record('restaurant.archived', $restaurant, ['status' => 'archived']);
+        $restaurant->delete();
+        app(AdminAudit::class)->record('restaurant.trashed', $restaurant, ['deleted_at' => $restaurant->deleted_at]);
     }
 
-    public static function archiveMany(iterable $restaurants): void
+    public static function moveManyToTrash(iterable $restaurants): void
     {
-        foreach ($restaurants as $restaurant) if ($restaurant instanceof Restaurant && $restaurant->status !== 'archived') static::archive($restaurant);
+        foreach ($restaurants as $restaurant) {
+            if ($restaurant instanceof Restaurant && ! $restaurant->trashed()) static::moveToTrash($restaurant);
+        }
     }
 
-    public static function archiveAction(): Action
+    public static function restore(Restaurant $restaurant): void
     {
-        return Action::make('archive')
+        $restaurant->restore();
+        app(AdminAudit::class)->record('restaurant.restored', $restaurant, ['deleted_at' => null]);
+    }
+
+    public static function forceDelete(Restaurant $restaurant): void
+    {
+        $snapshot = ['name' => $restaurant->name, 'deleted_at' => $restaurant->deleted_at];
+        $restaurant->forceDelete();
+        app(AdminAudit::class)->record('restaurant.force_deleted', $restaurant, $snapshot);
+    }
+
+    public static function emptyTrash(): void
+    {
+        Restaurant::onlyTrashed()->cursor()->each(fn (Restaurant $restaurant) => static::forceDelete($restaurant));
+    }
+
+    public static function trashAction(): Action
+    {
+        return Action::make('trash')
             ->label('Supprimer')
-            ->icon('heroicon-o-archive-box-x-mark')
+            ->icon('heroicon-o-trash')
             ->color('danger')
             ->requiresConfirmation()
             ->modalHeading('Supprimer ce restaurant ?')
-            ->modalDescription('La fiche sera archivée et retirée des parcours publics. Ses données restent conservées et pourront être restaurées ultérieurement.')
-            ->modalSubmitActionLabel('Archiver la fiche')
-            ->visible(fn (Restaurant $restaurant) => $restaurant->status !== 'archived')
-            ->action(fn (Restaurant $restaurant) => static::archive($restaurant));
+            ->modalDescription('La fiche sera retirée des parcours publics et placée dans la Corbeille. Vous pourrez la restaurer ou la supprimer définitivement plus tard.')
+            ->modalSubmitActionLabel('Mettre à la corbeille')
+            ->visible(fn (Restaurant $restaurant) => ! $restaurant->trashed())
+            ->action(fn (Restaurant $restaurant) => static::moveToTrash($restaurant));
+    }
+
+    public static function restoreAction(): Action
+    {
+        return Action::make('restore')
+            ->label('Restaurer')
+            ->icon('heroicon-o-arrow-uturn-left')
+            ->color('success')
+            ->visible(fn (Restaurant $restaurant) => $restaurant->trashed())
+            ->action(fn (Restaurant $restaurant) => static::restore($restaurant));
+    }
+
+    public static function forceDeleteAction(): Action
+    {
+        return Action::make('force_delete')
+            ->label('Supprimer définitivement')
+            ->icon('heroicon-o-trash')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->modalHeading('Supprimer définitivement ce restaurant ?')
+            ->modalDescription('Cette suppression est irréversible : la fiche et ses données associées seront définitivement effacées.')
+            ->modalSubmitActionLabel('Supprimer définitivement')
+            ->visible(fn (Restaurant $restaurant) => $restaurant->trashed())
+            ->action(fn (Restaurant $restaurant) => static::forceDelete($restaurant));
     }
 
     public static function form(Schema $schema): Schema
@@ -63,7 +107,7 @@ class RestaurantResource extends AdminResource
                 Section::make()->columns(2)->schema([
                     TextInput::make('name')->required()->maxLength(255)->live(onBlur: true)->afterStateUpdated(fn ($state, $set) => $set('slug', Str::slug((string) $state))),
                     TextInput::make('slug')->required()->alphaDash()->unique(ignoreRecord: true),
-                    Select::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé','archived'=>'Archivé'])->required()->default('draft'),
+                    Select::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé'])->required()->default('draft'),
                     Textarea::make('description')->columnSpanFull()->rows(6)->maxLength(20000),
                 ]),
             ]),
@@ -131,7 +175,8 @@ class RestaurantResource extends AdminResource
             TextColumn::make('reviews_count')->label('Avis')->numeric()->sortable()->toggleable(),
             TextColumn::make('legacy_published_at')->label('Créé (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(),TextColumn::make('legacy_modified_at')->label('Modifié (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(isToggledHiddenByDefault: true),
         ])->filters([
-            SelectFilter::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé','archived'=>'Archivé']),
+            SelectFilter::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé']),
+            TrashedFilter::make()->label('Corbeille'),
             SelectFilter::make('location')->label('Ville / zone')->relationship('locations', 'name')->searchable()->preload(),
             SelectFilter::make('geocoding_status')->label('Qualité géographique')->options(['VERIFIED'=>'Vérifiée','HIGH_CONFIDENCE'=>'Confiance élevée','APPROXIMATE'=>'Approximative','REVIEW_REQUIRED'=>'À vérifier','MANUAL'=>'Manuelle','MISSING'=>'Manquante']),
             Filter::make('missing_gps')->label('GPS manquant')->query(fn (Builder $q) => $q->where(fn($x)=>$x->whereNull('latitude')->orWhereNull('longitude'))), Filter::make('without_city_code')->label('Sans code INSEE')->query(fn (Builder $q) => $q->whereNull('city_code')),
@@ -139,8 +184,8 @@ class RestaurantResource extends AdminResource
             SelectFilter::make('category')->label('Catégorie')->relationship('categories', 'name')->searchable()->preload(),
             TernaryFilter::make('photo')->label('Photo')->queries(true: fn (Builder $q) => $q->whereHas('media.asset'), false: fn (Builder $q) => $q->whereDoesntHave('media.asset')),
             TernaryFilter::make('reviews')->label('Avis')->queries(true: fn (Builder $q) => $q->has('reviews'), false: fn (Builder $q) => $q->doesntHave('reviews')),
-        ])->recordActions([static::viewOnSiteAction(), EditAction::make(), static::archiveAction()])
-          ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});}), BulkAction::make('archive')->label('Supprimer')->icon('heroicon-o-archive-box-x-mark')->color('danger')->requiresConfirmation()->modalHeading('Supprimer les restaurants sélectionnés ?')->modalDescription('Les fiches seront archivées, retirées des parcours publics et conservées pour restauration ultérieure.')->modalSubmitActionLabel('Archiver les fiches')->action(fn ($records) => static::archiveMany($records))])])
+        ])->recordActions([static::viewOnSiteAction(), EditAction::make(), static::trashAction(), static::restoreAction(), static::forceDeleteAction()])
+          ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->action(function ($records): void {$records->filter(fn (Restaurant $restaurant) => ! $restaurant->trashed())->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->action(function ($records): void {$records->filter(fn (Restaurant $restaurant) => ! $restaurant->trashed())->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});}), BulkAction::make('trash')->label('Supprimer')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()->modalHeading('Supprimer les restaurants sélectionnés ?')->modalDescription('Les fiches seront placées dans la Corbeille et pourront être restaurées ultérieurement.')->modalSubmitActionLabel('Mettre à la corbeille')->action(fn ($records) => static::moveManyToTrash($records)), BulkAction::make('restore')->label('Restaurer')->icon('heroicon-o-arrow-uturn-left')->color('success')->action(fn ($records) => $records->filter(fn (Restaurant $restaurant) => $restaurant->trashed())->each(fn (Restaurant $restaurant) => static::restore($restaurant))), BulkAction::make('force_delete')->label('Supprimer définitivement')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()->modalHeading('Supprimer définitivement les restaurants sélectionnés ?')->modalDescription('Cette suppression est irréversible.')->modalSubmitActionLabel('Supprimer définitivement')->action(fn ($records) => $records->filter(fn (Restaurant $restaurant) => $restaurant->trashed())->each(fn (Restaurant $restaurant) => static::forceDelete($restaurant)))])])
           ->emptyStateHeading('Aucun restaurant')->emptyStateDescription('Créez une première fiche ou ajustez les filtres.')->defaultSort('updated_at', 'desc');
     }
     public static function getPages(): array { return ['index'=>Pages\ListRestaurants::route('/'),'create'=>Pages\CreateRestaurant::route('/create'),'edit'=>Pages\EditRestaurant::route('/{record}/edit')]; }
