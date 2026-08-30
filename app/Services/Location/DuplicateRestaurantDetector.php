@@ -20,7 +20,7 @@ class DuplicateRestaurantDetector
         $address = $this->normalise($values['address_line1'] ?? $restaurant->address_line1);
         return Restaurant::query()->whereKeyNot($restaurant->getKey())->whereNotNull('latitude')->whereNotNull('longitude')
             ->select('restaurants.*')->selectRaw("{$distance} as distance_km", [(float) $lat, (float) $lng, (float) $lat])
-            ->having('distance_km', '<=', 0.25)->orderBy('distance_km')->limit(10)->get()
+            ->orderBy('distance_km')->limit(30)->get()->filter(fn (Restaurant $candidate) => (float) $candidate->distance_km <= 0.25)
             ->filter(fn (Restaurant $candidate) => $this->normalise($candidate->name) === $name || ($address !== '' && $this->normalise($candidate->address_line1) === $address) || (filled($restaurant->phone) && $candidate->phone === $restaurant->phone))
             ->values()->all();
     }
