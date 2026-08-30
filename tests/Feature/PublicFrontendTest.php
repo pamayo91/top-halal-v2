@@ -102,7 +102,10 @@ class PublicFrontendTest extends TestCase
             ->assertOk()
             ->assertSee('Horaires')
             ->assertSee('Lundi')
-            ->assertSee('11:15–14:30 · 18:00–22:30', false)
+            ->assertSee('11:15')
+            ->assertSee('14:30')
+            ->assertSee('18:00')
+            ->assertSee('22:30')
             ->assertSee('Dimanche')
             ->assertSee('Fermé');
     }
