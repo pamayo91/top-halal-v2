@@ -37,3 +37,6 @@ Media is reconciled through explicit, idempotent attachment pilots. V2 stores or
 
 ### D012 — SEO URL and removal policy
 Canonical public paths are slashless (except `/`) and use the restaurant, location, taxonomy and editorial route contract in `specifications/seo.md`. Deleted legacy URLs default to a 301 toward the best equivalent and, ultimately, `/`; 404/410 require an explicit technical or product justification.
+# ADR — Carte de localisation admin : Leaflet et fournisseur de tuiles configurable
+
+La phase 6A emploie Leaflet uniquement dans le panneau Filament et seulement lorsque l’onglet Localisation est rendu. Les tuiles OpenStreetMap sont une valeur par défaut de préproduction, définie dans `config/location.php` et remplaçable par variables d’environnement avant production. La carte ne participe pas à la logique métier : les services de sélection, qualification et provenance restent indépendants de Leaflet et du fournisseur de tuiles.

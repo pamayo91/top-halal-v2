@@ -5,8 +5,10 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RestaurantResource\Pages;
 use App\Models\{Category, Feature, Location, Restaurant};
 use App\Services\AdminAudit;
+use App\Services\Location\AddressSuggestionService;
+use App\Services\Location\DuplicateRestaurantDetector;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, DeleteAction, EditAction};
-use Filament\Forms\Components\{MarkdownEditor, Select, Textarea, TextInput};
+use Filament\Forms\Components\{Hidden, MarkdownEditor, Select, Textarea, TextInput, View};
 use Filament\Schemas\Components\{Section, Tabs};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\{ImageColumn, TextColumn};
@@ -40,14 +42,40 @@ class RestaurantResource extends AdminResource
                     Textarea::make('description')->columnSpanFull()->rows(6)->maxLength(20000),
                 ]),
             ]),
-            Tabs\Tab::make('Localisation')->schema([Section::make()->columns(2)->schema([
-                TextInput::make('address')->label('Adresse historique')->maxLength(255), TextInput::make('address_line1')->label('Adresse structurée')->maxLength(255), TextInput::make('address_line2')->label('Complément')->maxLength(255), TextInput::make('postal_code')->label('Code postal')->maxLength(20),
-                TextInput::make('city_name')->label('Ville affichée')->maxLength(255)->helperText('Utilisée en priorité ; les zones V2 restent associées ci-dessous.'),
-                TextInput::make('city_code')->label('Code INSEE')->maxLength(10), TextInput::make('country_code')->label('Pays')->maxLength(2),
-                Select::make('locations')->label('Zones / villes V2')->relationship('locations', 'name')->multiple()->searchable()->preload(),
-                TextInput::make('latitude')->numeric()->minValue(-90)->maxValue(90), TextInput::make('longitude')->numeric()->minValue(-180)->maxValue(180),
-                Select::make('geocoding_status')->label('Confiance géographique')->options(['VERIFIED'=>'Vérifiée','HIGH_CONFIDENCE'=>'Confiance élevée','APPROXIMATE'=>'Approximative','REVIEW_REQUIRED'=>'À vérifier','MANUAL'=>'Manuelle','MISSING'=>'Manquante']), TextInput::make('geocoding_score')->label('Score fournisseur')->numeric()->disabled(), TextInput::make('geocoding_provider')->label('Provider')->disabled(), TextInput::make('geocoded_at')->label('Géocodé le')->disabled(),
-            ])]),
+            Tabs\Tab::make('Localisation')->schema([
+                Hidden::make('location_update_source')->default('manual'),
+                Section::make('Données d’origine')->description("Donnée importée de l’ancien site, conservée pour référence.")->columns(2)->schema([
+                    TextInput::make('address')->label("Adresse d’origine")->readOnly(),
+                    TextInput::make('legacy_gps')->label('GPS historique / actuel')->readOnly()->dehydrated(false)->formatStateUsing(fn (Restaurant $r) => $r->latitude !== null ? $r->latitude.', '.$r->longitude : 'Non renseigné'),
+                ]),
+                Section::make('Adresse utilisée par Top-Halal')->columns(2)->schema([
+                    Select::make('address_suggestion')->label('Rechercher une adresse')->placeholder('Commencez à saisir au moins 3 caractères')->searchable()->searchDebounce(350)->getSearchResultsUsing(function (string $search): array {
+                        return collect(app(AddressSuggestionService::class)->suggest($search))->mapWithKeys(fn (array $item) => [$item['token'] => $item['label']])->all();
+                    })->getOptionLabelUsing(fn (?string $value): ?string => ($feature = app(AddressSuggestionService::class)->resolve((string) $value)) ? app(AddressSuggestionService::class)->label($feature) : null)->live()->afterStateUpdated(function ($state, $set): void {
+                        $service = app(AddressSuggestionService::class); $feature = $service->resolve((string) $state); if (!$feature) return;
+                        foreach ($service->structured($feature) as $field => $value) $set($field, $value);
+                        $set('location_update_source', 'autocomplete');
+                    })->dehydrated(false)->columnSpanFull(),
+                    TextInput::make('address_line1')->label('Adresse')->maxLength(255), TextInput::make('address_line2')->label('Complément')->maxLength(255), TextInput::make('postal_code')->label('Code postal')->maxLength(20),
+                    TextInput::make('city_name')->label('Ville officielle')->maxLength(255), TextInput::make('city_code')->label('Code INSEE')->maxLength(10), TextInput::make('country_code')->label('Pays')->maxLength(2)->rule('nullable|size:2'),
+                    Select::make('locations')->label('Zones associées Top-Halal')->helperText('Ces zones ne sont pas modifiées automatiquement lors d’un changement d’adresse.')->relationship('locations', 'name')->multiple()->searchable()->preload()->columnSpanFull(),
+                ]),
+                Section::make('Vérifiez la position de l’établissement')->schema([
+                    View::make('filament.location-map')->viewData(['tileUrl' => config('location.map_tile_url'), 'tileAttribution' => config('location.map_tile_attribution')]),
+                    TextInput::make('latitude')->id('location-latitude')->label('Latitude')->numeric()->readOnly()->minValue(-90)->maxValue(90), TextInput::make('longitude')->id('location-longitude')->label('Longitude')->numeric()->readOnly()->minValue(-180)->maxValue(180),
+                ]),
+                Section::make('Qualité de localisation')->columns(2)->schema([
+                    TextInput::make('geocoding_status')->label('Adresse')->readOnly()->dehydrated(false), TextInput::make('geocoding_precision')->label('Précision GPS')->readOnly()->dehydrated(false),
+                    TextInput::make('proximity_status')->label('Autour de moi')->readOnly()->dehydrated(false), TextInput::make('geocoding_provider')->label('Fournisseur')->readOnly()->dehydrated(false),
+                    TextInput::make('geocoding_score')->label('Score')->readOnly()->dehydrated(false), TextInput::make('geocoded_at')->label('Dernier géocodage')->readOnly()->dehydrated(false)->formatStateUsing(fn ($state) => $state ? \Illuminate\Support\Carbon::parse($state)->locale('fr')->isoFormat('D MMMM YYYY à HH:mm') : 'Jamais'),
+                    TextInput::make('manually_verified_at')->label('Position corrigée manuellement')->readOnly()->dehydrated(false)->formatStateUsing(fn ($state) => $state ? 'Oui, le '.\Illuminate\Support\Carbon::parse($state)->format('d/m/Y H:i') : 'Non'),
+                    TextInput::make('duplicate_candidates')->label('Doublons potentiels')->readOnly()->dehydrated(false)->formatStateUsing(function (?Restaurant $record): string {
+                        if (!$record) return 'La vérification sera disponible après création.';
+                        $count = count(app(DuplicateRestaurantDetector::class)->candidates($record));
+                        return $count ? $count.' établissement(s) similaire(s) trouvé(s) à proximité — vérifiez les fiches avant toute action.' : 'Aucun candidat proche.';
+                    })->columnSpanFull(),
+                ]),
+            ]),
             Tabs\Tab::make('Catégories & caractéristiques')->schema([Section::make()->columns(2)->schema([
                 Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),
                 Select::make('features')->relationship('features', 'name')->multiple()->searchable()->preload(),
