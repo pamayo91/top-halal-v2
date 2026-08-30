@@ -96,7 +96,7 @@ class PublicContentController extends Controller
         return response()->view('public.taxonomy', ['term' => $term, 'kind' => $kind, 'restaurants' => $query->paginate(12)->withQueryString()]);
     }
 
-    private function publishedRestaurants(): Builder { return Restaurant::where('status', 'published')->with(['categories', 'features', 'locations', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]); }
+    private function publishedRestaurants(): Builder { return Restaurant::where('status', 'published')->with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]); }
 
     private function applySearch(Builder $query, Request $request): Builder
     {

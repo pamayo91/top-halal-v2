@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantMedia, RestaurantOutboundLink, RestaurantReview};
+use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantMedia, RestaurantOpeningHour, RestaurantOutboundLink, RestaurantReview};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -89,5 +89,21 @@ class PublicFrontendTest extends TestCase
 
         $response->assertOk()->assertSee('Services')->assertSee('service-list', false)->assertSee('viewBox="0 0 24 24"', false);
         foreach ($services as $service) $response->assertSee($service->name);
+    }
+
+    public function test_restaurant_detail_renders_validated_opening_hours(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 425, 'name' => 'Horaires test', 'slug' => 'horaires-test', 'status' => 'published']);
+        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'opens_at' => '11:15', 'closes_at' => '14:30', 'legacy_key' => 'web-monday-lunch']);
+        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'opens_at' => '18:00', 'closes_at' => '22:30', 'legacy_key' => 'web-monday-dinner']);
+        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'is_closed' => true, 'legacy_key' => 'web-sunday-closed']);
+
+        $this->get('/resto/horaires-test')
+            ->assertOk()
+            ->assertSee('Horaires')
+            ->assertSee('Lundi')
+            ->assertSee('11:15–14:30 · 18:00–22:30', false)
+            ->assertSee('Dimanche')
+            ->assertSee('Fermé');
     }
 }

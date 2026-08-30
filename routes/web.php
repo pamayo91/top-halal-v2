@@ -44,7 +44,7 @@ Route::post('/_preview/{type}/{legacyId}/comments', [PreviewCommentController::c
     ->whereIn('type', ['post', 'page']);
 
 Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
-    $restaurant = Restaurant::with(['categories', 'features', 'locations', 'media.asset.variants'])->where('legacy_wp_id', $legacyId)->firstOrFail();
+    $restaurant = Restaurant::with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants'])->where('legacy_wp_id', $legacyId)->firstOrFail();
     $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true]);
 })->name('restaurants.preview');
