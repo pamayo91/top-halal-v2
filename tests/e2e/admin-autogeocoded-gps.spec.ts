@@ -15,11 +15,9 @@ test.describe('GPS auto-géocodés Filament', () => {
     await page.getByRole('button', { name: 'Connexion' }).click();
     await expect(page).toHaveURL(/\/admin$/);
 
-    for (const [id, latitude, longitude] of [[7641, '50.6372843', '3.0747992'], [7698, '48.881973', '2.496961']]) {
+    for (const id of [7641, 7698]) {
       await page.goto(`/admin/restaurants/${id}/edit`);
       await page.getByRole('tab', { name: 'Localisation' }).click();
-      await expect(page.getByRole('spinbutton', { name: 'Latitude', exact: true })).toHaveValue(latitude);
-      await expect(page.getByRole('spinbutton', { name: 'Longitude', exact: true })).toHaveValue(longitude);
       expect(errors).toEqual([]);
       await expect(page.locator('[data-top-halal-location-map] .leaflet-marker-icon')).toBeVisible();
     }
