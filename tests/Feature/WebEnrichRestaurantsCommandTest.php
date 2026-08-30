@@ -63,4 +63,12 @@ class WebEnrichRestaurantsCommandTest extends TestCase
         $this->artisan('restaurants:web-enrich',['--retry-errors'=>true,'--limit'=>1,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
         $this->assertSame('PROCESSING',RestaurantWebEnrichment::first()->status);
     }
+
+    public function test_it_records_insufficient_manual_evidence_without_changing_the_restaurant(): void
+    {
+        $restaurant=$this->restaurant(['description'=>'Bonne description existante.']);
+        $this->applyEvidence($restaurant,['state'=>'matched','insufficient_data'=>true,'activity_status'=>'UNCERTAIN','sources'=>['directory:1'],'reason'=>'One weak source only']);
+        $this->assertSame('INSUFFICIENT_DATA',RestaurantWebEnrichment::first()->status);
+        $this->assertSame('Bonne description existante.',$restaurant->fresh()->description);
+    }
 }

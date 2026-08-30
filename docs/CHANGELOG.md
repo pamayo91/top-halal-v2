@@ -3,6 +3,7 @@
 ## 2026-08-30
 
 - Changed restaurant web enrichment to a Codex-researched workflow: Laravel reserves checkpoints and validates/applies structured evidence, while normal web navigation supplies the sources. No API key is required for normal batches.
+- Ran the first 10-restaurant web-research pilot on preproduction. All restaurant writes were safely refused: confirmed/potential closures and conflicting evidence were retained in the review queue, with the complete internal CSV audit.
 
 - Added resumable restaurant web-enrichment checkpoints, CSV batch reports, conservative source matching and strict write guards for missing hours and placeholder descriptions. Closure/radiation signals are retained only for human review; an optional official Google Places adapter is disabled until credentials and budget are approved.
 

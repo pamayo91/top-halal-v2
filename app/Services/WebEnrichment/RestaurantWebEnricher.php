@@ -28,6 +28,7 @@ class RestaurantWebEnricher
         if (($evidence['closure'] ?? null) === 'possible') return $this->finish($audit, $base + ['status'=>'CLOSED_POSSIBLE_REVIEW','reason'=>'Potential closure requires human confirmation','closure_sources'=>$evidence['closure_sources'] ?? [],'confidence'=>$evidence['confidence'] ?? null], $dryRun);
         if (($evidence['closure'] ?? null) === 'conflict') return $this->finish($audit, $base + ['status'=>'CLOSURE_CONFLICT','reason'=>'Deregistered company conflicts with an active matched establishment','closure_sources'=>$evidence['closure_sources'] ?? [],'confidence'=>$evidence['confidence'] ?? null], $dryRun);
         if (($evidence['conflict'] ?? false) === true) return $this->finish($audit, $base + ['status'=>'SOURCE_CONFLICT','reason'=>'Reliable sources disagree','confidence'=>$evidence['confidence'] ?? null], $dryRun);
+        if (($evidence['insufficient_data'] ?? false) === true) return $this->finish($audit, $base + ['status'=>'INSUFFICIENT_DATA','reason'=>$evidence['reason'] ?? 'Evidence is insufficient for a safe automatic change','confidence'=>$evidence['confidence'] ?? null], $dryRun);
 
         $hours = $beforeHours === [] ? ($evidence['hours'] ?? []) : [];
         $description = $this->descriptionMayChange($beforeDescription) ? trim((string) ($evidence['description'] ?? '')) : null;
