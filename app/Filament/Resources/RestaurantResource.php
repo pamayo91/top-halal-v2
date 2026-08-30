@@ -37,6 +37,11 @@ class RestaurantResource extends AdminResource
         app(AdminAudit::class)->record('restaurant.archived', $restaurant, ['status' => 'archived']);
     }
 
+    public static function archiveMany(iterable $restaurants): void
+    {
+        foreach ($restaurants as $restaurant) if ($restaurant instanceof Restaurant && $restaurant->status !== 'archived') static::archive($restaurant);
+    }
+
     public static function archiveAction(): Action
     {
         return Action::make('archive')
@@ -135,7 +140,7 @@ class RestaurantResource extends AdminResource
             TernaryFilter::make('photo')->label('Photo')->queries(true: fn (Builder $q) => $q->whereHas('media.asset'), false: fn (Builder $q) => $q->whereDoesntHave('media.asset')),
             TernaryFilter::make('reviews')->label('Avis')->queries(true: fn (Builder $q) => $q->has('reviews'), false: fn (Builder $q) => $q->doesntHave('reviews')),
         ])->recordActions([static::viewOnSiteAction(), EditAction::make(), static::archiveAction()])
-          ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});})])])
+          ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});}), BulkAction::make('archive')->label('Supprimer')->icon('heroicon-o-archive-box-x-mark')->color('danger')->requiresConfirmation()->modalHeading('Supprimer les restaurants sélectionnés ?')->modalDescription('Les fiches seront archivées, retirées des parcours publics et conservées pour restauration ultérieure.')->modalSubmitActionLabel('Archiver les fiches')->action(fn ($records) => static::archiveMany($records))])])
           ->emptyStateHeading('Aucun restaurant')->emptyStateDescription('Créez une première fiche ou ajustez les filtres.')->defaultSort('updated_at', 'desc');
     }
     public static function getPages(): array { return ['index'=>Pages\ListRestaurants::route('/'),'create'=>Pages\CreateRestaurant::route('/create'),'edit'=>Pages\EditRestaurant::route('/{record}/edit')]; }

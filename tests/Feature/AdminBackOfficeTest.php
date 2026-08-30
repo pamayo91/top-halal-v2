@@ -66,6 +66,14 @@ class AdminBackOfficeTest extends TestCase
         $this->assertDatabaseHas('admin_audit_logs', ['action' => 'restaurant.archived', 'subject_id' => $restaurant->id]);
     }
 
+    public function test_restaurant_bulk_delete_archives_each_selected_restaurant(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']); $first = $this->restaurant(); $second = $this->restaurant(); $this->actingAs($admin);
+        \App\Filament\Resources\RestaurantResource::archiveMany([$first, $second]);
+        $this->assertSame('archived', $first->fresh()->status); $this->assertSame('archived', $second->fresh()->status);
+        $this->assertDatabaseCount('admin_audit_logs', 2);
+    }
+
     public function test_moderation_can_mark_comments_and_reviews_as_spam(): void
     {
         $restaurant = $this->restaurant();
