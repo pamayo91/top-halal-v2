@@ -5,8 +5,8 @@ namespace App\Filament\Resources\RestaurantResource\Pages;
 use App\Filament\Resources\RestaurantResource;
 use App\Models\Restaurant;
 use Filament\Actions\{Action, CreateAction};
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListRestaurants extends ListRecords
