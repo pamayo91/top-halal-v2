@@ -23,6 +23,9 @@
     });
     document.addEventListener('DOMContentLoaded', window.topHalalInitLocationMaps);
     document.addEventListener('livewire:navigated', window.topHalalInitLocationMaps);
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('[role="tab"]')) window.setTimeout(window.topHalalInitLocationMaps, 50);
+    });
     if (document.readyState !== 'loading') window.topHalalInitLocationMaps();
     window.setTimeout(window.topHalalInitLocationMaps, 100);
     window.setTimeout(window.topHalalInitLocationMaps, 750);
