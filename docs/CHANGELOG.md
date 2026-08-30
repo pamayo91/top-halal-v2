@@ -3,6 +3,7 @@
 ## 2026-08-30
 
 - Correction de la carte de localisation Filament : son initialisation attend désormais l’onglet visible, sa taille est recalculée à chaque affichage et son canevas est préservé lors des mises à jour Livewire. L’édition d’adresse ne nécessite plus d’enregistrement ni d’actualisation pour voir la carte.
+- Clarification de la gestion des restaurants supprimés : onglets distincts « Restaurants » et « Corbeille », actions en masse cohérentes avec l’onglet courant, et restauration disponible uniquement dans la Corbeille.
 - Remplacement de l’archivage des restaurants par une Corbeille : « Supprimer » réalise un soft delete réversible, la Corbeille permet la restauration, la suppression définitive individuelle ou en masse et son vidage après confirmation. Toutes ces opérations sont auditées ; les anciennes fiches archivées y sont transférées.
 - Phase 6A.2 : géocodage massif idempotent des adresses structurées sans GPS. 13 coordonnées ajoutées automatiquement (10 housenumber, 3 street), `proximity_status=ELIGIBLE` lorsque cohérent, aucun GPS préexistant modifié.
 - Phase 6A.1 : un déplacement de marqueur validé par un administrateur reste de précision `MANUAL` mais devient `ELIGIBLE` quand aucune anomalie ne subsiste. Une incompatibilité Geography reste `REVIEW_REQUIRED`. La provenance `admin_map` est maintenant distincte de la future proposition publique `public_map`.

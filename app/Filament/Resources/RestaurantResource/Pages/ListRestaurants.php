@@ -5,7 +5,9 @@ namespace App\Filament\Resources\RestaurantResource\Pages;
 use App\Filament\Resources\RestaurantResource;
 use App\Models\Restaurant;
 use Filament\Actions\{Action, CreateAction};
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListRestaurants extends ListRecords
 {
@@ -14,7 +16,7 @@ class ListRestaurants extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->visible(fn (): bool => $this->activeTab !== 'trash'),
             Action::make('empty_trash')
                 ->label('Vider la Corbeille')
                 ->icon('heroicon-o-trash')
@@ -23,8 +25,17 @@ class ListRestaurants extends ListRecords
                 ->modalHeading('Vider la Corbeille ?')
                 ->modalDescription('Tous les restaurants présents dans la Corbeille seront supprimés définitivement. Cette action est irréversible.')
                 ->modalSubmitActionLabel('Vider définitivement la Corbeille')
-                ->visible(fn (): bool => Restaurant::onlyTrashed()->exists())
+                ->visible(fn (): bool => $this->activeTab === 'trash' && Restaurant::onlyTrashed()->exists())
                 ->action(fn () => RestaurantResource::emptyTrash()),
+        ];
+    }
+
+    public function getTabs(): array
+    {
+        return [
+            'active' => Tab::make('Restaurants')->badge(Restaurant::query()->count()),
+            'trash' => Tab::make('Corbeille')->badge(Restaurant::onlyTrashed()->count())
+                ->modifyQueryUsing(fn (Builder $query): Builder => $query->onlyTrashed()),
         ];
     }
 }
