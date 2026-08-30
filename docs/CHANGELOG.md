@@ -2,6 +2,7 @@
 
 ## 2026-08-30
 
+- Simplification de l’onglet Localisation Filament : seules l’adresse structurée, la carte et les alertes utiles sont affichées. Les adresses/GPS historiques et les métadonnées techniques restent conservés sans modifier les règles de géocodage, proximité ou audit.
 - Repasse après suppression manuelle des restaurants sans GPS : 7 683 restaurants actifs, aucun GPS manquant, aucun nouveau géocodage ni GPS existant modifié, et aucune référence restaurant orpheline détectée.
 - Correction de la carte de localisation Filament : son initialisation attend désormais l’onglet visible, sa taille est recalculée à chaque affichage et son canevas est préservé lors des mises à jour Livewire. L’édition d’adresse ne nécessite plus d’enregistrement ni d’actualisation pour voir la carte.
 - Clarification de la gestion des restaurants supprimés : onglets distincts « Restaurants » et « Corbeille », actions en masse cohérentes avec l’onglet courant, et restauration disponible uniquement dans la Corbeille.
