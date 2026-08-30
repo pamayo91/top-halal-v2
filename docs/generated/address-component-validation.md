@@ -18,7 +18,7 @@ L’adresse historique est uniquement en lecture. Les zones Geography V2 ne sont
 
 ## Tests et préproduction
 
-Les tests ciblés sont dans `tests/Feature/AddressComponentTest.php` : contrat autocomplete, autorisation endpoint, mapping/INSEE, sélection, préservation O Sha, correction marqueur/audit et doublon informatif. `tests/e2e/admin-address-component.spec.ts` ouvre O Sha sans le modifier et contrôle le contenu, les coordonnées en lecture seule, la carte et la console.
+Les tests ciblés sont dans `tests/Feature/AddressComponentTest.php` : contrat autocomplete, autorisation endpoint, mapping/INSEE, sélection, préservation O Sha, correction marqueur/audit et doublon informatif. Sur préproduction, ces 5 tests et les 7 tests de régression admin sont verts (45 assertions au total). `tests/e2e/admin-address-component.spec.ts` est vert en Chromium desktop et mobile ; il ouvre O Sha sans le modifier et contrôle le contenu, les coordonnées en lecture seule, la carte et la console.
 
 ## Limites avant Phase 6B
 
