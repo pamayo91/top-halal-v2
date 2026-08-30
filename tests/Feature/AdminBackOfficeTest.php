@@ -50,7 +50,7 @@ class AdminBackOfficeTest extends TestCase
         RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'legacy_attachment_id' => $asset->legacy_attachment_id, 'sort_order' => 0, 'status' => 'ready']);
 
         $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")->assertOk()->assertSee('Photos de la fiche')->assertSee(route('media.show', [$asset, 480]), false);
-        $this->get(route('restaurants.preview', $restaurant->legacy_wp_id))->assertOk()->assertSee($restaurant->name);
+        $this->get(route('restaurants.preview', $restaurant->legacy_wp_id))->assertOk()->assertSee($restaurant->name)->assertSee('Restaurant halal')->assertSee('noindex,nofollow', false);
     }
 
     public function test_admin_panel_exposes_all_operational_modules_and_legacy_back_office_is_gone(): void
