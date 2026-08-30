@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Restaurant extends Model
@@ -35,6 +36,7 @@ class Restaurant extends Model
     public function reviews(): HasMany { return $this->hasMany(RestaurantReview::class); }
     public function claims(): HasMany { return $this->hasMany(RestaurantClaim::class); }
     public function outboundLinks(): HasMany { return $this->hasMany(RestaurantOutboundLink::class); }
+    public function webEnrichment(): HasOne { return $this->hasOne(RestaurantWebEnrichment::class); }
     public function approvedReviewAggregate(): array
     {
         $aggregate = $this->reviews()->where('status', 'approved')->selectRaw('count(*) as count, avg(rating) as average')->first();

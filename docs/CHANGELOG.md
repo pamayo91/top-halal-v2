@@ -2,6 +2,8 @@
 
 ## 2026-08-30
 
+- Added resumable restaurant web-enrichment checkpoints, CSV batch reports, conservative source matching and strict write guards for missing hours and placeholder descriptions. Closure/radiation signals are retained only for human review; an optional official Google Places adapter is disabled until credentials and budget are approved.
+
 - Ajout de l’onglet « Médias » sur la fiche restaurant et de l’action « Prévisualiser » pour les restaurants en attente, qui utilise désormais le véritable gabarit front en `noindex,nofollow`, sans changement de statut ni exposition dans les parcours publiés.
 - Simplification de l’onglet Localisation Filament : seules l’adresse structurée, la carte et les alertes utiles sont affichées. Les adresses/GPS historiques et les métadonnées techniques restent conservés sans modifier les règles de géocodage, proximité ou audit.
 - Repasse après suppression manuelle des restaurants sans GPS : 7 683 restaurants actifs, aucun GPS manquant, aucun nouveau géocodage ni GPS existant modifié, et aucune référence restaurant orpheline détectée.

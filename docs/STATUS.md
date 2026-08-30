@@ -42,6 +42,7 @@ Last updated: 2026-08-30
 | Cohérence validation GPS manuelle | DONE (Phase 6A.1) | Une correction explicite par admin est `MANUAL` et peut être `ELIGIBLE`; les anomalies Geography conservent `REVIEW_REQUIRED`. La provenance future `public_map` reste non validante. |
 | Auto-géocodage GPS manquants | DONE (Phase 6A.2) | Après suppression manuelle des dernières fiches non géocodables, les 7 683 restaurants actifs possèdent tous un GPS. La repasse idempotente n’a ajouté ni modifié aucune coordonnée. Rapport : `docs/generated/missing-gps-autogeocoding-report.md`. |
 | Corbeille restaurants | DONE | La suppression admin est un soft delete réversible, avec restauration, suppression définitive et vidage audité de la Corbeille. Les anciennes fiches archivées ont été déplacées dans cette Corbeille. |
+| Enrichissement web restaurants | DONE (source à configurer) | Checkpoints persistants, rapports CSV, garde-fous fermeture et enrichissement strict des horaires/descriptions. L’adaptateur Google Places officiel reste désactivé tant qu’une clé/budget n’est pas approuvé. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |

@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use App\Services\Geocoding\GeoPlateformeProvider;
 use App\Services\Geocoding\GeocodingService;
+use App\Services\WebEnrichment\GooglePlacesRestaurantWebSourceProvider;
+use App\Services\WebEnrichment\RestaurantWebSourceProvider;
+use App\Services\WebEnrichment\UnavailableRestaurantWebSourceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
@@ -18,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(GeocodingService::class, GeoPlateformeProvider::class);
+        $this->app->bind(RestaurantWebSourceProvider::class, fn () => config('services.restaurant_web.provider') === 'google_places' && filled(config('services.restaurant_web.google_places_key')) ? new GooglePlacesRestaurantWebSourceProvider : new UnavailableRestaurantWebSourceProvider);
     }
 
     /**

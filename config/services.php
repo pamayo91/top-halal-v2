@@ -42,4 +42,12 @@ return [
         'user_agent' => env('GEOPLATEFORME_USER_AGENT', 'TopHalalV2-GeocodingPilot/1.0 contact@top-halal.fr'),
     ],
 
+    // Optional: official API only. The default intentionally performs no web request.
+    'restaurant_web' => [
+        'provider' => env('RESTAURANT_WEB_PROVIDER'),
+        'google_places_key' => env('GOOGLE_PLACES_API_KEY'),
+        'timeout' => env('RESTAURANT_WEB_TIMEOUT', 8),
+        'rate_sleep_us' => env('RESTAURANT_WEB_RATE_SLEEP_US', 500000),
+    ],
+
 ];
