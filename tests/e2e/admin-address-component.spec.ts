@@ -21,6 +21,8 @@ test.describe('Adresse intelligente Filament', () => {
     await expect(page.getByRole('textbox', { name: 'Adresse d’origine', exact: true })).toHaveValue('46 Boulevard du Temple, Paris, France');
     await expect(page.getByRole('combobox', { name: 'Rechercher une adresse', exact: true })).toBeVisible();
     await expect(page.locator('[data-top-halal-location-map]')).toBeVisible();
+    await expect(page.locator('[data-top-halal-location-map] .leaflet-container')).toBeVisible();
+    expect(await page.locator('[data-top-halal-location-map] .leaflet-container').evaluate((element) => element.clientWidth)).toBeGreaterThan(1);
     await expect(page.getByRole('spinbutton', { name: 'Latitude', exact: true })).toHaveAttribute('readonly', 'readonly');
     await expect(page.getByRole('spinbutton', { name: 'Longitude', exact: true })).toHaveAttribute('readonly', 'readonly');
     expect(errors).toEqual([]);

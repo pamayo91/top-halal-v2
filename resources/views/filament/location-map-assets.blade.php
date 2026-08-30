@@ -2,7 +2,11 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     window.topHalalInitLocationMaps = () => document.querySelectorAll('[data-top-halal-location-map]').forEach((container) => {
-        if (!window.L || container.dataset.initialized) return;
+        if (!window.L || !container.offsetParent) return;
+        if (container.dataset.initialized) {
+            container._topHalalMap?.invalidateSize();
+            return;
+        }
         const latField = document.getElementById('location-latitude'), lngField = document.getElementById('location-longitude');
         if (!latField || !lngField) return;
         const hasCoordinates = latField.value !== '' && lngField.value !== '';
@@ -15,6 +19,7 @@
         container.dataset.initialized = '1';
         const lat = hasCoordinates ? Number(latField.value) : 46.2276, lng = hasCoordinates ? Number(lngField.value) : 2.2137;
         const map = L.map(container.querySelector('div:last-child')).setView([lat, lng], hasCoordinates ? 16 : 5);
+        container._topHalalMap = map;
         L.tileLayer(@js(config('location.map_tile_url')), { maxZoom: 19, attribution: @js(config('location.map_tile_attribution')) }).addTo(map);
         let marker;
         const syncMarker = (point) => {
@@ -31,6 +36,13 @@
     document.addEventListener('livewire:navigated', window.topHalalInitLocationMaps);
     document.addEventListener('click', (event) => {
         if (event.target.closest('[role="tab"]')) window.setTimeout(window.topHalalInitLocationMaps, 50);
+    });
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.hook('morph.added', ({ el }) => {
+            if (el.matches?.('[data-top-halal-location-map]') || el.querySelector?.('[data-top-halal-location-map]')) {
+                window.setTimeout(window.topHalalInitLocationMaps, 50);
+            }
+        });
     });
     if (document.readyState !== 'loading') window.topHalalInitLocationMaps();
     window.setTimeout(window.topHalalInitLocationMaps, 100);
