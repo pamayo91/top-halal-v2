@@ -104,3 +104,8 @@
 - Completed the Filament 5 `/admin` migration: legacy `/bo` routes, controllers and Blade views are removed; settings, audit log, moderation, media, redirect, taxonomy and user modules are in the panel. Preproduction PHP suite (51 tests, 229 assertions) and Filament desktop/mobile Playwright validation pass.
 - Added the secured V2 administration area, audit log and daily operational management screens.
 - Added admin feature coverage for authorization, restaurant CRUD, moderation, editorial sanitization and sensitive audit filtering.
+# 2026-08-30 — Phase 6A : composant d’adresse administrateur
+
+- Ajout d’un service réutilisable de suggestions et de sélection d’adresse via l’abstraction Géoplateforme, avec cache fournisseur existant, minimum trois caractères et endpoint Laravel protégé/limité.
+- Refonte de la localisation Filament : adresse historique consultable, adresse administrative structurée, qualité non éditable, carte Leaflet chargée à la demande et coordonnées protégées de la saisie brute.
+- Les corrections manuelles de marqueur, les sélections et les entrées manuelles conservent la provenance, recalculent le statut de proximité et sont tracées dans l’audit existant. Les zones Geography et les doublons ne sont jamais modifiés automatiquement.

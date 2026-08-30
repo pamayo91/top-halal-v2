@@ -14,6 +14,12 @@ Le tableau de bord expose des compteurs réels. L’administration propose la ge
 
 Chaque opération sensible est enregistrée dans `admin_audit_logs`, avec l’administrateur, l’objet, l’action et un résumé filtré des changements. Les mots de passe, tokens et URL sortantes ne sont jamais mis dans ce résumé.
 
+## Localisation des restaurants
+
+L’onglet « Localisation » sépare l’adresse d’origine, strictement consultable, de l’adresse structurée utilisée par V2. La recherche d’adresse est servie par Laravel (`GET /admin/location/autocomplete`) et l’abstraction Géoplateforme : aucun navigateur ne contacte directement le fournisseur. Une sélection ne sauvegarde pas la fiche ; elle préremplit les champs, l’admin confirme ensuite la modification normale.
+
+La carte Leaflet est chargée uniquement dans cet onglet et son fournisseur de tuiles est configurable. Les coordonnées sont consultables mais ne se saisissent pas dans le parcours courant : déplacer le marqueur passe la localisation en `MANUAL`/à revoir, conserve l’identifiant du résultat fournisseur et crée une entrée d’audit avec les valeurs avant/après. Les associations Geography V2 ne sont jamais supprimées automatiquement ; un changement de code INSEE avec zones existantes est signalé pour revue. Les candidats doublons sont informatifs, sans fusion ni blocage.
+
 Les listes affichent les dates métier pertinentes en format français : publication et dernière modification legacy pour les contenus, date de commentaire/avis et date de modération, inscription utilisateur, dates legacy des médias et restaurants. La géographie affiche le parent/niveau, le nombre de restaurants et la date de modification ; son filtre « Sans restaurant » rend les termes inutilisés immédiatement identifiables. Les valeurs manifestement techniques ou malveillantes sont refusées à la saisie.
 
 ## Rôles

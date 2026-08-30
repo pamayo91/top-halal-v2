@@ -11,6 +11,7 @@ use App\Http\Controllers\PreviewRestaurantReviewController;
 use App\Http\Controllers\{AccountController, AuthController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
+use App\Http\Controllers\AdminAddressAutocompleteController;
 use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
 
 Route::get('/', [PublicContentController::class, 'home'])->name('home');
@@ -25,6 +26,7 @@ Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/media/{asset}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->whereNumber('width')->name('media.show');
 Route::get('/sortie/{token}', RestaurantOutboundController::class)->where('token', '[A-Za-z0-9_-]{20,64}')->name('restaurants.outbound');
+Route::get('/admin/location/autocomplete', AdminAddressAutocompleteController::class)->middleware(['auth', 'admin', 'throttle:address-autocomplete'])->name('admin.location.autocomplete');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));
