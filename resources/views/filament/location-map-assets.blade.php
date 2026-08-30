@@ -5,8 +5,14 @@
         if (!window.L || container.dataset.initialized) return;
         const latField = document.getElementById('location-latitude'), lngField = document.getElementById('location-longitude');
         if (!latField || !lngField) return;
-        container.dataset.initialized = '1';
         const hasCoordinates = latField.value !== '' && lngField.value !== '';
+        const attempts = Number(container.dataset.mapAttempts || '0');
+        if (!hasCoordinates && attempts < 20) {
+            container.dataset.mapAttempts = String(attempts + 1);
+            window.setTimeout(window.topHalalInitLocationMaps, 100);
+            return;
+        }
+        container.dataset.initialized = '1';
         const lat = hasCoordinates ? Number(latField.value) : 46.2276, lng = hasCoordinates ? Number(lngField.value) : 2.2137;
         const map = L.map(container.querySelector('div:last-child')).setView([lat, lng], hasCoordinates ? 16 : 5);
         L.tileLayer(@js(config('location.map_tile_url')), { maxZoom: 19, attribution: @js(config('location.map_tile_attribution')) }).addTo(map);
