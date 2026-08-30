@@ -37,13 +37,6 @@
     document.addEventListener('click', (event) => {
         if (event.target.closest('[role="tab"]')) window.setTimeout(window.topHalalInitLocationMaps, 50);
     });
-    document.addEventListener('livewire:initialized', () => {
-        Livewire.hook('morph.added', ({ el }) => {
-            if (el.matches?.('[data-top-halal-location-map]') || el.querySelector?.('[data-top-halal-location-map]')) {
-                window.setTimeout(window.topHalalInitLocationMaps, 50);
-            }
-        });
-    });
     if (document.readyState !== 'loading') window.topHalalInitLocationMaps();
     window.setTimeout(window.topHalalInitLocationMaps, 100);
     window.setTimeout(window.topHalalInitLocationMaps, 750);
