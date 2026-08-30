@@ -30,6 +30,19 @@ class AdminBackOfficeTest extends TestCase
         $this->actingAs($admin)->get('/admin/restaurants')->assertOk();
     }
 
+    public function test_restaurant_location_form_shows_only_operational_location_fields(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']); $restaurant = $this->restaurant(['latitude' => 48.866, 'longitude' => 2.364]);
+        $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")
+            ->assertOk()
+            ->assertSee('Rechercher une adresse')
+            ->assertSee('Zones associées Top-Halal')
+            ->assertSee('Position')
+            ->assertDontSee('Données d’origine')
+            ->assertDontSee('GPS historique / actuel')
+            ->assertDontSee('Qualité de localisation');
+    }
+
     public function test_admin_panel_exposes_all_operational_modules_and_legacy_back_office_is_gone(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

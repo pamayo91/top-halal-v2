@@ -113,11 +113,7 @@ class RestaurantResource extends AdminResource
             ]),
             Tabs\Tab::make('Localisation')->schema([
                 Hidden::make('location_update_source')->default('manual'),
-                Section::make('Données d’origine')->description("Donnée importée de l’ancien site, conservée pour référence.")->columns(2)->schema([
-                    TextInput::make('address')->label("Adresse d’origine")->readOnly(),
-                    TextInput::make('legacy_gps')->label('GPS historique / actuel')->readOnly()->dehydrated(false)->formatStateUsing(fn (Restaurant $r) => $r->latitude !== null ? $r->latitude.', '.$r->longitude : 'Non renseigné'),
-                ]),
-                Section::make('Adresse utilisée par Top-Halal')->columns(2)->schema([
+                Section::make('Adresse')->columns(2)->schema([
                     Select::make('address_suggestion')->label('Rechercher une adresse')->placeholder('Commencez à saisir au moins 3 caractères')->searchable()->searchDebounce(350)->getSearchResultsUsing(function (string $search): array {
                         return collect(app(AddressSuggestionService::class)->suggest($search))->mapWithKeys(fn (array $item) => [$item['token'] => $item['label']])->all();
                     })->getOptionLabelUsing(fn (?string $value): ?string => ($feature = app(AddressSuggestionService::class)->resolve((string) $value)) ? app(AddressSuggestionService::class)->label($feature) : null)->live()->afterStateUpdated(function ($state, $set): void {
@@ -129,20 +125,19 @@ class RestaurantResource extends AdminResource
                     TextInput::make('city_name')->label('Ville officielle')->maxLength(255), TextInput::make('city_code')->label('Code INSEE')->maxLength(10), TextInput::make('country_code')->label('Pays')->maxLength(2)->rules(['nullable', 'size:2']),
                     Select::make('locations')->label('Zones associées Top-Halal')->helperText('Ces zones ne sont pas modifiées automatiquement lors d’un changement d’adresse.')->relationship('locations', 'name')->multiple()->searchable()->preload()->columnSpanFull(),
                 ]),
-                Section::make('Vérifiez la position de l’établissement')->schema([
+                Section::make('Position')->schema([
                     View::make('filament.location-map')->viewData(['tileUrl' => config('location.map_tile_url'), 'tileAttribution' => config('location.map_tile_attribution')]),
-                    TextInput::make('latitude')->id('location-latitude')->label('Latitude')->numeric()->readOnly()->minValue(-90)->maxValue(90), TextInput::make('longitude')->id('location-longitude')->label('Longitude')->numeric()->readOnly()->minValue(-180)->maxValue(180),
+                    Hidden::make('latitude')->id('location-latitude'), Hidden::make('longitude')->id('location-longitude'),
                 ]),
-                Section::make('Qualité de localisation')->columns(2)->schema([
-                    TextInput::make('geocoding_status')->label('Adresse')->readOnly()->dehydrated(false), TextInput::make('geocoding_precision')->label('Précision GPS')->readOnly()->dehydrated(false),
-                    TextInput::make('proximity_status')->label('Autour de moi')->readOnly()->dehydrated(false), TextInput::make('geocoding_provider')->label('Fournisseur')->readOnly()->dehydrated(false),
-                    TextInput::make('geocoding_score')->label('Score')->readOnly()->dehydrated(false), TextInput::make('geocoded_at')->label('Dernier géocodage')->readOnly()->dehydrated(false)->formatStateUsing(fn ($state) => $state ? \Illuminate\Support\Carbon::parse($state)->locale('fr')->isoFormat('D MMMM YYYY à HH:mm') : 'Jamais'),
-                    TextInput::make('manually_verified_at')->label('Position corrigée manuellement')->readOnly()->dehydrated(false)->formatStateUsing(fn ($state) => $state ? 'Oui, le '.\Illuminate\Support\Carbon::parse($state)->format('d/m/Y H:i') : 'Non'),
-                    TextInput::make('duplicate_candidates')->label('Doublons potentiels')->readOnly()->dehydrated(false)->formatStateUsing(function (?Restaurant $record): string {
-                        if (!$record) return 'La vérification sera disponible après création.';
+                Section::make('Points à vérifier')->visible(fn (?Restaurant $record): bool => $record !== null && ($record->manually_verified_at !== null || in_array($record->geocoding_status, ['REVIEW_REQUIRED', 'MISSING'], true) || $record->location_review_reason === 'geography_associations_require_review' || count(app(DuplicateRestaurantDetector::class)->candidates($record)) > 0))->schema([
+                    TextInput::make('manual_position_notice')->label('Position corrigée manuellement')->readOnly()->dehydrated(false)->visible(fn (?Restaurant $record): bool => $record?->manually_verified_at !== null)->formatStateUsing(fn (?Restaurant $record): string => $record?->manually_verified_at ? 'Oui, le '.$record->manually_verified_at->format('d/m/Y H:i') : ''),
+                    TextInput::make('address_review_notice')->label('Adresse à vérifier')->readOnly()->dehydrated(false)->visible(fn (?Restaurant $record): bool => $record !== null && in_array($record->geocoding_status, ['REVIEW_REQUIRED', 'MISSING'], true) && $record->location_review_reason !== 'geography_associations_require_review')->formatStateUsing(fn (): string => 'Cette adresse nécessite une vérification avant utilisation.'),
+                    TextInput::make('geography_conflict_notice')->label('Conflit Geography')->readOnly()->dehydrated(false)->visible(fn (?Restaurant $record): bool => $record?->location_review_reason === 'geography_associations_require_review')->formatStateUsing(fn (): string => 'Les zones Top-Halal existantes doivent être vérifiées après le changement de code INSEE.'),
+                    TextInput::make('duplicate_candidates')->label('Doublon potentiel')->readOnly()->dehydrated(false)->visible(fn (?Restaurant $record): bool => $record !== null && count(app(DuplicateRestaurantDetector::class)->candidates($record)) > 0)->formatStateUsing(function (?Restaurant $record): string {
+                        if (!$record) return '';
                         $count = count(app(DuplicateRestaurantDetector::class)->candidates($record));
-                        return $count ? $count.' établissement(s) similaire(s) trouvé(s) à proximité — vérifiez les fiches avant toute action.' : 'Aucun candidat proche.';
-                    })->columnSpanFull(),
+                        return $count.' établissement(s) similaire(s) trouvé(s) à proximité — vérifiez les fiches avant toute action.';
+                    }),
                 ]),
             ]),
             Tabs\Tab::make('Catégories & caractéristiques')->schema([Section::make()->columns(2)->schema([
