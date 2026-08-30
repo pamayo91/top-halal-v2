@@ -2,6 +2,8 @@
 
 ## 2026-08-30
 
+- Changed restaurant web enrichment to a Codex-researched workflow: Laravel reserves checkpoints and validates/applies structured evidence, while normal web navigation supplies the sources. No API key is required for normal batches.
+
 - Added resumable restaurant web-enrichment checkpoints, CSV batch reports, conservative source matching and strict write guards for missing hours and placeholder descriptions. Closure/radiation signals are retained only for human review; an optional official Google Places adapter is disabled until credentials and budget are approved.
 
 - Ajout de l’onglet « Médias » sur la fiche restaurant et de l’action « Prévisualiser » pour les restaurants en attente, qui utilise désormais le véritable gabarit front en `noindex,nofollow`, sans changement de statut ni exposition dans les parcours publiés.

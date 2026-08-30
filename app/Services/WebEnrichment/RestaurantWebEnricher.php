@@ -19,7 +19,7 @@ class RestaurantWebEnricher
         $beforeHours = $this->hours($restaurant);
         $beforeDescription = $restaurant->description;
         $evidence = $this->provider->find($restaurant);
-        $base = ['legacy_wp_id'=>$restaurant->legacy_wp_id, 'sources'=>$evidence['sources'] ?? [], 'hours_before'=>$beforeHours, 'description_before'=>$beforeDescription, 'hours_after'=>null, 'description_after'=>null, 'hours_source'=>null, 'description_sources'=>[], 'closure_sources'=>[], 'confidence'=>null, 'technical_error'=>null];
+        $base = ['legacy_wp_id'=>$restaurant->legacy_wp_id, 'sources'=>$evidence['sources'] ?? [], 'matching'=>$evidence['matching'] ?? [], 'activity_status'=>$evidence['activity_status'] ?? null, 'facts'=>$evidence['facts'] ?? [], 'hours_before'=>$beforeHours, 'description_before'=>$beforeDescription, 'hours_after'=>null, 'description_after'=>null, 'hours_source'=>null, 'description_sources'=>[], 'closure_sources'=>[], 'confidence'=>null, 'technical_error'=>null];
 
         if (($evidence['state'] ?? null) === 'unavailable') return $this->finish($audit, $base + ['status'=>'ERROR','reason'=>'Web source provider is not configured','technical_error'=>$evidence['reason'] ?? 'provider unavailable'], $dryRun);
         if (($evidence['state'] ?? null) === 'error') return $this->finish($audit, $base + ['status'=>'ERROR','reason'=>'Technical provider error','technical_error'=>$evidence['reason'] ?? 'unknown'], $dryRun);

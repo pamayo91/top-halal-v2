@@ -7,6 +7,7 @@ use App\Models\RestaurantOpeningHour;
 use App\Models\RestaurantWebEnrichment;
 use App\Services\WebEnrichment\RestaurantWebSourceProvider;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class WebEnrichRestaurantsCommandTest extends TestCase
@@ -23,11 +24,19 @@ class WebEnrichRestaurantsCommandTest extends TestCase
         $this->app->instance(RestaurantWebSourceProvider::class, new class($result) implements RestaurantWebSourceProvider { public function __construct(private array $result) {} public function find(Restaurant $restaurant): array { return $this->result; } });
     }
 
+    private function applyEvidence(Restaurant $restaurant, array $evidence): void
+    {
+        RestaurantWebEnrichment::firstOrCreate(['restaurant_id'=>$restaurant->id], ['legacy_wp_id'=>$restaurant->legacy_wp_id, 'status'=>'PROCESSING', 'processing_started_at'=>now()]);
+        RestaurantWebEnrichment::where('restaurant_id',$restaurant->id)->update(['status'=>'PROCESSING','processing_started_at'=>now()]);
+        $path=storage_path('app/private/test-web-enrichment-'.$restaurant->id.'.json'); File::ensureDirectoryExists(dirname($path)); File::put($path,json_encode(['restaurants'=>[['restaurant_id'=>$restaurant->id,'evidence'=>$evidence]]],JSON_THROW_ON_ERROR));
+        $this->artisan('restaurants:web-enrich',['--apply'=>$path,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
+    }
+
     public function test_it_adds_only_missing_hours_and_an_eligible_description_then_skips_the_same_restaurant(): void
     {
         $restaurant=$this->restaurant(['description'=>'  KEBAB FRITES DE ancien texte']);
         $this->source(['state'=>'matched','sources'=>['https://internal-source.test/a'],'confidence'=>94,'hours_source'=>'https://internal-source.test/a','description_sources'=>['https://internal-source.test/a'],'hours'=>[['day'=>'monday','opens_at'=>'11:30:00','closes_at'=>'23:30:00','is_closed'=>false],['day'=>'monday','opens_at'=>'00:00:00','closes_at'=>'01:00:00','is_closed'=>false]],'description'=>'Restaurant situé à Paris. La vente à emporter et le service sur place sont proposés.']);
-        $this->artisan('restaurants:web-enrich',['--limit'=>50,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
+        $this->applyEvidence($restaurant,['state'=>'matched','sources'=>['https://internal-source.test/a'],'confidence'=>94,'hours_source'=>'https://internal-source.test/a','description_sources'=>['https://internal-source.test/a'],'hours'=>[['day'=>'monday','opens_at'=>'11:30:00','closes_at'=>'23:30:00','is_closed'=>false],['day'=>'monday','opens_at'=>'00:00:00','closes_at'=>'01:00:00','is_closed'=>false]],'description'=>'Restaurant situé à Paris. La vente à emporter et le service sur place sont proposés.']);
         $this->assertSame('UPDATED',RestaurantWebEnrichment::first()->status); $this->assertCount(2,$restaurant->fresh()->openingHours); $this->assertSame('Restaurant situé à Paris. La vente à emporter et le service sur place sont proposés.',$restaurant->fresh()->description);
         $this->artisan('restaurants:web-enrich',['--limit'=>50,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
         $this->assertSame(1,RestaurantWebEnrichment::count()); $this->assertCount(2,$restaurant->fresh()->openingHours);
@@ -37,7 +46,7 @@ class WebEnrichRestaurantsCommandTest extends TestCase
     {
         $restaurant=$this->restaurant(['description'=>'Bonne description existante.']); RestaurantOpeningHour::create(['restaurant_id'=>$restaurant->id,'day'=>'monday','opens_at'=>'09:00:00','closes_at'=>'18:00:00','is_closed'=>false,'legacy_key'=>'manual']);
         $this->source(['state'=>'matched','sources'=>['official:1'],'closure'=>'confirmed','closure_sources'=>['official:1'],'hours'=>[['day'=>'monday','opens_at'=>'01:00:00','closes_at'=>'02:00:00','is_closed'=>false]],'description'=>'Restaurant situé à Paris. Service sur place proposé.']);
-        $this->artisan('restaurants:web-enrich',['--limit'=>50,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
+        $this->applyEvidence($restaurant,['state'=>'matched','sources'=>['official:1'],'closure'=>'confirmed','closure_sources'=>['official:1'],'hours'=>[['day'=>'monday','opens_at'=>'01:00:00','closes_at'=>'02:00:00','is_closed'=>false]],'description'=>'Restaurant situé à Paris. Service sur place proposé.']);
         $this->assertSame('CLOSED_CONFIRMED_REVIEW',RestaurantWebEnrichment::first()->status); $this->assertSame('Bonne description existante.',$restaurant->fresh()->description); $this->assertCount(1,$restaurant->fresh()->openingHours);
     }
 
@@ -52,6 +61,6 @@ class WebEnrichRestaurantsCommandTest extends TestCase
     {
         $restaurant=$this->restaurant(); RestaurantWebEnrichment::create(['restaurant_id'=>$restaurant->id,'legacy_wp_id'=>$restaurant->legacy_wp_id,'status'=>'ERROR','technical_error'=>'timeout']); $this->source(['state'=>'unmatched','sources'=>[],'reason'=>'not found']);
         $this->artisan('restaurants:web-enrich',['--retry-errors'=>true,'--limit'=>1,'--out'=>'docs/generated/test-web-enrichment'])->assertSuccessful();
-        $this->assertSame('INSUFFICIENT_DATA',RestaurantWebEnrichment::first()->status);
+        $this->assertSame('PROCESSING',RestaurantWebEnrichment::first()->status);
     }
 }

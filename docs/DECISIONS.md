@@ -44,3 +44,7 @@ La phase 6A emploie Leaflet uniquement dans le panneau Filament et seulement lor
 ### D013 — Enrichissement web sous checkpoints et API officielle optionnelle
 
 Les enrichissements restaurant sont journalisés dans une table dédiée, un checkpoint par restaurant, et traités par ordre d’ID réel sans utiliser le nombre de lignes. La source est une abstraction : Google Places API officiel est un adaptateur optionnel, désactivé par défaut, afin de ne dépendre ni de scraping HTML fragile ni d’une API payante non approuvée. Toute fermeture/radiation est une alerte de revue humaine et interdit toute mutation automatique de la fiche.
+
+### D014 — Recherche web interactive par Codex
+
+Le flux normal de l’enrichissement est la recherche/navigation web interactive de Codex, restaurant par restaurant. Laravel ne recherche pas le web : il réserve les checkpoints, reçoit les preuves structurées, applique les validations métier et écrit le rapport. Cette séparation préserve une recherche contextuelle sans API obligatoire et sans scraping massif.
