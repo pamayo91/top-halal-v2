@@ -126,7 +126,7 @@ class RestaurantResource extends AdminResource
                         $set('location_update_source', 'autocomplete');
                     })->dehydrated(false)->columnSpanFull(),
                     TextInput::make('address_line1')->label('Adresse')->maxLength(255), TextInput::make('address_line2')->label('Complément')->maxLength(255), TextInput::make('postal_code')->label('Code postal')->maxLength(20),
-                    TextInput::make('city_name')->label('Ville officielle')->maxLength(255), TextInput::make('city_code')->label('Code INSEE')->maxLength(10), TextInput::make('country_code')->label('Pays')->maxLength(2)->rule('nullable|size:2'),
+                    TextInput::make('city_name')->label('Ville officielle')->maxLength(255), TextInput::make('city_code')->label('Code INSEE')->maxLength(10), TextInput::make('country_code')->label('Pays')->maxLength(2)->rules(['nullable', 'size:2']),
                     Select::make('locations')->label('Zones associées Top-Halal')->helperText('Ces zones ne sont pas modifiées automatiquement lors d’un changement d’adresse.')->relationship('locations', 'name')->multiple()->searchable()->preload()->columnSpanFull(),
                 ]),
                 Section::make('Vérifiez la position de l’établissement')->schema([
