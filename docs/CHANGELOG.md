@@ -2,6 +2,10 @@
 
 ## 2026-08-30
 
+- Phase 6A.1 : un déplacement de marqueur validé par un administrateur reste de précision `MANUAL` mais devient `ELIGIBLE` quand aucune anomalie ne subsiste. Une incompatibilité Geography reste `REVIEW_REQUIRED`. La provenance `admin_map` est maintenant distincte de la future proposition publique `public_map`.
+
+## 2026-08-30
+
 - Standardized public listing thumbnails: article cards, the three homepage restaurant cards and the three-column restaurant directory use fixed, responsive image frames with cropped images, so portrait source media can no longer change card height.
 - Restored article-page featured media rendering from the existing V2 featured-media relation. The selected image is now visible above the article body and included in Article structured data; no media record or source file was changed.
 - Corrected restaurant-detail hero delivery: it now selects the best available media variant and falls back to the original asset instead of requesting a non-existent 960 px variant.

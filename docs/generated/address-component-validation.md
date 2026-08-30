@@ -10,7 +10,7 @@ L’endpoint administrateur `GET /admin/location/autocomplete?q=` est authentifi
 
 ## Carte et saisie manuelle
 
-La carte Leaflet est réservée à l’onglet de localisation. Les tuiles sont configurables dans `config/location.php`. Un déplacement de marqueur synchronise les coordonnées consultables, conserve la provenance fournisseur, donne la précision/statut `MANUAL`, renseigne `manually_verified_at`, recalcule `proximity_status` à `REVIEW_REQUIRED` et crée l’audit existant. La saisie manuelle ambiguë reste possible sans inventer de code INSEE ni GPS, avec revue requise.
+La carte Leaflet est réservée à l’onglet de localisation. Les tuiles sont configurables dans `config/location.php`. Un déplacement de marqueur synchronise les coordonnées consultables, conserve la provenance fournisseur, donne la précision/statut `MANUAL`, renseigne `manually_verified_at` et crée l’audit existant. Depuis la Phase 6A.1, une correction validée par admin (`admin_map`) devient `ELIGIBLE` si les coordonnées sont valides et qu’aucune anomalie Geography n’existe ; une incompatibilité reste `REVIEW_REQUIRED`. La future provenance `public_map` conserve obligatoirement la revue, sans être développée côté public.
 
 ## Sécurité et garde-fous
 

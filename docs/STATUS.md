@@ -39,6 +39,7 @@ Last updated: 2026-08-30
 | Consolidation adresses — correctif de persistance | DONE | Les champs administratifs et `address_line1` manquants sont maintenant persistés indépendamment de `APPROXIMATE`, sans modifier l’adresse historique ni les GPS. Le compteur Phase 5 de 5 022 était un compteur de réponses worker, pas un total BDD ; contrôle dans `docs/generated/address-consolidation-report.md`. |
 | Résolution des exceptions adresses | DONE | Phase 5.1 : 34 des 65 exceptions ont été structurées de façon sûre ; 31 restent explicitement classées (3 inutilisables, 3 ambiguës, 5 hors France, 20 suspectes/tests) dans `docs/generated/address-exceptions-report.md`. |
 | Composant adresse intelligent | DONE (Phase 6A) | Autocomplete Laravel/Géoplateforme, édition structurée Filament, carte Leaflet isolée, audit/provenance, correction manuelle et détection informative de doublons. Rapport : `docs/generated/address-component-validation.md`. |
+| Cohérence validation GPS manuelle | DONE (Phase 6A.1) | Une correction explicite par admin est `MANUAL` et peut être `ELIGIBLE`; les anomalies Geography conservent `REVIEW_REQUIRED`. La provenance future `public_map` reste non validante. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |

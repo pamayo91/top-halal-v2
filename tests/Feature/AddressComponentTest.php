@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{AdminAuditLog, Restaurant, User};
+use App\Models\{AdminAuditLog, Location, Restaurant, User};
 use App\Services\Geocoding\GeocodingService;
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -53,14 +53,27 @@ class AddressComponentTest extends TestCase
         $this->assertDatabaseHas('admin_audit_logs', ['action'=>'restaurant.location_updated', 'subject_id'=>$restaurant->id]);
     }
 
-    public function test_manual_marker_move_requires_review_and_preserves_provider_provenance(): void
+    public function test_admin_manual_marker_move_is_eligible_when_there_is_no_geography_anomaly(): void
     {
         $admin = User::factory()->create(['role'=>'admin']); $this->actingAs($admin);
         $restaurant = $this->restaurant(['latitude'=>48.8, 'longitude'=>2.3, 'geocoding_provider'=>'geoplateforme', 'geocoding_source_id'=>'BAN-46', 'geocoding_status'=>'VERIFIED']);
-        app(RestaurantLocationService::class)->update($restaurant, ['latitude'=>48.81, 'longitude'=>2.31, 'location_update_source'=>'map']);
+        app(RestaurantLocationService::class)->update($restaurant, ['latitude'=>48.81, 'longitude'=>2.31, 'location_update_source'=>'admin_map']);
         $fresh = $restaurant->fresh();
-        $this->assertSame('MANUAL', $fresh->geocoding_status); $this->assertSame('MANUAL', $fresh->geocoding_precision); $this->assertNotNull($fresh->manually_verified_at);
-        $this->assertSame('BAN-46', $fresh->geocoding_source_id); $this->assertSame('REVIEW_REQUIRED', $fresh->proximity_status);
+        $this->assertSame('MANUAL', $fresh->geocoding_status); $this->assertSame('MANUAL', $fresh->geocoding_precision); $this->assertSame('MANUAL', $fresh->location_precision); $this->assertNotNull($fresh->manually_verified_at);
+        $this->assertSame('BAN-46', $fresh->geocoding_source_id); $this->assertSame('ELIGIBLE', $fresh->proximity_status);
+        $this->assertDatabaseHas('admin_audit_logs', ['action'=>'restaurant.location_updated', 'subject_id'=>$restaurant->id]);
+    }
+
+    public function test_admin_manual_marker_move_keeps_review_required_when_geography_is_incompatible(): void
+    {
+        $admin = User::factory()->create(['role'=>'admin']); $this->actingAs($admin);
+        $restaurant = $this->restaurant(['city_code'=>'75056', 'latitude'=>48.8, 'longitude'=>2.3]);
+        $location = Location::create(['legacy_term_id'=>random_int(1, 999999999), 'name'=>'Paris historique', 'slug'=>'paris-historique']);
+        $restaurant->locations()->attach($location);
+        app(RestaurantLocationService::class)->update($restaurant, ['city_code'=>'75111', 'latitude'=>48.81, 'longitude'=>2.31, 'location_update_source'=>'admin_map']);
+        $fresh = $restaurant->fresh();
+        $this->assertSame('MANUAL', $fresh->location_precision); $this->assertNotNull($fresh->manually_verified_at);
+        $this->assertSame('REVIEW_REQUIRED', $fresh->proximity_status); $this->assertSame('geography_associations_require_review', $fresh->location_review_reason);
     }
 
     public function test_duplicate_detector_is_informative_not_an_automatic_merge(): void
@@ -69,6 +82,15 @@ class AddressComponentTest extends TestCase
         $second = $this->restaurant(['name'=>'O Sha', 'latitude'=>48.8661, 'longitude'=>2.3641, 'address_line1'=>'46 Boulevard du Temple']);
         $this->assertCount(1, app(DuplicateRestaurantDetector::class)->candidates($first));
         $this->assertDatabaseHas('restaurants', ['id'=>$second->id]);
+    }
+
+    public function test_plain_save_does_not_artificially_change_location_provenance_or_status(): void
+    {
+        $admin = User::factory()->create(['role'=>'admin']); $this->actingAs($admin);
+        $restaurant = $this->restaurant(['latitude'=>48.866, 'longitude'=>2.364, 'geocoding_status'=>'VERIFIED', 'geocoding_precision'=>'housenumber', 'proximity_status'=>'ELIGIBLE']);
+        app(RestaurantLocationService::class)->update($restaurant, ['name'=>$restaurant->name, 'location_update_source'=>'form']);
+        $fresh = $restaurant->fresh();
+        $this->assertSame('VERIFIED', $fresh->geocoding_status); $this->assertSame('housenumber', $fresh->geocoding_precision); $this->assertSame('ELIGIBLE', $fresh->proximity_status); $this->assertNull($fresh->manually_verified_at);
     }
 
     private function restaurant(array $attributes = []): Restaurant

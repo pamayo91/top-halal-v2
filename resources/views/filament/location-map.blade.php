@@ -21,7 +21,7 @@
                             latField.value = point.lat.toFixed(7); lngField.value = point.lng.toFixed(7);
                             latField.dispatchEvent(new Event('input', { bubbles: true })); lngField.dispatchEvent(new Event('input', { bubbles: true }));
                             const source = document.querySelector('[wire\\:model$="location_update_source"]');
-                            if (source) { source.value = 'map'; source.dispatchEvent(new Event('input', { bubbles: true })); }
+                            if (source) { source.value = 'admin_map'; source.dispatchEvent(new Event('input', { bubbles: true })); }
                         });
                     });
             document.addEventListener('DOMContentLoaded', window.topHalalInitLocationMaps);
