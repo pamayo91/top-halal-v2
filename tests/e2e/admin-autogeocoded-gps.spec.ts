@@ -13,6 +13,7 @@ test.describe('GPS auto-géocodés Filament', () => {
     await page.getByLabel(/Adresse e-mail/).fill(email!);
     await page.getByLabel(/Mot de passe/).fill(password!);
     await page.getByRole('button', { name: 'Connexion' }).click();
+    await expect(page).toHaveURL(/\/admin$/);
 
     for (const [id, latitude, longitude] of [[7641, '50.6372843', '3.0747992'], [7698, '48.8819730', '2.4969610']]) {
       await page.goto(`/admin/restaurants/${id}/edit`);

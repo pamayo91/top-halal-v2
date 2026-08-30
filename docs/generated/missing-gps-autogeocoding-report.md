@@ -16,3 +16,5 @@
 - GPS existants modifiés : **0**
 
 Relance idempotente : 0 GPS ajouté, 23 fiches sans GPS restent inexploitablement structurées.
+
+Validation Filament préproduction : Fresh Burritos Euralille et Braise Gourmande affichent les coordonnées BDD et leur marqueur Leaflet respectif, en desktop et mobile.

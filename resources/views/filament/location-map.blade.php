@@ -3,10 +3,9 @@
     <div x-ref="map" style="height: 360px" class="rounded-md bg-gray-100"></div>
 </div>
 @once
-    @push('scripts')
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
             window.topHalalInitLocationMaps = () => document.querySelectorAll('[data-top-halal-location-map]').forEach((container) => {
                         if (!window.L || container.dataset.initialized) return;
                         const latField = document.getElementById('location-latitude'), lngField = document.getElementById('location-longitude');
@@ -30,6 +29,5 @@
             document.addEventListener('DOMContentLoaded', window.topHalalInitLocationMaps);
             document.addEventListener('livewire:navigated', window.topHalalInitLocationMaps);
             if (document.readyState !== 'loading') window.topHalalInitLocationMaps();
-        </script>
-    @endpush
+    </script>
 @endonce
