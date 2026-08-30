@@ -12,5 +12,5 @@ class EditRestaurant extends EditAuditedRecord {
         if ($record instanceof Restaurant) return app(RestaurantLocationService::class)->update($record, $data);
         return parent::handleRecordUpdate($record, $data);
     }
-    protected function getHeaderActions(): array { return [RestaurantResource::viewOnSiteAction(), RestaurantResource::trashAction()]; }
+    protected function getHeaderActions(): array { return [RestaurantResource::viewOnSiteAction(), RestaurantResource::previewAction(), RestaurantResource::trashAction()]; }
 }

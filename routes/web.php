@@ -47,7 +47,7 @@ Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
     $restaurant = Restaurant::where('legacy_wp_id', $legacyId)->firstOrFail();
     $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
     return view('restaurant-preview', ['restaurant' => $restaurant, 'reviews' => $reviews, 'aggregate' => $restaurant->approvedReviewAggregate()]);
-});
+})->name('restaurants.preview');
 Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');
 
 // The former Blade back-office has been removed. Keep its reserved prefix

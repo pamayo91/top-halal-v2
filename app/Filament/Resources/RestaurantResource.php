@@ -100,6 +100,17 @@ class RestaurantResource extends AdminResource
             ->action(fn (Restaurant $restaurant) => static::forceDelete($restaurant));
     }
 
+    public static function previewAction(): Action
+    {
+        return Action::make('preview')
+            ->label('Prévisualiser')
+            ->icon('heroicon-o-eye')
+            ->color('gray')
+            ->url(fn (Restaurant $restaurant): string => route('restaurants.preview', $restaurant->legacy_wp_id))
+            ->openUrlInNewTab()
+            ->visible(fn (Restaurant $restaurant): bool => $restaurant->status === 'pending');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([Tabs::make('Restaurant')->tabs([
@@ -145,6 +156,7 @@ class RestaurantResource extends AdminResource
                 Select::make('features')->relationship('features', 'name')->multiple()->searchable()->preload(),
             ])]),
             Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255)])]),
+            Tabs\Tab::make('Médias')->schema([Section::make('Photos de la fiche')->schema([View::make('filament.restaurant-media')])]),
             Tabs\Tab::make('SEO')->schema([Section::make()->schema([TextInput::make('seo_title')->maxLength(255), Textarea::make('seo_description')->rows(3)->maxLength(500)])]),
             Tabs\Tab::make('Système')->schema([Section::make('Identifiants et historique')->columns(2)->schema([
                 TextInput::make('legacy_wp_id')->disabled()->dehydrated(false)->label('ID WordPress'), TextInput::make('legacy_modified_at')->disabled()->dehydrated(false)->label('Dernière modification legacy'),
@@ -178,7 +190,7 @@ class RestaurantResource extends AdminResource
             SelectFilter::make('category')->label('Catégorie')->relationship('categories', 'name')->searchable()->preload(),
             TernaryFilter::make('photo')->label('Photo')->queries(true: fn (Builder $q) => $q->whereHas('media.asset'), false: fn (Builder $q) => $q->whereDoesntHave('media.asset')),
             TernaryFilter::make('reviews')->label('Avis')->queries(true: fn (Builder $q) => $q->has('reviews'), false: fn (Builder $q) => $q->doesntHave('reviews')),
-        ])->recordActions([static::viewOnSiteAction()->visible(fn (Restaurant $restaurant) => ! $restaurant->trashed() && $restaurant->status === 'published'), EditAction::make()->visible(fn (Restaurant $restaurant) => ! $restaurant->trashed()), static::trashAction(), static::restoreAction(), static::forceDeleteAction()])
+        ])->recordActions([static::viewOnSiteAction()->visible(fn (Restaurant $restaurant) => ! $restaurant->trashed() && $restaurant->status === 'published'), static::previewAction(), EditAction::make()->visible(fn (Restaurant $restaurant) => ! $restaurant->trashed()), static::trashAction(), static::restoreAction(), static::forceDeleteAction()])
           ->toolbarActions([BulkActionGroup::make([BulkAction::make('publish')->label('Publier')->requiresConfirmation()->visible(fn ($livewire): bool => $livewire->activeTab !== 'trash')->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'published']); app(AdminAudit::class)->record('restaurant.published', $r);});}), BulkAction::make('pending')->label('Passer en attente')->requiresConfirmation()->visible(fn ($livewire): bool => $livewire->activeTab !== 'trash')->action(function ($records): void {$records->each(function (Restaurant $r): void {$r->update(['status'=>'pending']); app(AdminAudit::class)->record('restaurant.pending', $r);});}), BulkAction::make('trash')->label('Supprimer')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()->visible(fn ($livewire): bool => $livewire->activeTab !== 'trash')->modalHeading('Supprimer les restaurants sélectionnés ?')->modalDescription('Les fiches seront placées dans la Corbeille et pourront être restaurées ultérieurement.')->modalSubmitActionLabel('Mettre à la corbeille')->action(fn ($records) => static::moveManyToTrash($records)), BulkAction::make('restore')->label('Restaurer')->icon('heroicon-o-arrow-uturn-left')->color('success')->visible(fn ($livewire): bool => $livewire->activeTab === 'trash')->action(fn ($records) => $records->each(fn (Restaurant $restaurant) => static::restore($restaurant))), BulkAction::make('force_delete')->label('Supprimer définitivement')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()->visible(fn ($livewire): bool => $livewire->activeTab === 'trash')->modalHeading('Supprimer définitivement les restaurants sélectionnés ?')->modalDescription('Cette suppression est irréversible.')->modalSubmitActionLabel('Supprimer définitivement')->action(fn ($records) => $records->each(fn (Restaurant $restaurant) => static::forceDelete($restaurant)))])])
           ->emptyStateHeading('Aucun restaurant')->emptyStateDescription('Créez une première fiche ou ajustez les filtres.')->defaultSort('updated_at', 'desc');
     }

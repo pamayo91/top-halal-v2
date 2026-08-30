@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{AdminAuditLog,Article,Comment,RedirectRule,Restaurant,RestaurantClaim,RestaurantReview,User};
+use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -41,6 +41,16 @@ class AdminBackOfficeTest extends TestCase
             ->assertDontSee('Données d’origine')
             ->assertDontSee('GPS historique / actuel')
             ->assertDontSee('Qualité de localisation');
+    }
+
+    public function test_restaurant_edit_form_shows_its_media_and_pending_restaurant_has_a_front_preview(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']); $restaurant = $this->restaurant(['status' => 'pending']);
+        $asset = MediaAsset::create(['legacy_attachment_id' => 987654321, 'original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('a', 64), 'status' => 'ready']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'legacy_attachment_id' => $asset->legacy_attachment_id, 'sort_order' => 0, 'status' => 'ready']);
+
+        $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")->assertOk()->assertSee('Photos de la fiche')->assertSee(route('media.show', [$asset, 480]), false);
+        $this->get(route('restaurants.preview', $restaurant->legacy_wp_id))->assertOk()->assertSee($restaurant->name);
     }
 
     public function test_admin_panel_exposes_all_operational_modules_and_legacy_back_office_is_gone(): void
