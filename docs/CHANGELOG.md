@@ -2,6 +2,7 @@
 
 ## 2026-08-31
 
+- Correction de la migration d’utilisateurs legacy : les comptes WordPress `administrator` conservent désormais le rôle V2 `admin`, sans abaisser un rôle V2 existant lors d’une reprise.
 - Sécurisation du bootstrap PHPUnit : les tests refusent désormais de démarrer hors environnement `testing` avec SQLite, afin qu’un cache de configuration de préproduction ne puisse jamais orienter des migrations de test vers MariaDB.
 - Ajout du parcours public non indexable « Ajouter un restaurant » : formulaire Blade SSR en cinq étapes, sans compte, avec progression, panneau desktop et ergonomie mobile. Les propositions créent exclusivement une fiche `pending` et un contexte déposant privé ; elles ne sont jamais publiées automatiquement.
 - Réutilisation de la Géoplateforme pour l’adresse structurée, le code INSEE, le GPS, la carte à marqueur déplaçable et la détection informative de doublons. Les liens proposés restent des destinations sortantes inactives et n’apparaissent jamais dans le HTML public.

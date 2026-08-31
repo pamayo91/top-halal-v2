@@ -31,15 +31,16 @@ class LegacyMigrateUsersCommand extends Command
         $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'ids' => $ids, 'items' => []];
 
         foreach ($rows as $row) {
+            $role = $this->legacyRole((int) $row->ID);
             $item = [
                 'legacy_wp_user_id' => (int) $row->ID,
-                'role' => 'user',
+                'role' => $role,
                 'email_present' => $row->user_email !== '',
                 'password_strategy' => 'laravel_temporary_hash_must_change',
                 'anomalies' => $row->user_email === '' ? ['missing_email'] : [],
             ];
             if ($this->option('apply') && $row->user_email !== '') {
-                DB::transaction(function () use ($row): void {
+                DB::transaction(function () use ($row, $role): void {
                     $user = User::firstOrNew(['legacy_wp_user_id' => $row->ID]);
                     if ($user->exists) {
                         return;
@@ -49,7 +50,7 @@ class LegacyMigrateUsersCommand extends Command
                         'name' => trim($row->display_name) ?: 'Utilisateur',
                         'email' => $row->user_email,
                         'password' => Hash::make((string) env('LEGACY_MIGRATION_TEMP_PASSWORD')),
-                        'role' => 'user',
+                        'role' => $role,
                         'status' => 'active',
                         'must_change_password' => true,
                         'created_at' => $row->user_registered,
@@ -69,5 +70,18 @@ class LegacyMigrateUsersCommand extends Command
         $this->info('Users migration report written.');
 
         return self::SUCCESS;
+    }
+
+    private function legacyRole(int $legacyUserId): string
+    {
+        try {
+            return DB::connection('legacy_wp')->table('usermeta')
+                ->where('user_id', $legacyUserId)
+                ->where('meta_key', 'like', '%capabilities')
+                ->where('meta_value', 'like', '%administrator%')
+                ->exists() ? 'admin' : 'user';
+        } catch (\Throwable) {
+            return 'user';
+        }
     }
 }

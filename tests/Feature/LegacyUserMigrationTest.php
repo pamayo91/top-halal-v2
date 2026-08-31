@@ -31,9 +31,20 @@ class LegacyUserMigrationTest extends TestCase
             $table->string('user_registered');
             $table->string('user_pass');
         });
+        Schema::connection('legacy_wp')->create('usermeta', function (Blueprint $table): void {
+            $table->id('umeta_id');
+            $table->unsignedBigInteger('user_id');
+            $table->string('meta_key');
+            $table->text('meta_value');
+        });
         DB::connection('legacy_wp')->table('users')->insert([
             ['ID' => 17, 'display_name' => 'Élodie', 'user_email' => 'elodie@example.test', 'user_registered' => '2020-01-02 03:04:05', 'user_pass' => 'legacy-hash-never-migrated'],
             ['ID' => 18, 'display_name' => 'Sans e-mail', 'user_email' => '', 'user_registered' => '2020-01-02 03:04:05', 'user_pass' => 'legacy-hash-never-migrated'],
+        ]);
+        DB::connection('legacy_wp')->table('usermeta')->insert([
+            'user_id' => 17,
+            'meta_key' => 'wp_capabilities',
+            'meta_value' => 'a:1:{s:13:"administrator";b:1;}',
         ]);
     }
 
@@ -59,6 +70,7 @@ class LegacyUserMigrationTest extends TestCase
         $this->artisan('legacy:migrate-users', ['--ids' => '17,18', '--apply' => true])->assertExitCode(0);
         $user = User::where('legacy_wp_user_id', 17)->firstOrFail();
         $this->assertTrue($user->must_change_password);
+        $this->assertSame('admin', $user->role);
         $this->assertNotSame('legacy-hash-never-migrated', $user->password);
         $this->assertNotSame(0, password_get_info($user->password)['algo']);
         $this->assertDatabaseCount('users', 1);

@@ -4,6 +4,7 @@
 - Laravel session authentication supports registration, login, logout and password reset.
 - Authentication writes are protected by CSRF and rate limited per e-mail/IP pair.
 - Legacy users retain `legacy_wp_user_id`. WordPress password hashes are deliberately discarded.
+- A legacy WordPress user whose capabilities contain `administrator` is migrated with the V2 `admin` role; an existing V2 role is never downgraded by a repeat migration.
 - A migrated account is marked `must_change_password` and can only change its password or log out until it completes that action.
 - Password reset also clears the mandatory-change flag after a successful reset.
 
