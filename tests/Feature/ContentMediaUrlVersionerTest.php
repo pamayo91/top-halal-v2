@@ -13,7 +13,8 @@ class ContentMediaUrlVersionerTest extends TestCase
 
     public function test_it_rewrites_originals_and_variants_without_touching_unknown_or_versioned_urls(): void
     {
-        $asset = MediaAsset::create(['legacy_attachment_id' => 44, 'original_path' => 'media/originals/example.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('a', 64), 'status' => 'ready']);
+        MediaAsset::create(['id' => 92, 'legacy_attachment_id' => 44, 'original_path' => 'media/originals/short.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('b', 64), 'status' => 'ready']);
+        $asset = MediaAsset::create(['id' => 921, 'legacy_attachment_id' => 45, 'original_path' => 'media/originals/example.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('a', 64), 'status' => 'ready']);
         $html = '<img src="/media/'.$asset->id.'" srcset="/media/'.$asset->id.'/480 480w"><a href="/media/999999">Télécharger</a><img src="/media/'.$asset->id.'/v/'.str_repeat('a', 64).'">';
 
         $result = app(ContentMediaUrlVersioner::class)->rewrite($html);
