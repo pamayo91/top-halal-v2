@@ -84,6 +84,11 @@ Maintain:
 - Legacy SQL and uploads stay local/private and are ignored by Git.
 - Public app must use CSRF protection, output escaping, strict validation, safe uploads, rate limiting, secure cookies and appropriate security headers.
 
+## Account safeguards
+- The project owner's designated human administrator account is the sole human admin account. Never reset its password or change its role/status unless the project owner gives a specific request for that action.
+- The WordPress migration is finalized. Do not query, use, or rerun migrations against the legacy WordPress database unless the project owner specifically authorizes a new legacy-data task.
+- For development-only needs, Codex may use a separate provisional admin account when explicitly provisioned; never repurpose or alter the project owner's human administrator account for that purpose.
+
 ## Git discipline
 - Keep commits small and descriptive.
 - Before committing: inspect `git diff`, run relevant tests, ensure no secret/private file is staged.

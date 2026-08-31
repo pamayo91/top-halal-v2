@@ -56,3 +56,7 @@ Une proposition publique crée une fiche `restaurants` standard en statut `pendi
 ### D016 — Tests refusés hors configuration SQLite
 
 La base de tests doit obligatoirement être SQLite. Le bootstrap `tests/TestCase.php` échoue avant toute migration si l’environnement ou la connexion active ne correspond pas à la configuration de PHPUnit ; un cache de configuration de préproduction ne peut donc plus faire exécuter des tests migratoires sur MariaDB.
+
+### D017 — Compte administrateur humain et migration legacy figés
+
+Le compte administrateur humain désigné par le propriétaire du projet est l’unique compte admin humain. Son mot de passe, son rôle et son statut ne peuvent être modifiés qu’à la demande explicite et ponctuelle du propriétaire. La migration WordPress est finalisée : la base legacy ne doit plus être interrogée, utilisée ni relancée sans une nouvelle autorisation explicite. Les validations de développement utilisent, lorsque nécessaire, un compte admin provisoire distinct.
