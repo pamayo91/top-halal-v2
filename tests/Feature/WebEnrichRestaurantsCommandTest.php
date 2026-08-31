@@ -80,4 +80,19 @@ class WebEnrichRestaurantsCommandTest extends TestCase
         $this->artisan('restaurants:web-enrich',['--retry-insufficient'=>true,'--limit'=>1])->assertSuccessful();
         $audit=RestaurantWebEnrichment::first(); $this->assertSame('PROCESSING',$audit->status); $this->assertSame('INSUFFICIENT_DATA',$audit->previous_status);
     }
+
+    public function test_retry_insufficient_can_be_constrained_to_explicit_non_contiguous_ids_and_keeps_research_audit(): void
+    {
+        $first=$this->restaurant(['id'=>9000]); $second=$this->restaurant(['id'=>12000]);
+        RestaurantWebEnrichment::create(['restaurant_id'=>$first->id,'legacy_wp_id'=>$first->legacy_wp_id,'status'=>'INSUFFICIENT_DATA']);
+        RestaurantWebEnrichment::create(['restaurant_id'=>$second->id,'legacy_wp_id'=>$second->legacy_wp_id,'status'=>'INSUFFICIENT_DATA']);
+        $this->artisan('restaurants:web-enrich',['--retry-insufficient'=>true,'--ids'=>'12000','--limit'=>50])->assertSuccessful();
+        $this->assertSame('INSUFFICIENT_DATA', RestaurantWebEnrichment::where('restaurant_id', 9000)->value('status'));
+        $this->assertSame('PROCESSING', RestaurantWebEnrichment::where('restaurant_id', 12000)->value('status'));
+        $this->applyEvidence($second, ['state'=>'unmatched','research_count'=>5,'search_queries'=>['"Restaurant Test" "Paris"'],'rejected_sources'=>[['url'=>'https://example.test','reason'=>'address mismatch']],'reason'=>'No reliable match after required searches']);
+        $audit=RestaurantWebEnrichment::where('restaurant_id', 12000)->first();
+        $this->assertSame(5, $audit->research_count);
+        $this->assertSame(['"Restaurant Test" "Paris"'], $audit->search_queries);
+        $this->assertSame('address mismatch', $audit->rejected_sources[0]['reason']);
+    }
 }
