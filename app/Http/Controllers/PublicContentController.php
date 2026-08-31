@@ -55,7 +55,7 @@ class PublicContentController extends Controller
     public function restaurant(string $slug): Response
     {
         $restaurant = $this->publishedRestaurants()->where('slug', $slug)->firstOrFail();
-        $reviews = $restaurant->reviews()->where('status', 'approved')->oldest()->get();
+        $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
         return response()->view('public.restaurant', compact('restaurant', 'reviews'));
     }
 
@@ -73,7 +73,7 @@ class PublicContentController extends Controller
     public function editorial(string $slug): Response
     {
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::with('featuredMedia.asset')->where('slug', $slug)->where('status', 'published')->firstOrFail();
-        $comments = $content->comments()->where('status', 'approved')->oldest()->get();
+        $comments = $content->comments()->where('status', 'approved')->latest('created_at')->get();
         $isArticle = $content instanceof Article;
         return response()->view('public.editorial', compact('content', 'comments', 'isArticle'));
     }

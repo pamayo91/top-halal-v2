@@ -2,6 +2,7 @@
 
 ## 2026-08-31
 
+- Public restaurant reviews and editorial comments now display newest first, including front previews.
 - Fixed media delivery cache collisions that made distinct article thumbnails render the same file. Public and regression-sentinel media URLs now contain the asset checksum, stale numeric URLs redirect safely, and feature coverage rejects a mismatched checksum.
 - Gallery and back-office media rendering now select an available WebP variant and fall back to the original when none exists, so a missing 480 px derivative cannot cause a browser 404.
 - Rewrote the remaining V2 editorial media URLs through an idempotent V2-only command, so existing inline images receive the same checksum-versioned cache key.

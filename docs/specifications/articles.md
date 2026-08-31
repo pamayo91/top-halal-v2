@@ -2,6 +2,7 @@
 
 ## Articles
 Store clean HTML/content structure, title/slug/excerpt/status/author/media/SEO metadata/publication dates and source type (`manual`, `ai`, `imported`).
+Approved public comments are displayed from newest to oldest.
 
 ## Pages
 No page-builder dependency. Use a constrained set of lightweight content blocks when structured layout is required.

@@ -69,6 +69,19 @@ class PublicFrontendTest extends TestCase
         $this->get('/article-date')->assertOk()->assertSee('Publié le 3 février 2020');
     }
 
+    public function test_public_reviews_and_comments_are_sorted_from_newest_to_oldest(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 427, 'name' => 'Ordre avis', 'slug' => 'ordre-avis', 'status' => 'published']);
+        RestaurantReview::create(['restaurant_id' => $restaurant->id, 'author_name' => 'Amina', 'rating' => 5, 'content' => 'Ancien avis', 'status' => 'approved', 'created_at' => '2024-01-01 12:00:00']);
+        RestaurantReview::create(['restaurant_id' => $restaurant->id, 'author_name' => 'Yanis', 'rating' => 4, 'content' => 'Nouvel avis', 'status' => 'approved', 'created_at' => '2024-02-01 12:00:00']);
+        $article = Article::create(['legacy_wp_id' => 428, 'original_title' => 'Ordre commentaires', 'title' => 'Ordre commentaires', 'slug' => 'ordre-commentaires', 'legacy_url' => '/ordre-commentaires', 'status' => 'published']);
+        Comment::create(['article_id' => $article->id, 'author_name' => 'Amina', 'content' => 'Ancien commentaire', 'status' => 'approved', 'created_at' => '2024-01-01 12:00:00']);
+        Comment::create(['article_id' => $article->id, 'author_name' => 'Yanis', 'content' => 'Nouveau commentaire', 'status' => 'approved', 'created_at' => '2024-02-01 12:00:00']);
+
+        $this->get('/resto/ordre-avis')->assertOk()->assertSeeInOrder(['Nouvel avis', 'Ancien avis']);
+        $this->get('/ordre-commentaires')->assertOk()->assertSeeInOrder(['Nouveau commentaire', 'Ancien commentaire']);
+    }
+
     public function test_article_detail_renders_its_featured_media(): void
     {
         $article = Article::create(['legacy_wp_id' => 422, 'original_title' => 'Article illustré', 'title' => 'Article illustré', 'slug' => 'article-illustre', 'legacy_url' => '/article-illustre', 'status' => 'published']);

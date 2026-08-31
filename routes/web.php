@@ -41,7 +41,7 @@ Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId)
     $comments = Comment::query()
         ->where($type === 'post' ? 'article_id' : 'page_id', $content->id)
         ->where('status', 'approved')
-        ->orderBy('created_at')
+        ->latest('created_at')
         ->get();
     return view('content-preview', compact('content', 'comments', 'type', 'legacyId'));
 })->whereIn('type', ['post', 'page']);
@@ -52,13 +52,13 @@ Route::post('/_preview/{type}/{legacyId}/comments', [PreviewCommentController::c
 
 Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
     $restaurant = Restaurant::with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants'])->where('legacy_wp_id', $legacyId)->firstOrFail();
-    $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
+    $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => route('restaurants.preview', $legacyId)]);
 })->name('restaurants.preview');
 Route::get('/_preview/restaurant/v2/{restaurant}', function (Restaurant $restaurant) {
     abort_unless($restaurant->status === 'pending', 404);
     $restaurant->load(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants']);
-    $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
+    $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => request()->fullUrl()]);
 })->middleware('signed')->name('restaurants.preview.pending');
 Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');
