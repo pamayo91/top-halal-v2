@@ -38,6 +38,7 @@ class Restaurant extends Model
     public function claims(): HasMany { return $this->hasMany(RestaurantClaim::class); }
     public function outboundLinks(): HasMany { return $this->hasMany(RestaurantOutboundLink::class); }
     public function webEnrichment(): HasOne { return $this->hasOne(RestaurantWebEnrichment::class); }
+    public function submission(): HasOne { return $this->hasOne(RestaurantSubmission::class); }
     public function approvedReviewAggregate(): array
     {
         $aggregate = $this->reviews()->where('status', 'approved')->selectRaw('count(*) as count, avg(rating) as average')->first();

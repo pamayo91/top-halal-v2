@@ -8,3 +8,4 @@ Le front public est rendu côté serveur avec Blade. Il n’utilise ni SPA, ni p
 - Les images V2 ne pointent jamais vers WordPress : elles utilisent les variantes media locales, avec dimensions, `srcset`, `sizes` et chargement différé hors visuel principal.
 - Les horaires ne sont jamais affichés en l’absence de données validées. Lorsqu’ils existent, ils sont affichés sous forme de créneaux par jour, y compris les journées fermées. Les liens sortants sont exclusivement des routes opaques `/sortie/{token}` ; aucune destination n’apparaît dans le HTML ou le JSON-LD.
 - Les avis et commentaires sont soumis à modération. Les URL sont refusées côté serveur et le contenu rendu est du texte sûr.
+- Le parcours public d’ajout de restaurant est volontairement `noindex,nofollow`, SSR et sans compte. Son script optionnel charge la carte et Leaflet uniquement à l’étape Adresse ; aucune dépendance cartographique n’est chargée sur les autres pages publiques.

@@ -28,7 +28,7 @@ class RestaurantResource extends AdminResource
     protected static ?int $navigationSort = 1;
     protected static ?string $navigationLabel = 'Restaurants';
 
-    public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['categories', 'locations', 'media.asset'])->withCount('reviews'); }
+    public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['categories', 'locations', 'media.asset', 'submission'])->withCount('reviews'); }
     public static function getGloballySearchableAttributes(): array { return ['name', 'city_name', 'slug']; }
     public static function getGlobalSearchResultDetails(Model $record): array { return ['Ville' => $record->city_name ?: $record->locations->pluck('name')->join(', ') ?: 'Non renseignée', 'Statut' => $record->status]; }
 
@@ -109,7 +109,7 @@ class RestaurantResource extends AdminResource
             ->color('gray')
             ->url(fn (Restaurant $restaurant): string => route('restaurants.preview', $restaurant->legacy_wp_id))
             ->openUrlInNewTab()
-            ->visible(fn (Restaurant $restaurant): bool => $restaurant->status === 'pending');
+            ->visible(fn (Restaurant $restaurant): bool => $restaurant->status === 'pending' && $restaurant->legacy_wp_id !== null);
     }
 
     public static function form(Schema $schema): Schema
@@ -180,6 +180,7 @@ class RestaurantResource extends AdminResource
             TextColumn::make('name')->label('Restaurant')->searchable(['name', 'slug', 'address', 'phone', 'contact_email'])->sortable()->description(fn (Restaurant $r) => $r->slug),
             TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: $r->locations->pluck('name')->join(', ') ?: '—')->searchable(['city_name']),
             TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {'published'=>'success','pending'=>'warning','reported'=>'danger','archived'=>'gray',default=>'info'})->sortable(),
+            TextColumn::make('submission.submitter_email')->label('Déposant')->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('geocoding_status')->label('Géo')->badge()->color(fn (?string $state) => match ($state) {'VERIFIED'=>'success','HIGH_CONFIDENCE'=>'info','APPROXIMATE'=>'warning','REVIEW_REQUIRED'=>'danger','MANUAL'=>'primary',default=>'gray'}),
             TextColumn::make('address_exception_reason')->label('Adresse à traiter')->state(function (Restaurant $r): string {
                 if ($r->latitude === null || $r->longitude === null) return 'sans GPS';

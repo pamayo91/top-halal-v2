@@ -48,3 +48,7 @@ Les enrichissements restaurant sont journalisés dans une table dédiée, un che
 ### D014 — Recherche web interactive par Codex
 
 Le flux normal de l’enrichissement est la recherche/navigation web interactive de Codex, restaurant par restaurant. Laravel ne recherche pas le web : il réserve les checkpoints, reçoit les preuves structurées, applique les validations métier et écrit le rapport. Cette séparation préserve une recherche contextuelle sans API obligatoire et sans scraping massif.
+
+### D015 — Propositions publiques créées directement en attente
+
+Une proposition publique crée une fiche `restaurants` standard en statut `pending`, afin qu’elle utilise le même circuit de modération que les autres fiches, sans jamais devenir visible publiquement. Son e-mail de suivi et son lien avec l’établissement vivent dans `restaurant_submissions`, séparés des coordonnées publiques du restaurant. Les URLs proposées restent des destinations sortantes inactives, sans exposition HTML/JSON-LD avant validation humaine.

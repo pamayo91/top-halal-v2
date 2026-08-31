@@ -8,7 +8,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, RegisteredUserController, RestaurantClaimController};
+use App\Http\Controllers\{AccountController, AuthController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\AdminAddressAutocompleteController;
@@ -27,6 +27,11 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/media/{asset}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->whereNumber('width')->name('media.show');
 Route::get('/sortie/{token}', RestaurantOutboundController::class)->where('token', '[A-Za-z0-9_-]{20,64}')->name('restaurants.outbound');
 Route::get('/admin/location/autocomplete', AdminAddressAutocompleteController::class)->middleware(['auth', 'admin', 'throttle:address-autocomplete'])->name('admin.location.autocomplete');
+Route::get('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'create'])->name('restaurant-submissions.create');
+Route::get('/ajouter-un-restaurant/adresses', [PublicRestaurantSubmissionController::class, 'addressAutocomplete'])->middleware('throttle:public-address-autocomplete')->name('restaurant-submissions.addresses');
+Route::get('/ajouter-un-restaurant/doublons', [PublicRestaurantSubmissionController::class, 'duplicates'])->middleware('throttle:restaurant-submission')->name('restaurant-submissions.duplicates');
+Route::post('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'store'])->middleware('throttle:restaurant-submission')->name('restaurant-submissions.store');
+Route::get('/ajouter-un-restaurant/merci', [PublicRestaurantSubmissionController::class, 'thanks'])->name('restaurant-submissions.thanks');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));

@@ -26,6 +26,18 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 ## Admin/owner
 Create/edit/moderate records, media, hours, categories/features and ownership/claims with clear auditability.
 
+## Public restaurant proposal
+
+`/ajouter-un-restaurant` is a `noindex,nofollow` public Blade form. It requires no account and is protected by Laravel CSRF, server-side validation and an e-mail/IP rate limit. JavaScript only improves the five-step interaction; the complete form remains submittable without it.
+
+- Step 1 requires a restaurant name and at least one of `has_halal_meat` or `has_halal_chicken`; it performs an informative name-similarity lookup.
+- Step 2 uses the reusable Géoplateforme address-suggestion service. A selected suggestion is resolved again server-side; it fills structured address, code INSEE and GPS. A manual fallback is retained as `REVIEW_REQUIRED`, and a public map-marker adjustment is explicitly recorded as `public_map`, never treated as an admin verification. Similarity candidates combine name, structured address and a 250m GPS radius without automatic merge or publication.
+- Step 3 accepts optional categories, services (including an optional halal certification), simple seven-day schedules, contact data and private outbound destinations. External destinations are stored inactive and never rendered directly in public HTML or JSON-LD.
+- Step 4 requires exactly one cover upload and accepts at most ten additional JPEG, PNG or WebP uploads. Files are revalidated by the server-side V2 media pipeline before a pending media relation is created.
+- Step 5 stores only the contributor e-mail and their relation to the restaurant (`owner`, `employee` or `customer`); no name or account is required. Selecting owner does not ask for further details. Claiming remains a separate authenticated flow.
+
+A valid proposal creates a normal `restaurants` record with `status=pending`, never `published`, plus one private `restaurant_submissions` record for the contact/audit context. Filament’s existing pending status is the moderation queue; contributor e-mail is visible only to administrators.
+
 ## SEO par fiche
 Le panneau SEO permet de sélectionner les directives `robots` actives (`all`, `noindex`, `nofollow`, `none`, `nosnippet`, `indexifembedded`, `noimageindex`, `notranslate`) et de paramétrer les valeurs qui nécessitent un argument : longueur d’extrait, aperçu image, aperçu vidéo et date `unavailable_after`. Les directives sont rendues dans la balise `meta name="robots"` de la fiche ; une fiche `noindex` ou `none` est exclue du sitemap.
 
