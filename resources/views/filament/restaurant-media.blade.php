@@ -4,7 +4,7 @@
     @forelse($restaurant?->media ?? [] as $media)
         @if($asset = $media->asset)
             <figure class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                <img src="{{ route('media.show', [$asset, 480]) }}" width="{{ $asset->width }}" height="{{ $asset->height }}" loading="lazy" class="aspect-[4/3] w-full object-cover" alt="{{ $asset->alt_text ?: $restaurant->name }}">
+                <img src="{{ $asset->deliveryUrl(480) }}" width="{{ $asset->width }}" height="{{ $asset->height }}" loading="lazy" class="aspect-[4/3] w-full object-cover" alt="{{ $asset->alt_text ?: $restaurant->name }}">
                 @if($asset->caption || $asset->alt_text)
                     <figcaption class="p-3 text-sm text-gray-600 dark:text-gray-300">{{ $asset->caption ?: $asset->alt_text }}</figcaption>
                 @endif

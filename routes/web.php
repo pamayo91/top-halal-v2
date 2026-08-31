@@ -25,7 +25,8 @@ Route::get('/health', function () {
 })->name('health');
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
-Route::get('/media/{asset}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->whereNumber('width')->name('media.show');
+Route::get('/media/{asset}/v/{version}/{width?}', [MediaController::class, 'show'])->whereNumber('asset')->where('version', '[a-f0-9]{64}')->whereNumber('width')->name('media.show');
+Route::get('/media/{asset}/{width?}', [MediaController::class, 'legacy'])->whereNumber('asset')->whereNumber('width')->name('media.legacy');
 Route::get('/sortie/{token}', RestaurantOutboundController::class)->where('token', '[A-Za-z0-9_-]{20,64}')->name('restaurants.outbound');
 Route::get('/admin/location/autocomplete', AdminAddressAutocompleteController::class)->middleware(['auth', 'admin', 'throttle:address-autocomplete'])->name('admin.location.autocomplete');
 Route::get('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'create'])->name('restaurant-submissions.create');

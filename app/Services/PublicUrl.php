@@ -14,7 +14,7 @@ class PublicUrl
             $record instanceof RestaurantReview => $this->forReview($record),
             $record instanceof Comment => $this->forComment($record),
             $record instanceof RestaurantClaim => $this->for($record->restaurant),
-            $record instanceof MediaAsset => route('media.show', $record),
+            $record instanceof MediaAsset => $record->deliveryUrl(),
             $record instanceof Location => $record->restaurants()->exists() ? route('locations.show', $record->slug) : null,
             $record instanceof Category => $record->restaurants()->exists() ? route('categories.show', $record->slug) : null,
             $record instanceof Feature => $record->restaurants()->exists() ? route('features.show', $record->slug) : null,

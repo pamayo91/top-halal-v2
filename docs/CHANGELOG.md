@@ -2,6 +2,7 @@
 
 ## 2026-08-31
 
+- Fixed media delivery cache collisions that made distinct article thumbnails render the same file. Public and regression-sentinel media URLs now contain the asset checksum, stale numeric URLs redirect safely, and feature coverage rejects a mismatched checksum.
 - Added the permanent V2 non-regression gate: approved database sentinels, media/storage and relation verification, protected minimum counts, dedicated Playwright HTTP/browser regression checks, and Laravel error-log validation for the preproduction run.
 - Validated the gate on preproduction: 13 real V2 sentinels, 3 PHP regression tests and 98 desktop/mobile Playwright checks pass; no lost relation/media, HTTP 500, browser failure or new Laravel exception was found.
 - Restored the pending-restaurant preview action for V2 proposals without a legacy ID. It now uses a temporary signed `noindex,nofollow` front URL and is included in the regression sentinels.

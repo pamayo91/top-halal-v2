@@ -17,4 +17,18 @@ class MediaAsset extends Model
     {
         return $this->hasMany(MediaVariant::class);
     }
+
+    public function deliveryUrl(?int $width = null): string
+    {
+        $parameters = [
+            'asset' => $this,
+            'version' => $this->checksum,
+        ];
+
+        if ($width !== null) {
+            $parameters['width'] = $width;
+        }
+
+        return route('media.show', $parameters);
+    }
 }

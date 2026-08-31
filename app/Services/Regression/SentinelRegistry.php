@@ -227,7 +227,7 @@ class SentinelRegistry
                 if (! isset($variants[$variant['id']]) || ! $disk->exists($variant['path'])) $errors[] = "{$key}: expected media variant is unavailable.";
             }
             if (! empty($expected['asset']['variants']) && $asset->variants->isEmpty()) $errors[] = "{$key}: all expected media variants disappeared.";
-            if (str_starts_with($asset->mime, 'image/')) $mediaUrls[] = '/media/'.$asset->id;
+            if (str_starts_with($asset->mime, 'image/')) $mediaUrls[] = (string) parse_url($asset->deliveryUrl(), PHP_URL_PATH);
         }
     }
 }

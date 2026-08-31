@@ -1,7 +1,7 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>{{ $content->title }}</title><style>.content-inline-image{max-width:100%;height:auto}</style></head><body><main><h1>{{ $content->title }}</h1>
 @php($featured = \App\Models\ContentMedia::query()->where('content_type', $type)->where('content_id', $content->id)->where('role', 'featured')->whereNotNull('media_asset_id')->with('asset.variants')->first()?->asset)
 @if ($featured)
-<img src="{{ route('media.show', $featured) }}" srcset="{{ $featured->variants->sortBy('width')->map(fn($variant) => route('media.show', [$featured, $variant->width]).' '.$variant->width.'w')->implode(', ') }}" sizes="(max-width: 100vw) 100vw, {{ $featured->width }}px" width="{{ $featured->width }}" height="{{ $featured->height }}" alt="{{ $featured->alt_text }}">
+<img src="{{ $featured->deliveryUrl() }}" srcset="{{ $featured->variants->sortBy('width')->map(fn($variant) => $featured->deliveryUrl($variant->width).' '.$variant->width.'w')->implode(', ') }}" sizes="(max-width: 100vw) 100vw, {{ $featured->width }}px" width="{{ $featured->width }}" height="{{ $featured->height }}" alt="{{ $featured->alt_text }}">
 @endif
 {!! $content->content_html !!}
 <section aria-labelledby="comments-title"><h2 id="comments-title">Commentaires</h2>
