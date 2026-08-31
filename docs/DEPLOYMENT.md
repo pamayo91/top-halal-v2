@@ -31,7 +31,7 @@
 6. Build frontend assets when needed.
 7. Run Laravel optimization/cache commands appropriate for preproduction.
 8. Restart queue workers when workers exist and code affecting jobs changed.
-9. Run health check and targeted smoke/E2E tests against the preproduction URL.
+9. Clear the route cache whenever `routes/` changes; this project contains closure routes and must not route-cache them. Run health check and targeted smoke/E2E tests against the preproduction URL.
 10. Run `composer test:regression` from the workstation after deployment. It requires the deployed `regression_sentinels` baseline and blocks on database/media/relation drift, HTTP 500, Playwright console/network failures or new Laravel exceptions.
 11. If validation fails, stop and fix before considering deployment complete.
 
