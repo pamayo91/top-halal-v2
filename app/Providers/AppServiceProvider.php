@@ -37,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         });
         RateLimiter::for('address-autocomplete', fn (Request $request): Limit => Limit::perMinute(30)->by(($request->user()?->id ?? 'guest').'|'.$request->ip()));
         RateLimiter::for('public-address-autocomplete', fn (Request $request): Limit => Limit::perMinute(20)->by('address|'.$request->ip()));
+        RateLimiter::for('restaurant-duplicate-check', fn (Request $request): Limit => Limit::perMinute(30)->by('restaurant-duplicates|'.$request->ip()));
         RateLimiter::for('restaurant-submission', fn (Request $request): Limit => Limit::perHour(5)->by('restaurant|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
     }
 }

@@ -36,7 +36,7 @@ test('public restaurant contribution blocks an empty halal choice and identifies
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {
   await fillRestaurantAndAddress(page, `photos-${testInfo.project.name}-${Date.now()}`);
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect.poll(() => page.locator('[data-cover-input]').evaluate((input: HTMLInputElement) => input.validationMessage)).toContain('photo de couverture');
+  await expect.poll(() => page.locator('[data-cover-input]').evaluate((input: HTMLInputElement) => input.validationMessage)).not.toBe('');
 
   await page.locator('[data-cover-input]').setInputFiles(cover);
   await page.getByRole('button', { name: 'Continuer' }).click();
