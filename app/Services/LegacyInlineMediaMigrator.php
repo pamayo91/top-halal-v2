@@ -148,12 +148,12 @@ class LegacyInlineMediaMigrator
             if (preg_match('/\balt=["\']([^"\']*)["\']/i', $match[0], $altMatch)) $alt = e(html_entity_decode($altMatch[1]));
             $legacyWidth = preg_match('/\bwidth=["\'](\d+)["\']/i', $match[0], $widthMatch) ? min((int) $widthMatch[1], $asset->width) : $asset->width;
             $legacyHeight = preg_match('/\bheight=["\'](\d+)["\']/i', $match[0], $heightMatch) ? (int) $heightMatch[1] : (int) round($asset->height * $legacyWidth / $asset->width);
-            $srcset = $asset->variants()->orderBy('width')->get()->map(fn ($variant) => '/media/'.$asset->id.'/'.$variant->width.' '.$variant->width.'w')->implode(', ');
-            return '<img class="content-inline-image" src="/media/'.$asset->id.'"'.($srcset ? ' srcset="'.$srcset.'" sizes="(max-width: '.$legacyWidth.'px) 100vw, '.$legacyWidth.'px"' : '').' width="'.$legacyWidth.'" height="'.$legacyHeight.'" loading="lazy" alt="'.$alt.'">';
+            $srcset = $asset->variants()->orderBy('width')->get()->map(fn ($variant) => $asset->deliveryUrl($variant->width).' '.$variant->width.'w')->implode(', ');
+            return '<img class="content-inline-image" src="'.$asset->deliveryUrl().'"'.($srcset ? ' srcset="'.$srcset.'" sizes="(max-width: '.$legacyWidth.'px) 100vw, '.$legacyWidth.'px"' : '').' width="'.$legacyWidth.'" height="'.$legacyHeight.'" loading="lazy" alt="'.$alt.'">';
         }, $html);
         $html = preg_replace_callback('/\bhref=["\']((?:https?:\/\/(?:www\.)?top-halal\.fr)?\/wp-conten(?:t|u)[^"\']*)["\']/i', function (array $match) use ($resolved): string {
             $source = html_entity_decode($match[1]);
-            return isset($resolved[$source]) ? 'href="/media/'.$resolved[$source]->id.'"' : '';
+            return isset($resolved[$source]) ? 'href="'.$resolved[$source]->deliveryUrl().'"' : '';
         }, $html);
         return preg_replace('/<a\s*>\s*<\/a>/i', '', $html);
     }

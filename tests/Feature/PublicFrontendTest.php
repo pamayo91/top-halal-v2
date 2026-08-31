@@ -88,6 +88,17 @@ class PublicFrontendTest extends TestCase
         $this->get('/resto/restaurant-illustre')->assertOk()->assertSee($asset->deliveryUrl(480), false)->assertDontSee($asset->deliveryUrl(960), false);
     }
 
+    public function test_restaurant_gallery_falls_back_to_the_original_when_no_variant_exists(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 426, 'name' => 'Galerie illustrée', 'slug' => 'galerie-illustree', 'status' => 'published']);
+        $hero = MediaAsset::create(['legacy_attachment_id' => 426, 'original_path' => 'media/originals/hero.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('e', 64), 'status' => 'ready']);
+        $gallery = MediaAsset::create(['legacy_attachment_id' => 427, 'original_path' => 'media/originals/gallery.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('f', 64), 'status' => 'ready']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'legacy_attachment_id' => 426, 'media_asset_id' => $hero->id, 'sort_order' => 0, 'status' => 'ready']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'legacy_attachment_id' => 427, 'media_asset_id' => $gallery->id, 'sort_order' => 1, 'status' => 'ready']);
+
+        $this->get('/resto/galerie-illustree')->assertOk()->assertSee($gallery->deliveryUrl(), false)->assertDontSee($gallery->deliveryUrl(480), false);
+    }
+
     public function test_restaurant_services_render_local_svg_icons_with_their_text_labels(): void
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 424, 'name' => 'Services test', 'slug' => 'services-test', 'status' => 'published']);
