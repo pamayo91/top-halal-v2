@@ -3,6 +3,7 @@
 ## 2026-08-31
 
 - Added the permanent V2 non-regression gate: approved database sentinels, media/storage and relation verification, protected minimum counts, dedicated Playwright HTTP/browser regression checks, and Laravel error-log validation for the preproduction run.
+- Validated the gate on preproduction: 13 real V2 sentinels, 3 PHP regression tests and 98 desktop/mobile Playwright checks pass; no lost relation/media, HTTP 500, browser failure or new Laravel exception was found.
 
 - Correction de la migration d’utilisateurs legacy : les comptes WordPress `administrator` conservent désormais le rôle V2 `admin`, sans abaisser un rôle V2 existant lors d’une reprise.
 - Sécurisation du bootstrap PHPUnit : les tests refusent désormais de démarrer hors environnement `testing` avec SQLite, afin qu’un cache de configuration de préproduction ne puisse jamais orienter des migrations de test vers MariaDB.

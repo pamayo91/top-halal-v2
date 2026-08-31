@@ -51,7 +51,7 @@ Last updated: 2026-08-31
 | Automated news workflow | TODO | Disclosure configurable |
 | SEO structural / routes | DONE | Canonical routes, slash policy, sitemap, environment-aware robots, 404/410, breadcrumbs, JSON-LD and facet policy validated on preproduction. Les fiches restaurant ont des directives meta robots paramétrables (noindex/none exclues du sitemap) et un titre par défaut nom/ville/première spécialité, surchargeable par `seo_title`. Nine approved technical/duplicate non-restaurant URLs are now redirected and excluded; `/blog` and `/mon-compte` are retained. Final visual design remains out of scope. |
 | Playwright E2E | DONE | HTTPS preprod smoke passes on desktop/mobile for homepage, `/health`, 404, noindex, robots, cookies and sensitive paths |
-| Non-régression permanente | IN PROGRESS | Registre V2 de sentinelles, intégrité relations/médias, smoke HTTP/Playwright et contrôle des exceptions Laravel ajoutés ; validation préproduction et baseline final à exécuter après déploiement. |
+| Non-régression permanente | DONE | 13 sentinelles V2 réelles enregistrées ; 3 tests PHP de conservation/intégrité et 98 tests Playwright desktop/mobile passent sur préproduction, avec contrôle final des médias, relations, compteurs, 500, console/réseau et logs Laravel. |
 | Public exposure checks | DONE | `/`, `/health`, 404 and sensitive paths checked; `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/` are not publicly readable |
 | Preproduction indexing protection | DONE | `X-Robots-Tag: noindex, nofollow` is active and `robots.txt` disallows all crawling |
 | Legacy inventory | DONE | `legacy:inventory` ran against `meyo5199_th` via SELECT-only `legacy_wp`; reports are in `docs/generated/` |
