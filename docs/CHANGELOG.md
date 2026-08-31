@@ -6,6 +6,7 @@
 - Ran the first 10-restaurant web-research pilot on preproduction. All restaurant writes were safely refused: confirmed/potential closures and conflicting evidence were retained in the review queue, with the complete internal CSV audit.
 - Added field-level web-evidence confidence and `--retry-insufficient`, preserving the previous status in the comparative CSV so incomplete records can be revisited under improved search rules without advancing the batch cursor.
 - Revisited the 43 insufficient batch records under the field-specific confidence policy: six placeholder descriptions were safely replaced from exact, recently crawled local pages; 37 records remain unchanged with explicit low-confidence reasons.
+- Fixed web-enrichment CSV snapshots: persisted description before/after values and the applied flag now agree with the database, with regression coverage for the generated CSV.
 
 - Added resumable restaurant web-enrichment checkpoints, CSV batch reports, conservative source matching and strict write guards for missing hours and placeholder descriptions. Closure/radiation signals are retained only for human review; an optional official Google Places adapter is disabled until credentials and budget are approved.
 
