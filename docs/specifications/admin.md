@@ -32,4 +32,4 @@ Les secrets restent dans `.env`; les réglages V2 ne contiennent que des valeurs
 
 ## Non-régression
 
-Les sauvegardes Filament sont couvertes par une vérification de conservation : modifier uniquement un champ éditorial d'une fiche sentinelle ne doit ni synchroniser à vide ni supprimer médias, catégories, services, géographie, avis ou horaires. Un test navigateur admin supplémentaire peut être activé uniquement avec un compte de test provisoire explicitement provisionné ; aucun compte humain n'est une fixture.
+Les sauvegardes Filament sont couvertes par une vérification de conservation : modifier uniquement un champ éditorial d'une fiche sentinelle ne doit ni synchroniser à vide ni supprimer médias, catégories, services, géographie, avis ou horaires. Une fiche `pending`, y compris une proposition sans `legacy_wp_id`, possède une prévisualisation front signée et `noindex,nofollow`. Un test navigateur admin supplémentaire peut être activé uniquement avec un compte de test provisoire explicitement provisionné ; aucun compte humain n'est une fixture.

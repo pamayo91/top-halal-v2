@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class AdminBackOfficeTest extends TestCase
@@ -51,6 +52,15 @@ class AdminBackOfficeTest extends TestCase
 
         $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")->assertOk()->assertSee('Photos de la fiche')->assertSee(route('media.show', [$asset, 480]), false);
         $this->get(route('restaurants.preview', $restaurant->legacy_wp_id))->assertOk()->assertSee($restaurant->name)->assertSee('Restaurant halal')->assertSee('noindex,nofollow', false);
+    }
+
+    public function test_pending_restaurant_without_a_legacy_id_has_a_signed_front_preview(): void
+    {
+        $restaurant = Restaurant::create(['name' => 'Nouvelle proposition', 'slug' => 'nouvelle-proposition', 'status' => 'pending']);
+        $url = URL::temporarySignedRoute('restaurants.preview.pending', now()->addDay(), ['restaurant' => $restaurant]);
+
+        $this->get($url)->assertOk()->assertSee($restaurant->name)->assertSee('noindex,nofollow', false);
+        $this->get('/_preview/restaurant/v2/'.$restaurant->id)->assertForbidden();
     }
 
     public function test_admin_panel_exposes_all_operational_modules_and_legacy_back_office_is_gone(): void

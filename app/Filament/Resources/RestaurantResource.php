@@ -18,6 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\URL;
 
 class RestaurantResource extends AdminResource
 {
@@ -107,9 +108,11 @@ class RestaurantResource extends AdminResource
             ->label('Prévisualiser')
             ->icon('heroicon-o-eye')
             ->color('gray')
-            ->url(fn (Restaurant $restaurant): string => route('restaurants.preview', $restaurant->legacy_wp_id))
+            ->url(fn (Restaurant $restaurant): string => $restaurant->legacy_wp_id !== null
+                ? route('restaurants.preview', $restaurant->legacy_wp_id)
+                : URL::temporarySignedRoute('restaurants.preview.pending', now()->addDays(7), ['restaurant' => $restaurant]))
             ->openUrlInNewTab()
-            ->visible(fn (Restaurant $restaurant): bool => $restaurant->status === 'pending' && $restaurant->legacy_wp_id !== null);
+            ->visible(fn (Restaurant $restaurant): bool => ! $restaurant->trashed() && $restaurant->status === 'pending');
     }
 
     public static function form(Schema $schema): Schema

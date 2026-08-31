@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use App\Models\Article;
 use App\Models\Comment;
 use App\Models\Page;
@@ -53,6 +54,12 @@ Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
     $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true]);
 })->name('restaurants.preview');
+Route::get('/_preview/restaurant/v2/{restaurant}', function (Restaurant $restaurant) {
+    abort_unless($restaurant->status === 'pending', 404);
+    $restaurant->load(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants']);
+    $reviews = $restaurant->reviews()->where('status', 'approved')->orderBy('created_at')->get();
+    return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true]);
+})->middleware('signed')->name('restaurants.preview.pending');
 Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');
 
 // The former Blade back-office has been removed. Keep its reserved prefix

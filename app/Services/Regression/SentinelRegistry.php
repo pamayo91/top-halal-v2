@@ -5,6 +5,7 @@ namespace App\Services\Regression;
 use App\Models\{Article, Page, RedirectRule, RegressionSentinel, Restaurant};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\{DB, Storage};
+use Illuminate\Support\Facades\URL;
 
 class SentinelRegistry
 {
@@ -32,6 +33,7 @@ class SentinelRegistry
         $this->addRestaurant($sentinels, 'restaurant.reviews', (clone $restaurant())->has('reviews')->orderByDesc('id')->first());
         $this->addRestaurant($sentinels, 'restaurant.structured_address', (clone $restaurant())->whereNotNull('address_line1')->whereNotNull('city_code')->whereNotNull('latitude')->whereNotNull('longitude')->orderByDesc('id')->first());
         $this->addRestaurant($sentinels, 'restaurant.o_sha', (clone $restaurant())->whereRaw('LOWER(name) = ?', ['o sha'])->first());
+        $this->addRestaurant($sentinels, 'restaurant.pending_preview', Restaurant::query()->where('status', 'pending')->latest('id')->first(), false);
 
         $this->addArticle($sentinels, 'article.featured_media', Article::query()->where('status', 'published')->whereHas('featuredMedia.asset')->orderByDesc('id')->first());
         $this->addArticle($sentinels, 'article.inline_media', Article::query()->where('status', 'published')->whereHas('contentMedia.asset', fn (Builder $query) => $query->where('role', 'inline'))->orderByDesc('id')->first());
@@ -53,14 +55,15 @@ class SentinelRegistry
     }
 
     /** @param array<string, array{subject_type: string, subject_id: int|null, route_path: string|null, baseline: array<string, mixed>}> $sentinels */
-    private function addRestaurant(array &$sentinels, string $key, ?Restaurant $restaurant): void
+    private function addRestaurant(array &$sentinels, string $key, ?Restaurant $restaurant, bool $public = true): void
     {
         if (! $restaurant) {
             return;
         }
 
         $restaurant->load(['media.asset.variants', 'categories', 'features', 'locations', 'reviews', 'openingHours']);
-        $sentinels[$key] = ['subject_type' => 'restaurant', 'subject_id' => $restaurant->id, 'route_path' => '/resto/'.$restaurant->slug, 'baseline' => [
+        $routePath = $public ? '/resto/'.$restaurant->slug : null;
+        $sentinels[$key] = ['subject_type' => 'restaurant', 'subject_id' => $restaurant->id, 'route_path' => $routePath, 'baseline' => [
             'id' => $restaurant->id,
             'legacy_wp_id' => $restaurant->legacy_wp_id,
             'slug' => $restaurant->slug,
@@ -141,7 +144,11 @@ class SentinelRegistry
         }
 
         foreach ($sentinels->where('key', '!=', 'database.counts') as $sentinel) {
-            if ($sentinel->route_path) $urls[$sentinel->key] = $sentinel->route_path;
+            if ($sentinel->key === 'restaurant.pending_preview' && $sentinel->subject_id) {
+                $urls[$sentinel->key] = URL::temporarySignedRoute('restaurants.preview.pending', now()->addDays(1), ['restaurant' => $sentinel->subject_id]);
+            } elseif ($sentinel->route_path) {
+                $urls[$sentinel->key] = $sentinel->route_path;
+            }
             $this->verifySentinel($sentinel, $errors, $mediaUrls);
         }
 

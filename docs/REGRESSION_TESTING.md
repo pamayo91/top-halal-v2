@@ -10,7 +10,7 @@ Elle détecte les pertes silencieuses de relations, de médias ou de comptes, le
 
 La table privée `regression_sentinels` conserve uniquement les identifiants techniques V2/legacy sûrs, slugs, chemins V2, relations et compteurs approuvés. Elle ne contient ni adresse e-mail, ni mot de passe, ni URL sortante privée.
 
-`regression:sentinels` sélectionne des données migrées réelles et représentatives : galerie, photo unique si disponible, fiche sans photo, catégories, services, avis, adresse/GPS structurés, article avec image à la une, média inline si disponible, article sans image, page éditoriale et redirection exacte. Les catégories sans donnée disponible restent explicitement absentes du registre plutôt que d'être remplacées par une fausse donnée de test.
+`regression:sentinels` sélectionne des données migrées réelles et représentatives : galerie, photo unique si disponible, fiche sans photo, catégories, services, avis, adresse/GPS structurés, prévisualisation signée d'une fiche `pending`, article avec image à la une, média inline si disponible, article sans image, page éditoriale et redirection exacte. Les catégories sans donnée disponible restent explicitement absentes du registre plutôt que d'être remplacées par une fausse donnée de test.
 
 Les relations de chaque sentinelle sont comparées exactement : médias/asset/variantes, catégories, services, géographie, avis, horaires, taxonomies éditoriales, adresse et GPS. Les volumes globaux ont un seuil minimal : une addition légitime est acceptée, une baisse exige une investigation et une mise à jour volontaire du baseline.
 
