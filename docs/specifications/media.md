@@ -35,3 +35,7 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - Pilote explicitement relié aux contenus/listing déjà migrés, appliqué deux fois sans doublon.
 - Original et variantes V2 vérifiés par tests PHP et navigateur desktop/mobile, sans requête `wp-content` ni erreur console/réseau.
 - Spécification, mapping, statut et changelog mis à jour.
+
+## Non-régression permanente
+
+Les médias des sentinelles V2 sont vérifiés avant chaque DONE fonctionnel : relation métier → `media_asset`, original dans le stockage V2, variantes attendues et réponse HTTP image utilisable. Toute réapparition de `wp-content` ou `wp-contenu`, perte de fichier, de variante ou de relation bloque la validation préproduction ; le correctif doit viser la cause racine, jamais une recréation artificielle de données.

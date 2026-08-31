@@ -57,6 +57,14 @@ Every completed feature requires appropriate automated tests.
 - If an E2E/browser test finds a defect, diagnose, fix, redeploy and rerun the failing flow before marking complete.
 - Run targeted tests during development; run the full relevant suite before completing a milestone.
 
+## NON-REGRESSION GATE
+- For every significant functional change, run targeted tests during development and the complete regression suite before marking the work DONE.
+- `composer test:regression` is the mandatory preproduction gate. It verifies PHP sentinel coverage, database integrity, V2 media/storage, Playwright public sentinels, HTTP 500s, browser console/network failures and Laravel exceptions generated during the run.
+- A new HTTP 500, lost media, unexpected lost relationship, unexpected count decrease, failed Playwright regression or new Laravel exception blocks DONE.
+- Never repair data artificially, rerun a global migration, recreate relations/media, or change a valid fixture merely to make a regression test pass. Diagnose and correct the root cause in code first; restore data only afterwards when necessary.
+- The regression suite protects the existing application as well as the changed feature. It is never optional because a change appears isolated.
+- After a root-cause correction, rerun the complete regression suite. Inspect the complete Git diff before every functional commit; explain any unrelated or large change and verify that no secret, `.env`, or unintended deletion is staged.
+
 ## Documentation rules
 Documentation is part of the deliverable.
 Before changing behavior, read only the relevant spec under `docs/specifications/` plus `docs/PROJECT.md` and `docs/STATUS.md` as needed.

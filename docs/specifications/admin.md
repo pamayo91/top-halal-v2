@@ -29,3 +29,7 @@ Les listes affichent les dates métier pertinentes en format français : publica
 - `admin`: accès complet au back-office.
 
 Les secrets restent dans `.env`; les réglages V2 ne contiennent que des valeurs non sensibles. La liste des restaurants sépare explicitement les onglets « Restaurants » et « Corbeille ». L’action « Supprimer » de la liste active, des actions en masse ou de la fiche place celle-ci dans la Corbeille (soft delete), la retire des parcours publics et laisse une trace d’audit. Seul l’onglet Corbeille permet de restaurer, supprimer définitivement une ou plusieurs fiches, ou vider toute la Corbeille après confirmation explicite ; ces suppressions sont irréversibles et auditées. Les taxonomies associées à des restaurants ne peuvent pas être supprimées.
+
+## Non-régression
+
+Les sauvegardes Filament sont couvertes par une vérification de conservation : modifier uniquement un champ éditorial d'une fiche sentinelle ne doit ni synchroniser à vide ni supprimer médias, catégories, services, géographie, avis ou horaires. Un test navigateur admin supplémentaire peut être activé uniquement avec un compte de test provisoire explicitement provisionné ; aucun compte humain n'est une fixture.

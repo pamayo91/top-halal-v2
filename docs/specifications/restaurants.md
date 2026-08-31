@@ -42,3 +42,7 @@ A valid proposal creates a normal `restaurants` record with `status=pending`, ne
 Le panneau SEO permet de sélectionner les directives `robots` actives (`all`, `noindex`, `nofollow`, `none`, `nosnippet`, `indexifembedded`, `noimageindex`, `notranslate`) et de paramétrer les valeurs qui nécessitent un argument : longueur d’extrait, aperçu image, aperçu vidéo et date `unavailable_after`. Les directives sont rendues dans la balise `meta name="robots"` de la fiche ; une fiche `noindex` ou `none` est exclue du sitemap.
 
 Le titre par défaut d’une fiche publiée est `Restaurant {nom} Halal à {ville} spécialité {première spécialité}`, sans suffixe de marque. La première spécialité est déterminée par ordre alphabétique pour un résultat stable. Une valeur renseignée dans `seo_title` remplace intégralement ce titre généré.
+
+## Non-régression
+
+Une modification sans rapport dans Filament doit préserver les relations existantes de la fiche : médias, catégories, services, zones, avis, horaires et adresse/GPS. Le registre V2 de sentinelles compare ces relations exactement sur préproduction et bloque toute perte inattendue.

@@ -1,5 +1,10 @@
 # Architectural & Product Decisions
 
+## 2026-08-31
+
+### D019 — Non-regression gate
+Significant functional work is not DONE until the complete V2 non-regression suite passes on preproduction. The baseline is held in the V2 database, is refreshed only deliberately after a reviewed legitimate data change, and never uses WordPress as a runtime dependency. Count decreases, lost relations/media, HTTP 500s, browser failures and new Laravel exceptions are release blockers.
+
 ## 2026-08-24
 
 ### D001 — Leave WordPress entirely
