@@ -137,3 +137,4 @@
 - Ajout de l’audit de recherche web des enrichissements restaurants : nombre de recherches, requêtes et sources rejetées, exportés dans le CSV interne.
 - Ajout de `restaurants:web-enrich --ids=…` pour reprendre exactement des checkpoints non continus sans sélectionner un nouveau batch.
 - Reprise préproduction du lot existant de 98 restaurants : écritures limitées aux descriptions éligibles et aux horaires absents; les alertes de fermeture restent en revue humaine.
+- Clôture du batch web-enrichment réservé des restaurants 172 à 271 et génération de son rapport CSV consolidé privé.
