@@ -22,6 +22,13 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - Les réponses ont un type MIME exact, `X-Content-Type-Options: nosniff` et un cache immuable. Les images sous le pli sont `loading=lazy`; l’image LCP ne l’est pas.
 - Les PDF, vidéos, HEIC et GIF ne sont pas convertis automatiquement. Ils restent traçables dans l’audit et ne sont exposés qu’après une décision produit dédiée.
 
+## Réparation post-migration des relations restaurant
+
+- `data:repair-restaurant-media-links` est une réparation strictement V2 : elle ne lit ni la connexion ni les fichiers legacy.
+- Par défaut, la commande produit seulement un audit. `--apply` associe une relation `restaurant_media` sans `media_asset_id` à l’unique `media_assets` ayant le même `legacy_attachment_id`.
+- Une relation déjà associée au même asset pour le même restaurant est conservée et signalée comme conflit ; aucun doublon ou remplacement n’est forcé.
+- La commande est idempotente et écrit ses rapports JSON/Markdown dans `docs/generated/restaurant-media-link-repair.*`.
+
 ## Critères de fin de phase
 
 - Audit préproduction exécuté et archivé.
