@@ -34,6 +34,12 @@
 9. Run health check and targeted smoke/E2E tests against the preproduction URL.
 10. If validation fails, stop and fix before considering deployment complete.
 
+## Frontend build and test safety
+
+The preproduction SSH environment has no Node.js executable in PATH. After the Git deployment, build Vite assets with the approved workstation runtime and copy only the resulting `public/build/` artifacts to the exact preproduction `public/build/` directory; do not copy source files or secrets.
+
+Before running `artisan test` on preproduction, run `artisan optimize:clear` first so PHPUnit’s SQLite testing configuration is not shadowed by the cached preproduction configuration. Recreate the configuration, route and view caches after the test run. Never run database-migrating tests against a cached preproduction configuration.
+
 ## SEO structural deployment addition
 After approval to deploy this release to preproduction, run the explicit PHP 8.4 Artisan commands in this order: `migrate --force`, `redirects:import-htaccess`, `redirects:audit`, then application cache commands. Do not move content redirects back to Apache; only preserve the existing host/HTTPS rules. Validate representative exact, regex and query redirects plus sitemap, robots, 404 and a restaurant aggregate-rating page in Playwright before promotion.
 
