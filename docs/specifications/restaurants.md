@@ -25,3 +25,6 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 
 ## Admin/owner
 Create/edit/moderate records, media, hours, categories/features and ownership/claims with clear auditability.
+
+## SEO par fiche
+Le panneau SEO permet de sélectionner les directives `robots` actives (`all`, `noindex`, `nofollow`, `none`, `nosnippet`, `indexifembedded`, `noimageindex`, `notranslate`) et de paramétrer les valeurs qui nécessitent un argument : longueur d’extrait, aperçu image, aperçu vidéo et date `unavailable_after`. Les directives sont rendues dans la balise `meta name="robots"` de la fiche ; une fiche `noindex` ou `none` est exclue du sitemap.

@@ -1,6 +1,6 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-08-30
+Last updated: 2026-08-31
 
 | Area | Status | Notes |
 |---|---|---|
@@ -47,7 +47,7 @@ Last updated: 2026-08-30
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |
 | Automated news workflow | TODO | Disclosure configurable |
-| SEO structural / routes | DONE | Canonical routes, slash policy, sitemap, environment-aware robots, 404/410, breadcrumbs, JSON-LD and facet policy validated on preproduction. Nine approved technical/duplicate non-restaurant URLs are now redirected and excluded; `/blog` and `/mon-compte` are retained. Final visual design remains out of scope. |
+| SEO structural / routes | DONE | Canonical routes, slash policy, sitemap, environment-aware robots, 404/410, breadcrumbs, JSON-LD and facet policy validated on preproduction. Les fiches restaurant ont désormais des directives meta robots complètes et paramétrables ; les fiches noindex/none sont exclues du sitemap. Nine approved technical/duplicate non-restaurant URLs are now redirected and excluded; `/blog` and `/mon-compte` are retained. Final visual design remains out of scope. |
 | Playwright E2E | DONE | HTTPS preprod smoke passes on desktop/mobile for homepage, `/health`, 404, noindex, robots, cookies and sensitive paths |
 | Public exposure checks | DONE | `/`, `/health`, 404 and sensitive paths checked; `.env`, `composer.json`, `artisan`, `storage/`, `vendor/`, `.git/` are not publicly readable |
 | Preproduction indexing protection | DONE | `X-Robots-Tag: noindex, nofollow` is active and `robots.txt` disallows all crawling |

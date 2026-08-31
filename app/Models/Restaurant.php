@@ -25,6 +25,7 @@ class Restaurant extends Model
             'manually_verified_at' => 'datetime',
             'legacy_published_at' => 'datetime',
             'legacy_modified_at' => 'datetime',
+            'seo_unavailable_after' => 'datetime',
         ];
     }
 

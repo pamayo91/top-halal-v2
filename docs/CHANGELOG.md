@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-31
+
+- Ajout des directives SEO `meta robots` configurables par fiche restaurant, avec options Google actives, limites d’extraits/aperçus et date d’expiration ; les fiches `noindex` ou `none` sont retirées du sitemap.
+
 ## 2026-08-30
 
 - Changed restaurant web enrichment to a Codex-researched workflow: Laravel reserves checkpoints and validates/applies structured evidence, while normal web navigation supplies the sources. No API key is required for normal batches.

@@ -7,8 +7,9 @@ use App\Models\{Category, Feature, Location, Restaurant};
 use App\Services\AdminAudit;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\DuplicateRestaurantDetector;
+use App\Support\RobotsMeta;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
-use Filament\Forms\Components\{Hidden, MarkdownEditor, Select, Textarea, TextInput};
+use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Select, Textarea, TextInput};
 use Filament\Schemas\Components\{Section, Tabs, View};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\{ImageColumn, TextColumn};
@@ -157,7 +158,15 @@ class RestaurantResource extends AdminResource
             ])]),
             Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255)])]),
             Tabs\Tab::make('Médias')->schema([Section::make('Photos de la fiche')->schema([View::make('filament.restaurant-media')])]),
-            Tabs\Tab::make('SEO')->schema([Section::make()->schema([TextInput::make('seo_title')->maxLength(255), Textarea::make('seo_description')->rows(3)->maxLength(500)])]),
+            Tabs\Tab::make('SEO')->schema([Section::make()->columns(2)->schema([
+                TextInput::make('seo_title')->maxLength(255),
+                Textarea::make('seo_description')->rows(3)->maxLength(500),
+                Select::make('seo_robots')->label('Méta robots')->options(RobotsMeta::DIRECTIVE_OPTIONS)->multiple()->searchable()->helperText('Laissez vide pour index, follow. « Indexer uniquement si intégré » ne s’applique qu’avec « Ne pas indexer ».')->formatStateUsing(fn (?string $state): array => RobotsMeta::normalize($state))->dehydrateStateUsing(fn (?array $state): ?string => ($directives = RobotsMeta::normalize(implode(',', $state ?? []))) === [] ? null : implode(',', $directives))->columnSpanFull(),
+                TextInput::make('seo_max_snippet')->label('Longueur maximale de l’extrait')->integer()->minValue(-1)->helperText('-1 : sans limite ; 0 : aucun extrait.'),
+                Select::make('seo_max_image_preview')->label('Aperçu image maximal')->options(['none' => 'Aucun', 'standard' => 'Standard', 'large' => 'Grand']),
+                TextInput::make('seo_max_video_preview')->label('Durée maximale d’aperçu vidéo (secondes)')->integer()->minValue(-1)->helperText('-1 : sans limite ; 0 : aucune vidéo.'),
+                DateTimePicker::make('seo_unavailable_after')->label('Retirer des résultats après')->seconds(false)->helperText('La fiche ne sera plus affichée par les moteurs après cette date.'),
+            ])]),
             Tabs\Tab::make('Système')->schema([Section::make('Identifiants et historique')->columns(2)->schema([
                 TextInput::make('legacy_wp_id')->disabled()->dehydrated(false)->label('ID WordPress'), TextInput::make('legacy_modified_at')->disabled()->dehydrated(false)->label('Dernière modification legacy'),
             ])->visibleOn('edit')]),
