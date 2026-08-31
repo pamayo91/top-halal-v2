@@ -31,8 +31,18 @@ class PublicFrontendTest extends TestCase
 
     public function test_restaurant_title_is_not_double_encoded(): void
     {
-        Restaurant::create(['legacy_wp_id' => 413, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published']);
-        $this->get('/resto/adams-burger')->assertOk()->assertSee('<title>Adam&#039;s Burger | Top Halal</title>', false)->assertDontSee('Adam&amp;#039;s Burger', false);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 413, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published', 'city_name' => 'Lyon']);
+        $category = Category::create(['legacy_term_id' => 413, 'name' => 'Marocain', 'slug' => 'marocain']);
+        $restaurant->categories()->attach($category);
+
+        $this->get('/resto/adams-burger')->assertOk()->assertSee('<title>Restaurant Adam&#039;s Burger Halal à Lyon spécialité Marocain</title>', false)->assertDontSee('Top Halal</title>', false)->assertDontSee('Adam&amp;#039;s Burger', false);
+    }
+
+    public function test_manual_restaurant_seo_title_overrides_the_default(): void
+    {
+        Restaurant::create(['legacy_wp_id' => 426, 'name' => 'Titre test', 'slug' => 'titre-test', 'status' => 'published', 'seo_title' => 'Titre personnalisé']);
+
+        $this->get('/resto/titre-test')->assertOk()->assertSee('<title>Titre personnalisé</title>', false);
     }
 
     public function test_every_dynamic_public_page_title_is_escaped_once(): void

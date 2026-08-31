@@ -159,7 +159,7 @@ class RestaurantResource extends AdminResource
             Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255)])]),
             Tabs\Tab::make('Médias')->schema([Section::make('Photos de la fiche')->schema([View::make('filament.restaurant-media')])]),
             Tabs\Tab::make('SEO')->schema([Section::make()->columns(2)->schema([
-                TextInput::make('seo_title')->maxLength(255),
+                TextInput::make('seo_title')->label('Titre SEO')->maxLength(255)->helperText('Laissez vide pour générer : Restaurant Nom Halal à Ville spécialité Première spécialité.'),
                 Textarea::make('seo_description')->rows(3)->maxLength(500),
                 Select::make('seo_robots')->label('Méta robots')->options(RobotsMeta::DIRECTIVE_OPTIONS)->multiple()->searchable()->helperText('Laissez vide pour index, follow. « Indexer uniquement si intégré » ne s’applique qu’avec « Ne pas indexer ».')->formatStateUsing(fn (string|array|null $state): array => is_array($state) ? $state : RobotsMeta::normalize($state))->dehydrateStateUsing(fn (array|string|null $state): ?string => ($directives = RobotsMeta::normalize(implode(',', is_array($state) ? $state : [$state ?? '']))) === [] ? null : implode(',', $directives))->columnSpanFull(),
                 TextInput::make('seo_max_snippet')->label('Longueur maximale de l’extrait')->integer()->minValue(-1)->helperText('-1 : sans limite ; 0 : aucun extrait.'),

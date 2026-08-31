@@ -2,6 +2,7 @@
 
 ## 2026-08-31
 
+- Les titres SEO des restaurants sont maintenant générés par défaut sans suffixe de marque : nom, ville et première spécialité ; un titre SEO renseigné manuellement garde priorité.
 - Ajout des directives SEO `meta robots` configurables par fiche restaurant, avec options Google actives, limites d’extraits/aperçus et date d’expiration ; les fiches `noindex` ou `none` sont retirées du sitemap.
 
 ## 2026-08-30

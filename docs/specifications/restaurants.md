@@ -28,3 +28,5 @@ Create/edit/moderate records, media, hours, categories/features and ownership/cl
 
 ## SEO par fiche
 Le panneau SEO permet de sélectionner les directives `robots` actives (`all`, `noindex`, `nofollow`, `none`, `nosnippet`, `indexifembedded`, `noimageindex`, `notranslate`) et de paramétrer les valeurs qui nécessitent un argument : longueur d’extrait, aperçu image, aperçu vidéo et date `unavailable_after`. Les directives sont rendues dans la balise `meta name="robots"` de la fiche ; une fiche `noindex` ou `none` est exclue du sitemap.
+
+Le titre par défaut d’une fiche publiée est `Restaurant {nom} Halal à {ville} spécialité {première spécialité}`, sans suffixe de marque. La première spécialité est déterminée par ordre alphabétique pour un résultat stable. Une valeur renseignée dans `seo_title` remplace intégralement ce titre généré.
