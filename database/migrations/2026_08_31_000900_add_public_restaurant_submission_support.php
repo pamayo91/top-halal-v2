@@ -56,19 +56,23 @@ return new class extends Migration
     {
         Schema::dropIfExists('restaurant_submissions');
 
-        Schema::table('restaurant_media', function (Blueprint $table): void {
+        $canRestoreLegacyMediaConstraint = ! DB::table('restaurant_media')->whereNull('legacy_attachment_id')->exists();
+        $canRestoreLegacyRestaurantConstraint = ! DB::table('restaurants')->whereNull('legacy_wp_id')->exists();
+
+        Schema::table('restaurant_media', function (Blueprint $table) use ($canRestoreLegacyMediaConstraint): void {
             $table->dropUnique('restaurant_media_asset_unique');
             $table->dropConstrainedForeignId('media_asset_id');
-            $table->unsignedBigInteger('legacy_attachment_id')->nullable(false)->change();
+            // Do not make a rollback destructive when a public V2 upload exists.
+            if ($canRestoreLegacyMediaConstraint) $table->unsignedBigInteger('legacy_attachment_id')->nullable(false)->change();
         });
 
         Schema::table('restaurant_opening_hours', function (Blueprint $table): void {
             $table->dropColumn(['slot', 'is_open_24_hours']);
         });
 
-        Schema::table('restaurants', function (Blueprint $table): void {
+        Schema::table('restaurants', function (Blueprint $table) use ($canRestoreLegacyRestaurantConstraint): void {
             $table->dropColumn(['has_halal_meat', 'has_halal_chicken']);
-            $table->unsignedBigInteger('legacy_wp_id')->nullable(false)->change();
+            if ($canRestoreLegacyRestaurantConstraint) $table->unsignedBigInteger('legacy_wp_id')->nullable(false)->change();
         });
     }
 };
