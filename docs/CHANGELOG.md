@@ -5,6 +5,7 @@
 - Added the permanent V2 non-regression gate: approved database sentinels, media/storage and relation verification, protected minimum counts, dedicated Playwright HTTP/browser regression checks, and Laravel error-log validation for the preproduction run.
 - Validated the gate on preproduction: 13 real V2 sentinels, 3 PHP regression tests and 98 desktop/mobile Playwright checks pass; no lost relation/media, HTTP 500, browser failure or new Laravel exception was found.
 - Restored the pending-restaurant preview action for V2 proposals without a legacy ID. It now uses a temporary signed `noindex,nofollow` front URL and is included in the regression sentinels.
+- Fixed the pending preview rendering and route-cache deployment gap discovered by its new test. Preproduction now clears its route cache on route changes; the validation passes with 17 PHP checks and 108 Playwright checks.
 
 - Correction de la migration d’utilisateurs legacy : les comptes WordPress `administrator` conservent désormais le rôle V2 `admin`, sans abaisser un rôle V2 existant lors d’une reprise.
 - Sécurisation du bootstrap PHPUnit : les tests refusent désormais de démarrer hors environnement `testing` avec SQLite, afin qu’un cache de configuration de préproduction ne puisse jamais orienter des migrations de test vers MariaDB.
