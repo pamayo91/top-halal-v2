@@ -20,6 +20,7 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - Les images raster reçoivent des variantes WebP 480, 960 et 1440 px, sans agrandissement. Les dimensions intrinsèques sont conservées pour réserver l’espace et éviter le CLS.
 - Une largeur demandée qui n’existe pas répond 404; elle ne retombe jamais silencieusement sur un original avec un type MIME erroné.
 - Les réponses ont un type MIME exact, `X-Content-Type-Options: nosniff` et un cache immuable. Les URL publiques intègrent le checksum SHA-256 de l’asset : chaque entrée de cache est donc liée à un contenu déterministe. Les anciennes URL numériques sont redirigées vers cette URL canonique. Les images sous le pli sont `loading=lazy`; l’image LCP ne l’est pas.
+- `media:version-content-urls --dry-run|--apply` met à niveau les URL numériques encore présentes dans les HTML éditoriaux V2, sans aucune lecture legacy. La commande est idempotente, conserve les URL vers un asset introuvable et les signale dans son rapport JSON/Markdown.
 - Les PDF, vidéos, HEIC et GIF ne sont pas convertis automatiquement. Ils restent traçables dans l’audit et ne sont exposés qu’après une décision produit dédiée.
 
 ## Réparation post-migration des relations restaurant
