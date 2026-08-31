@@ -132,3 +132,8 @@
 - Ajout d’un service réutilisable de suggestions et de sélection d’adresse via l’abstraction Géoplateforme, avec cache fournisseur existant, minimum trois caractères et endpoint Laravel protégé/limité.
 - Refonte de la localisation Filament : adresse historique consultable, adresse administrative structurée, qualité non éditable, carte Leaflet chargée à la demande et coordonnées protégées de la saisie brute.
 - Les corrections manuelles de marqueur, les sélections et les entrées manuelles conservent la provenance, recalculent le statut de proximité et sont tracées dans l’audit existant. Les zones Geography et les doublons ne sont jamais modifiés automatiquement.
+## 2026-08-31
+
+- Ajout de l’audit de recherche web des enrichissements restaurants : nombre de recherches, requêtes et sources rejetées, exportés dans le CSV interne.
+- Ajout de `restaurants:web-enrich --ids=…` pour reprendre exactement des checkpoints non continus sans sélectionner un nouveau batch.
+- Reprise préproduction du lot existant de 98 restaurants : écritures limitées aux descriptions éligibles et aux horaires absents; les alertes de fermeture restent en revue humaine.
