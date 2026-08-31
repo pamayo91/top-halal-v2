@@ -18,6 +18,8 @@ class Restaurant extends Model
     {
         return [
             'is_claimed' => 'boolean',
+            'has_halal_meat' => 'boolean',
+            'has_halal_chicken' => 'boolean',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'geocoding_score' => 'decimal:6',
