@@ -2,6 +2,7 @@
 
 ## 2026-08-31
 
+- Sécurisation du bootstrap PHPUnit : les tests refusent désormais de démarrer hors environnement `testing` avec SQLite, afin qu’un cache de configuration de préproduction ne puisse jamais orienter des migrations de test vers MariaDB.
 - Ajout du parcours public non indexable « Ajouter un restaurant » : formulaire Blade SSR en cinq étapes, sans compte, avec progression, panneau desktop et ergonomie mobile. Les propositions créent exclusivement une fiche `pending` et un contexte déposant privé ; elles ne sont jamais publiées automatiquement.
 - Réutilisation de la Géoplateforme pour l’adresse structurée, le code INSEE, le GPS, la carte à marqueur déplaçable et la détection informative de doublons. Les liens proposés restent des destinations sortantes inactives et n’apparaissent jamais dans le HTML public.
 - Ajout des validations serveur des options halal, horaires, e-mail et fichiers ; une couverture est obligatoire et la galerie est limitée à dix images JPEG/PNG/WebP. Le parcours préproduction complet passe sur desktop et mobile.

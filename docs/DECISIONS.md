@@ -52,3 +52,7 @@ Le flux normal de l’enrichissement est la recherche/navigation web interactive
 ### D015 — Propositions publiques créées directement en attente
 
 Une proposition publique crée une fiche `restaurants` standard en statut `pending`, afin qu’elle utilise le même circuit de modération que les autres fiches, sans jamais devenir visible publiquement. Son e-mail de suivi et son lien avec l’établissement vivent dans `restaurant_submissions`, séparés des coordonnées publiques du restaurant. Les URLs proposées restent des destinations sortantes inactives, sans exposition HTML/JSON-LD avant validation humaine.
+
+### D016 — Tests refusés hors configuration SQLite
+
+La base de tests doit obligatoirement être SQLite. Le bootstrap `tests/TestCase.php` échoue avant toute migration si l’environnement ou la connexion active ne correspond pas à la configuration de PHPUnit ; un cache de configuration de préproduction ne peut donc plus faire exécuter des tests migratoires sur MariaDB.
