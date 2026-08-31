@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $remotePhp = '/opt/alt/php84/usr/bin/php'
-$phpTests = & ssh $PreprodHost "cd $PreprodPath && $remotePhp artisan config:clear && $remotePhp artisan test --filter=Regression; $status=`$?; $remotePhp artisan config:cache; exit `$status"
+$phpTests = & ssh $PreprodHost "cd $PreprodPath && $remotePhp artisan config:clear && $remotePhp artisan test --filter=Regression; `$testStatus=`$?; $remotePhp artisan config:cache; exit `$testStatus"
 if ($LASTEXITCODE -ne 0) {
     if ($phpTests) { Write-Error $phpTests }
     exit $LASTEXITCODE
