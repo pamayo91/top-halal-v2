@@ -25,7 +25,14 @@ if ($sentinelPayload.errors.Count -gt 0) {
 $since = & ssh $PreprodHost "date -u +%Y-%m-%dT%H:%M:%SZ"
 $env:PREPROD_BASE_URL = $BaseUrl
 $env:REGRESSION_SENTINELS_JSON = $sentinels
-& npx playwright test tests/e2e/regression
+$node = Get-Command node -ErrorAction SilentlyContinue
+if (-not $node) {
+    $bundledNode = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe'
+    if (-not (Test-Path $bundledNode)) { throw 'Node.js is required to run Playwright. Install Node.js or set it on PATH.' }
+    $env:PATH = "$(Split-Path $bundledNode -Parent);$env:PATH"
+}
+$playwright = Join-Path $PSScriptRoot '..\node_modules\.bin\playwright.cmd'
+& $playwright test tests/e2e/regression
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $final = & ssh $PreprodHost "cd $PreprodPath && $remotePhp artisan regression:verify --json"

@@ -13,7 +13,10 @@ for (const [key, path] of Object.entries(sentinels.urls)) {
     const consoleErrors: string[] = [];
     const networkFailures: string[] = [];
     const legacyRequests: string[] = [];
-    page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+    page.on('console', message => {
+      const expectedNotFound = key === 'not_found' && /Failed to load resource:.*404/i.test(message.text());
+      if (message.type() === 'error' && !expectedNotFound) consoleErrors.push(message.text());
+    });
     page.on('requestfailed', request => networkFailures.push(`${request.method()} ${request.url()}`));
     page.on('request', request => { if (/wp-conten(?:t|u)/i.test(request.url())) legacyRequests.push(request.url()); });
 
