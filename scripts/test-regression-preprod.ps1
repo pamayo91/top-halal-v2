@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 $remotePhp = '/opt/alt/php84/usr/bin/php'
 $phpTests = & ssh $PreprodHost "cd $PreprodPath && $remotePhp artisan config:clear && $remotePhp artisan route:clear && ($remotePhp artisan test --filter='RegressionSentinelTest|AdminBackOfficeTest' || { $remotePhp artisan config:cache; exit 1; }) && $remotePhp artisan config:cache"
 if ($LASTEXITCODE -ne 0) {
-    if ($phpTests) { Write-Error $phpTests }
+    if ($phpTests) { Write-Error ($phpTests -join [Environment]::NewLine) }
     exit $LASTEXITCODE
 }
 

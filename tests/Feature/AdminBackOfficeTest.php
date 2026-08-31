@@ -50,7 +50,7 @@ class AdminBackOfficeTest extends TestCase
         $asset = MediaAsset::create(['legacy_attachment_id' => 987654321, 'original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('a', 64), 'status' => 'ready']);
         RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'legacy_attachment_id' => $asset->legacy_attachment_id, 'sort_order' => 0, 'status' => 'ready']);
 
-        $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")->assertOk()->assertSee('Photos de la fiche')->assertSee($asset->deliveryUrl(480), false);
+        $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")->assertOk()->assertSee('Photos de la fiche')->assertSee($asset->deliveryUrl(), false);
         $this->get(route('restaurants.preview', $restaurant->legacy_wp_id))->assertOk()->assertSee($restaurant->name)->assertSee('Restaurant halal')->assertSee('noindex,nofollow', false);
     }
 
