@@ -60,8 +60,11 @@ class AddressLineParser
 
         $line = $this->clean($addressLine1);
         $raw = $this->clean($rawAddress);
-        $looksLikeCompleteHistoricalLine = $line !== null && $line === $raw && $postalCode && $cityName
-            && preg_match('/\s+\d{5}\s+.+$/u', $line) === 1;
+        // This is the exact audited cohort: the structured line duplicates the
+        // historical address and has separately stored city/postcode data. A
+        // non-candidate in that cohort must remain visible as ambiguous, even
+        // when its malformed suffix cannot be parsed as a French postcode.
+        $looksLikeCompleteHistoricalLine = $line !== null && $line === $raw && $postalCode && $cityName;
 
         return ['state' => $looksLikeCompleteHistoricalLine ? 'ambiguous' : 'ignored', 'new_line1' => null];
     }
