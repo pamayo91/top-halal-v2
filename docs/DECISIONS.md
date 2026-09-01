@@ -2,6 +2,10 @@
 
 ## 2026-08-31
 
+### D022 — Provider-derived completion for fully missing address structure
+
+When `address_line1`, postcode and city are all missing, Géoplateforme is the authoritative source for their structured replacement and related INSEE/country/provenance fields, provided its result is complete and precise to a street or housenumber. The historical raw address is the query input and remains immutable; existing GPS and geocoding/location statuses are not recomputed by this completion.
+
 ### D021 — Strict address-line repair without arbitration
 
 `address` remains the immutable historical/raw value. `address_line1` is only the number and street, while `postal_code` and `city_name` remain separate. A reusable deterministic parser may remove the suffix when the current line duplicates the raw address and a non-empty street remains. The normal mode requires matching structured postcode/city; a separately opted-in cleanup mode, authorized after manual verification, may remove a visibly final historical `CP + ville` despite a mismatch. It never changes the raw address or structured/GPS fields.

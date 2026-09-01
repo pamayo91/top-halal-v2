@@ -13,6 +13,7 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 - `address_line1` contains only the number and street; `postal_code` and `city_name` are separate fields.
 - `AddressLineParser` is the single deterministic implementation for this split. It removes a suffix only when the raw/structured postcode and city agree strictly and a non-empty street remains.
 - A confirmed cleanup mode may remove an explicit final historical `CP + ville` from `address_line1` even when it conflicts with structured data; it never changes `address`, `postal_code` or `city_name`, and requires a non-empty street before the suffix.
+- When all three structured fields are absent, Géoplateforme may supply `address_line1`, postcode, city, INSEE code, country and provider provenance from the immutable raw address. Existing GPS and qualification/status fields are not changed; incomplete, imprecise or failed provider results remain untouched.
 
 ## Controlled legacy migration
 - The pilot schema uses `restaurants`, `categories`, `features`, hierarchical `locations`, their pivots, `restaurant_opening_hours` and `restaurant_media`.
