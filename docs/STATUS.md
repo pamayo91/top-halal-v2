@@ -5,6 +5,7 @@ Last updated: 2026-09-01
 | Area | Status | Notes |
 |---|---|---|
 | Architecture | DECIDED | Laravel 13 / PHP 8.4 / Apache / MariaDB / no Docker |
+| Restaurations/imports legacy | DECIDED | Toute restauration BDD, reconstruction/réensemencement V2 ou import/réimport legacy exige deux confirmations explicites distinctes du propriétaire dans la conversation courante : cadrage puis feu vert immédiat avant écriture. |
 | Starter documentation | DONE | Initial Codex handoff created |
 | Legacy SQL inventory | BASELINE | Must be reproduced by migration tooling |
 | htaccess redirect inventory | IN PROGRESS | Parser included; application importer not built yet |

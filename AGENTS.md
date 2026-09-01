@@ -97,6 +97,11 @@ Maintain:
 - The WordPress migration is finalized. Do not query, use, or rerun migrations against the legacy WordPress database unless the project owner specifically authorizes a new legacy-data task.
 - For development-only needs, Codex may use a separate provisional admin account when explicitly provisioned; never repurpose or alter the project owner's human administrator account for that purpose.
 
+## Critical data-operation safeguard
+- Never restore a database, rebuild/reseed V2 data, or import/reimport any data from the legacy database without **two distinct explicit confirmations** from the project owner in the current conversation.
+- First present the exact target, scope, source, expected creates/updates/deletes, and rollback/backup plan; the first confirmation authorizes preparation only. Obtain the second confirmation immediately before the irreversible command or write begins.
+- A past authorization, a broad request to "restore" or "import", or silence never counts as either confirmation. Read-only audits remain permitted when otherwise authorized.
+
 ## Git discipline
 - Keep commits small and descriptive.
 - Before committing: inspect `git diff`, run relevant tests, ensure no secret/private file is staged.
