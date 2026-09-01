@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 /** Provider-neutral address suggestions. Tokens deliberately keep provider payload out of the browser. */
 class AddressSuggestionService
 {
-    public function __construct(private GeocodingService $geocoder) {}
+    public function __construct(private GeocodingService $geocoder, private AddressLineParser $lines) {}
 
     /** @return array<int, array{token:string,label:string,feature:array}> */
     public function suggest(string $query, int $limit = 6): array
@@ -45,8 +45,7 @@ class AddressSuggestionService
         $label = trim((string) ($feature['label'] ?? ''));
         $postcode = (string) ($feature['postcode'] ?? '');
         $city = (string) ($feature['city'] ?? '');
-        $suffix = trim($postcode.' '.$city);
-        $line = $suffix !== '' ? trim((string) preg_replace('/\\s*'.preg_quote($suffix, '/').'$/iu', '', $label)) : $label;
+        $line = $this->lines->fromProviderLabel($label, $postcode, $city);
         return [
             'address_line1' => $line ?: null, 'postal_code' => $postcode ?: null, 'city_name' => $city ?: null,
             'city_code' => $feature['citycode'] ?? null, 'country_code' => ($feature['citycode'] ?? null) ? 'FR' : null,

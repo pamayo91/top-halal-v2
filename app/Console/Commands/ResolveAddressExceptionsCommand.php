@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Restaurant;
 use App\Services\Geocoding\GeocodingConfidence;
 use App\Services\Geocoding\GeocodingService;
+use App\Services\Location\AddressLineParser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -13,7 +14,7 @@ class ResolveAddressExceptionsCommand extends Command
 {
     protected $signature = 'data:resolve-address-exceptions {--apply} {--ids= : Comma-separated V2 IDs} {--out=docs/generated/address-exceptions-report.md}';
 
-    public function handle(GeocodingService $geo, GeocodingConfidence $confidence): int
+    public function handle(GeocodingService $geo, GeocodingConfidence $confidence, AddressLineParser $lines): int
     {
         $ids = collect(explode(',', (string) $this->option('ids')))->map(fn ($id) => (int) trim($id))->filter()->all();
         $rows = Restaurant::with('locations')->where(function ($q) {
@@ -33,7 +34,7 @@ class ResolveAddressExceptionsCommand extends Command
             $applied = false;
 
             if ($this->option('apply') && ! $special && $complete && $compatible && in_array($candidate['type'], ['housenumber', 'street'], true)) {
-                $line = $this->structuredLine($r->address, $candidate['label']);
+                $line = $lines->fromHistoricalOrProvider($r->address, $candidate['label'], $candidate['postcode'], $candidate['city']);
                 $fields = [
                     'address_line1' => $r->address_line1 ?: $line,
                     'postal_code' => $r->postal_code ?: $candidate['postcode'],
@@ -78,13 +79,6 @@ class ResolveAddressExceptionsCommand extends Command
         if (str_contains($address, 'morocco') || str_contains($address, 'marrakech')) return 'hors France : Géoplateforme/BAN non appropriée';
         if (str_contains($address, 'monaco') || str_contains($address, 'monte-carlo')) return 'hors France : Monaco, code pays FR interdit';
         return null;
-    }
-
-    private function structuredLine(?string $raw, ?string $label): ?string
-    {
-        $raw = trim((string) strtok((string) $raw, ','));
-        if (preg_match('/^\d+[\p{L}\d\s\-' . "'" . ']+$/u', $raw)) return $raw;
-        return $label ? trim((string) preg_replace('/\s+(?:\d{5}|97\d{3}|98\d{3})\s+.*$/u', '', $label)) : null;
     }
 
     private function legacy(int $id): array
