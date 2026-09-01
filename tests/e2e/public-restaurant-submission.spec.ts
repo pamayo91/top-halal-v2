@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 const cover = {
-  name: 'couverture.png',
+  name: 'couverture-800px.png',
   mimeType: 'image/png',
-  buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64'),
+  buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAyAAAAABCAYAAAAmaMpmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAaSURBVEhL7cExAQAAAMKg9U9tCy+gAAAATgYMgQABm0L0EAAAAABJRU5ErkJggg==', 'base64'),
 };
 
 async function fillRestaurantAndAddress(page: import('@playwright/test').Page, suffix: string) {

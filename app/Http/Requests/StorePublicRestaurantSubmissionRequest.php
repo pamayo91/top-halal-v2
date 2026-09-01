@@ -45,9 +45,9 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'facebook_url' => ['nullable', 'url:http,https', 'max:2048'],
             'tiktok_url' => ['nullable', 'url:http,https', 'max:2048'],
             'description' => ['nullable', 'string', 'max:3000'],
-            'cover_photo' => ['required', 'file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
+            'cover_photo' => ['required', 'file', 'image', 'dimensions:min_width=800', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             'gallery_photos' => ['nullable', 'array', 'max:10'],
-            'gallery_photos.*' => ['file', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
+            'gallery_photos.*' => ['file', 'image', 'dimensions:min_width=800', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             'submitter_role' => ['required', Rule::in(['owner', 'employee', 'customer'])],
             'email' => ['required', 'email:rfc', 'max:255'],
         ];
@@ -90,5 +90,13 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
                 }
             }
         });
+    }
+
+    public function messages(): array
+    {
+        return [
+            'cover_photo.dimensions' => 'La photo de couverture doit mesurer au moins 800 pixels de large.',
+            'gallery_photos.*.dimensions' => 'Chaque photo de galerie doit mesurer au moins 800 pixels de large.',
+        ];
     }
 }

@@ -52,6 +52,21 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertSessionHasErrors('email');
     }
 
+    public function test_it_rejects_cover_and_gallery_images_narrower_than_800_pixels(): void
+    {
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload([
+            'cover_photo' => UploadedFile::fake()->image('couverture-trop-petite.jpg', 799, 600),
+        ]))->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('cover_photo');
+
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload([
+            'gallery_photos' => [UploadedFile::fake()->image('galerie-trop-petite.jpg', 799, 600)],
+        ]))->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('gallery_photos.0');
+
+        $this->assertDatabaseCount('restaurants', 0);
+    }
+
     public function test_it_submits_a_complete_pending_restaurant_with_private_outbound_links(): void
     {
         $category = Category::create(['legacy_term_id' => 1001, 'name' => 'Libanais', 'slug' => 'libanais']);
