@@ -139,6 +139,7 @@
 
 - Repaired only the 812 strictly verified V2 `address_line1` values that duplicated a matching historical `postcode + city` suffix. The raw address, structured postcode/city/code, GPS and geocoding/location status fields were not changed; 184 conflicting records remain untouched. The second execution corrected zero records.
 - Centralized deterministic address-line parsing in `AddressLineParser`, used by consolidation, exception resolution and address suggestions. The repair command writes a persistent candidate report, refuses writes unless the expected cohort is found, processes safe ID chunks and verifies protected fields after every update.
+- Following manual verification, removed only the explicit historical final postcode/city suffix from 180 additional `address_line1` values whose structured locality differed. Four malformed lines without such a visible suffix remain untouched.
 
 ## 2026-08-30
 

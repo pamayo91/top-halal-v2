@@ -4,7 +4,7 @@
 
 ### D021 — Strict address-line repair without arbitration
 
-`address` remains the immutable historical/raw value. `address_line1` is only the number and street, while `postal_code` and `city_name` remain separate. A reusable deterministic parser may remove the suffix only when the current line duplicates the raw address and both structured values agree with its suffix. A postcode or city disagreement is never resolved automatically; it remains unchanged for manual review.
+`address` remains the immutable historical/raw value. `address_line1` is only the number and street, while `postal_code` and `city_name` remain separate. A reusable deterministic parser may remove the suffix when the current line duplicates the raw address and a non-empty street remains. The normal mode requires matching structured postcode/city; a separately opted-in cleanup mode, authorized after manual verification, may remove a visibly final historical `CP + ville` despite a mismatch. It never changes the raw address or structured/GPS fields.
 
 ### D020 — Double confirmation for restoration and legacy imports
 

@@ -12,7 +12,7 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 - `address` is the immutable historical/raw address.
 - `address_line1` contains only the number and street; `postal_code` and `city_name` are separate fields.
 - `AddressLineParser` is the single deterministic implementation for this split. It removes a suffix only when the raw/structured postcode and city agree strictly and a non-empty street remains.
-- Any disagreement remains unchanged for manual review: this parser never selects between conflicting historical and structured values.
+- A confirmed cleanup mode may remove an explicit final historical `CP + ville` from `address_line1` even when it conflicts with structured data; it never changes `address`, `postal_code` or `city_name`, and requires a non-empty street before the suffix.
 
 ## Controlled legacy migration
 - The pilot schema uses `restaurants`, `categories`, `features`, hierarchical `locations`, their pivots, `restaurant_opening_hours` and `restaurant_media`.
