@@ -78,6 +78,7 @@ class PublicRestaurantSubmissionController extends Controller
                 'has_halal_chicken' => (bool) ($data['halal_chicken'] ?? false),
                 'description' => filled($data['description'] ?? null) ? trim(strip_tags($data['description'])) : null,
                 'phone' => filled($data['phone'] ?? null) ? trim($data['phone']) : null,
+                'contact_email' => Str::lower(trim($data['email'])),
                 'address' => $this->displayAddress($location),
             ]);
 

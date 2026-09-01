@@ -183,7 +183,7 @@
                         </fieldset>
                         <label for="submitter-email">Votre e-mail</label>
                         <input id="submitter-email" name="email" type="email" autocomplete="email" required maxlength="255" value="{{ old('email') }}">
-                        <p class="form-help">Nous l’utilisons seulement pour le suivi de cette proposition. Aucun nom ni prénom n’est demandé.</p>
+                        <p class="form-help">Nous l’utilisons pour le suivi de cette proposition et comme e-mail de contact à vérifier par la modération. Aucun nom ni prénom n’est demandé.</p>
                         @error('email')<p class="field-error">{{ $message }}</p>@enderror
 
                         <div class="submission-actions">

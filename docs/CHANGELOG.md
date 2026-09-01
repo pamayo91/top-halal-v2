@@ -3,6 +3,7 @@
 ## 2026-09-01
 
 - Public restaurant submissions now reject any cover or gallery image narrower than 800 px, with server-side validation and PHP/Playwright coverage.
+- The required e-mail in a public restaurant submission now populates the restaurant contact field as well as the private contributor record, so moderators see it in the Contact tab.
 - Added a permanent double-confirmation safeguard: no database restoration, V2 rebuild/reseed or legacy import/reimport may start without two distinct explicit owner confirmations in the current conversation, including a final confirmation immediately before writes.
 - Refined public restaurant opening hours into a compact, responsive Blade card with semantic day/time rows, a subtle current-day state and no client-side dependency. A tested server-side Paris-time status now handles open services, breaks, closed days, the following day and overnight slots, while incomplete data never produces a guessed status.
 - Made the Filament back-office container responsive and compacted the restaurant table on narrow screens. The list now shows a publication/addition date and defaults to the newest restaurant records.

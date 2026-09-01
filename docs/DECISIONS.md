@@ -60,7 +60,7 @@ Le flux normal de l’enrichissement est la recherche/navigation web interactive
 
 ### D015 — Propositions publiques créées directement en attente
 
-Une proposition publique crée une fiche `restaurants` standard en statut `pending`, afin qu’elle utilise le même circuit de modération que les autres fiches, sans jamais devenir visible publiquement. Son e-mail de suivi et son lien avec l’établissement vivent dans `restaurant_submissions`, séparés des coordonnées publiques du restaurant. Les URLs proposées restent des destinations sortantes inactives, sans exposition HTML/JSON-LD avant validation humaine.
+Une proposition publique crée une fiche `restaurants` standard en statut `pending`, afin qu’elle utilise le même circuit de modération que les autres fiches, sans jamais devenir visible publiquement. Son unique e-mail requis alimente le contact de la fiche, à vérifier par la modération, et est conservé avec le lien du déposant dans `restaurant_submissions` pour l’audit. Les URLs proposées restent des destinations sortantes inactives, sans exposition HTML/JSON-LD avant validation humaine.
 
 ### D016 — Tests refusés hors configuration SQLite
 

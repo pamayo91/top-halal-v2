@@ -88,6 +88,8 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame('pending', $restaurant->status);
         $this->assertTrue($restaurant->has_halal_meat);
         $this->assertFalse($restaurant->has_halal_chicken);
+        $this->assertSame('0123456789', $restaurant->phone);
+        $this->assertSame('contributeur@example.invalid', $restaurant->contact_email);
         $this->assertSame('46 Boulevard du Temple', $restaurant->address_line1);
         $this->assertSame('75111', $restaurant->city_code);
         $this->assertSame('VERIFIED', $restaurant->geocoding_status);
@@ -126,6 +128,7 @@ class PublicRestaurantSubmissionTest extends TestCase
             'address_suggestion_token' => app(\App\Services\Location\AddressSuggestionService::class)->suggest('46 boulevard du temple')[0]['token'],
             'hours' => $hours,
             'cover_photo' => UploadedFile::fake()->image('cover.jpg', 800, 600),
+            'phone' => '0123456789',
             'submitter_role' => 'customer',
             'email' => 'contributeur@example.invalid',
         ], $overrides);
