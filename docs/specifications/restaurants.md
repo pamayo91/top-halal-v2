@@ -16,7 +16,7 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 
 ## Public page
 - Fast server-rendered content.
-- Core info and opening hours.
+- Core info and opening hours. When validated hours are available, the public detail page renders a compact semantic schedule card with one stored day per row, separated services and an unobtrusive current-day highlight. A server-side `Europe/Paris` status is displayed only when the current schedule is complete: open (with closing time), between services (with the next opening time), closed for the day, or the next opening on the following day. Incomplete schedules retain their available display but never produce a guessed live status.
 - categories/features.
 - Services are rendered as local inline SVG icons plus their text labels. The icon set has no external dependency; three domain-specific icons (halal certification, prayer room and decor) follow the same 24px rounded-stroke style as the Lucide-derived icons.
 - Reviews approved by moderation and their aggregate where valid; public reviews are displayed from newest to oldest.

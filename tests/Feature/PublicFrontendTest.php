@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantMedia, RestaurantOpeningHour, RestaurantOutboundLink, RestaurantReview};
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -142,5 +143,25 @@ class PublicFrontendTest extends TestCase
             ->assertSee('22:30')
             ->assertSee('Dimanche')
             ->assertSee('Fermé');
+    }
+
+    public function test_restaurant_detail_renders_the_server_calculated_opening_status(): void
+    {
+        CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-31 19:00', 'Europe/Paris'));
+
+        try {
+            $restaurant = Restaurant::create(['legacy_wp_id' => 426, 'name' => 'Statut horaires test', 'slug' => 'statut-horaires-test', 'status' => 'published']);
+            RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'opens_at' => '10:00', 'closes_at' => '12:00', 'slot' => 1, 'legacy_key' => 'status-monday-lunch']);
+            RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'opens_at' => '18:00', 'closes_at' => '23:00', 'slot' => 2, 'legacy_key' => 'status-monday-dinner']);
+
+            $this->get('/resto/statut-horaires-test')
+                ->assertOk()
+                ->assertSee('opening-hours-card', false)
+                ->assertSee('opening-hours-list', false)
+                ->assertSee('is-today', false)
+                ->assertSee('Ouvert actuellement · Ferme à 23:00');
+        } finally {
+            CarbonImmutable::setTestNow();
+        }
     }
 }
