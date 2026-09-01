@@ -14,7 +14,7 @@ class RestaurantOpeningStatus
     ];
 
     /**
-     * @param Collection<int, mixed> $openingHours
+     * @param  Collection<int, mixed>  $openingHours
      * @return array{day: string, message: string|null}
      */
     public function for(Collection $openingHours, ?CarbonImmutable $at = null): array

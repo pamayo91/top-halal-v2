@@ -2,9 +2,22 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Article, Category, Comment, ContentMedia, Feature, Location, MediaAsset, Page, Restaurant, RestaurantMedia, RestaurantOpeningHour, RestaurantOutboundLink, RestaurantReview};
+use App\Models\Article;
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\ContentMedia;
+use App\Models\Feature;
+use App\Models\Location;
+use App\Models\MediaAsset;
+use App\Models\Page;
+use App\Models\Restaurant;
+use App\Models\RestaurantMedia;
+use App\Models\RestaurantOpeningHour;
+use App\Models\RestaurantOutboundLink;
+use App\Models\RestaurantReview;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PublicFrontendTest extends TestCase
@@ -17,7 +30,9 @@ class PublicFrontendTest extends TestCase
         $category = Category::create(['legacy_term_id' => 12, 'name' => 'Marocain', 'slug' => 'marocain']);
         $feature = Feature::create(['legacy_term_id' => 13, 'name' => 'À emporter', 'slug' => 'a-emporter']);
         $location = Location::create(['legacy_term_id' => 14, 'name' => 'Lyon', 'slug' => 'lyon']);
-        $restaurant->categories()->attach($category); $restaurant->features()->attach($feature); $restaurant->locations()->attach($location);
+        $restaurant->categories()->attach($category);
+        $restaurant->features()->attach($feature);
+        $restaurant->locations()->attach($location);
         $this->get('/restaurants?q=safran&ville=lyon&categories[]=marocain&features[]=a-emporter')->assertOk()->assertSee('Le Safran')->assertSee('noindex,follow', false);
     }
 
@@ -52,7 +67,9 @@ class PublicFrontendTest extends TestCase
         $category = Category::create(['legacy_term_id' => 15, 'name' => "Cuisine d'Orient", 'slug' => 'orient']);
         $feature = Feature::create(['legacy_term_id' => 16, 'name' => "Chef d'œuvre", 'slug' => 'chef-oeuvre']);
         $location = Location::create(['legacy_term_id' => 17, 'name' => "L'Haÿ-les-Roses", 'slug' => 'lhay']);
-        $restaurant->categories()->attach($category); $restaurant->features()->attach($feature); $restaurant->locations()->attach($location);
+        $restaurant->categories()->attach($category);
+        $restaurant->features()->attach($feature);
+        $restaurant->locations()->attach($location);
         Article::create(['legacy_wp_id' => 18, 'original_title' => "L'article", 'title' => "L'article", 'slug' => 'article-test', 'legacy_url' => '/article-test', 'status' => 'published']);
         Page::create(['legacy_wp_id' => 19, 'original_title' => "La page d'accueil", 'title' => "La page d'accueil", 'slug' => 'page-test', 'legacy_url' => '/page-test', 'status' => 'published']);
         foreach (['/resto/adams-burger', '/article-test', '/page-test', '/restos/lhay', '/specialites/orient', '/service/chef-oeuvre'] as $url) {
@@ -117,13 +134,15 @@ class PublicFrontendTest extends TestCase
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 424, 'name' => 'Services test', 'slug' => 'services-test', 'status' => 'published']);
         $services = collect(['Accès handicapé', 'Ambiance musicale', 'Beau décor', 'Branché', 'Certifié halal', 'Original', 'Romantique', 'Salle de prière', 'Sans alcool', 'Terrasse', 'Traiteur', 'Vente à emporter', 'Wi-Fi'])
-            ->map(fn (string $name, int $index) => Feature::create(['legacy_term_id' => 500 + $index, 'name' => $name, 'slug' => \Illuminate\Support\Str::slug($name)]));
+            ->map(fn (string $name, int $index) => Feature::create(['legacy_term_id' => 500 + $index, 'name' => $name, 'slug' => Str::slug($name)]));
         $restaurant->features()->attach($services->pluck('id'));
 
         $response = $this->get('/resto/services-test');
 
         $response->assertOk()->assertSee('Services')->assertSee('service-list', false)->assertSee('viewBox="0 0 24 24"', false);
-        foreach ($services as $service) $response->assertSee($service->name);
+        foreach ($services as $service) {
+            $response->assertSee($service->name);
+        }
     }
 
     public function test_restaurant_detail_renders_validated_opening_hours(): void
