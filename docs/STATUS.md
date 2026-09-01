@@ -1,6 +1,6 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-08-31
+Last updated: 2026-09-01
 
 | Area | Status | Notes |
 |---|---|---|
@@ -29,7 +29,7 @@ Last updated: 2026-08-31
 | Restaurant frontend | DONE | Accueil, blog, collections, fiches, galerie, avis/commentaires et sortie opaque, validés par PHP et navigateur ; les avis restaurant et commentaires éditoriaux publics sont affichés du plus récent au plus ancien. Les articles rendent désormais leur image à la une V2 lorsqu’elle est liée, les fiches restaurant utilisent toujours une variante média disponible et les services sont affichés avec des icônes SVG locales accessibles. |
 | Search/geolocation | DONE | Recherche V2 texte/ville/catégories/services et action volontaire « autour de moi », validées |
 | Accounts/claims | DONE (pilot) | Auth Laravel, changement obligatoire des comptes legacy, claims et modération technique validés ; aucune migration massive utilisateur autorisée. |
-| Admin/moderation | DONE | Filament 5 sur `/admin`, modules opérationnels, audit, réglages et modération validés par PHP et Playwright desktop/mobile sur préproduction. |
+| Admin/moderation | DONE | Filament 5 sur `/admin`, modules opérationnels, audit, réglages et modération validés par PHP et Playwright desktop/mobile sur préproduction. Le conteneur est fluide sur écran étroit ; la liste des restaurants affiche la date de publication/ajout et ouvre les fiches les plus récentes. |
 | Qualité back-office | IN PROGRESS | Normalisation déterministe de texte plain-text, actions « Voir sur le site » et amélioration ciblée des recherches Filament en cours de validation. |
 | Intégrité données migrées | DONE | Audit legacy/V2 des dates, reprise idempotente de `published_at` et des dates média, 32 payloads géographiques malveillants non associés supprimés de V2 ; rapport dans `docs/generated/data-integrity-audit.md`. |
 | Audit adresses / GPS | DONE (read-only) | Les 7 704 restaurants V2 et la source WordPress ont été audités sans modification métier ni géocodage. Le blocage principal est l’absence totale de remplissage des colonnes V2 `city_name`/`postal_code` : 4 234 paires CP/ville sont seulement extractibles de l’adresse brute. Rapport et échantillon dans `docs/generated/address-gps-audit.md` et `address-gps-sample.csv`. |

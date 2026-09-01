@@ -31,6 +31,16 @@ class AdminBackOfficeTest extends TestCase
         $this->actingAs($admin)->get('/admin/restaurants')->assertOk();
     }
 
+    public function test_restaurant_back_office_lists_newest_records_first_and_shows_their_publication_date(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $older = $this->restaurant(['name' => 'Restaurant ancien', 'slug' => 'restaurant-ancien', 'created_at' => '2024-01-01 12:00:00']);
+        $newer = $this->restaurant(['name' => 'Restaurant récent', 'slug' => 'restaurant-recent', 'created_at' => '2024-02-01 12:00:00']);
+
+        $this->assertSame([$newer->id, $older->id], \App\Filament\Resources\RestaurantResource::getEloquentQuery()->whereKey([$older, $newer])->pluck('id')->all());
+        $this->actingAs($admin)->get('/admin/restaurants')->assertOk()->assertSee('Publié le')->assertSee('fi-admin-responsive', false);
+    }
+
     public function test_restaurant_location_form_shows_only_operational_location_fields(): void
     {
         $admin = User::factory()->create(['role' => 'admin']); $restaurant = $this->restaurant(['latitude' => 48.866, 'longitude' => 2.364]);
@@ -149,6 +159,6 @@ class AdminBackOfficeTest extends TestCase
         $this->actingAs($admin)->get('/admin/users')->assertOk();
     }
 
-    private function restaurant(): Restaurant { return Restaurant::create(['legacy_wp_id' => random_int(1, 999999999), 'name' => 'Resto test', 'slug' => 'resto-'.str()->random(8), 'status' => 'published']); }
+    private function restaurant(array $attributes = []): Restaurant { return Restaurant::create([...['legacy_wp_id' => random_int(1, 999999999), 'name' => 'Resto test', 'slug' => 'resto-'.str()->random(8), 'status' => 'published'], ...$attributes]); }
     private function article(): Article { return Article::create(['legacy_wp_id' => random_int(1, 999999999), 'original_title' => 'Original', 'title' => 'Article', 'slug' => 'article-'.str()->random(8), 'legacy_url' => '/article', 'status' => 'published']); }
 }

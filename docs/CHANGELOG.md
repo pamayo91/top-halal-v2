@@ -1,7 +1,10 @@
 # Changelog
 
-## 2026-08-31
+## 2026-09-01
 
+- Made the Filament back-office container responsive and compacted the restaurant table on narrow screens. The list now shows a publication/addition date and defaults to the newest restaurant records.
+
+## 2026-08-31
 - Public restaurant reviews and editorial comments now display newest first, including front previews.
 - Fixed media delivery cache collisions that made distinct article thumbnails render the same file. Public and regression-sentinel media URLs now contain the asset checksum, stale numeric URLs redirect safely, and feature coverage rejects a mismatched checksum.
 - Gallery and back-office media rendering now select an available WebP variant and fall back to the original when none exists, so a missing 480 px derivative cannot cause a browser 404.
