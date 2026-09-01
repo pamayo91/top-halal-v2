@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Restaurant;
 use App\Services\Geocoding\GeocodingService;
+use App\Services\Location\AddressLineParser;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\File;
@@ -18,7 +19,7 @@ class ConsolidateAddressesCommand extends Command
         {--ids= : Comma-separated restaurant IDs to process}
         {--out=docs/generated/address-consolidation-report.md : Markdown report path}';
 
-    public function handle(GeocodingService $geo): int
+    public function handle(GeocodingService $geo, AddressLineParser $lines): int
     {
         $ids = collect(explode(',', (string) $this->option('ids')))
             ->map(fn (string $id) => (int) trim($id))
@@ -67,7 +68,7 @@ class ConsolidateAddressesCommand extends Command
                 continue;
             }
 
-            $line1 = $this->addressLine1($restaurant->address, $feature['label'] ?? null);
+            $line1 = $lines->fromHistoricalOrProvider($restaurant->address, $feature['label'] ?? null, $feature['postcode'], $feature['city']);
             if (! $line1) {
                 $stats['incomplete_provider_result']++;
                 continue;
@@ -100,21 +101,5 @@ class ConsolidateAddressesCommand extends Command
         $this->info(json_encode($stats));
 
         return self::SUCCESS;
-    }
-
-    private function addressLine1(?string $historicalAddress, ?string $providerLabel): ?string
-    {
-        $historicalLine = trim((string) strtok((string) $historicalAddress, ','));
-        if (preg_match('/^\d+[\p{L}\d\s\-' . "'" . ']+$/u', $historicalLine)) {
-            return $historicalLine;
-        }
-
-        if (! $providerLabel) {
-            return null;
-        }
-
-        $line = preg_replace('/\s+(?:\d{5}|97\d{3}|98\d{3})\s+.*$/u', '', $providerLabel);
-
-        return $line ? trim($line) : null;
     }
 }
