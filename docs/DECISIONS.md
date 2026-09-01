@@ -2,6 +2,10 @@
 
 ## 2026-08-31
 
+### D021 — Strict address-line repair without arbitration
+
+`address` remains the immutable historical/raw value. `address_line1` is only the number and street, while `postal_code` and `city_name` remain separate. A reusable deterministic parser may remove the suffix only when the current line duplicates the raw address and both structured values agree with its suffix. A postcode or city disagreement is never resolved automatically; it remains unchanged for manual review.
+
 ### D020 — Double confirmation for restoration and legacy imports
 
 Any database restoration, V2 rebuild/reseed, or import/reimport from the legacy database requires two distinct explicit confirmations from the project owner in the current conversation. Before the first, Codex must state the target, scope, source, expected mutations and rollback/backup plan. The first confirmation permits only preparation; a second confirmation is required immediately before the command or write starts. Previous permission, a broad request or silence cannot be treated as confirmation. Read-only audits are unaffected.

@@ -135,6 +135,11 @@
 - Recorded the preproduction audit and official Composer bootstrap as hard prerequisites before Laravel initialization.
 # Changelog
 
+## 2026-09-01
+
+- Repaired only the 812 strictly verified V2 `address_line1` values that duplicated a matching historical `postcode + city` suffix. The raw address, structured postcode/city/code, GPS and geocoding/location status fields were not changed; 184 conflicting records remain untouched. The second execution corrected zero records.
+- Centralized deterministic address-line parsing in `AddressLineParser`, used by consolidation, exception resolution and address suggestions. The repair command writes a persistent candidate report, refuses writes unless the expected cohort is found, processes safe ID chunks and verifies protected fields after every update.
+
 ## 2026-08-30
 
 - Added a dependency-free local SVG icon set for restaurant services. All listed services now have a semantic visual marker on public restaurant cards and detail pages; the three domain-specific icons use the same 24px rounded-stroke language as the Lucide-derived set, and every icon remains paired with accessible text.

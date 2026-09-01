@@ -7,6 +7,13 @@ Suggested core data includes name/slug/description/status/owner, address/postcod
 ## Geography
 Normalize legacy flat locations into useful region/department/city/postcode relationships where data allows. Keep geocoordinates and support spatial/distance queries using MariaDB capabilities.
 
+## Structured address contract
+
+- `address` is the immutable historical/raw address.
+- `address_line1` contains only the number and street; `postal_code` and `city_name` are separate fields.
+- `AddressLineParser` is the single deterministic implementation for this split. It removes a suffix only when the raw/structured postcode and city agree strictly and a non-empty street remains.
+- Any disagreement remains unchanged for manual review: this parser never selects between conflicting historical and structured values.
+
 ## Controlled legacy migration
 - The pilot schema uses `restaurants`, `categories`, `features`, hierarchical `locations`, their pivots, `restaurant_opening_hours` and `restaurant_media`.
 - Each imported entity keeps its WordPress identifier (`legacy_wp_id`, `legacy_term_id` or `legacy_attachment_id`).
