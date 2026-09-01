@@ -15,6 +15,7 @@ use App\Models\RestaurantMedia;
 use App\Models\RestaurantOpeningHour;
 use App\Models\RestaurantOutboundLink;
 use App\Models\RestaurantReview;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
@@ -23,6 +24,28 @@ use Tests\TestCase;
 class PublicFrontendTest extends TestCase
 {
     use DatabaseMigrations;
+
+    public function test_active_admin_gets_a_direct_edit_shortcut_only_on_the_public_record_being_viewed(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 430, 'name' => 'Raccourci restaurant', 'slug' => 'raccourci-restaurant', 'status' => 'published']);
+        $article = Article::create(['legacy_wp_id' => 431, 'original_title' => 'Raccourci article', 'title' => 'Raccourci article', 'slug' => 'raccourci-article', 'legacy_url' => '/raccourci-article', 'status' => 'published']);
+        $page = Page::create(['legacy_wp_id' => 432, 'original_title' => 'Raccourci page', 'title' => 'Raccourci page', 'slug' => 'raccourci-page', 'legacy_url' => '/raccourci-page', 'status' => 'published']);
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+
+        $this->get('/resto/raccourci-restaurant')->assertOk()->assertDontSee('Modifier cette page dans l’administration');
+        $this->actingAs(User::factory()->create())->get('/resto/raccourci-restaurant')->assertOk()->assertDontSee('Modifier cette page dans l’administration');
+
+        $this->actingAs($admin)->get('/resto/raccourci-restaurant')
+            ->assertOk()
+            ->assertSee('Modifier cette page dans l’administration', false)
+            ->assertSee(\App\Filament\Resources\RestaurantResource::getUrl('edit', ['record' => $restaurant]), false);
+        $this->actingAs($admin)->get('/raccourci-article')
+            ->assertOk()
+            ->assertSee(\App\Filament\Resources\ArticleResource::getUrl('edit', ['record' => $article]), false);
+        $this->actingAs($admin)->get('/raccourci-page')
+            ->assertOk()
+            ->assertSee(\App\Filament\Resources\PageResource::getUrl('edit', ['record' => $page]), false);
+    }
 
     public function test_directory_filters_real_v2_relations_and_is_noindex_when_filtered(): void
     {

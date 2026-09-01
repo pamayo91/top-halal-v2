@@ -6,6 +6,8 @@ Le panel Filament `/admin` exige une session authentifiée, un mot de passe non 
 
 Après connexion, une URL `intended` historique ou non-back-office n’est jamais rejouée pour un administrateur : celui-ci arrive sur `/admin`.
 
+Sur une fiche restaurant, un article ou une page publique publiée, un administrateur actif voit en haut un raccourci « Éditer » menant directement au formulaire Filament de l’enregistrement visité. Le lien est rendu uniquement pour cet administrateur ; il n'ajoute ni JavaScript, ni requête supplémentaire, ni markup aux réponses publiques ordinaires.
+
 Un administrateur marqué `must_change_password` est dirigé vers le changement de mot de passe, puis vers `/admin` une fois ce changement terminé.
 
 ## Modules

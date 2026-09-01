@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filament\Resources\{ArticleResource, PageResource, RestaurantResource};
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\StoreRestaurantReviewRequest;
 use App\Models\{Article, Category, Comment, Feature, Location, Page, Restaurant, RestaurantReview};
@@ -56,7 +57,9 @@ class PublicContentController extends Controller
     {
         $restaurant = $this->publishedRestaurants()->where('slug', $slug)->firstOrFail();
         $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
-        return response()->view('public.restaurant', compact('restaurant', 'reviews'));
+        $adminEditUrl = $this->adminEditUrlFor($restaurant);
+
+        return response()->view('public.restaurant', compact('restaurant', 'reviews', 'adminEditUrl'));
     }
 
     public function storeReview(StoreRestaurantReviewRequest $request, string $slug): RedirectResponse
@@ -75,7 +78,9 @@ class PublicContentController extends Controller
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::with('featuredMedia.asset')->where('slug', $slug)->where('status', 'published')->firstOrFail();
         $comments = $content->comments()->where('status', 'approved')->latest('created_at')->get();
         $isArticle = $content instanceof Article;
-        return response()->view('public.editorial', compact('content', 'comments', 'isArticle'));
+        $adminEditUrl = $this->adminEditUrlFor($content);
+
+        return response()->view('public.editorial', compact('content', 'comments', 'isArticle', 'adminEditUrl'));
     }
 
     public function storeComment(StoreCommentRequest $request, string $slug): RedirectResponse
@@ -97,6 +102,26 @@ class PublicContentController extends Controller
     }
 
     private function publishedRestaurants(): Builder { return Restaurant::where('status', 'published')->with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]); }
+
+    /**
+     * Builds a back-office shortcut only for the active administrator already
+     * authenticated for this request. Public visitors receive no extra markup,
+     * assets, or database query.
+     */
+    private function adminEditUrlFor(Restaurant|Article|Page $record): ?string
+    {
+        $user = request()->user();
+
+        if ($user?->role !== 'admin' || $user->status !== 'active') {
+            return null;
+        }
+
+        return match (true) {
+            $record instanceof Restaurant => RestaurantResource::getUrl('edit', ['record' => $record]),
+            $record instanceof Article => ArticleResource::getUrl('edit', ['record' => $record]),
+            $record instanceof Page => PageResource::getUrl('edit', ['record' => $record]),
+        };
+    }
 
     private function applySearch(Builder $query, Request $request): Builder
     {

@@ -3,6 +3,7 @@
 Le front public est rendu côté serveur avec Blade. Il n’utilise ni SPA, ni police distante, ni bibliothèque UI. La feuille CSS locale constitue le design system : couleurs, typographie système, boutons, formulaires, cartes, étiquettes, états vides et grilles responsive.
 
 - L’en-tête conserve les parcours Restaurant, Guide et Compte ; le menu mobile est une amélioration progressive très légère.
+- Lorsqu’un administrateur actif consulte une fiche restaurant, un article ou une page, l’en-tête rend un raccourci SSR « Éditer » vers son formulaire Filament ; les visiteurs et autres comptes ne reçoivent pas ce markup.
 - Les pages publiques partagent une navigation clavier, un lien d’évitement, des fils d’Ariane et des états de formulaire accessibles.
 - L’accueil, `/blog`, les collections, fiches, articles, pages, auth et compte sont des vues Blade responsives.
 - Les images V2 ne pointent jamais vers WordPress : elles utilisent les variantes media locales, avec dimensions, `srcset`, `sizes` et chargement différé hors visuel principal.

@@ -2,6 +2,7 @@
 
 ## 2026-09-01
 
+- Les administrateurs actifs voient désormais un raccourci « Éditer » en haut des fiches restaurant, articles et pages publiques ; il ouvre directement le formulaire Filament correspondant, sans JavaScript ni surcharge des réponses des visiteurs.
 - Public restaurant submissions now reject any cover or gallery image narrower than 800 px, with server-side validation and PHP/Playwright coverage.
 - The required e-mail in a public restaurant submission now populates the restaurant contact field as well as the private contributor record, so moderators see it in the Contact tab.
 - Added a permanent double-confirmation safeguard: no database restoration, V2 rebuild/reseed or legacy import/reimport may start without two distinct explicit owner confirmations in the current conversation, including a final confirmation immediately before writes.
