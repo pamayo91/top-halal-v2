@@ -30,4 +30,12 @@ class AddressLineParserTest extends TestCase
 
         $this->assertSame('46 Boulevard du Temple', $parser->fromHistoricalOrProvider('46 Boulevard du Temple, Paris, France', '48 Boulevard du Temple 75011 Paris', '75011', 'Paris'));
     }
+
+    public function test_it_can_remove_a_visible_historical_suffix_without_using_it_as_structured_truth(): void
+    {
+        $parser = app(AddressLineParser::class);
+
+        $this->assertSame('1 Rue Charles Duchesne', $parser->repairVisibleSuffix('1 Rue Charles Duchesne 13100 Aix en Provence', '1 Rue Charles Duchesne 13100 Aix en Provence'));
+        $this->assertNull($parser->repairVisibleSuffix('1 Rue Charles Duchesne', '1 Rue Charles Duchesne'));
+    }
 }

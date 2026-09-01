@@ -11,6 +11,7 @@ class RepairAddressLine1Command extends Command
 {
     protected $signature = 'data:repair-address-line1
         {--apply : Persist only the strict, verified address_line1 corrections}
+        {--visible-suffix : Also remove an explicit final historical CP/city despite a structured mismatch}
         {--expect=812 : Refuse a write unless this exact number of candidates is found}
         {--out=docs/generated/address-line1-repair-report.json : Persistent JSON report path}';
 
@@ -31,7 +32,7 @@ class RepairAddressLine1Command extends Command
         Restaurant::query()->orderBy('id')->chunkById(200, function ($restaurants) use ($lines, &$stats, &$candidates, &$violations): void {
             foreach ($restaurants as $restaurant) {
                 $stats['examined']++;
-                $inspection = $lines->inspect($restaurant->address_line1, $restaurant->address, $restaurant->postal_code, $restaurant->city_name);
+                $inspection = $lines->inspect($restaurant->address_line1, $restaurant->address, $restaurant->postal_code, $restaurant->city_name, (bool) $this->option('visible-suffix'));
 
                 if ($inspection['state'] !== 'candidate') {
                     $stats[$inspection['state']]++;
@@ -54,7 +55,7 @@ class RepairAddressLine1Command extends Command
             $candidateIds = collect($candidates)->pluck('id')->all();
             Restaurant::query()->whereIn('id', $candidateIds)->orderBy('id')->chunkById(200, function ($restaurants) use ($lines, &$stats, &$violations): void {
                 foreach ($restaurants as $restaurant) {
-                    $inspection = $lines->inspect($restaurant->address_line1, $restaurant->address, $restaurant->postal_code, $restaurant->city_name);
+                    $inspection = $lines->inspect($restaurant->address_line1, $restaurant->address, $restaurant->postal_code, $restaurant->city_name, (bool) $this->option('visible-suffix'));
                     if ($inspection['state'] !== 'candidate') {
                         $violations[] = "Restaurant {$restaurant->id} no longer matches the strict rule.";
                         continue;
@@ -97,6 +98,7 @@ class RepairAddressLine1Command extends Command
         $payload = [
             'generated_at' => now()->toIso8601String(),
             'mode' => $applied ? 'apply' : 'dry-run',
+            'visible_suffix' => (bool) $this->option('visible-suffix'),
             'expected_candidates' => (int) $this->option('expect'),
             'strict_candidates' => count($candidates),
             'stats' => $stats,

@@ -69,4 +69,23 @@ class RepairAddressLine1CommandTest extends TestCase
         $this->assertSame([], $report['candidates']);
         File::delete(base_path($out));
     }
+
+    public function test_it_can_remove_an_explicit_historical_suffix_without_changing_structured_data(): void
+    {
+        $restaurant = Restaurant::create([
+            'legacy_wp_id' => 13499, 'name' => 'Le Pôle Café', 'slug' => 'le-pole-cafe', 'status' => 'published',
+            'address' => '1 Rue Charles Duchesne 13100 Aix en Provence',
+            'address_line1' => '1 Rue Charles Duchesne 13100 Aix en Provence',
+            'postal_code' => '13290', 'city_name' => 'Aix-en-Provence', 'city_code' => '13001',
+            'latitude' => '43.522', 'longitude' => '5.449', 'geocoding_status' => 'REVIEW_REQUIRED',
+        ]);
+        $protected = $restaurant->only(['address', 'postal_code', 'city_name', 'city_code', 'latitude', 'longitude', 'geocoding_status']);
+        $out = 'docs/generated/testing-address-line1-visible-suffix.json';
+
+        $this->artisan('data:repair-address-line1', ['--apply' => true, '--visible-suffix' => true, '--expect' => 1, '--out' => $out])->assertSuccessful();
+        $restaurant->refresh();
+        $this->assertSame('1 Rue Charles Duchesne', $restaurant->address_line1);
+        $this->assertSame($protected, $restaurant->only(array_keys($protected)));
+        File::delete(base_path($out));
+    }
 }

@@ -29,6 +29,23 @@ class AddressLineParser
     }
 
     /**
+     * Removes an explicit final French postcode/city from a duplicated raw
+     * line, without treating that historical suffix as authoritative.
+     */
+    public function repairVisibleSuffix(?string $addressLine1, ?string $rawAddress): ?string
+    {
+        $line = $this->clean($addressLine1);
+        $raw = $this->clean($rawAddress);
+
+        if ($line === null || $raw === null || $line !== $raw
+            || preg_match('/^(?<street>.+?)\s+\d{5}\s+.+$/u', $line, $parts) !== 1) {
+            return null;
+        }
+
+        return $this->clean($parts['street']);
+    }
+
+    /**
      * Uses the historical first line only when it agrees with provider
      * structured data; otherwise falls back to an equally strict provider label.
      */
@@ -51,10 +68,14 @@ class AddressLineParser
     }
 
     /** @return array{state:'candidate'|'ambiguous'|'ignored',new_line1:?string} */
-    public function inspect(?string $addressLine1, ?string $rawAddress, ?string $postalCode, ?string $cityName): array
+    public function inspect(?string $addressLine1, ?string $rawAddress, ?string $postalCode, ?string $cityName, bool $allowVisibleSuffix = false): array
     {
         $candidate = $this->repair($addressLine1, $rawAddress, $postalCode, $cityName);
         if ($candidate !== null) {
+            return ['state' => 'candidate', 'new_line1' => $candidate];
+        }
+
+        if ($allowVisibleSuffix && ($candidate = $this->repairVisibleSuffix($addressLine1, $rawAddress)) !== null) {
             return ['state' => 'candidate', 'new_line1' => $candidate];
         }
 
