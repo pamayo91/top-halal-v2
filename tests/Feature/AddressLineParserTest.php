@@ -23,4 +23,11 @@ class AddressLineParserTest extends TestCase
         $this->assertNull($parser->repair('1 Rue des Fleurs 93300 Auvervilliers', '1 Rue des Fleurs 93300 Auvervilliers', '93300', 'Aubervilliers'));
         $this->assertNull($parser->repair('54 Boulevard de La libération', '54 Boulevard de La libération', '13001', 'Marseille'));
     }
+
+    public function test_it_keeps_an_unambiguous_historical_first_line_for_provider_enrichment(): void
+    {
+        $parser = app(AddressLineParser::class);
+
+        $this->assertSame('46 Boulevard du Temple', $parser->fromHistoricalOrProvider('46 Boulevard du Temple, Paris, France', '48 Boulevard du Temple 75011 Paris', '75011', 'Paris'));
+    }
 }

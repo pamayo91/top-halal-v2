@@ -36,6 +36,10 @@ class AddressLineParser
     {
         $historical = $this->clean((string) strtok((string) $historicalAddress, ','));
 
+        if ($historical !== null && preg_match('/\b\d{5}\b/u', $historical) !== 1) {
+            return $historical;
+        }
+
         return $this->stripMatchingSuffix($historical, $postalCode, $cityName)
             ?? $this->stripMatchingSuffix($this->clean($providerLabel), $postalCode, $cityName);
     }
