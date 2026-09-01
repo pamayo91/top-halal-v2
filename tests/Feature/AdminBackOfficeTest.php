@@ -37,7 +37,7 @@ class AdminBackOfficeTest extends TestCase
         $older = $this->restaurant(['name' => 'Restaurant ancien', 'slug' => 'restaurant-ancien', 'created_at' => '2024-01-01 12:00:00']);
         $newer = $this->restaurant(['name' => 'Restaurant récent', 'slug' => 'restaurant-recent', 'created_at' => '2024-02-01 12:00:00']);
 
-        $this->assertSame([$newer->id, $older->id], \App\Filament\Resources\RestaurantResource::getEloquentQuery()->whereKey([$older, $newer])->pluck('id')->all());
+        $this->assertSame([$newer->id, $older->id], \App\Filament\Resources\RestaurantResource::getEloquentQuery()->whereKey([$older->id, $newer->id])->pluck('id')->all());
         $this->actingAs($admin)->get('/admin/restaurants')->assertOk()->assertSee('Publié le')->assertSee('fi-admin-responsive', false);
     }
 
