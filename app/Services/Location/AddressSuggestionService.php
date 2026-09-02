@@ -20,7 +20,7 @@ class AddressSuggestionService
         $result = $this->geocoder->search($query, min(max($limit, 1), 8));
         if (!$result['ok']) return [];
 
-        return collect($result['features'])->filter(fn (array $feature) => filled($feature['label'] ?? null))->map(function (array $feature) use ($query): array {
+        return collect($result['features'])->filter(fn (array $feature) => $this->isUsableFeature($feature))->map(function (array $feature) use ($query): array {
             $token = (string) Str::uuid();
             Cache::put($this->key($token), $feature, now()->addMinutes(15));
             return ['token' => $token, 'label' => $this->label($feature), 'feature' => $feature];
@@ -40,7 +40,7 @@ class AddressSuggestionService
     {
         $feature = $this->resolve($token);
 
-        return $feature === null ? null : $this->structured($feature);
+        return $feature === null || ! $this->isUsableFeature($feature) ? null : $this->structured($feature);
     }
 
     /** Data needed only to render a selected address and its map in a browser. */
@@ -69,10 +69,20 @@ class AddressSuggestionService
             'address_line1' => $line ?: null, 'postal_code' => $postcode ?: null, 'city_name' => $city ?: null,
             'city_code' => $feature['citycode'] ?? null, 'country_code' => ($feature['citycode'] ?? null) ? 'FR' : null,
             'latitude' => $feature['latitude'] ?? null, 'longitude' => $feature['longitude'] ?? null,
-            'geocoding_provider' => 'geoplateforme', 'geocoding_source_id' => $feature['id'] ?? null,
-            'geocoding_precision' => $feature['type'] ?? null, 'geocoding_score' => $feature['score'] ?? null,
-            'geocoded_at' => now(),
         ];
+    }
+
+    /** A selected address must always yield the complete persistent location contract. */
+    private function isUsableFeature(array $feature): bool
+    {
+        return filled($feature['label'] ?? null)
+            && filled($feature['postcode'] ?? null)
+            && filled($feature['city'] ?? null)
+            && filled($feature['citycode'] ?? null)
+            && is_numeric($feature['latitude'] ?? null)
+            && is_numeric($feature['longitude'] ?? null)
+            && (float) $feature['latitude'] >= -90 && (float) $feature['latitude'] <= 90
+            && (float) $feature['longitude'] >= -180 && (float) $feature['longitude'] <= 180;
     }
 
     private function key(string $token): string { return 'address-suggestion:'.$token; }

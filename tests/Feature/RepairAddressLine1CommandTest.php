@@ -27,16 +27,10 @@ class RepairAddressLine1CommandTest extends TestCase
             'country_code' => 'FR',
             'latitude' => '43.2997549',
             'longitude' => '5.3876106',
-            'geocoding_status' => 'REVIEW_REQUIRED',
-            'geocoding_review_reason' => 'résolu automatiquement',
-            'address_confidence' => 'APPROXIMATE',
-            'location_precision' => 'HOUSENUMBER',
-            'proximity_status' => 'ELIGIBLE',
         ]);
         $protected = $restaurant->only([
             'address', 'address_line2', 'postal_code', 'city_name', 'city_code', 'country_code',
-            'latitude', 'longitude', 'geocoding_status', 'geocoding_review_reason',
-            'address_confidence', 'location_precision', 'proximity_status',
+            'latitude', 'longitude',
         ]);
         $out = 'docs/generated/testing-address-line1-repair.json';
 
@@ -77,9 +71,9 @@ class RepairAddressLine1CommandTest extends TestCase
             'address' => '1 Rue Charles Duchesne 13100 Aix en Provence',
             'address_line1' => '1 Rue Charles Duchesne 13100 Aix en Provence',
             'postal_code' => '13290', 'city_name' => 'Aix-en-Provence', 'city_code' => '13001',
-            'latitude' => '43.522', 'longitude' => '5.449', 'geocoding_status' => 'REVIEW_REQUIRED',
+            'latitude' => '43.522', 'longitude' => '5.449',
         ]);
-        $protected = $restaurant->only(['address', 'postal_code', 'city_name', 'city_code', 'latitude', 'longitude', 'geocoding_status']);
+        $protected = $restaurant->only(['address', 'postal_code', 'city_name', 'city_code', 'latitude', 'longitude']);
         $out = 'docs/generated/testing-address-line1-visible-suffix.json';
 
         $this->artisan('data:repair-address-line1', ['--apply' => true, '--visible-suffix' => true, '--expect' => 1, '--out' => $out])->assertSuccessful();

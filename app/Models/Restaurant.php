@@ -22,8 +22,6 @@ class Restaurant extends Model
             'has_halal_chicken' => 'boolean',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
-            'geocoding_score' => 'decimal:6',
-            'geocoded_at' => 'datetime',
             'manually_verified_at' => 'datetime',
             'legacy_published_at' => 'datetime',
             'legacy_modified_at' => 'datetime',

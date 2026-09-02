@@ -110,7 +110,9 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame('contributeur@example.invalid', $restaurant->contact_email);
         $this->assertSame('46 Boulevard du Temple', $restaurant->address_line1);
         $this->assertSame('75111', $restaurant->city_code);
-        $this->assertSame('VERIFIED', $restaurant->geocoding_status);
+        $this->assertSame('FR', $restaurant->country_code);
+        $this->assertSame('48.8660000', $restaurant->latitude);
+        $this->assertSame('2.3640000', $restaurant->longitude);
         $this->assertTrue($restaurant->categories->contains($category));
         $this->assertTrue($restaurant->features->contains($feature));
         $this->assertCount(7, $restaurant->openingHours);
@@ -137,10 +139,8 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame('75011', $restaurant->postal_code);
         $this->assertSame('Paris', $restaurant->city_name);
         $this->assertSame('75111', $restaurant->city_code);
-        $this->assertSame('BAN-46', $restaurant->geocoding_source_id);
         $this->assertSame('48.8670000', $restaurant->latitude);
         $this->assertSame('2.3650000', $restaurant->longitude);
-        $this->assertSame('VERIFIED', $restaurant->geocoding_status);
     }
 
     public function test_submission_never_modifies_an_existing_restaurant(): void
@@ -163,8 +163,7 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $this->getJson(route('restaurant-submissions.addresses', ['q' => 'Boulevard du Temple']))
             ->assertOk()
-            ->assertJsonMissing(['city_code' => '75111'])
-            ->assertJsonMissing(['geocoding_source_id' => 'BAN-46']);
+            ->assertJsonMissing(['city_code' => '75111']);
 
         $this->getJson(route('restaurant-submissions.duplicates', ['name' => 'Le Safran', 'address_line1' => '46 Boulevard du Temple', 'city_name' => 'Paris', 'latitude' => 48.866, 'longitude' => 2.364]))
             ->assertOk()

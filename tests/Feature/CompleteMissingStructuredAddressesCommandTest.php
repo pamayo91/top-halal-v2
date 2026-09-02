@@ -14,8 +14,8 @@ class CompleteMissingStructuredAddressesCommandTest extends TestCase
 
     public function test_it_completes_only_missing_structured_fields_from_geoplateforme_without_changing_raw_or_gps(): void
     {
-        $restaurant = Restaurant::create(['legacy_wp_id' => 1, 'name' => 'Kebab Cansu', 'slug' => 'kebab-cansu', 'status' => 'published', 'address' => '16 rue Sainte Catherine 73220 Aiguebelle', 'latitude' => 45.0, 'longitude' => 6.0, 'geocoding_status' => 'REVIEW_REQUIRED']);
-        $protected = $restaurant->only(['address', 'latitude', 'longitude', 'geocoding_status']);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 1, 'name' => 'Kebab Cansu', 'slug' => 'kebab-cansu', 'status' => 'published', 'address' => '16 rue Sainte Catherine 73220 Aiguebelle', 'latitude' => 45.0, 'longitude' => 6.0]);
+        $protected = $restaurant->only(['address', 'latitude', 'longitude']);
         app()->instance(GeocodingService::class, new class implements GeocodingService {
             public function search(string $query, int $limit = 3): array { return ['ok' => true, 'cached' => true, 'features' => [['label' => '16 Rue Sainte-Catherine 73220 Aiguebelle', 'postcode' => '73220', 'city' => 'Aiguebelle', 'citycode' => '73002', 'id' => '73002_test', 'type' => 'housenumber', 'score' => .91]], 'error' => null, 'query' => '']; }
             public function reverse(float $latitude, float $longitude, int $limit = 3): array { return []; }

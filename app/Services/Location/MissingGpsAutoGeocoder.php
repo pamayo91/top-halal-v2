@@ -45,13 +45,7 @@ class MissingGpsAutoGeocoder
 
     private function fields(Restaurant $r, array $f): array
     {
-        $type = $f['type']; $status = $type === 'housenumber' ? 'HIGH_CONFIDENCE' : 'APPROXIMATE';
-        $fields = [
-            'geocoding_provider'=>'geoplateforme', 'geocoding_source_id'=>$f['id'] ?? null, 'geocoding_precision'=>$type,
-            'geocoding_status'=>$status, 'geocoding_score'=>$f['score'] ?? null, 'geocoding_distance_m'=>null,
-            'geocoding_review_reason'=>null, 'geocoded_at'=>now(), 'address_confidence'=>$status,
-            'location_precision'=>strtoupper($type), 'proximity_status'=>'ELIGIBLE',
-        ];
+        $fields = [];
         // Never replace a legacy or previously verified coordinate; complete only the missing half if needed.
         if ($r->latitude === null) $fields['latitude'] = (float) $f['latitude'];
         if ($r->longitude === null) $fields['longitude'] = (float) $f['longitude'];

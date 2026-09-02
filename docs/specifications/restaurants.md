@@ -9,11 +9,13 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 
 ## Structured address contract
 
-- `address` is the immutable historical/raw address.
+- `address` is retained unchanged as the historical/raw address for legacy records.
 - `address_line1` contains only the number and street; `postal_code` and `city_name` are separate fields.
 - `AddressLineParser` is the single deterministic implementation for this split. It removes a suffix only when the raw/structured postcode and city agree strictly and a non-empty street remains.
 - A confirmed cleanup mode may remove an explicit final historical `CP + ville` from `address_line1` even when it conflicts with structured data; it never changes `address`, `postal_code` or `city_name`, and requires a non-empty street before the suffix.
-- When all three structured fields are absent, Géoplateforme may supply `address_line1`, postcode, city, INSEE code, country and provider provenance from the immutable raw address. Existing GPS and qualification/status fields are not changed; incomplete, imprecise or failed provider results remain untouched.
+- New or replacement addresses require a Géoplateforme selection resolved server-side. A usable selection supplies `address_line1`, postcode, city, INSEE code, country and valid GPS coordinates; no manual administrative/GPS entry is accepted.
+- The persisted localisation contract is `address`, `address_line1`, `address_line2`, `postal_code`, `city_name`, `city_code`, `country_code`, `latitude` and `longitude`. The former migration-only confidence, precision, provenance and proximity qualification columns are not part of the model.
+- Proximity search includes only non-null coordinates within latitude `[-90, 90]` and longitude `[-180, 180]`; it has no qualification-status dependency.
 - Public restaurant pages and JSON-LD use only `address_line1`, `postal_code` and `city_name` whenever structured fields exist; they must not expose the historical/raw `address` in that case.
 
 ## Controlled legacy migration
@@ -40,7 +42,7 @@ Create/edit/moderate records, media, hours, categories/features and ownership/cl
 `/ajouter-un-restaurant` is a `noindex,nofollow` public Blade form. It requires no account and is protected by Laravel CSRF, server-side validation and an e-mail/IP rate limit. JavaScript progressively enhances the five-step interaction; it is required solely for the mandatory remote address-selection control.
 
 - Step 1 requires a restaurant name and at least one of `has_halal_meat` or `has_halal_chicken`; it performs an informative name-similarity lookup.
-- Step 2 uses the reusable Géoplateforme address-selection service in the public form, Filament and owner-edit flow. Selecting a suggestion is mandatory: it is resolved again server-side and supplies `address_line1`, postcode, city, INSEE code, country, GPS and provider provenance. The public UI never exposes the INSEE code or manual postcode/city/GPS inputs. When the precise address is missing, the contributor selects the closest suggestion then moves the marker; this changes only latitude/longitude, does not reverse-geocode and never rewrites the selected structured address or metadata. Similarity candidates combine name, structured address and a 250m GPS radius without automatic merge or publication.
+- Step 2 uses the reusable Géoplateforme address-selection service in the public form, Filament and owner-edit flow. Selecting a suggestion is mandatory: it is resolved again server-side and supplies `address_line1`, postcode, city, INSEE code, country and valid GPS. The public UI never exposes the INSEE code or manual postcode/city/GPS inputs. When the precise address is missing, the contributor selects the closest suggestion then moves the marker; this changes only latitude/longitude, does not reverse-geocode and never rewrites the selected structured address. Similarity candidates combine name, structured address and a 250m GPS radius without automatic merge or publication.
 - Step 3 accepts optional categories, services (including an optional halal certification), simple seven-day schedules, contact data and private outbound destinations. External destinations are stored inactive and never rendered directly in public HTML or JSON-LD.
 - Step 4 requires exactly one cover upload and accepts at most ten additional JPEG, PNG or WebP uploads. Every uploaded image, cover or gallery, must be at least 800 px wide. Files are revalidated by the server-side V2 media pipeline before a pending media relation is created.
 - Step 5 stores the required e-mail both as the restaurant contact e-mail to be checked by moderation and in the private submission context with the contributor's relation to the restaurant (`owner`, `employee` or `customer`); no name or account is required. Selecting owner does not ask for further details. Claiming remains a separate authenticated flow.

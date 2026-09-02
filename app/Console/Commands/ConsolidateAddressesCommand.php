@@ -28,7 +28,6 @@ class ConsolidateAddressesCommand extends Command
             ->all();
 
         $rows = Restaurant::query()
-            ->whereIn('geocoding_status', ['APPROXIMATE', 'REVIEW_REQUIRED'])
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->when($ids !== [], fn (Builder $query) => $query->whereIn('id', $ids))
@@ -41,13 +40,6 @@ class ConsolidateAddressesCommand extends Command
             ->when($this->option('to-id'), fn (Builder $query, $id) => $query->where('id', '<=', $id))
             ->orderBy('id')
             ->get();
-
-        $clustered = Restaurant::query()->whereNotNull('latitude')->whereNotNull('longitude')->get()
-            ->groupBy(fn (Restaurant $restaurant) => $restaurant->latitude.','.$restaurant->longitude)
-            ->filter(fn ($group) => $group->count() > 1)
-            ->flatten()
-            ->pluck('id')
-            ->flip();
 
         $stats = ['selected' => $rows->count(), 'asked' => 0, 'cached' => 0, 'filled' => 0, 'incomplete_provider_result' => 0, 'provider_errors' => 0];
 
@@ -75,20 +67,12 @@ class ConsolidateAddressesCommand extends Command
             }
 
             if ($this->option('apply')) {
-                $safe = ! isset($clustered[$restaurant->id]) && in_array($feature['type'], ['housenumber', 'street'], true);
                 $restaurant->forceFill([
                     'address_line1' => $restaurant->address_line1 ?: $line1,
                     'postal_code' => $restaurant->postal_code ?: $feature['postcode'],
                     'city_name' => $restaurant->city_name ?: $feature['city'],
                     'city_code' => $restaurant->city_code ?: $feature['citycode'],
                     'country_code' => $restaurant->country_code ?: 'FR',
-                    // Metadata is informational; coordinates and the historical address are deliberately untouched.
-                    'geocoding_provider' => $restaurant->geocoding_provider ?: 'geoplateforme',
-                    'geocoding_source_id' => $restaurant->geocoding_source_id ?: $feature['id'],
-                    'geocoding_precision' => $restaurant->geocoding_precision ?: $feature['type'],
-                    'geocoding_score' => $restaurant->geocoding_score ?: $feature['score'],
-                    'geocoded_at' => $restaurant->geocoded_at ?: now(),
-                    'proximity_status' => $restaurant->proximity_status ?: ($safe ? 'ELIGIBLE' : 'REVIEW_REQUIRED'),
                 ])->save();
             }
 

@@ -6,6 +6,10 @@
 
 Restaurant address creation/replacement is provider-authoritative: every public, admin-create and owner-edit address change starts from a Géoplateforme suggestion whose opaque token is resolved server-side. The public form exposes neither manual administrative/GPS fields nor the INSEE code. A marker refinement after selection changes latitude/longitude only; it does not reverse-geocode, change structured address data or mutate geocoding provenance/status. Existing restaurant records are not mass-updated by this feature.
 
+### D023 — Localisation restaurant structurée sans qualification historique
+
+Les nouvelles adresses reposent sur une sélection Géoplateforme complète et des coordonnées GPS valides. La couche temporaire de qualification de migration (confiance, précision, score, provenance, statuts de géocodage et de proximité) est supprimée de `restaurants`. `address` est conservée sans modification comme donnée legacy ; l’affichage public reste strictement construit à partir de `address_line1`, `postal_code` et `city_name`. La proximité filtre directement latitude/longitude non nulles dans les plages mondiales valides. Tout déplacement de marqueur, quelle que soit l’interface, ne modifie que les deux coordonnées.
+
 ## 2026-08-31
 
 ### D022 — Provider-derived completion for fully missing address structure

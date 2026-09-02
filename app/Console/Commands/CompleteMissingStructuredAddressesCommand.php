@@ -16,8 +16,7 @@ class CompleteMissingStructuredAddressesCommand extends Command
         {--out=docs/generated/missing-structured-addresses-report.json : Persistent JSON report path}';
 
     private const PROTECTED_FIELDS = [
-        'address', 'address_line2', 'latitude', 'longitude', 'geocoding_status', 'geocoding_review_reason',
-        'address_confidence', 'location_precision', 'proximity_status',
+        'address', 'address_line2', 'latitude', 'longitude',
     ];
 
     public function handle(GeocodingService $geo, AddressLineParser $lines): int
@@ -40,7 +39,7 @@ class CompleteMissingStructuredAddressesCommand extends Command
                 $line1 = $lines->fromProviderLabel($feature['label'] ?? null, $feature['postcode'], $feature['city']);
                 if (! $line1) { $stats['incomplete']++; continue; }
 
-                $candidates[] = ['id' => $restaurant->id, 'legacy_wp_id' => $restaurant->legacy_wp_id, 'slug' => $restaurant->slug, 'address' => $restaurant->address, 'address_line1' => $line1, 'postal_code' => $feature['postcode'], 'city_name' => $feature['city'], 'city_code' => $feature['citycode'], 'country_code' => 'FR', 'provider_id' => $feature['id'] ?? null, 'precision' => $feature['type'], 'score' => $feature['score']];
+                $candidates[] = ['id' => $restaurant->id, 'legacy_wp_id' => $restaurant->legacy_wp_id, 'slug' => $restaurant->slug, 'address' => $restaurant->address, 'address_line1' => $line1, 'postal_code' => $feature['postcode'], 'city_name' => $feature['city'], 'city_code' => $feature['citycode'], 'country_code' => 'FR'];
             }
         });
         $stats['candidates'] = count($candidates);
@@ -59,8 +58,6 @@ class CompleteMissingStructuredAddressesCommand extends Command
                     $restaurant->forceFill([
                         'address_line1' => $candidate['address_line1'], 'postal_code' => $candidate['postal_code'], 'city_name' => $candidate['city_name'],
                         'city_code' => $candidate['city_code'], 'country_code' => $candidate['country_code'],
-                        'geocoding_provider' => 'geoplateforme', 'geocoding_source_id' => $candidate['provider_id'],
-                        'geocoding_precision' => $candidate['precision'], 'geocoding_score' => $candidate['score'], 'geocoded_at' => now(),
                     ])->save();
                     if ($before !== $restaurant->fresh()->only(self::PROTECTED_FIELDS)) { $violations[] = "Restaurant {$candidate['id']} changed a protected field."; continue; }
                     $stats['corrected']++;

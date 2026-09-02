@@ -28,7 +28,7 @@ class AutoGeocodeMissingGpsCommandTest extends TestCase
         $restaurant = $this->restaurant(['name'=>'Fresh Burritos Euralille', 'address_line1'=>'100 Avenue Willy Brandt', 'postal_code'=>'59777', 'city_name'=>'Lille', 'city_code'=>'59350', 'country_code'=>'FR']);
         $this->artisan('data:autogeocode-missing-gps', ['--apply'=>true, '--out'=>'docs/generated/testing-missing-gps.md'])->assertSuccessful();
         $fresh = $restaurant->fresh();
-        $this->assertSame('50.6370000', $fresh->latitude); $this->assertSame('3.0630000', $fresh->longitude); $this->assertSame('housenumber', $fresh->geocoding_precision); $this->assertSame('HIGH_CONFIDENCE', $fresh->geocoding_status); $this->assertSame('ELIGIBLE', $fresh->proximity_status);
+        $this->assertSame('50.6370000', $fresh->latitude); $this->assertSame('3.0630000', $fresh->longitude);
         $before = $fresh->getAttributes();
         $this->artisan('data:autogeocode-missing-gps', ['--apply'=>true, '--out'=>'docs/generated/testing-missing-gps.md'])->assertSuccessful();
         $this->assertSame($before, $restaurant->fresh()->getAttributes());
@@ -39,7 +39,7 @@ class AutoGeocodeMissingGpsCommandTest extends TestCase
         $street = $this->restaurant(['name'=>'Rue compatible', 'address_line1'=>'Rue Test', 'postal_code'=>'59777', 'city_name'=>'Lille', 'city_code'=>'59350', 'country_code'=>'FR']);
         $bad = $this->restaurant(['name'=>'Incompatible', 'address_line1'=>'Incompatible', 'postal_code'=>'59777', 'city_name'=>'Lille', 'city_code'=>'59350', 'country_code'=>'FR']);
         $this->artisan('data:autogeocode-missing-gps', ['--apply'=>true, '--out'=>'docs/generated/testing-missing-gps.md'])->assertSuccessful();
-        $this->assertSame('APPROXIMATE', $street->fresh()->geocoding_status); $this->assertSame('ELIGIBLE', $street->fresh()->proximity_status);
+        $this->assertSame('50.6370000', $street->fresh()->latitude); $this->assertSame('3.0630000', $street->fresh()->longitude);
         $this->assertNull($bad->fresh()->latitude); $this->assertNull($bad->fresh()->longitude);
     }
 

@@ -19,8 +19,7 @@ class RepairAddressLine1Command extends Command
 
     private const PROTECTED_FIELDS = [
         'address', 'address_line2', 'postal_code', 'city_name', 'city_code', 'country_code',
-        'latitude', 'longitude', 'geocoding_status', 'geocoding_review_reason',
-        'address_confidence', 'location_precision', 'proximity_status',
+        'latitude', 'longitude',
     ];
 
     public function handle(AddressLineParser $lines): int

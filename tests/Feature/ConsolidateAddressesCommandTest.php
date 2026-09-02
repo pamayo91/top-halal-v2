@@ -24,7 +24,6 @@ class ConsolidateAddressesCommandTest extends TestCase
             'address' => '46 Boulevard du Temple, Paris, France',
             'latitude' => '48.8659718',
             'longitude' => '2.3657509',
-            'geocoding_status' => 'APPROXIMATE',
         ]);
         $before = $restaurant->only(['address', 'latitude', 'longitude']);
 

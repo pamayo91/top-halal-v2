@@ -59,6 +59,21 @@ class PublicFrontendTest extends TestCase
         $this->get('/restaurants?q=safran&ville=lyon&categories[]=marocain&features[]=a-emporter')->assertOk()->assertSee('Le Safran')->assertSee('noindex,follow', false);
     }
 
+    public function test_near_me_uses_only_non_null_coordinates_within_valid_ranges(): void
+    {
+        Restaurant::create(['legacy_wp_id' => 510, 'name' => 'Coordonnées valides', 'slug' => 'coordonnees-valides', 'status' => 'published', 'latitude' => 48.8566, 'longitude' => 2.3522]);
+        Restaurant::create(['legacy_wp_id' => 511, 'name' => 'Latitude invalide', 'slug' => 'latitude-invalide', 'status' => 'published', 'latitude' => 91, 'longitude' => 2.3522]);
+        Restaurant::create(['legacy_wp_id' => 512, 'name' => 'Longitude invalide', 'slug' => 'longitude-invalide', 'status' => 'published', 'latitude' => 48.8566, 'longitude' => 181]);
+        Restaurant::create(['legacy_wp_id' => 513, 'name' => 'Sans coordonnées', 'slug' => 'sans-coordonnees', 'status' => 'published']);
+
+        $this->get('/restaurants?lat=48.8566&lng=2.3522')
+            ->assertOk()
+            ->assertSee('Coordonnées valides')
+            ->assertDontSee('Latitude invalide')
+            ->assertDontSee('Longitude invalide')
+            ->assertDontSee('Sans coordonnées');
+    }
+
     public function test_outbound_route_redirects_without_exposing_destination_in_restaurant_html(): void
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 412, 'name' => 'Le Cèdre', 'slug' => 'le-cedre', 'status' => 'published']);
