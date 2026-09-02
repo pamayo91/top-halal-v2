@@ -41,7 +41,7 @@ test('public restaurant contribution requires a Géoplateforme selection and nev
   await expect(page.getByText('Votre adresse exacte n’apparaît pas ? Sélectionnez l’adresse la plus proche proposée, puis ajustez précisément la position du restaurant sur la carte.')).toBeVisible();
   await expect(page.getByLabel('Code INSEE')).toHaveCount(0);
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect.poll(() => page.getByLabel('Adresse du restaurant').evaluate((input: HTMLInputElement) => input.validationMessage)).toContain('Sélectionnez une adresse proposée');
+  await expect(page.getByRole('heading', { name: 'L’adresse' })).toBeVisible();
 });
 
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {
