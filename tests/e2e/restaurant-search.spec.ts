@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-for (const device of ['desktop', 'mobile']) {
-  test(`two-field restaurant search works on ${device}`, async ({ page }) => {
+test('two-field restaurant search works responsively', async ({ page }) => {
     await page.goto('/');
     const search = page.locator('[data-restaurant-search]').first();
     await expect(search.getByLabel('Localisation')).toHaveValue('Paris');
@@ -9,12 +8,11 @@ for (const device of ['desktop', 'mobile']) {
     await expect(search.getByRole('button', { name: 'Autour de moi' })).toBeVisible();
     await search.getByLabel('Spécialité ou nom de restaurant').fill('burger');
     await expect(search.locator('[data-suggestions-list]')).toBeVisible();
-    if (device === 'mobile') {
-      await expect(search).toHaveCSS('grid-template-columns', /1fr/);
+    if ((page.viewportSize()?.width ?? 0) < 760) {
+      expect(await search.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(1);
       expect(await page.locator('body').evaluate(el => el.scrollWidth > el.clientWidth)).toBe(false);
     }
   });
-}
 
 test('near me is requested only after the voluntary choice and keeps the search usable on refusal', async ({ page }) => {
   await page.goto('/');
