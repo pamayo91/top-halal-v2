@@ -6,6 +6,9 @@ test('two-field restaurant search works responsively', async ({ page }) => {
     await expect(search.getByLabel('Localisation')).toHaveValue('Paris');
     await search.getByLabel('Localisation').focus();
     await expect(search.getByRole('button', { name: 'Autour de moi' })).toBeVisible();
+    await page.locator('h1').click();
+    await expect(search.getByRole('button', { name: 'Autour de moi' })).toBeHidden();
+    await search.getByLabel('Localisation').focus();
     await search.getByLabel('Spécialité ou nom de restaurant').fill('burger');
     await expect(search.locator('[data-suggestions-list]')).toBeVisible();
     if ((page.viewportSize()?.width ?? 0) < 760) {
