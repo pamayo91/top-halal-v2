@@ -5,12 +5,14 @@
 @php($hero = $restaurant->media->first()?->asset)
 @php($heroVariant = $hero?->variants->where('width', '>=', 960)->sortBy('width')->first() ?? $hero?->variants->sortByDesc('width')->first())
 @php($heroUrl = $hero ? $hero->deliveryUrl($heroVariant?->width) : null)
-@php($displayAddress = $restaurant->address_line1 ?: preg_replace('/,?\s*France\s*$/iu', '', (string) $restaurant->address))
+@php($hasStructuredAddress = filled($restaurant->address_line1) || filled($restaurant->postal_code) || filled($restaurant->city_name))
+@php($displayAddress = $hasStructuredAddress ? $restaurant->address_line1 : preg_replace('/,?\s*France\s*$/iu', '', (string) $restaurant->address))
 @php($openingHours = $restaurant->openingHours->groupBy('day'))
 @php($days = ['monday' => 'Lundi', 'tuesday' => 'Mardi', 'wednesday' => 'Mercredi', 'thursday' => 'Jeudi', 'friday' => 'Vendredi', 'saturday' => 'Samedi', 'sunday' => 'Dimanche'])
 @php($formatTime = fn ($time) => $time ? substr((string) $time, 0, 5) : null)
 @php($openingHoursStatus = app(\App\Services\RestaurantOpeningStatus::class)->for($restaurant->openingHours))
-@php($schema = array_filter(['@context'=>'https://schema.org','@type'=>'Restaurant','name'=>$restaurant->name,'address'=>$restaurant->address ? ['@type'=>'PostalAddress','streetAddress'=>$restaurant->address,'postalCode'=>$restaurant->postal_code,'addressLocality'=>$restaurant->city_name,'addressCountry'=>'FR'] : null,'telephone'=>$restaurant->phone,'aggregateRating'=>$aggregate['count'] ? ['@type'=>'AggregateRating','ratingValue'=>$aggregate['average'],'reviewCount'=>$aggregate['count'],'bestRating'=>5,'worstRating'=>1] : null]))
+@php($schemaAddress = $hasStructuredAddress ? array_filter(['@type'=>'PostalAddress','streetAddress'=>$restaurant->address_line1,'postalCode'=>$restaurant->postal_code,'addressLocality'=>$restaurant->city_name,'addressCountry'=>$restaurant->country_code ?: 'FR']) : ($restaurant->address ? ['@type'=>'PostalAddress','streetAddress'=>$restaurant->address] : null))
+@php($schema = array_filter(['@context'=>'https://schema.org','@type'=>'Restaurant','name'=>$restaurant->name,'address'=>$schemaAddress,'telephone'=>$restaurant->phone,'aggregateRating'=>$aggregate['count'] ? ['@type'=>'AggregateRating','ratingValue'=>$aggregate['average'],'reviewCount'=>$aggregate['count'],'bestRating'=>5,'worstRating'=>1] : null]))
 <x-layouts.app :title="$title" :canonical="$isPreview ? ($previewUrl ?? route('restaurants.preview', $restaurant->legacy_wp_id)) : route('restaurants.show', $restaurant->slug)" :robots="$robots" :admin-edit-url="$adminEditUrl ?? null">
 <x-slot:head><script type="application/ld+json">@json($schema)</script></x-slot:head>
 <div class="shell"><nav class="breadcrumbs" aria-label="Fil d’Ariane"><a href="{{ route('home') }}">Accueil</a><span>/</span><a href="{{ route('restaurants.index') }}">Restaurants</a><span>/</span><span aria-current="page">{{ $restaurant->name }}</span></nav>

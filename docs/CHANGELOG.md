@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-02
+
+- Reworked restaurant address entry around mandatory server-resolved Géoplateforme selections. The public proposal and owner-edit forms share the address selector/map; Filament creation also requires a selection. Public users no longer enter postcode, city, INSEE code or GPS manually. Marker refinement changes GPS only and does not reverse-geocode or rewrite structured/provider data. Restaurant pages and JSON-LD now prefer the structured address fields over the historical raw address. No existing restaurant was modified.
+
 ## 2026-09-01
 
 - Les administrateurs actifs voient désormais un raccourci « Éditer » en haut des fiches restaurant, articles et pages publiques ; il ouvre directement le formulaire Filament correspondant, sans JavaScript ni surcharge des réponses des visiteurs.

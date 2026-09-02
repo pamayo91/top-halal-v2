@@ -29,7 +29,25 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertOk()
             ->assertSee('Étape 1 sur 5')
             ->assertSee('Photo de couverture')
+            ->assertSee('Votre adresse exacte n’apparaît pas ? Sélectionnez l’adresse la plus proche proposée, puis ajustez précisément la position du restaurant sur la carte.')
+            ->assertDontSee('Code INSEE')
             ->assertSee('noindex,nofollow', false);
+    }
+
+    public function test_it_rejects_manual_address_fields_without_a_geoplateforme_selection(): void
+    {
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload([
+            'address_suggestion_token' => null,
+            'address_line1' => '46 Boulevard du Temple',
+            'postal_code' => '75011',
+            'city_name' => 'Paris',
+            'city_code' => '75111',
+            'latitude' => 48.866,
+            'longitude' => 2.364,
+        ]))->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('address_suggestion_token');
+
+        $this->assertDatabaseCount('restaurants', 0);
     }
 
     public function test_it_requires_one_halal_option(): void
@@ -101,13 +119,51 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame('customer', RestaurantSubmission::firstOrFail()->submitter_role);
     }
 
+    public function test_a_marker_move_changes_only_coordinates_after_the_selected_address_is_persisted(): void
+    {
+        $asset = MediaAsset::create(['original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('b', 64), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload([
+            'map_moved' => '1',
+            'latitude' => 48.867,
+            'longitude' => 2.365,
+        ]))->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $restaurant = Restaurant::firstOrFail();
+        $this->assertSame('46 Boulevard du Temple', $restaurant->address_line1);
+        $this->assertSame('75011', $restaurant->postal_code);
+        $this->assertSame('Paris', $restaurant->city_name);
+        $this->assertSame('75111', $restaurant->city_code);
+        $this->assertSame('BAN-46', $restaurant->geocoding_source_id);
+        $this->assertSame('48.8670000', $restaurant->latitude);
+        $this->assertSame('2.3650000', $restaurant->longitude);
+        $this->assertSame('VERIFIED', $restaurant->geocoding_status);
+    }
+
+    public function test_submission_never_modifies_an_existing_restaurant(): void
+    {
+        $existing = Restaurant::create(['legacy_wp_id' => 987, 'name' => 'Historique', 'slug' => 'historique', 'status' => 'published', 'address' => 'Adresse historique', 'address_line1' => '1 Rue Historique', 'postal_code' => '75001', 'city_name' => 'Paris', 'city_code' => '75101', 'latitude' => 48.8566, 'longitude' => 2.3522]);
+        $before = $existing->only(['address', 'address_line1', 'postal_code', 'city_name', 'city_code', 'latitude', 'longitude']);
+        $asset = MediaAsset::create(['original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $this->assertSame($before, $existing->fresh()->only(array_keys($before)));
+    }
+
     public function test_address_endpoint_and_duplicate_endpoint_expose_only_the_safe_public_contract(): void
     {
         Restaurant::create(['legacy_wp_id' => 99, 'name' => 'Le Safran', 'slug' => 'le-safran', 'status' => 'published', 'address_line1' => '46 Boulevard du Temple', 'city_name' => 'Paris', 'latitude' => 48.866, 'longitude' => 2.364]);
 
         $this->getJson(route('restaurant-submissions.addresses', ['q' => 'Boulevard du Temple']))
             ->assertOk()
-            ->assertJsonPath('data.0.address.city_code', '75111')
+            ->assertJsonMissing(['city_code' => '75111'])
             ->assertJsonMissing(['geocoding_source_id' => 'BAN-46']);
 
         $this->getJson(route('restaurant-submissions.duplicates', ['name' => 'Le Safran', 'address_line1' => '46 Boulevard du Temple', 'city_name' => 'Paris', 'latitude' => 48.866, 'longitude' => 2.364]))

@@ -1,7 +1,14 @@
+import { initializeAddressSelectors } from './address-selector';
+
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
 
 const submission = document.querySelector('[data-restaurant-submission]');
+
+if (document.querySelector('[data-address-selector]')) {
+    void import('../css/restaurant-submission.css');
+    initializeAddressSelectors();
+}
 
 if (submission) {
     void import('../css/restaurant-submission.css');
@@ -14,17 +21,11 @@ if (submission) {
     const nameInput = form.querySelector('[data-restaurant-name]');
     const halalOptions = [...form.querySelectorAll('[data-halal-option]')];
     const halalError = form.querySelector('[data-halal-error]');
-    const addressQuery = form.querySelector('[data-address-query]');
-    const addressResults = form.querySelector('[data-address-results]');
+    const addressSelector = form.querySelector('[data-address-selector]');
+    const addressQuery = addressSelector.querySelector('[data-address-query]');
     const addressToken = form.querySelector('[data-address-token]');
-    const selectedAddress = form.querySelector('[data-address-selected]');
-    const manualAddress = form.querySelector('[data-manual-address]');
-    const addressFields = [...form.querySelectorAll('[data-address-field]')];
     const latitude = form.querySelector('[data-latitude]');
     const longitude = form.querySelector('[data-longitude]');
-    const mapMoved = form.querySelector('[data-map-moved]');
-    const mapContainer = form.querySelector('[data-submission-map]');
-    const mapHelp = form.querySelector('[data-map-help]');
     const nameDuplicates = form.querySelector('[data-name-duplicates]');
     const addressDuplicates = form.querySelector('[data-address-duplicates]');
     const coverInput = form.querySelector('[data-cover-input]');
@@ -33,18 +34,14 @@ if (submission) {
     const galleryPreview = form.querySelector('[data-gallery-preview]');
     const summary = form.querySelector('[data-submission-summary]');
     let currentStep = Number.parseInt(submission.dataset.initialStep || '1', 10) || 1;
-    let addressTimer;
     let nameTimer;
-    let map;
-    let marker;
-    let leaflet;
-    let addressApplying = false;
     let galleryFiles = [];
     let coverUrl;
     const galleryUrls = new WeakMap();
 
     const text = (element, value) => { element.textContent = value || 'Non renseigné'; return element; };
     const inputValue = name => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+    const addressValue = name => addressSelector.querySelector(`[data-address-display="${name}"]`)?.value?.trim() || '';
     const selectedLabels = name => [...form.querySelectorAll(`[name="${name}[]"]:checked`)].map(input => input.parentElement.textContent.trim());
 
     const setStep = (step, focus = true) => {
@@ -60,7 +57,6 @@ if (submission) {
             if (active) indicator.setAttribute('aria-current', 'step'); else indicator.removeAttribute('aria-current');
         });
         finalSubmit.hidden = currentStep !== 5;
-        if (currentStep === 2 && latitude.value && longitude.value) showMap(Number(latitude.value), Number(longitude.value));
         if (currentStep === 5) renderSummary();
         if (focus) steps[currentStep - 1].querySelector('h2')?.focus({ preventScroll: true });
         window.scrollTo({ top: submission.getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth' });
@@ -86,13 +82,10 @@ if (submission) {
         }
         if (step === 1 && !validateHalal()) return false;
         if (step === 2) {
-            const hasManualAddress = ['address_line1', 'postal_code', 'city_name'].every(field => inputValue(field));
-            if (!addressToken.value && !hasManualAddress) {
-                const first = form.querySelector('[name="address_line1"]');
-                manualAddress.open = true;
-                first.setCustomValidity('Sélectionnez une adresse ou complétez l’adresse manuellement.');
-                first.reportValidity();
-                first.setCustomValidity('');
+            if (!addressToken.value) {
+                addressQuery.setCustomValidity('Sélectionnez une adresse proposée par la Géoplateforme.');
+                addressQuery.reportValidity();
+                addressQuery.setCustomValidity('');
                 return false;
             }
         }
@@ -125,7 +118,7 @@ if (submission) {
         if (nameInput.value.trim().length < 2) { target.replaceChildren(); return; }
         const params = new URLSearchParams({ name: nameInput.value.trim() });
         if (detailed) {
-            ['address_line1', 'city_name'].forEach(field => { if (inputValue(field)) params.set(field, inputValue(field)); });
+            ['address_line1', 'city_name'].forEach(field => { if (addressValue(field)) params.set(field, addressValue(field)); });
             if (latitude.value && longitude.value) { params.set('latitude', latitude.value); params.set('longitude', longitude.value); }
         }
         try {
@@ -138,83 +131,6 @@ if (submission) {
         }
     };
 
-    const applyAddress = address => {
-        addressApplying = true;
-        Object.entries(address).forEach(([field, value]) => {
-            const input = form.querySelector(`[data-address-field="${field}"]`);
-            if (input && value !== null && value !== undefined) input.value = value;
-        });
-        latitude.value = address.latitude ?? '';
-        longitude.value = address.longitude ?? '';
-        mapMoved.value = '0';
-        addressApplying = false;
-        selectedAddress.hidden = false;
-        manualAddress.open = false;
-        if (latitude.value && longitude.value) showMap(Number(latitude.value), Number(longitude.value));
-        refreshDuplicates(addressDuplicates, true);
-    };
-
-    const showAddressResults = data => {
-        addressResults.replaceChildren();
-        if (!data.length) {
-            if (addressQuery.value.trim().length >= 3) text(addressResults.appendChild(document.createElement('p')), 'Aucune adresse trouvée. Vous pouvez la renseigner manuellement.');
-            return;
-        }
-        const list = document.createElement('ul');
-        data.forEach(item => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            text(button, item.label);
-            button.addEventListener('click', () => {
-                addressToken.value = item.token;
-                addressQuery.value = item.label;
-                addressResults.replaceChildren();
-                applyAddress(item.address || {});
-            });
-            const row = document.createElement('li');
-            row.append(button);
-            list.append(row);
-        });
-        addressResults.append(list);
-    };
-
-    const loadLeaflet = async () => {
-        if (leaflet) return leaflet;
-        const module = await import('leaflet');
-        await import('leaflet/dist/leaflet.css');
-        leaflet = module.default || module;
-        return leaflet;
-    };
-
-    const showMap = async (lat, lng) => {
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-        try {
-            const L = await loadLeaflet();
-            if (!map) {
-                map = L.map(mapContainer, { scrollWheelZoom: false }).setView([lat, lng], 16);
-                L.tileLayer(mapContainer.dataset.tileUrl, { maxZoom: 19, attribution: mapContainer.dataset.tileAttribution }).addTo(map);
-                marker = L.marker([lat, lng], {
-                    draggable: true,
-                    icon: L.divIcon({ className: 'submission-map-marker', html: '<span aria-hidden="true">⌖</span>', iconSize: [34, 34], iconAnchor: [17, 17] }),
-                }).addTo(map);
-                marker.on('dragend', () => {
-                    const position = marker.getLatLng();
-                    latitude.value = position.lat.toFixed(7);
-                    longitude.value = position.lng.toFixed(7);
-                    mapMoved.value = '1';
-                    text(mapHelp, 'Position ajustée manuellement. Elle sera vérifiée par la modération.');
-                    refreshDuplicates(addressDuplicates, true);
-                });
-            } else {
-                marker.setLatLng([lat, lng]);
-                map.setView([lat, lng], 16);
-            }
-            requestAnimationFrame(() => map.invalidateSize());
-            text(mapHelp, 'Déplacez le marqueur si la position doit être affinée. Cette correction sera vérifiée par la modération.');
-        } catch (_) {
-            text(mapHelp, 'La carte est indisponible pour le moment. L’adresse reste utilisable et sera vérifiée par la modération.');
-        }
-    };
 
     const updateHoursVisibility = day => {
         const row = form.querySelector(`[data-hours-day="${day}"]`);
@@ -270,7 +186,7 @@ if (submission) {
         const add = (label, value) => { const term = document.createElement('dt'); text(term, label); const definition = document.createElement('dd'); text(definition, value); list.append(term, definition); };
         add('Restaurant', nameInput.value.trim());
         add('Offre halal', halalOptions.filter(option => option.checked).map(option => option.parentElement.textContent.trim().split('\n')[0]).join(', '));
-        add('Adresse', [inputValue('address_line1'), inputValue('postal_code'), inputValue('city_name')].filter(Boolean).join(', '));
+        add('Adresse', [addressValue('address_line1'), addressValue('postal_code'), addressValue('city_name')].filter(Boolean).join(', '));
         add('Catégories', selectedLabels('categories').join(', '));
         add('Services', selectedLabels('features').join(', '));
         add('Photos', `1 couverture${galleryFiles.length ? ` + ${galleryFiles.length} galerie` : ''}`);
@@ -289,23 +205,8 @@ if (submission) {
     });
     halalOptions.forEach(option => option.addEventListener('change', validateHalal));
     nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(() => refreshDuplicates(nameDuplicates, false), 350); });
-    addressQuery.addEventListener('input', () => {
-        clearTimeout(addressTimer);
-        const query = addressQuery.value.trim();
-        if (query.length < 3) { addressResults.replaceChildren(); return; }
-        addressTimer = setTimeout(async () => {
-            try {
-                const response = await fetch(`${submission.dataset.addressEndpoint}?${new URLSearchParams({ q: query })}`, { headers: { Accept: 'application/json' } });
-                if (response.ok) showAddressResults((await response.json()).data || []);
-            } catch (_) { showAddressResults([]); }
-        }, 250);
-    });
-    addressFields.forEach(field => field.addEventListener('input', () => {
-        if (addressApplying) return;
-        addressToken.value = '';
-        selectedAddress.hidden = true;
-        manualAddress.open = true;
-    }));
+    addressSelector.addEventListener('address-selected', () => refreshDuplicates(addressDuplicates, true));
+    addressSelector.addEventListener('address-marker-moved', () => refreshDuplicates(addressDuplicates, true));
     form.querySelectorAll('[data-hours-status]').forEach(select => select.addEventListener('change', () => updateHoursVisibility(select.closest('[data-hours-day]').dataset.hoursDay)));
     form.querySelector('[data-copy-hours]').addEventListener('click', () => {
         const source = form.querySelector(`[data-hours-day="${form.querySelector('[data-copy-source]').value}"]`);

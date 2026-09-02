@@ -32,6 +32,25 @@ class AddressSuggestionService
         return Str::isUuid($token) ? Cache::get($this->key($token)) : null;
     }
 
+    /**
+     * Resolve a browser selection back to the provider payload held server-side.
+     * Client-submitted address fields are deliberately never trusted.
+     */
+    public function structuredFromToken(string $token): ?array
+    {
+        $feature = $this->resolve($token);
+
+        return $feature === null ? null : $this->structured($feature);
+    }
+
+    /** Data needed only to render a selected address and its map in a browser. */
+    public function publicStructured(array $feature): array
+    {
+        return collect($this->structured($feature))
+            ->only(['address_line1', 'postal_code', 'city_name', 'latitude', 'longitude'])
+            ->all();
+    }
+
     public function label(array $feature): string
     {
         $line = trim((string) ($feature['label'] ?? ''));

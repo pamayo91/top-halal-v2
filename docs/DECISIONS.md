@@ -1,5 +1,11 @@
 # Architectural & Product Decisions
 
+## 2026-09-02
+
+### D023 — Mandatory selection for restaurant addresses
+
+Restaurant address creation/replacement is provider-authoritative: every public, admin-create and owner-edit address change starts from a Géoplateforme suggestion whose opaque token is resolved server-side. The public form exposes neither manual administrative/GPS fields nor the INSEE code. A marker refinement after selection changes latitude/longitude only; it does not reverse-geocode, change structured address data or mutate geocoding provenance/status. Existing restaurant records are not mass-updated by this feature.
+
 ## 2026-08-31
 
 ### D022 — Provider-derived completion for fully missing address structure

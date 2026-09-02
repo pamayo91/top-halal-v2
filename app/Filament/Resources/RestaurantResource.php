@@ -129,15 +129,15 @@ class RestaurantResource extends AdminResource
             Tabs\Tab::make('Localisation')->schema([
                 Hidden::make('location_update_source')->default('manual'),
                 Section::make('Adresse')->columns(2)->schema([
-                    Select::make('address_suggestion')->label('Rechercher une adresse')->placeholder('Commencez à saisir au moins 3 caractères')->searchable()->searchDebounce(350)->getSearchResultsUsing(function (string $search): array {
+                    Select::make('address_suggestion')->label('Rechercher une adresse')->helperText('Sélection obligatoire pour créer ou remplacer une adresse.')->placeholder('Commencez à saisir au moins 3 caractères')->required(fn (string $operation): bool => $operation === 'create')->searchable()->searchDebounce(350)->getSearchResultsUsing(function (string $search): array {
                         return collect(app(AddressSuggestionService::class)->suggest($search))->mapWithKeys(fn (array $item) => [$item['token'] => $item['label']])->all();
                     })->getOptionLabelUsing(fn (?string $value): ?string => ($feature = app(AddressSuggestionService::class)->resolve((string) $value)) ? app(AddressSuggestionService::class)->label($feature) : null)->live()->afterStateUpdated(function ($state, $set): void {
                         $service = app(AddressSuggestionService::class); $feature = $service->resolve((string) $state); if (!$feature) return;
                         foreach ($service->structured($feature) as $field => $value) $set($field, $value);
                         $set('location_update_source', 'autocomplete');
-                    })->dehydrated(false)->columnSpanFull(),
-                    TextInput::make('address_line1')->label('Adresse')->maxLength(255), TextInput::make('address_line2')->label('Complément')->maxLength(255), TextInput::make('postal_code')->label('Code postal')->maxLength(20),
-                    TextInput::make('city_name')->label('Ville officielle')->maxLength(255), TextInput::make('city_code')->label('Code INSEE')->maxLength(10), TextInput::make('country_code')->label('Pays')->maxLength(2)->rules(['nullable', 'size:2']),
+                    })->columnSpanFull(),
+                    TextInput::make('address_line1')->label('Adresse')->maxLength(255)->readOnly(), TextInput::make('address_line2')->label('Complément')->maxLength(255)->readOnly(), TextInput::make('postal_code')->label('Code postal')->maxLength(20)->readOnly(),
+                    TextInput::make('city_name')->label('Ville officielle')->maxLength(255)->readOnly(), TextInput::make('city_code')->label('Code INSEE')->maxLength(10)->readOnly(), TextInput::make('country_code')->label('Pays')->maxLength(2)->rules(['nullable', 'size:2'])->readOnly(),
                     Select::make('locations')->label('Zones associées Top-Halal')->helperText('Ces zones ne sont pas modifiées automatiquement lors d’un changement d’adresse.')->relationship('locations', 'name')->multiple()->searchable()->preload()->columnSpanFull(),
                 ]),
                 Section::make('Position')->schema([

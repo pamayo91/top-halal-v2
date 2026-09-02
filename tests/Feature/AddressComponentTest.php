@@ -76,6 +76,19 @@ class AddressComponentTest extends TestCase
         $this->assertSame('REVIEW_REQUIRED', $fresh->proximity_status); $this->assertSame('geography_associations_require_review', $fresh->location_review_reason);
     }
 
+    public function test_public_marker_move_preserves_the_selected_address_and_geocoding_metadata(): void
+    {
+        $restaurant = $this->restaurant(['address_line1'=>'46 Boulevard du Temple', 'postal_code'=>'75011', 'city_name'=>'Paris', 'city_code'=>'75111', 'country_code'=>'FR', 'latitude'=>48.866, 'longitude'=>2.364, 'geocoding_status'=>'VERIFIED', 'geocoding_source_id'=>'BAN-46']);
+        $before = $restaurant->only(['address_line1', 'postal_code', 'city_name', 'city_code', 'country_code', 'geocoding_status', 'geocoding_source_id']);
+
+        app(RestaurantLocationService::class)->update($restaurant, ['latitude'=>48.867, 'longitude'=>2.365, 'location_update_source'=>'public_map']);
+
+        $fresh = $restaurant->fresh();
+        $this->assertSame($before, $fresh->only(array_keys($before)));
+        $this->assertSame('48.8670000', $fresh->latitude);
+        $this->assertSame('2.3650000', $fresh->longitude);
+    }
+
     public function test_duplicate_detector_is_informative_not_an_automatic_merge(): void
     {
         $first = $this->restaurant(['name'=>'O Sha', 'latitude'=>48.866, 'longitude'=>2.364, 'address_line1'=>'46 Boulevard du Temple']);

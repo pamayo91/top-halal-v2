@@ -77,6 +77,27 @@ class PublicFrontendTest extends TestCase
         $this->get('/resto/adams-burger')->assertOk()->assertSee('<title>Restaurant Adam&#039;s Burger Halal à Lyon spécialité Marocain</title>', false)->assertDontSee('Top Halal</title>', false)->assertDontSee('Adam&amp;#039;s Burger', false);
     }
 
+    public function test_restaurant_address_uses_only_structured_fields_when_available(): void
+    {
+        Restaurant::create([
+            'legacy_wp_id' => 415,
+            'name' => 'Adresse structurée',
+            'slug' => 'adresse-structuree',
+            'status' => 'published',
+            'address' => 'Adresse brute qui ne doit jamais être publique, 99999 Nullepart',
+            'address_line1' => '54 Boulevard de La libération',
+            'postal_code' => '13001',
+            'city_name' => 'Marseille',
+            'country_code' => 'FR',
+        ]);
+
+        $this->get('/resto/adresse-structuree')
+            ->assertOk()
+            ->assertSee('54 Boulevard de La libération')
+            ->assertSee('13001 Marseille')
+            ->assertDontSee('Adresse brute qui ne doit jamais être publique');
+    }
+
     public function test_manual_restaurant_seo_title_overrides_the_default(): void
     {
         Restaurant::create(['legacy_wp_id' => 426, 'name' => 'Titre test', 'slug' => 'titre-test', 'status' => 'published', 'seo_title' => 'Titre personnalisé']);

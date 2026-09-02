@@ -32,11 +32,11 @@ class PublicRestaurantSubmissionController extends Controller
         return response()->json([
             'data' => collect($suggestions->suggest($data['q']))
                 ->map(function (array $item) use ($suggestions): array {
-                    $structured = $suggestions->structured($item['feature']);
+                    $structured = $suggestions->publicStructured($item['feature']);
                     return [
                         'token' => $item['token'],
                         'label' => $item['label'],
-                        'address' => collect($structured)->only(['address_line1', 'postal_code', 'city_name', 'city_code', 'country_code', 'latitude', 'longitude'])->all(),
+                        'address' => $structured,
                     ];
                 })
                 ->all(),
@@ -82,7 +82,12 @@ class PublicRestaurantSubmissionController extends Controller
                 'address' => $this->displayAddress($location),
             ]);
 
-            $locations->update($restaurant, $location);
+            $locations->applySelectedSuggestion(
+                $restaurant,
+                $location,
+                $request->boolean('map_moved') ? (float) $data['latitude'] : null,
+                $request->boolean('map_moved') ? (float) $data['longitude'] : null,
+            );
             $restaurant->categories()->sync($data['categories'] ?? []);
             $restaurant->features()->sync($data['features'] ?? []);
 
@@ -136,33 +141,14 @@ class PublicRestaurantSubmissionController extends Controller
     {
         $token = $data['address_suggestion_token'] ?? null;
         if (filled($token)) {
-            $feature = $suggestions->resolve($token);
-            if ($feature === null) {
+            $location = $suggestions->structuredFromToken($token);
+            if ($location === null) {
                 throw ValidationException::withMessages(['address_line1' => 'Cette suggestion a expiré. Recherchez l’adresse à nouveau.']);
             }
-            $location = $suggestions->structured($feature);
-            if ($request->boolean('map_moved')) {
-                $location['latitude'] = $data['latitude'];
-                $location['longitude'] = $data['longitude'];
-                $location['location_update_source'] = 'public_map';
-            } else {
-                $location['location_update_source'] = 'autocomplete';
-            }
-
             return $location;
         }
 
-        return [
-            'address_line1' => trim((string) $data['address_line1']),
-            'address_line2' => filled($data['address_line2'] ?? null) ? trim($data['address_line2']) : null,
-            'postal_code' => trim((string) $data['postal_code']),
-            'city_name' => trim((string) $data['city_name']),
-            'city_code' => filled($data['city_code'] ?? null) ? trim($data['city_code']) : null,
-            'country_code' => Str::upper(trim((string) ($data['country_code'] ?? 'FR'))),
-            'latitude' => $data['latitude'] ?? null,
-            'longitude' => $data['longitude'] ?? null,
-            'location_update_source' => $request->boolean('map_moved') ? 'public_map' : 'manual',
-        ];
+        throw ValidationException::withMessages(['address_suggestion_token' => 'Sélectionnez une adresse proposée par la Géoplateforme.']);
     }
 
     private function displayAddress(array $location): string

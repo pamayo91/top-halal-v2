@@ -52,36 +52,8 @@
                     <section class="submission-step" data-submission-step="2" aria-labelledby="submission-step-2-title">
                         <p class="submission-kicker">Étape 2 sur 5</p>
                         <h2 id="submission-step-2-title">L’adresse</h2>
-                        <p class="muted">Sélectionnez l’adresse proposée : les données administratives et la position sont alors complétées automatiquement.</p>
-
-                        <label for="address-query">Rechercher une adresse</label>
-                        <input id="address-query" type="search" autocomplete="street-address" placeholder="Ex. 46 boulevard du Temple, Paris" data-address-query aria-describedby="address-help address-results">
-                        <p id="address-help" class="form-help">Les suggestions sont fournies par la Géoplateforme. Vous pourrez ajuster le marqueur si nécessaire.</p>
-                        <div id="address-results" class="address-results" data-address-results aria-live="polite"></div>
-                        <input type="hidden" name="address_suggestion_token" value="{{ old('address_suggestion_token') }}" data-address-token>
-                        <p class="address-selected" data-address-selected @if(!old('address_suggestion_token')) hidden @endif>Adresse sélectionnée. Vous pouvez déplacer le marqueur pour corriger la position.</p>
-
-                        <details class="manual-address" data-manual-address @if(!old('address_suggestion_token')) open @endif>
-                            <summary>Mon adresse n’apparaît pas dans les suggestions</summary>
-                            <p class="form-help">Renseignez ce que vous connaissez. La modération vérifiera l’adresse avant publication.</p>
-                            <div class="form-grid">
-                                <label for="address-line1">Adresse <input id="address-line1" name="address_line1" maxlength="255" value="{{ old('address_line1') }}" data-address-field="address_line1"></label>
-                                <label for="address-line2">Complément <input id="address-line2" name="address_line2" maxlength="255" value="{{ old('address_line2') }}" data-address-field="address_line2"></label>
-                                <label for="postal-code">Code postal <input id="postal-code" name="postal_code" maxlength="20" inputmode="numeric" value="{{ old('postal_code') }}" data-address-field="postal_code"></label>
-                                <label for="city-name">Ville <input id="city-name" name="city_name" maxlength="255" value="{{ old('city_name') }}" data-address-field="city_name"></label>
-                                <label for="city-code">Code INSEE <input id="city-code" name="city_code" maxlength="10" value="{{ old('city_code') }}" data-address-field="city_code"></label>
-                            </div>
-                            <input type="hidden" name="country_code" value="{{ old('country_code', 'FR') }}" data-address-field="country_code">
-                        </details>
-                        @foreach(['address_line1', 'postal_code', 'city_name', 'latitude'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
-
-                        <div class="submission-map-wrap">
-                            <div class="submission-map" data-submission-map data-tile-url="{{ config('location.map_tile_url') }}" data-tile-attribution="{{ config('location.map_tile_attribution') }}" aria-label="Carte de la position du restaurant"></div>
-                            <p class="form-help" data-map-help>Choisissez une adresse pour afficher la carte et déplacer le marqueur.</p>
-                        </div>
-                        <input type="hidden" name="latitude" value="{{ old('latitude') }}" data-latitude>
-                        <input type="hidden" name="longitude" value="{{ old('longitude') }}" data-longitude>
-                        <input type="hidden" name="map_moved" value="{{ old('map_moved', 0) }}" data-map-moved>
+                        <p class="muted">Sélectionnez une suggestion Géoplateforme : l’adresse, les données administratives et la position sont complétées automatiquement.</p>
+                        <x-address-selector />
 
                         <div class="submission-duplicates" data-address-duplicates aria-live="polite"></div>
                         <div class="submission-actions">

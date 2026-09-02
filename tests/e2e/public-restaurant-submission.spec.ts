@@ -33,6 +33,17 @@ test('public restaurant contribution blocks an empty halal choice and identifies
   await expect(page.locator('[data-name-duplicates]').getByRole('link', { name: /O Sha/ })).toBeVisible();
 });
 
+test('public restaurant contribution requires a Géoplateforme selection and never exposes the INSEE field', async ({ page }) => {
+  await page.goto('/ajouter-un-restaurant');
+  await page.locator('[data-restaurant-name]').fill('Adresse obligatoire');
+  await page.getByLabel('Viande halal').check();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Votre adresse exacte n’apparaît pas ? Sélectionnez l’adresse la plus proche proposée, puis ajustez précisément la position du restaurant sur la carte.')).toBeVisible();
+  await expect(page.getByLabel('Code INSEE')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect.poll(() => page.getByLabel('Adresse du restaurant').evaluate((input: HTMLInputElement) => input.validationMessage)).toContain('Sélectionnez une adresse proposée');
+});
+
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {
   await fillRestaurantAndAddress(page, `photos-${testInfo.project.name}-${Date.now()}`);
   await page.getByRole('button', { name: 'Continuer' }).click();

@@ -19,13 +19,7 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'halal_meat' => ['nullable', 'boolean'],
             'halal_chicken' => ['nullable', 'boolean'],
-            'address_suggestion_token' => ['nullable', 'uuid'],
-            'address_line1' => ['nullable', 'string', 'max:255'],
-            'address_line2' => ['nullable', 'string', 'max:255'],
-            'postal_code' => ['nullable', 'string', 'max:20'],
-            'city_name' => ['nullable', 'string', 'max:255'],
-            'city_code' => ['nullable', 'string', 'max:10'],
-            'country_code' => ['nullable', 'string', 'size:2'],
+            'address_suggestion_token' => ['required', 'uuid'],
             'latitude' => ['nullable', 'numeric', 'between:41,52'],
             'longitude' => ['nullable', 'numeric', 'between:-5.5,10'],
             'map_moved' => ['nullable', 'boolean'],
@@ -60,10 +54,6 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
                 $validator->errors()->add('halal_meat', 'Cochez au moins « Viande halal » ou « Poulet halal ».');
             }
 
-            $hasFallback = filled($this->input('address_line1')) && filled($this->input('postal_code')) && filled($this->input('city_name'));
-            if (! filled($this->input('address_suggestion_token')) && ! $hasFallback) {
-                $validator->errors()->add('address_line1', 'Sélectionnez une adresse ou renseignez l’adresse, le code postal et la ville manuellement.');
-            }
             if ($this->boolean('map_moved') && (! filled($this->input('latitude')) || ! filled($this->input('longitude')))) {
                 $validator->errors()->add('latitude', 'La position déplacée doit contenir des coordonnées valides.');
             }

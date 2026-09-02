@@ -14,6 +14,7 @@ Normalize legacy flat locations into useful region/department/city/postcode rela
 - `AddressLineParser` is the single deterministic implementation for this split. It removes a suffix only when the raw/structured postcode and city agree strictly and a non-empty street remains.
 - A confirmed cleanup mode may remove an explicit final historical `CP + ville` from `address_line1` even when it conflicts with structured data; it never changes `address`, `postal_code` or `city_name`, and requires a non-empty street before the suffix.
 - When all three structured fields are absent, Géoplateforme may supply `address_line1`, postcode, city, INSEE code, country and provider provenance from the immutable raw address. Existing GPS and qualification/status fields are not changed; incomplete, imprecise or failed provider results remain untouched.
+- Public restaurant pages and JSON-LD use only `address_line1`, `postal_code` and `city_name` whenever structured fields exist; they must not expose the historical/raw `address` in that case.
 
 ## Controlled legacy migration
 - The pilot schema uses `restaurants`, `categories`, `features`, hierarchical `locations`, their pivots, `restaurant_opening_hours` and `restaurant_media`.
@@ -36,10 +37,10 @@ Create/edit/moderate records, media, hours, categories/features and ownership/cl
 
 ## Public restaurant proposal
 
-`/ajouter-un-restaurant` is a `noindex,nofollow` public Blade form. It requires no account and is protected by Laravel CSRF, server-side validation and an e-mail/IP rate limit. JavaScript only improves the five-step interaction; the complete form remains submittable without it.
+`/ajouter-un-restaurant` is a `noindex,nofollow` public Blade form. It requires no account and is protected by Laravel CSRF, server-side validation and an e-mail/IP rate limit. JavaScript progressively enhances the five-step interaction; it is required solely for the mandatory remote address-selection control.
 
 - Step 1 requires a restaurant name and at least one of `has_halal_meat` or `has_halal_chicken`; it performs an informative name-similarity lookup.
-- Step 2 uses the reusable Géoplateforme address-suggestion service. A selected suggestion is resolved again server-side; it fills structured address, code INSEE and GPS. A manual fallback is retained as `REVIEW_REQUIRED`, and a public map-marker adjustment is explicitly recorded as `public_map`, never treated as an admin verification. Similarity candidates combine name, structured address and a 250m GPS radius without automatic merge or publication.
+- Step 2 uses the reusable Géoplateforme address-selection service in the public form, Filament and owner-edit flow. Selecting a suggestion is mandatory: it is resolved again server-side and supplies `address_line1`, postcode, city, INSEE code, country, GPS and provider provenance. The public UI never exposes the INSEE code or manual postcode/city/GPS inputs. When the precise address is missing, the contributor selects the closest suggestion then moves the marker; this changes only latitude/longitude, does not reverse-geocode and never rewrites the selected structured address or metadata. Similarity candidates combine name, structured address and a 250m GPS radius without automatic merge or publication.
 - Step 3 accepts optional categories, services (including an optional halal certification), simple seven-day schedules, contact data and private outbound destinations. External destinations are stored inactive and never rendered directly in public HTML or JSON-LD.
 - Step 4 requires exactly one cover upload and accepts at most ten additional JPEG, PNG or WebP uploads. Every uploaded image, cover or gallery, must be at least 800 px wide. Files are revalidated by the server-side V2 media pipeline before a pending media relation is created.
 - Step 5 stores the required e-mail both as the restaurant contact e-mail to be checked by moderation and in the private submission context with the contributor's relation to the restaurant (`owner`, `employee` or `customer`); no name or account is required. Selecting owner does not ask for further details. Claiming remains a separate authenticated flow.
