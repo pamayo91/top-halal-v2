@@ -12,7 +12,7 @@ async function fillRestaurantAndAddress(page: import('@playwright/test').Page, s
   await page.getByLabel('Viande halal').check();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'L’adresse' })).toBeVisible();
-  await page.getByLabel('Rechercher une adresse').fill('46 Boulevard du Temple Paris');
+  await page.getByLabel('Adresse du restaurant').fill('46 Boulevard du Temple Paris');
   await expect(page.locator('[data-address-results] button').first()).toBeVisible();
   await page.locator('[data-address-results] button').first().click();
   await expect(page.locator('[data-address-selected]')).toBeVisible();
