@@ -9,16 +9,17 @@ use App\Models\{Article, Category, Comment, Feature, Location, Page, Restaurant,
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Services\PublicRestaurantSearch;
 
 class PublicContentController extends Controller
 {
+    public function __construct(private readonly PublicRestaurantSearch $search) {}
     public function home(): View
     {
         return view('public.home', [
-            'featuredRestaurants' => $this->publishedRestaurants()->latest('legacy_published_at')->limit(6)->get(),
-            'cities' => Location::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(12)->get(),
+            'featuredRestaurants' => $this->search->published()->latest('legacy_published_at')->limit(6)->get(),
+            'cities' => $this->topCities(),
             'categories' => Category::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(10)->get(),
             'articles' => Article::with(['categories', 'featuredMedia.asset.variants', 'contentMedia.asset.variants'])->where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->limit(3)->get(),
         ]);
@@ -27,11 +28,20 @@ class PublicContentController extends Controller
     public function index(Request $request): View
     {
         return view('public.restaurants.index', [
-            'restaurants' => $this->applySearch($this->publishedRestaurants(), $request)->paginate(12)->withQueryString(),
+            'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
             'locations' => Location::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->get(),
             'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
+    }
+
+    public function search(Request $request): RedirectResponse
+    {
+        $city = trim((string) $request->query('ville'));
+        $query = trim((string) $request->query('q'));
+        $categories = array_values(array_filter((array) $request->query('categories', []), 'is_string'));
+        if ($city !== '' && $query === '' && $categories === []) return redirect()->route('locations.show', $city);
+        return redirect()->route('restaurants.index', array_filter(['ville' => $city ?: null, 'q' => $query ?: null, 'categories' => $categories ?: null]));
     }
 
     public function nearMe(Request $request): RedirectResponse
@@ -56,7 +66,7 @@ class PublicContentController extends Controller
 
     public function restaurant(string $slug): Response
     {
-        $restaurant = $this->publishedRestaurants()->where('slug', $slug)->firstOrFail();
+        $restaurant = $this->search->published()->where('slug', $slug)->firstOrFail();
         $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
         $adminEditUrl = $this->adminEditUrlFor($restaurant);
 
@@ -70,7 +80,12 @@ class PublicContentController extends Controller
         return back()->with('review_submitted', true);
     }
 
-    public function location(string $slug): Response { return $this->taxonomy(Location::where('slug', $slug)->firstOrFail(), 'ville'); }
+    public function location(string $slug): Response
+    {
+        $city = Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->get(['city_name'])->first(fn ($restaurant) => Str::slug($restaurant->city_name) === $slug);
+        if ($city) return response()->view('public.taxonomy', ['term' => (object) ['name' => $city->city_name], 'kind' => 'ville', 'restaurants' => $this->search->published()->where('city_name', $city->city_name)->paginate(12)]);
+        return $this->taxonomy(Location::where('slug', $slug)->firstOrFail(), 'ville');
+    }
     public function category(string $slug): Response { return $this->taxonomy(Category::where('slug', $slug)->firstOrFail(), 'spécialité'); }
     public function feature(string $slug): Response { return $this->taxonomy(Feature::where('slug', $slug)->firstOrFail(), 'service'); }
 
@@ -93,7 +108,7 @@ class PublicContentController extends Controller
 
     private function taxonomy(object $term, string $kind): Response
     {
-        $query = $this->publishedRestaurants();
+        $query = $this->search->published();
         match (true) {
             $term instanceof Location => $query->whereHas('locations', fn (Builder $q) => $q->whereKey($term->id)),
             $term instanceof Category => $query->whereHas('categories', fn (Builder $q) => $q->whereKey($term->id)),
@@ -101,8 +116,6 @@ class PublicContentController extends Controller
         };
         return response()->view('public.taxonomy', ['term' => $term, 'kind' => $kind, 'restaurants' => $query->paginate(12)->withQueryString()]);
     }
-
-    private function publishedRestaurants(): Builder { return Restaurant::where('status', 'published')->with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]); }
 
     /**
      * Builds a back-office shortcut only for the active administrator already
@@ -124,13 +137,8 @@ class PublicContentController extends Controller
         };
     }
 
-    private function applySearch(Builder $query, Request $request): Builder
+    private function topCities(): \Illuminate\Support\Collection
     {
-        if ($q = trim((string) $request->input('q'))) { $escaped = addcslashes(Str::lower($q), '%_\\'); $query->where(fn (Builder $search) => $search->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orWhereRaw('LOWER(city_name) LIKE ?', ["%{$escaped}%"])); }
-        if ($city = $request->input('ville')) $query->where(fn (Builder $q) => $q->where('city_name', $city)->orWhereHas('locations', fn (Builder $locations) => $locations->where('slug', $city)));
-        foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
-        foreach (array_filter((array) $request->input('features', []), 'is_string') as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
-        if ($request->filled(['lat', 'lng'])) { $lat = (float) $request->input('lat'); $lng = (float) $request->input('lng'); $clamp = DB::connection()->getDriverName() === 'sqlite' ? 'min' : 'least'; $distance = "(6371 * acos({$clamp}(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))"; $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km'); } else $query->orderBy('name');
-        return $query;
+        return Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->where('city_name', '!=', '')->selectRaw('city_name, count(*) as restaurants_count')->groupBy('city_name')->orderByDesc('restaurants_count')->limit(11)->get()->map(fn ($city) => ['name' => $city->city_name, 'slug' => Str::slug($city->city_name)])->sortByDesc(fn ($city) => $city['slug'] === 'paris')->values();
     }
 }

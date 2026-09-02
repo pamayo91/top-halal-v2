@@ -87,3 +87,7 @@ La base de tests doit obligatoirement être SQLite. Le bootstrap `tests/TestCase
 ### D017 — Compte administrateur humain et migration legacy figés
 
 Le compte administrateur humain désigné par le propriétaire du projet est l’unique compte admin humain. Son mot de passe, son rôle et son statut ne peuvent être modifiés qu’à la demande explicite et ponctuelle du propriétaire. La migration WordPress est finalisée : la base legacy ne doit plus être interrogée, utilisée ni relancée sans une nouvelle autorisation explicite. Les validations de développement utilisent, lorsque nécessaire, un compte admin provisoire distinct.
+
+### D018 — Recherche publique localisation + intention
+
+La recherche publique est un composant Blade à deux champs : localisation et spécialité/restaurant. Paris est la valeur initiale; les villes proviennent de `city_name` sur les restaurants publiés et les URLs ville utilisent `Str::slug(city_name)`. La géolocalisation est strictement déclenchée par le choix volontaire « Autour de moi ». Les requêtes et combinaisons qui ne correspondent pas à une landing page explicitement gérée restent des résultats `noindex,follow` et ne créent pas de facette SEO indexable.

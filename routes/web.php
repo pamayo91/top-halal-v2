@@ -12,6 +12,7 @@ use App\Http\Controllers\PreviewRestaurantReviewController;
 use App\Http\Controllers\{AccountController, AuthController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
+use App\Http\Controllers\RestaurantSearchSuggestionController;
 use App\Http\Controllers\AdminAddressAutocompleteController;
 use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
 
@@ -100,6 +101,9 @@ Route::middleware('auth')->group(function (): void {
 Route::get('/blog', [PublicContentController::class, 'blog'])->name('blog.index');
 Route::get('/muslim-gourmet', [PublicContentController::class, 'muslimGourmet'])->name('blog.muslim-gourmet');
 Route::get('/restaurants', [PublicContentController::class, 'index'])->name('restaurants.index');
+Route::get('/restaurants/recherche', [PublicContentController::class, 'search'])->name('restaurants.search');
+Route::get('/restaurants/recherche/villes', [RestaurantSearchSuggestionController::class, 'cities'])->middleware('throttle:60,1')->name('restaurants.search.cities');
+Route::get('/restaurants/recherche/suggestions', [RestaurantSearchSuggestionController::class, 'suggestions'])->middleware('throttle:60,1')->name('restaurants.search.suggestions');
 Route::post('/restaurants/autour-de-moi', [PublicContentController::class, 'nearMe'])->middleware('throttle:20,1')->name('restaurants.near-me');
 Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
 Route::post('/resto/{slug}/avis', [PublicContentController::class, 'storeReview'])->middleware('throttle:10,1')->name('restaurants.reviews.store');

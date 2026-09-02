@@ -179,3 +179,7 @@
 - Ajout de `restaurants:web-enrich --ids=…` pour reprendre exactement des checkpoints non continus sans sélectionner un nouveau batch.
 - Reprise préproduction du lot existant de 98 restaurants : écritures limitées aux descriptions éligibles et aux horaires absents; les alertes de fermeture restent en revue humaine.
 - Clôture du batch web-enrichment réservé des restaurants 172 à 271 et génération de son rapport CSV consolidé privé.
+# 2026-09-02
+
+- Refonte de la recherche publique en composant SSR réutilisable à deux champs : villes issues de `city_name`, autocomplete limité de villes/spécialités/restaurants, priorité de ville, navigation directe vers la fiche et proximité déclenchée uniquement après choix volontaire.
+- Les recherches combinées conservent le moteur de filtres et la politique `noindex,follow`; une ville seule mène à la page `/restos/{slug}` correspondante.
