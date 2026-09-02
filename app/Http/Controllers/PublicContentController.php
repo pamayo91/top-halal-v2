@@ -9,6 +9,7 @@ use App\Models\{Article, Category, Comment, Feature, Location, Page, Restaurant,
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PublicContentController extends Controller
@@ -129,7 +130,7 @@ class PublicContentController extends Controller
         if ($city = $request->input('ville')) $query->where(fn (Builder $q) => $q->where('city_name', $city)->orWhereHas('locations', fn (Builder $locations) => $locations->where('slug', $city)));
         foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
         foreach (array_filter((array) $request->input('features', []), 'is_string') as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
-        if ($request->filled(['lat', 'lng'])) { $lat = (float) $request->input('lat'); $lng = (float) $request->input('lng'); $distance = '(6371 * acos(least(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))'; $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km'); } else $query->orderBy('name');
+        if ($request->filled(['lat', 'lng'])) { $lat = (float) $request->input('lat'); $lng = (float) $request->input('lng'); $clamp = DB::connection()->getDriverName() === 'sqlite' ? 'min' : 'least'; $distance = "(6371 * acos({$clamp}(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))"; $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km'); } else $query->orderBy('name');
         return $query;
     }
 }

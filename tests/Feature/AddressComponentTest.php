@@ -59,14 +59,14 @@ class AddressComponentTest extends TestCase
     public function test_marker_move_changes_only_coordinates(): void
     {
         $restaurant = $this->restaurant(['address'=>'Adresse historique', 'address_line1'=>'46 Boulevard du Temple', 'postal_code'=>'75011', 'city_name'=>'Paris', 'city_code'=>'75111', 'country_code'=>'FR', 'latitude'=>48.866, 'longitude'=>2.364]);
-        $before = $restaurant->getAttributes();
+        $before = $restaurant->getRawOriginal();
 
         app(RestaurantLocationService::class)->update($restaurant, ['latitude'=>48.867, 'longitude'=>2.365, 'location_update_source'=>'public_map']);
 
         $fresh = $restaurant->fresh();
         foreach ($before as $field => $value) {
             if (in_array($field, ['latitude', 'longitude', 'updated_at'], true)) continue;
-            $this->assertSame($value, $fresh->getAttribute($field), "{$field} must not change when moving the marker.");
+            $this->assertSame($value, $fresh->getRawOriginal($field), "{$field} must not change when moving the marker.");
         }
         $this->assertSame('48.8670000', $fresh->latitude);
         $this->assertSame('2.3650000', $fresh->longitude);
