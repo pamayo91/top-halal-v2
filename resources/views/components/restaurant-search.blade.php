@@ -6,7 +6,7 @@
         <div id="restaurant-search-cities" class="search-popover" data-cities-list role="listbox" hidden>
             <button type="button" data-near-me>Autour de moi <span aria-hidden="true">›</span></button>
             <p class="search-popover-heading">Suggestions</p>
-            @foreach($cities as $city)<button type="button" role="option" data-city-name="{{ $city['name'] }}" data-city-slug="{{ $city['slug'] }}">{{ $city['name'] }}, France</button>@endforeach
+            @foreach($cities as $city)<button type="button" role="option" data-city-name="{{ $city['name'] }}" data-city-slug="{{ $city['slug'] }}">{{ $city['name'] }}</button>@endforeach
         </div>
     </div>
     <div class="restaurant-search-field query-field">

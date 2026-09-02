@@ -233,7 +233,7 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     const close = container => { container.hidden = true; active = -1; };
     const chooseCity = (name, slug) => { location.value = name; cityValue.value = slug; close(cities); };
     const showMessage = text => { message.textContent = text; message.hidden = false; location.focus(); };
-    const cityButton = city => { const button = document.createElement('button'); button.type = 'button'; button.role = 'option'; button.textContent = `${city.name}, France`; button.dataset.cityName = city.name; button.dataset.citySlug = city.slug; return button; };
+    const cityButton = city => { const button = document.createElement('button'); button.type = 'button'; button.role = 'option'; button.textContent = city.name; button.dataset.cityName = city.name; button.dataset.citySlug = city.slug; return button; };
     const loadCities = async () => {
         try { const response = await fetch(`${form.dataset.citiesUrl}?q=${encodeURIComponent(location.value)}`, { headers: { Accept: 'application/json' } }); if (!response.ok) return; const data = await response.json(); cities.querySelectorAll('[data-city-name]').forEach(el => el.remove()); data.cities.forEach(city => cities.append(cityButton(city))); cities.hidden = false; location.setAttribute('aria-expanded', 'true'); } catch (_) { /* Native form submission remains available. */ }
     };

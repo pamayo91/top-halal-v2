@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\Restaurant;
+use App\Models\{RedirectRule, Restaurant};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -42,5 +42,13 @@ class PublicRestaurantSearchTest extends TestCase
         $this->get('/restos/paris')->assertOk()->assertSee('Burger Paris');
         $this->get('/restaurants/recherche?ville=paris&categories[]=burger')->assertRedirect('/restaurants?ville=paris&categories%5B0%5D=burger');
         $this->get('/restaurants?ville=paris&categories[]=burger')->assertOk()->assertSee('Burger Paris')->assertSee('noindex,follow', false);
+    }
+
+    public function test_search_routes_are_not_intercepted_by_a_legacy_redirect_rule(): void
+    {
+        Restaurant::create(['legacy_wp_id' => 6, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris']);
+        RedirectRule::create(['source_path' => '/restaurants/recherche', 'match_type' => 'exact', 'destination' => '/resto/recherche', 'status_code' => 301, 'priority' => 1, 'is_active' => true]);
+
+        $this->get('/restaurants/recherche?ville=paris')->assertRedirect('/restos/paris');
     }
 }
