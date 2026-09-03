@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MediaAsset extends Model
 {
+    public const RESTAURANT_IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
+
     protected $guarded = [];
 
     protected function casts(): array
@@ -30,5 +32,10 @@ class MediaAsset extends Model
         }
 
         return route('media.show', $parameters);
+    }
+
+    public function isRestaurantImage(): bool
+    {
+        return in_array($this->mime, self::RESTAURANT_IMAGE_MIMES, true);
     }
 }

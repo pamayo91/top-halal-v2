@@ -22,6 +22,7 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - Les réponses ont un type MIME exact, `X-Content-Type-Options: nosniff` et un cache immuable. Les URL publiques intègrent le checksum SHA-256 de l’asset : chaque entrée de cache est donc liée à un contenu déterministe. Les anciennes URL numériques sont redirigées vers cette URL canonique. Les images sous le pli sont `loading=lazy`; l’image LCP ne l’est pas.
 - `media:version-content-urls --dry-run|--apply` met à niveau les URL numériques encore présentes dans les HTML éditoriaux V2, sans aucune lecture legacy. La commande est idempotente, conserve les URL vers un asset introuvable et les signale dans son rapport JSON/Markdown.
 - Les PDF, vidéos, HEIC et GIF ne sont pas convertis automatiquement. Ils restent traçables dans l’audit et ne sont exposés qu’après une décision produit dédiée.
+- Les fiches restaurant n’acceptent et n’affichent que des JPEG, PNG ou WebP. Une relation historique vers une vidéo est exclue du rendu public ; `data:remove-restaurant-videos` permet de l’auditer puis de la retirer, de promouvoir l’image suivante et de purger uniquement les assets V2 devenus orphelins.
 
 ## Réparation post-migration des relations restaurant
 

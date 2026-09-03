@@ -2,6 +2,10 @@
 
 ## 2026-09-02
 
+### D024 — Restaurant media is raster-image only
+
+Restaurant covers and galleries are restricted to JPEG, PNG and WebP. Video assets are not a supported restaurant product feature: public rendering must ignore them defensively, while the V2-only cleanup command removes their restaurant relations, promotes the first remaining raster image and purges an asset/file only when it has no remaining V2 reference.
+
 ### D023 — Mandatory selection for restaurant addresses
 
 Restaurant address creation/replacement is provider-authoritative: every public, admin-create and owner-edit address change starts from a Géoplateforme suggestion whose opaque token is resolved server-side. The public form exposes neither manual administrative/GPS fields nor the INSEE code. A marker refinement after selection changes latitude/longitude only; it does not reverse-geocode, change structured address data or mutate geocoding provenance/status. Existing restaurant records are not mass-updated by this feature.

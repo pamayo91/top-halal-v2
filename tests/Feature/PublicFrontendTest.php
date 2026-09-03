@@ -178,6 +178,18 @@ class PublicFrontendTest extends TestCase
         $this->get('/resto/restaurant-illustre')->assertOk()->assertSee($asset->deliveryUrl(480), false)->assertDontSee($asset->deliveryUrl(960), false);
     }
 
+    public function test_restaurant_detail_uses_the_first_image_when_a_video_precedes_it(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 424, 'name' => 'Restaurant sans vidéo', 'slug' => 'restaurant-sans-video', 'status' => 'published']);
+        $video = MediaAsset::create(['legacy_attachment_id' => 424, 'original_path' => 'media/originals/video.mp4', 'mime' => 'video/mp4', 'bytes' => 10, 'checksum' => str_repeat('v', 64), 'status' => 'ready']);
+        $image = MediaAsset::create(['legacy_attachment_id' => 425, 'original_path' => 'media/originals/image.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 10, 'checksum' => str_repeat('g', 64), 'status' => 'ready']);
+        $image->variants()->create(['format' => 'webp', 'width' => 480, 'height' => 360, 'path' => 'media/variants/image-480.webp']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'media_asset_id' => $video->id, 'sort_order' => 0, 'status' => 'ready']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'media_asset_id' => $image->id, 'sort_order' => 1, 'status' => 'ready']);
+
+        $this->get('/resto/restaurant-sans-video')->assertOk()->assertSee($image->deliveryUrl(480), false)->assertDontSee($video->deliveryUrl(), false);
+    }
+
     public function test_restaurant_gallery_falls_back_to_the_original_when_no_variant_exists(): void
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 426, 'name' => 'Galerie illustrée', 'slug' => 'galerie-illustree', 'status' => 'published']);
