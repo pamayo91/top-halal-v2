@@ -234,8 +234,8 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     const chooseCity = (name, slug) => { location.value = name; cityValue.value = slug; close(cities); };
     const showMessage = text => { message.textContent = text; message.hidden = false; location.focus(); };
     const cityButton = city => { const button = document.createElement('button'); button.type = 'button'; button.role = 'option'; button.textContent = city.name; button.dataset.cityName = city.name; button.dataset.citySlug = city.slug; return button; };
-    const loadCities = async () => {
-        try { const response = await fetch(`${form.dataset.citiesUrl}?q=${encodeURIComponent(location.value)}`, { headers: { Accept: 'application/json' } }); if (!response.ok) return; const data = await response.json(); cities.querySelectorAll('[data-city-name]').forEach(el => el.remove()); data.cities.forEach(city => cities.append(cityButton(city))); cities.hidden = false; location.setAttribute('aria-expanded', 'true'); } catch (_) { /* Native form submission remains available. */ }
+    const loadCities = async (term = '') => {
+        try { const response = await fetch(`${form.dataset.citiesUrl}?q=${encodeURIComponent(term)}`, { headers: { Accept: 'application/json' } }); if (!response.ok) return; const data = await response.json(); cities.querySelectorAll('[data-city-name]').forEach(el => el.remove()); data.cities.forEach(city => cities.append(cityButton(city))); cities.hidden = false; location.setAttribute('aria-expanded', 'true'); } catch (_) { /* Native form submission remains available. */ }
     };
     const renderSuggestions = data => {
         suggestions.replaceChildren(); selectedRestaurant = null; category.disabled = true;
@@ -247,7 +247,7 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
         if (query.value.trim().length < 2) { close(suggestions); return; }
         try { const response = await fetch(`${form.dataset.suggestionsUrl}?q=${encodeURIComponent(query.value)}&ville=${encodeURIComponent(cityValue.value)}`, { headers: { Accept: 'application/json' } }); if (response.ok) renderSuggestions(await response.json()); } catch (_) { /* Search remains a regular GET form. */ }
     };
-    location.addEventListener('focus', loadCities); location.addEventListener('input', () => { clearTimeout(cityTimer); cityTimer = setTimeout(loadCities, 180); });
+    location.addEventListener('focus', () => loadCities()); location.addEventListener('input', () => { clearTimeout(cityTimer); cityTimer = setTimeout(() => loadCities(location.value), 180); });
     query.addEventListener('focus', () => close(cities));
     document.addEventListener('pointerdown', event => { if (!form.contains(event.target)) close(cities); });
     cities.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.matches('[data-near-me]')) { if (!navigator.geolocation) return showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); button.disabled = true; navigator.geolocation.getCurrentPosition(({ coords }) => { const params = new URLSearchParams(new FormData(form)); params.delete('ville'); params.set('lat', coords.latitude); params.set('lng', coords.longitude); window.location.assign(`${form.action.replace('/recherche', '')}?${params.toString()}`); }, () => { button.disabled = false; showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }); return; } chooseCity(button.dataset.cityName, button.dataset.citySlug); });

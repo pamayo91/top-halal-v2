@@ -11,7 +11,7 @@
     </div>
     <div class="restaurant-search-field query-field">
         <label class="sr-only" for="restaurant-search-query">Spécialité ou nom de restaurant</label>
-        <div class="search-input-wrap"><svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.25 4.25"/></svg><input id="restaurant-search-query" data-query-input name="q" type="search" placeholder="Spécialité ou nom de restaurant" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="restaurant-search-suggestions"></div>
+        <div class="search-input-wrap"><svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.25 4.25"/></svg><input id="restaurant-search-query" data-query-input name="q" type="search" placeholder="Spécialité ou nom du resto" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="restaurant-search-suggestions"></div>
         <input data-category-input type="hidden" name="categories[]" disabled>
         <div id="restaurant-search-suggestions" class="search-popover" data-suggestions-list role="listbox" hidden></div>
     </div>
