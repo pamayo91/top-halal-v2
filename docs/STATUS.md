@@ -1,6 +1,6 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-02
+Last updated: 2026-09-03
 
 | Area | Status | Notes |
 |---|---|---|

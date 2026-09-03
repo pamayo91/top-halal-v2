@@ -1,8 +1,11 @@
 # Changelog
 
-## 2026-09-02
+## 2026-09-03
 
 - Restaurant covers and galleries now accept only JPEG, PNG and WebP. The V2-only audited cleanup removed five video relations and five orphaned video assets/files across two restaurant records, promoted the remaining images, left no restaurant without a replacement and was idempotent on its second preproduction pass.
+
+## 2026-09-02
+
 - Simplified the restaurant location model: removed the twelve migration-only geocoding/qualification columns, while retaining the untouched legacy `address` field and the structured address/GPS contract. Nearby search now accepts only non-null coordinates within valid global ranges. Mandatory Géoplateforme selection, public structured-address rendering and GPS-only marker moves are covered by PHP tests.
 - Refreshed only the two approved preproduction regression floors after a read-only audit of the intentional restaurant cleanup: `restaurants >= 7618` and `restaurant_media >= 885`. The update preserves strict decrease detection; no restaurant or media record was restored, imported, or otherwise changed.
 - Reworked restaurant address entry around mandatory server-resolved Géoplateforme selections. The public proposal and owner-edit forms share the address selector/map; Filament creation also requires a selection. Public users no longer enter postcode, city, INSEE code or GPS manually. Marker refinement changes GPS only and does not reverse-geocode or rewrite structured/provider data. Restaurant pages and JSON-LD now prefer the structured address fields over the historical raw address. No existing restaurant was modified.
