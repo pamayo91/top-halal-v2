@@ -61,7 +61,7 @@ class RemoveRestaurantVideosCommandTest extends TestCase
         $restaurant = $this->restaurant();
         $video = $this->asset('video/mp4', 'shared.mp4', 'c');
         RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'media_asset_id' => $video->id, 'sort_order' => 0, 'status' => 'ready']);
-        ContentMedia::create(['content_type' => 'post', 'content_id' => 1, 'media_asset_id' => $video->id, 'role' => 'inline']);
+        ContentMedia::create(['content_type' => 'post', 'content_id' => 1, 'legacy_attachment_id' => 999999, 'media_asset_id' => $video->id, 'role' => 'inline']);
 
         $this->artisan('data:remove-restaurant-videos', ['--apply' => true, '--purge-orphaned-assets' => true, '--out' => $this->report])->assertSuccessful();
 
