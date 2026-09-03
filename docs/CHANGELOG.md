@@ -3,6 +3,7 @@
 ## 2026-09-03
 
 - Restaurant covers and galleries now accept only JPEG, PNG and WebP. The V2-only audited cleanup removed five video relations and five orphaned video assets/files across two restaurant records, promoted the remaining images, left no restaurant without a replacement and was idempotent on its second preproduction pass.
+- After review of this authorized deletion, the preproduction regression baseline was refreshed to the resulting V2 counts, including `media_assets >= 1,459` and `restaurant_media >= 880`; all other count floors remain unchanged.
 
 ## 2026-09-02
 
