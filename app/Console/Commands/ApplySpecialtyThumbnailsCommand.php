@@ -30,11 +30,21 @@ class ApplySpecialtyThumbnailsCommand extends Command
             return self::FAILURE;
         }
 
+        $sources = $categories->mapWithKeys(function (Category $category) use ($files): array {
+            $keys = [$category->slug, Str::slug($category->name), Str::after($category->slug, 'cuisine-')];
+            return [$category->id => collect($keys)->first(fn (string $key) => $files->has($key)) ? $files->get(collect($keys)->first(fn (string $key) => $files->has($key))) : null];
+        });
+        $missing = $categories->filter(fn (Category $category) => $sources->get($category->id) === null && $category->slug !== 'mauricienne')->pluck('slug');
+        if ($missing->isNotEmpty()) {
+            $this->error('Missing source images for: '.$missing->implode(', '));
+            return self::FAILURE;
+        }
+
         foreach ($categories as $category) {
-            $path = $files->get($category->slug);
+            $path = $sources->get($category->id);
             if ($path === null) {
                 if ($category->slug === 'mauricienne') continue;
-                throw new RuntimeException("Missing source image for specialty {$category->slug}.");
+                continue;
             }
             $report['specialties'][$category->slug] = ['source' => basename($path), 'output' => "{$category->slug}.webp", 'media_asset_id' => $category->media_asset_id];
             if (! $this->option('apply')) continue;
