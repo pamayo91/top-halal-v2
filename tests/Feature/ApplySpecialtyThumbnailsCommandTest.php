@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\{Category, Restaurant};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\{File, Storage};
 use Tests\TestCase;
 
 class ApplySpecialtyThumbnailsCommandTest extends TestCase
@@ -14,6 +14,7 @@ class ApplySpecialtyThumbnailsCommandTest extends TestCase
 
     public function test_it_creates_a_card_only_specialty_thumbnail_for_a_restaurant_without_a_photo(): void
     {
+        Storage::fake('local');
         $source = storage_path('framework/testing/specialty-source');
         $output = storage_path('framework/testing/specialty-output');
         $report = storage_path('framework/testing/specialty-report.json');
