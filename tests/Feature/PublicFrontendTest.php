@@ -9,6 +9,7 @@ use App\Models\ContentMedia;
 use App\Models\Feature;
 use App\Models\Location;
 use App\Models\MediaAsset;
+use App\Models\MediaVariant;
 use App\Models\Page;
 use App\Models\Restaurant;
 use App\Models\RestaurantMedia;
@@ -24,6 +25,19 @@ use Tests\TestCase;
 class PublicFrontendTest extends TestCase
 {
     use DatabaseMigrations;
+
+    public function test_specialty_fallback_thumbnail_is_used_on_cards_but_not_as_a_restaurant_cover(): void
+    {
+        $category = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 3001, 'name' => 'Burger']);
+        $asset = MediaAsset::create(['original_path' => 'media/originals/specialty.webp', 'mime' => 'image/webp', 'width' => 1200, 'height' => 800, 'bytes' => 1000, 'checksum' => str_repeat('a', 64), 'alt_text' => 'Illustration Burger']);
+        MediaVariant::create(['media_asset_id' => $asset->id, 'format' => 'webp', 'width' => 480, 'height' => 320, 'path' => 'media/variants/specialty-480.webp']);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 3001, 'name' => 'Miniature uniquement', 'slug' => 'miniature-uniquement', 'status' => 'published']);
+        $restaurant->categories()->attach($category);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'media_asset_id' => $asset->id, 'sort_order' => 0, 'status' => 'ready', 'role' => 'fallback_thumbnail']);
+
+        $this->get('/restaurants')->assertOk()->assertSee($asset->deliveryUrl(480), false);
+        $this->get('/resto/miniature-uniquement')->assertOk()->assertDontSee('restaurant-hero', false)->assertDontSee('Galerie');
+    }
 
     public function test_active_admin_gets_a_direct_edit_shortcut_only_on_the_public_record_being_viewed(): void
     {
