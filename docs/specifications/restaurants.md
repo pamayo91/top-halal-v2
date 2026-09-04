@@ -53,6 +53,8 @@ A valid proposal creates a normal `restaurants` record with `status=pending`, ne
 
 Les spécialités sont un référentiel V2 partagé : elles alimentent les filtres de l’annuaire, l’autocomplétion de recherche, le formulaire public, et la sélection d’administration. `Burger`, `Brunch` et `Grillades` sont des entrées natives V2 disponibles même lorsqu’aucune fiche publiée ne leur est encore associée.
 
+Les illustrations associées aux spécialités peuvent servir de miniature de secours uniquement pour les fiches sans photo raster. Elles suivent l’ordre alphabétique déterministe de la première spécialité, sans remplacer ni créer une couverture de fiche.
+
 ## SEO par fiche
 Le panneau SEO permet de sélectionner les directives `robots` actives (`all`, `noindex`, `nofollow`, `none`, `nosnippet`, `indexifembedded`, `noimageindex`, `notranslate`) et de paramétrer les valeurs qui nécessitent un argument : longueur d’extrait, aperçu image, aperçu vidéo et date `unavailable_after`. Les directives sont rendues dans la balise `meta name="robots"` de la fiche ; une fiche `noindex` ou `none` est exclue du sitemap.
 

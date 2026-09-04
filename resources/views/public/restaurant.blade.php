@@ -2,7 +2,7 @@
 @php($robots = $isPreview ? 'noindex,nofollow' : \App\Support\RobotsMeta::forRestaurant($restaurant))
 @php($title = \App\Support\RestaurantSeo::title($restaurant))
 @php($aggregate = $restaurant->approvedReviewAggregate())
-@php($restaurantImages = $restaurant->media->filter(fn ($item) => $item->asset?->isRestaurantImage())->values())
+@php($restaurantImages = $restaurant->media->filter(fn ($item) => $item->role !== 'fallback_thumbnail' && $item->asset?->isRestaurantImage())->values())
 @php($hero = $restaurantImages->first()?->asset)
 @php($heroVariant = $hero?->variants->where('width', '>=', 960)->sortBy('width')->first() ?? $hero?->variants->sortByDesc('width')->first())
 @php($heroUrl = $hero ? $hero->deliveryUrl($heroVariant?->width) : null)

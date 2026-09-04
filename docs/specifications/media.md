@@ -23,6 +23,7 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - `media:version-content-urls --dry-run|--apply` met à niveau les URL numériques encore présentes dans les HTML éditoriaux V2, sans aucune lecture legacy. La commande est idempotente, conserve les URL vers un asset introuvable et les signale dans son rapport JSON/Markdown.
 - Les PDF, vidéos, HEIC et GIF ne sont pas convertis automatiquement. Ils restent traçables dans l’audit et ne sont exposés qu’après une décision produit dédiée.
 - Les fiches restaurant n’acceptent et n’affichent que des JPEG, PNG ou WebP. Une relation historique vers une vidéo est exclue du rendu public ; `data:remove-restaurant-videos` permet de l’auditer puis de la retirer, de promouvoir l’image suivante et de purger uniquement les assets V2 devenus orphelins.
+- Les illustrations de spécialité sont normalisées en WebP `1200 × 800 px`, stockées par le pipeline V2 puis liées au référentiel `categories`. Une relation restaurant de rôle `fallback_thumbnail` est réservée aux cartes et à l’administration lorsqu’une fiche ne possède aucune photo raster ; elle ne devient jamais la couverture, le visuel principal ou une image de galerie de cette fiche.
 
 ## Réparation post-migration des relations restaurant
 

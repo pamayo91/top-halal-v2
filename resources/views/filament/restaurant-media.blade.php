@@ -6,7 +6,9 @@
             <figure class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                 @php($variant = $asset->variants->where('width', '>=', 480)->sortBy('width')->first() ?? $asset->variants->sortByDesc('width')->first())
                 <img src="{{ $asset->deliveryUrl($variant?->width) }}" width="{{ $asset->width }}" height="{{ $asset->height }}" loading="lazy" class="aspect-[4/3] w-full object-cover" alt="{{ $asset->alt_text ?: $restaurant->name }}">
-                @if($asset->caption || $asset->alt_text)
+                @if($media->role === 'fallback_thumbnail')
+                    <figcaption class="p-3 text-sm text-gray-600 dark:text-gray-300">Miniature de spécialité (sans couverture)</figcaption>
+                @elseif($asset->caption || $asset->alt_text)
                     <figcaption class="p-3 text-sm text-gray-600 dark:text-gray-300">{{ $asset->caption ?: $asset->alt_text }}</figcaption>
                 @endif
             </figure>
