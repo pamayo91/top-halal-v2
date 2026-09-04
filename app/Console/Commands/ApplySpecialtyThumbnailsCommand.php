@@ -8,7 +8,6 @@ use Illuminate\Console\Command;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\{DB, File};
 use Illuminate\Support\Str;
-use RuntimeException;
 
 class ApplySpecialtyThumbnailsCommand extends Command
 {
@@ -23,7 +22,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
         $slugs = collect(explode(',', (string) $this->option('slugs')))->map(fn (string $slug) => Str::slug(trim($slug)))->filter()->values();
         $files = collect(File::files($source))->mapWithKeys(fn ($file) => [Str::slug(pathinfo($file->getFilename(), PATHINFO_FILENAME)) => $file->getPathname()]);
         $categories = Category::query()->when($slugs->isNotEmpty(), fn ($query) => $query->whereIn('slug', $slugs))->orderBy('name')->get();
-        $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'specialties' => [], 'thumbnails' => ['eligible' => 0, 'assigned' => 0, 'skipped_without_specialty_image' => 0], 'mauricienne' => null];
+        $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'specialties' => [], 'thumbnails' => ['eligible' => 0, 'created' => 0, 'existing' => 0, 'skipped_without_specialty_image' => 0, 'skipped' => []], 'mauricienne' => null];
 
         if ($categories->isEmpty()) {
             $this->error('No requested V2 specialty exists.');
@@ -75,13 +74,18 @@ class ApplySpecialtyThumbnailsCommand extends Command
                 $asset = $category?->media;
                 if (! $asset?->isRestaurantImage()) {
                     $report['thumbnails']['skipped_without_specialty_image']++;
+                    if (count($report['thumbnails']['skipped']) < 20) $report['thumbnails']['skipped'][] = ['restaurant_id' => $restaurant->id, 'restaurant' => $restaurant->name, 'first_specialty' => $category?->name];
                     continue;
                 }
                 if ($this->option('apply')) {
-                    RestaurantMedia::firstOrCreate(['restaurant_id' => $restaurant->id, 'media_asset_id' => $asset->id], ['sort_order' => 0, 'status' => 'ready', 'role' => 'fallback_thumbnail']);
-                    app(AdminAudit::class)->record('restaurant.specialty_thumbnail_assigned', $restaurant, ['category_id' => $category->id, 'media_asset_id' => $asset->id]);
+                    $media = RestaurantMedia::firstOrCreate(['restaurant_id' => $restaurant->id, 'media_asset_id' => $asset->id], ['sort_order' => 0, 'status' => 'ready', 'role' => 'fallback_thumbnail']);
+                    if ($media->wasRecentlyCreated) {
+                        $report['thumbnails']['created']++;
+                        app(AdminAudit::class)->record('restaurant.specialty_thumbnail_assigned', $restaurant, ['category_id' => $category->id, 'media_asset_id' => $asset->id]);
+                    } else {
+                        $report['thumbnails']['existing']++;
+                    }
                 }
-                $report['thumbnails']['assigned']++;
             }
         }, 'restaurants.id', 'id');
 
