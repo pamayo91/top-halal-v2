@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\{Category, Restaurant};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\{File, Storage};
 use Tests\TestCase;
 
@@ -22,7 +21,9 @@ class ApplySpecialtyThumbnailsCommandTest extends TestCase
         File::deleteDirectory($output);
         File::delete($report);
         File::ensureDirectoryExists($source);
-        File::copy(UploadedFile::fake()->image('source.jpg', 1600, 1000)->getPathname(), $source.'/burger.jpg');
+        $image = imagecreatetruecolor(1600, 1000);
+        imagejpeg($image, $source.'/burger.jpg', 90);
+        imagedestroy($image);
 
         $burger = Category::where('slug', 'burger')->firstOrFail();
         $restaurant = Restaurant::create(['legacy_wp_id' => 700001, 'name' => 'Sans photo', 'slug' => 'sans-photo', 'status' => 'published']);
