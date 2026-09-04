@@ -34,7 +34,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
             $keys = [$category->slug, Str::slug($category->name), Str::after($category->slug, 'cuisine-')];
             return [$category->id => collect($keys)->first(fn (string $key) => $files->has($key)) ? $files->get(collect($keys)->first(fn (string $key) => $files->has($key))) : null];
         });
-        $missing = $categories->filter(fn (Category $category) => $sources->get($category->id) === null && $category->slug !== 'mauricienne')->pluck('slug');
+        $missing = $categories->filter(fn (Category $category) => $sources->get($category->id) === null && ! Str::endsWith($category->slug, 'mauricienne'))->pluck('slug');
         if ($missing->isNotEmpty()) {
             $this->error('Missing source images for: '.$missing->implode(', '));
             return self::FAILURE;
@@ -43,7 +43,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
         foreach ($categories as $category) {
             $path = $sources->get($category->id);
             if ($path === null) {
-                if ($category->slug === 'mauricienne') continue;
+                if (Str::endsWith($category->slug, 'mauricienne')) continue;
                 continue;
             }
             $report['specialties'][$category->slug] = ['source' => basename($path), 'output' => "{$category->slug}.webp", 'media_asset_id' => $category->media_asset_id];
@@ -57,7 +57,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
             $report['specialties'][$category->slug]['media_asset_id'] = $asset->id;
         }
 
-        $mauricienne = Category::where('slug', 'mauricienne')->first();
+        $mauricienne = Category::where('slug', 'like', '%mauricienne')->first();
         if ($mauricienne) {
             $usage = DB::table('restaurant_category')->where('category_id', $mauricienne->id)->count();
             $report['mauricienne'] = ['restaurant_relations' => $usage, 'deleted' => false];
