@@ -146,6 +146,10 @@
 - Recorded the preproduction audit and official Composer bootstrap as hard prerequisites before Laravel initialization.
 # Changelog
 
+## 2026-09-04
+
+- Added the native V2 restaurant specialties Burger, Brunch and Grillades. They are available in directory filters, public submissions and administration; search suggestions no longer hide a specialty solely because it has no published restaurant yet.
+
 ## 2026-09-01
 
 - Repaired only the 812 strictly verified V2 `address_line1` values that duplicated a matching historical `postcode + city` suffix. The raw address, structured postcode/city/code, GPS and geocoding/location status fields were not changed; 184 conflicting records remain untouched. The second execution corrected zero records.

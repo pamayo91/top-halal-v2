@@ -26,7 +26,9 @@ class RestaurantSearchSuggestionController extends Controller
         if (Str::length($term) < 2) return response()->json(['specialties' => [], 'restaurants' => []]);
         $escaped = addcslashes(Str::lower($term), '%_\\');
         $city = trim((string) $request->query('ville'));
-        $specialties = Category::query()->whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orderBy('name')->limit(5)->get(['name', 'slug']);
+        // A specialty remains selectable as soon as it exists in the V2
+        // catalogue, including before its first published restaurant.
+        $specialties = Category::query()->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orderBy('name')->limit(5)->get(['name', 'slug']);
         $restaurants = Restaurant::query()->where('status', 'published')->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])
             ->when($city !== '', fn (Builder $q) => $q->orderByRaw('CASE WHEN LOWER(city_name) = ? THEN 0 ELSE 1 END', [Str::lower(str_replace('-', ' ', $city))]))
             ->orderBy('name')->limit(6)->get(['name', 'slug', 'city_name']);
