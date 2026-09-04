@@ -22,7 +22,7 @@ class PublicRestaurantSearchTest extends TestCase
 
     public function test_suggestions_return_real_specialties_and_prioritize_selected_city_restaurants(): void
     {
-        $burger = Category::create(['legacy_term_id' => 1, 'name' => 'Burger', 'slug' => 'burger']);
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 1, 'name' => 'Burger']);
         $paris = Restaurant::create(['legacy_wp_id' => 3, 'name' => 'Black Paris', 'slug' => 'black-paris', 'status' => 'published', 'city_name' => 'Paris']);
         $lyon = Restaurant::create(['legacy_wp_id' => 4, 'name' => 'Black Lyon', 'slug' => 'black-lyon', 'status' => 'published', 'city_name' => 'Lyon']);
         $paris->categories()->attach($burger);
@@ -34,7 +34,7 @@ class PublicRestaurantSearchTest extends TestCase
 
     public function test_city_only_search_uses_city_name_slug_and_other_combinations_stay_noindex_results(): void
     {
-        $burger = Category::create(['legacy_term_id' => 2, 'name' => 'Burger', 'slug' => 'burger']);
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 2, 'name' => 'Burger']);
         $restaurant = Restaurant::create(['legacy_wp_id' => 5, 'name' => 'Burger Paris', 'slug' => 'burger-paris', 'status' => 'published', 'city_name' => 'Paris']);
         $restaurant->categories()->attach($burger);
 
