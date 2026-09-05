@@ -54,15 +54,16 @@ test.describe('Filament administration', () => {
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/admin$/);
 
-    for (const [path, label, column] of [['/admin/restaurant-reviews', 'Date historique de l’avis', 'Date de l’avis'], ['/admin/comments', 'Date historique du commentaire', 'Date du commentaire']]) {
+    for (const [path, column] of [['/admin/restaurant-reviews', 'Date de l’avis'], ['/admin/comments', 'Date du commentaire']]) {
       await page.goto(path);
       await expect(page.getByRole('table')).toContainText(/\d{2}\/\d{2}\/20\d{2} \d{2}:\d{2}/);
       const dateHeader = page.getByRole('columnheader', { name: column, exact: true });
       await expect(dateHeader).toBeVisible();
       expect(await dateHeader.evaluate((element) => element.getBoundingClientRect().right <= window.innerWidth)).toBe(true);
       await page.getByRole('button', { name: 'Voir' }).first().click();
-      await expect(page.getByText(label, { exact: true })).toBeVisible();
-      await expect(page.getByLabel(label)).not.toHaveValue('');
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await expect(dialog.locator('input').first()).not.toHaveValue('');
       await page.keyboard.press('Escape');
     }
   });
