@@ -25,6 +25,7 @@ Les médias WordPress sont une source de migration uniquement. Une ressource aff
 - Les fiches restaurant n’acceptent et n’affichent que des JPEG, PNG ou WebP. Une relation historique vers une vidéo est exclue du rendu public ; `data:remove-restaurant-videos` permet de l’auditer puis de la retirer, de promouvoir l’image suivante et de purger uniquement les assets V2 devenus orphelins.
 - Les illustrations de spécialité sont normalisées en WebP `1200 × 800 px`, stockées par le pipeline V2 puis liées au référentiel `categories`. Une relation restaurant de rôle `fallback_thumbnail` est réservée aux cartes et à l’administration lorsqu’une fiche ne possède aucune photo raster ; elle ne devient jamais la couverture, le visuel principal ou une image de galerie de cette fiche.
 - Lorsqu’une illustration de spécialité est remplacée, le pipeline remplace de façon idempotente la miniature de secours des seules fiches concernées : aucune relation `fallback_thumbnail` obsolète ou en double n’est conservée.
+- Une exécution limitée à une ou plusieurs spécialités ne synchronise que les fiches dont la première spécialité alphabétique appartient explicitement à ce sous-ensemble.
 
 ## Réparation post-migration des relations restaurant
 

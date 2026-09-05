@@ -22,7 +22,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
         $slugs = collect(explode(',', (string) $this->option('slugs')))->map(fn (string $slug) => Str::slug(trim($slug)))->filter()->values();
         $files = collect(File::files($source))->mapWithKeys(fn ($file) => [Str::slug(pathinfo($file->getFilename(), PATHINFO_FILENAME)) => $file->getPathname()]);
         $categories = Category::query()->when($slugs->isNotEmpty(), fn ($query) => $query->whereIn('slug', $slugs))->orderBy('name')->get();
-        $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'specialties' => [], 'thumbnails' => ['eligible' => 0, 'created' => 0, 'existing' => 0, 'replaced' => 0, 'skipped_without_specialty_image' => 0, 'skipped' => []], 'mauricienne' => null];
+        $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'specialties' => [], 'thumbnails' => ['eligible' => 0, 'out_of_scope' => 0, 'created' => 0, 'existing' => 0, 'replaced' => 0, 'skipped_without_specialty_image' => 0, 'skipped' => []], 'mauricienne' => null];
 
         if ($categories->isEmpty()) {
             $this->error('No requested V2 specialty exists.');
@@ -71,6 +71,10 @@ class ApplySpecialtyThumbnailsCommand extends Command
             foreach ($restaurants as $restaurant) {
                 $report['thumbnails']['eligible']++;
                 $category = $restaurant->categories->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->first();
+                if ($slugs->isNotEmpty() && ! $slugs->contains($category?->slug)) {
+                    $report['thumbnails']['out_of_scope']++;
+                    continue;
+                }
                 $asset = $category?->media;
                 if (! $asset?->isRestaurantImage()) {
                     $report['thumbnails']['skipped_without_specialty_image']++;
