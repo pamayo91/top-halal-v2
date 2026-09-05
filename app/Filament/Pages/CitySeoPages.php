@@ -31,7 +31,7 @@ class CitySeoPages extends Page implements HasTable
     public ?array $data = [];
     public string $cityName = '';
 
-    public function mount(?string $city = null): void { $this->data = ['threshold' => app(CitySeoService::class)->threshold(), 'state' => 'auto']; if ($city !== null) $this->selectCity($city); }
+    public function mount(?string $city = null): void { $this->data = ['threshold' => app(CitySeoService::class)->threshold(), 'state' => 'auto']; $city ??= request()->query('city'); if (is_string($city) && $city !== '') $this->selectCity($city); }
 
     public function table(Table $table): Table
     {
