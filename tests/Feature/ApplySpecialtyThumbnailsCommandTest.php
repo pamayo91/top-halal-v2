@@ -85,7 +85,7 @@ class ApplySpecialtyThumbnailsCommandTest extends TestCase
         imagedestroy($image);
 
         $burger = Category::where('slug', 'burger')->firstOrFail();
-        $other = Category::where('slug', 'cuisine-francaise')->firstOrFail();
+        $other = Category::firstOrCreate(['slug' => 'cuisine-francaise'], ['legacy_term_id' => 700004, 'name' => 'Française']);
         $restaurant = Restaurant::create(['legacy_wp_id' => 700003, 'name' => 'Autre spécialité', 'slug' => 'autre-specialite', 'status' => 'published']);
         $restaurant->categories()->attach($other);
         $old = \App\Models\MediaAsset::create(['original_path' => 'media/originals/other.webp', 'mime' => 'image/webp', 'width' => 1200, 'height' => 800, 'bytes' => 1, 'checksum' => str_repeat('c', 64)]);

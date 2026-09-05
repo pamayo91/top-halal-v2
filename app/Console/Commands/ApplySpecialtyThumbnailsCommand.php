@@ -67,7 +67,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
         }
 
         $eligible = Restaurant::query()->whereDoesntHave('media.asset', fn ($query) => $query->whereIn('mime', MediaAsset::RESTAURANT_IMAGE_MIMES)->where('restaurant_media.role', '!=', 'fallback_thumbnail'));
-        $eligible->with(['categories.media'])->orderBy('id')->chunkById(200, function ($restaurants) use (&$report): void {
+        $eligible->with(['categories.media'])->orderBy('id')->chunkById(200, function ($restaurants) use (&$report, $slugs): void {
             foreach ($restaurants as $restaurant) {
                 $report['thumbnails']['eligible']++;
                 $category = $restaurant->categories->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->first();
