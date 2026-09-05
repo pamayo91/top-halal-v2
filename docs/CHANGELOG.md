@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-05
+
+- Added a dedicated Filament user-creation screen for active administrators. It supports standard, restaurant-owner and administrator roles, requires a confirmed initial password, defaults to forcing a password change, and records the creation without retaining any password in the audit log.
+
 ## 2026-09-03
 
 - Restaurant covers and galleries now accept only JPEG, PNG and WebP. The V2-only audited cleanup removed five video relations and five orphaned video assets/files across two restaurant records, promoted the remaining images, left no restaurant without a replacement and was idempotent on its second preproduction pass.

@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminBackOfficeTest extends TestCase
@@ -157,6 +160,38 @@ class AdminBackOfficeTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']); $user = User::factory()->create();
         $this->actingAs($admin)->get('/admin/articles')->assertOk();
         $this->actingAs($admin)->get('/admin/users')->assertOk();
+    }
+
+    public function test_admin_can_create_an_administrator_from_the_users_section_without_a_password_in_the_audit_log(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)->get('/admin/users')->assertOk()->assertSee('Ajouter un utilisateur');
+        $this->actingAs($admin)->get('/admin/users/create')->assertOk()
+            ->assertSee('Mot de passe initial')
+            ->assertSee('Administrateur');
+
+        Livewire::actingAs($admin)
+            ->test(CreateUser::class)
+            ->fillForm([
+                'name' => 'Administrateur de test',
+                'email' => 'admin-test@example.test',
+                'password' => 'a-secure-test-password',
+                'password_confirmation' => 'a-secure-test-password',
+                'role' => 'admin',
+                'status' => 'active',
+                'must_change_password' => true,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $created = User::where('email', 'admin-test@example.test')->firstOrFail();
+
+        $this->assertSame('admin', $created->role);
+        $this->assertTrue($created->must_change_password);
+        $this->assertTrue(Hash::check('a-secure-test-password', $created->password));
+        $audit = AdminAuditLog::where('action', 'user.created')->where('subject_id', $created->id)->firstOrFail();
+        $this->assertArrayNotHasKey('password', $audit->changes ?? []);
     }
 
     private function restaurant(array $attributes = []): Restaurant { return Restaurant::create([...['legacy_wp_id' => random_int(1, 999999999), 'name' => 'Resto test', 'slug' => 'resto-'.str()->random(8), 'status' => 'published'], ...$attributes]); }
