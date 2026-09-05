@@ -4,7 +4,9 @@ Last updated: 2026-09-05
 
 Latest: city pages are decoupled from Geography: `/restos/{slug}` resolves only against published `restaurants.city_name` with `Str::slug`. The preproduction audit found 0 published restaurants without a city, 0 structured-city slug collisions, 166 unambiguous legacy-city redirects and 2 explicit homepage fallbacks; legacy tables are retained for the later removal lot.
 
-Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; no override exists yet.
+Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; overrides remain sparse and are created only after an administrator saves a customization.
+
+Latest admin validation: the dedicated preproduction test administrator validates authenticated Filament flows on desktop and mobile. The City SEO table search, editor opening and override saving are covered; save audits retain only structured city metadata.
 
 | Area | Status | Notes |
 |---|---|---|
