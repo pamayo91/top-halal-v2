@@ -8,6 +8,7 @@ use App\Http\Requests\StoreRestaurantReviewRequest;
 use App\Models\{Article, Category, Comment, Feature, Page, Restaurant, RestaurantReview};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Services\{CityPageResolver, PublicRestaurantSearch};
 
@@ -29,7 +30,7 @@ class PublicContentController extends Controller
         return view('public.restaurants.index', [
             'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
-            'locations' => Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->where('city_name', '!=', '')->selectRaw('city_name, count(*) as restaurants_count')->groupBy('city_name')->orderBy('city_name')->get()->map(fn ($city) => (object) ['name' => $city->city_name, 'slug' => \Illuminate\Support\Str::slug($city->city_name)]),
+            'locations' => Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->where('city_name', '!=', '')->selectRaw('city_name, count(*) as restaurants_count')->groupBy('city_name')->orderBy('city_name')->get()->map(fn ($city) => (object) ['name' => $city->city_name, 'slug' => Str::slug($city->city_name)]),
             'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
     }
