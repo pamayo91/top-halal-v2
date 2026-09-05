@@ -153,6 +153,11 @@
 - Removed the unused Mauricienne specialty after a V2-only relation audit confirmed zero associated restaurants.
 - Replaced the Fast-food specialty source with the supplied image, normalized it through the same V2 WebP 1200×800 pipeline, and idempotently updated the 6,700 affected card-only fallback thumbnails.
 
+## 2026-09-05
+
+- City pages now resolve solely from published `restaurants.city_name` and `Str::slug(city_name)`. Public filters, city links and the restaurant back-office no longer use Geography associations; the address search remains unchanged.
+- Preserved legacy-only city slugs through application-managed 301 rules generated at deployment, with an explicit homepage fallback only where no unique structured-city target exists. The `locations` and `restaurant_location` tables remain intact for the later removal lot.
+
 ## 2026-09-01
 
 - Repaired only the 812 strictly verified V2 `address_line1` values that duplicated a matching historical `postcode + city` suffix. The raw address, structured postcode/city/code, GPS and geocoding/location status fields were not changed; 184 conflicting records remain untouched. The second execution corrected zero records.

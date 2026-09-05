@@ -13,7 +13,7 @@ class RestaurantSeo
         }
 
         $title = 'Restaurant '.$restaurant->name.' Halal';
-        $city = filled($restaurant->city_name) ? $restaurant->city_name : $restaurant->locations->sortBy('name')->first()?->name;
+        $city = $restaurant->city_name;
         $specialty = $restaurant->categories->sortBy('name')->first()?->name;
 
         if ($city) {

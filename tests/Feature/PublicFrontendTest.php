@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Comment;
 use App\Models\ContentMedia;
 use App\Models\Feature;
-use App\Models\Location;
 use App\Models\MediaAsset;
 use App\Models\MediaVariant;
 use App\Models\Page;
@@ -66,10 +65,8 @@ class PublicFrontendTest extends TestCase
         $restaurant = Restaurant::create(['legacy_wp_id' => 411, 'name' => 'Le Safran', 'slug' => 'le-safran', 'status' => 'published', 'city_name' => 'Lyon']);
         $category = Category::create(['legacy_term_id' => 12, 'name' => 'Marocain', 'slug' => 'marocain']);
         $feature = Feature::create(['legacy_term_id' => 13, 'name' => 'À emporter', 'slug' => 'a-emporter']);
-        $location = Location::create(['legacy_term_id' => 14, 'name' => 'Lyon', 'slug' => 'lyon']);
         $restaurant->categories()->attach($category);
         $restaurant->features()->attach($feature);
-        $restaurant->locations()->attach($location);
         $this->get('/restaurants?q=safran&ville=lyon&categories[]=marocain&features[]=a-emporter')->assertOk()->assertSee('Le Safran')->assertSee('noindex,follow', false);
     }
 
@@ -139,13 +136,12 @@ class PublicFrontendTest extends TestCase
         $restaurant = Restaurant::create(['legacy_wp_id' => 414, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published']);
         $category = Category::create(['legacy_term_id' => 15, 'name' => "Cuisine d'Orient", 'slug' => 'orient']);
         $feature = Feature::create(['legacy_term_id' => 16, 'name' => "Chef d'œuvre", 'slug' => 'chef-oeuvre']);
-        $location = Location::create(['legacy_term_id' => 17, 'name' => "L'Haÿ-les-Roses", 'slug' => 'lhay']);
         $restaurant->categories()->attach($category);
         $restaurant->features()->attach($feature);
-        $restaurant->locations()->attach($location);
+        $restaurant->update(['city_name' => "L'Haÿ-les-Roses"]);
         Article::create(['legacy_wp_id' => 18, 'original_title' => "L'article", 'title' => "L'article", 'slug' => 'article-test', 'legacy_url' => '/article-test', 'status' => 'published']);
         Page::create(['legacy_wp_id' => 19, 'original_title' => "La page d'accueil", 'title' => "La page d'accueil", 'slug' => 'page-test', 'legacy_url' => '/page-test', 'status' => 'published']);
-        foreach (['/resto/adams-burger', '/article-test', '/page-test', '/restos/lhay', '/specialites/orient', '/service/chef-oeuvre'] as $url) {
+        foreach (['/resto/adams-burger', '/article-test', '/page-test', '/restos/lhay-les-roses', '/specialites/orient', '/service/chef-oeuvre'] as $url) {
             $this->get($url)->assertOk()->assertDontSee('&amp;#039;', false);
         }
     }

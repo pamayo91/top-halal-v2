@@ -10,9 +10,11 @@ use Illuminate\Support\Str;
 
 class PublicRestaurantSearch
 {
+    public function __construct(private readonly CityPageResolver $cities) {}
+
     public function published(): Builder
     {
-        return Restaurant::where('status', 'published')->with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]);
+        return Restaurant::where('status', 'published')->with(['categories', 'features', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]);
     }
 
     public function apply(Builder $query, Request $request): Builder
@@ -22,7 +24,8 @@ class PublicRestaurantSearch
             $query->where(fn (Builder $search) => $search->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orWhereRaw('LOWER(city_name) LIKE ?', ["%{$escaped}%"]));
         }
         if ($city = trim((string) $request->input('ville'))) {
-            $query->where(fn (Builder $cities) => $cities->whereRaw('LOWER(city_name) = ?', [Str::lower(str_replace('-', ' ', $city))])->orWhereHas('locations', fn (Builder $locations) => $locations->where('slug', $city)));
+            $cityName = $this->cities->cityNameForSlug($city);
+            $query->when($cityName !== null, fn (Builder $cities) => $cities->where('city_name', $cityName), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
         }
         foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
         foreach (array_filter((array) $request->input('features', []), 'is_string') as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));

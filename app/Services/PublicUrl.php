@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Article, Category, Comment, Feature, Location, MediaAsset, Page, Restaurant, RestaurantClaim, RestaurantReview};
+use App\Models\{Article, Category, Comment, Feature, MediaAsset, Page, Restaurant, RestaurantClaim, RestaurantReview};
 
 class PublicUrl
 {
@@ -15,7 +15,6 @@ class PublicUrl
             $record instanceof Comment => $this->forComment($record),
             $record instanceof RestaurantClaim => $this->for($record->restaurant),
             $record instanceof MediaAsset => $record->deliveryUrl(),
-            $record instanceof Location => $record->restaurants()->exists() ? route('locations.show', $record->slug) : null,
             $record instanceof Category => $record->restaurants()->exists() ? route('categories.show', $record->slug) : null,
             $record instanceof Feature => $record->restaurants()->exists() ? route('features.show', $record->slug) : null,
             default => null,

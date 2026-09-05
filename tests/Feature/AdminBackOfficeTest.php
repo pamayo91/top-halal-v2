@@ -47,7 +47,7 @@ class AdminBackOfficeTest extends TestCase
         $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")
             ->assertOk()
             ->assertSee('Rechercher une adresse')
-            ->assertSee('Zones associées Top-Halal')
+            ->assertDontSee('Zones associées Top-Halal')
             ->assertSee('Position')
             ->assertDontSee('Données d’origine')
             ->assertDontSee('GPS historique / actuel')

@@ -7,12 +7,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\CityPageResolver;
 
 class Restaurant extends Model
 {
     use SoftDeletes;
 
     protected $guarded = [];
+
+    protected static function booted(): void
+    {
+        static::saved(function (self $restaurant): void {
+            if ($restaurant->wasRecentlyCreated || $restaurant->wasChanged(['city_name', 'status'])) {
+                app(CityPageResolver::class)->forget();
+            }
+        });
+        static::deleted(fn (): mixed => app(CityPageResolver::class)->forget());
+        static::restored(fn (): mixed => app(CityPageResolver::class)->forget());
+    }
 
     protected function casts(): array
     {

@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Filament\Resources\{ArticleResource, PageResource, RestaurantResource};
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\StoreRestaurantReviewRequest;
-use App\Models\{Article, Category, Comment, Feature, Location, Page, Restaurant, RestaurantReview};
+use App\Models\{Article, Category, Comment, Feature, Page, Restaurant, RestaurantReview};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
-use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\PublicRestaurantSearch;
+use App\Services\{CityPageResolver, PublicRestaurantSearch};
 
 class PublicContentController extends Controller
 {
-    public function __construct(private readonly PublicRestaurantSearch $search) {}
+    public function __construct(private readonly PublicRestaurantSearch $search, private readonly CityPageResolver $cities) {}
     public function home(): View
     {
         return view('public.home', [
@@ -30,7 +29,7 @@ class PublicContentController extends Controller
         return view('public.restaurants.index', [
             'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
-            'locations' => Location::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->get(),
+            'locations' => Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->where('city_name', '!=', '')->selectRaw('city_name, count(*) as restaurants_count')->groupBy('city_name')->orderBy('city_name')->get()->map(fn ($city) => (object) ['name' => $city->city_name, 'slug' => \Illuminate\Support\Str::slug($city->city_name)]),
             'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
     }
@@ -40,7 +39,7 @@ class PublicContentController extends Controller
         $city = trim((string) $request->query('ville'));
         $query = trim((string) $request->query('q'));
         $categories = array_values(array_filter((array) $request->query('categories', []), 'is_string'));
-        if ($city !== '' && $query === '' && $categories === []) return redirect()->route('locations.show', $city);
+        if ($city !== '' && $query === '' && $categories === []) return redirect()->route('cities.show', $city);
         return redirect()->route('restaurants.index', array_filter(['ville' => $city ?: null, 'q' => $query ?: null, 'categories' => $categories ?: null]));
     }
 
@@ -82,9 +81,9 @@ class PublicContentController extends Controller
 
     public function location(string $slug): Response
     {
-        $city = Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->get(['city_name'])->first(fn ($restaurant) => Str::slug($restaurant->city_name) === $slug);
-        if ($city) return response()->view('public.taxonomy', ['term' => (object) ['name' => $city->city_name], 'kind' => 'ville', 'restaurants' => $this->search->published()->where('city_name', $city->city_name)->paginate(12)]);
-        return $this->taxonomy(Location::where('slug', $slug)->firstOrFail(), 'ville');
+        $cityName = $this->cities->cityNameForSlug($slug);
+        abort_unless($cityName !== null, 404);
+        return response()->view('public.taxonomy', ['term' => (object) ['name' => $cityName], 'kind' => 'ville', 'restaurants' => $this->search->published()->where('city_name', $cityName)->paginate(12)->withQueryString()]);
     }
     public function category(string $slug): Response { return $this->taxonomy(Category::where('slug', $slug)->firstOrFail(), 'spécialité'); }
     public function feature(string $slug): Response { return $this->taxonomy(Feature::where('slug', $slug)->firstOrFail(), 'service'); }
@@ -110,7 +109,6 @@ class PublicContentController extends Controller
     {
         $query = $this->search->published();
         match (true) {
-            $term instanceof Location => $query->whereHas('locations', fn (Builder $q) => $q->whereKey($term->id)),
             $term instanceof Category => $query->whereHas('categories', fn (Builder $q) => $q->whereKey($term->id)),
             $term instanceof Feature => $query->whereHas('features', fn (Builder $q) => $q->whereKey($term->id)),
         };

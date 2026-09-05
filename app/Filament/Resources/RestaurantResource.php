@@ -3,7 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RestaurantResource\Pages;
-use App\Models\{Category, Feature, Location, Restaurant};
+use App\Models\{Category, Feature, Restaurant};
 use App\Services\AdminAudit;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\DuplicateRestaurantDetector;
@@ -29,9 +29,9 @@ class RestaurantResource extends AdminResource
     protected static ?int $navigationSort = 1;
     protected static ?string $navigationLabel = 'Restaurants';
 
-    public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['categories', 'locations', 'media.asset', 'submission'])->withCount('reviews')->orderByDesc('created_at'); }
+    public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['categories', 'media.asset', 'submission'])->withCount('reviews')->orderByDesc('created_at'); }
     public static function getGloballySearchableAttributes(): array { return ['name', 'city_name', 'slug']; }
-    public static function getGlobalSearchResultDetails(Model $record): array { return ['Ville' => $record->city_name ?: $record->locations->pluck('name')->join(', ') ?: 'Non renseignée', 'Statut' => $record->status]; }
+    public static function getGlobalSearchResultDetails(Model $record): array { return ['Ville' => $record->city_name ?: 'Non renseignée', 'Statut' => $record->status]; }
 
     public static function moveToTrash(Restaurant $restaurant): void
     {
@@ -138,7 +138,6 @@ class RestaurantResource extends AdminResource
                     })->columnSpanFull(),
                     TextInput::make('address_line1')->label('Adresse')->maxLength(255)->readOnly(), TextInput::make('address_line2')->label('Complément')->maxLength(255)->readOnly(), TextInput::make('postal_code')->label('Code postal')->maxLength(20)->readOnly(),
                     TextInput::make('city_name')->label('Ville officielle')->maxLength(255)->readOnly(), TextInput::make('city_code')->label('Code INSEE')->maxLength(10)->readOnly(), TextInput::make('country_code')->label('Pays')->maxLength(2)->rules(['nullable', 'size:2'])->readOnly(),
-                    Select::make('locations')->label('Zones associées Top-Halal')->helperText('Ces zones ne sont pas modifiées automatiquement lors d’un changement d’adresse.')->relationship('locations', 'name')->multiple()->searchable()->preload()->columnSpanFull(),
                 ]),
                 Section::make('Position')->schema([
                     View::make('filament.location-map')->viewData(['tileUrl' => config('location.map_tile_url'), 'tileAttribution' => config('location.map_tile_attribution')]),
@@ -178,7 +177,7 @@ class RestaurantResource extends AdminResource
         return $table->columns([
             ImageColumn::make('image')->label('')->getStateUsing(fn (Restaurant $r) => ($r->media->first(fn ($media) => $media->role !== 'fallback_thumbnail' && $media->asset?->isRestaurantImage()) ?? $r->media->first(fn ($media) => $media->role === 'fallback_thumbnail' && $media->asset?->isRestaurantImage()))?->asset?->deliveryUrl())->defaultImageUrl('/images/media-placeholder.svg')->circular()->visibleFrom('lg'),
             TextColumn::make('name')->label('Restaurant')->searchable(['name', 'slug', 'address', 'phone', 'contact_email'])->sortable()->description(fn (Restaurant $r) => $r->slug),
-            TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: $r->locations->pluck('name')->join(', ') ?: '—')->searchable(['city_name'])->visibleFrom('md'),
+            TextColumn::make('city')->label('Ville')->state(fn (Restaurant $r) => $r->city_name ?: '—')->searchable(['city_name'])->visibleFrom('md'),
             TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {'published'=>'success','pending'=>'warning','reported'=>'danger','archived'=>'gray',default=>'info'})->sortable(),
             TextColumn::make('submission.submitter_email')->label('Déposant')->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('categories.name')->label('Catégories')->badge()->separator(',')->limitList(2)->visibleFrom('xl'),
@@ -186,7 +185,7 @@ class RestaurantResource extends AdminResource
             TextColumn::make('publication_date')->label('Publié le')->state(fn (Restaurant $restaurant) => $restaurant->legacy_published_at ?? $restaurant->created_at)->dateTime('d/m/Y H:i')->placeholder('—')->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderByRaw('COALESCE(legacy_published_at, created_at) '.($direction === 'asc' ? 'asc' : 'desc'))), TextColumn::make('legacy_modified_at')->label('Modifié (legacy)')->dateTime('d/m/Y H:i')->placeholder('—')->sortable()->toggleable(isToggledHiddenByDefault: true),
         ])->filters([
             SelectFilter::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé']),
-            SelectFilter::make('location')->label('Ville / zone')->relationship('locations', 'name')->searchable()->preload(),
+            SelectFilter::make('city_name')->label('Ville')->options(fn (): array => Restaurant::query()->whereNotNull('city_name')->where('city_name', '!=', '')->distinct()->orderBy('city_name')->pluck('city_name', 'city_name')->all())->searchable(),
             Filter::make('missing_gps')->label('GPS manquant ou invalide')->query(fn (Builder $q) => $q->where(fn ($x) => $x->whereNull('latitude')->orWhereNull('longitude')->orWhereNotBetween('latitude', [-90, 90])->orWhereNotBetween('longitude', [-180, 180]))), Filter::make('without_city_code')->label('Sans code INSEE')->query(fn (Builder $q) => $q->whereNull('city_code')),
             Filter::make('address_to_process')->label('Adresse à traiter')->query(fn (Builder $q) => $q->where(function (Builder $missing): void { foreach (['address_line1', 'postal_code', 'city_name', 'city_code', 'country_code'] as $field) $missing->orWhereNull($field)->orWhere($field, ''); })),
             SelectFilter::make('category')->label('Catégorie')->relationship('categories', 'name')->searchable()->preload(),

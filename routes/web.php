@@ -52,13 +52,13 @@ Route::post('/_preview/{type}/{legacyId}/comments', [PreviewCommentController::c
     ->whereIn('type', ['post', 'page']);
 
 Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
-    $restaurant = Restaurant::with(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants'])->where('legacy_wp_id', $legacyId)->firstOrFail();
+    $restaurant = Restaurant::with(['categories', 'features', 'openingHours', 'media.asset.variants'])->where('legacy_wp_id', $legacyId)->firstOrFail();
     $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => route('restaurants.preview', $legacyId)]);
 })->name('restaurants.preview');
 Route::get('/_preview/restaurant/v2/{restaurant}', function (Restaurant $restaurant) {
     abort_unless($restaurant->status === 'pending', 404);
-    $restaurant->load(['categories', 'features', 'locations', 'openingHours', 'media.asset.variants']);
+    $restaurant->load(['categories', 'features', 'openingHours', 'media.asset.variants']);
     $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => request()->fullUrl()]);
 })->middleware('signed')->name('restaurants.preview.pending');
@@ -107,7 +107,7 @@ Route::get('/restaurants/recherche/suggestions', [RestaurantSearchSuggestionCont
 Route::post('/restaurants/autour-de-moi', [PublicContentController::class, 'nearMe'])->middleware('throttle:20,1')->name('restaurants.near-me');
 Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
 Route::post('/resto/{slug}/avis', [PublicContentController::class, 'storeReview'])->middleware('throttle:10,1')->name('restaurants.reviews.store');
-Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name('locations.show');
+Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name('cities.show');
 Route::get('/specialites/{slug}', [PublicContentController::class, 'category'])->name('categories.show');
 Route::get('/service/{slug}', [PublicContentController::class, 'feature'])->name('features.show');
 Route::post('/{slug}/commentaires', [PublicContentController::class, 'storeComment'])->middleware('throttle:10,1')->where('slug', '[a-z0-9-]+')->name('editorial.comments.store');

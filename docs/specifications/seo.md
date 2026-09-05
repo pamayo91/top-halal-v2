@@ -9,7 +9,7 @@
 
 ## Frozen public URL contract (2026-08-26)
 - Canonical public URLs are HTTPS, on the canonical host, with no trailing slash except `/`.
-- Restaurants use `/resto/{slug}`; geographic pages use `/restos/{location}`; category and service pages use `/specialites/{slug}` and `/service/{slug}`. Published editorial content uses its root slug: `/{slug}`.
+- Restaurants use `/resto/{slug}`; city pages use `/restos/{Str::slug(restaurants.city_name)}`; category and service pages use `/specialites/{slug}` and `/service/{slug}`. Published editorial content uses its root slug: `/{slug}`. The legacy Geography tables do not resolve city pages; legacy city slugs without an identical structured-city slug redirect through the application redirect engine.
 - A page/article slug collision is a migration anomaly to resolve before cutover; it must never produce two indexable URLs.
 - `/sitemap.xml` contains only indexable canonical URLs. `robots.txt` exposes it in production only; preproduction remains disallow-all/noindex.
 - Arbitrary query parameters canonicalize to the parameter-free URL and are `noindex,follow`. Pagination is `?page=N`; page 1 is canonicalized to the root and pages above 1 are `noindex,follow` until a curated collection is approved.
