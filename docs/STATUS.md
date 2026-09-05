@@ -4,6 +4,8 @@ Last updated: 2026-09-03
 
 Latest: city pages are decoupled from Geography: `/restos/{slug}` resolves only against published `restaurants.city_name` with `Str::slug`. The preproduction audit found 0 published restaurants without a city, 0 structured-city slug collisions, 166 unambiguous legacy-city redirects and 2 explicit homepage fallbacks; legacy tables are retained for the later removal lot.
 
+Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; no override exists yet.
+
 | Area | Status | Notes |
 |---|---|---|
 | Architecture | DECIDED | Laravel 13 / PHP 8.4 / Apache / MariaDB / no Docker |
