@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\{CitySeoPage, Restaurant, User};
+use App\Models\{AdminAuditLog, CitySeoPage, Restaurant, User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -42,6 +42,8 @@ class CitySeoAdminTableTest extends TestCase
             ->set('data.h1', 'Restaurants halal à Marseille')
             ->call('save');
         $this->assertDatabaseHas('city_seo_pages', ['city_name' => 'Marseille', 'h1' => 'Restaurants halal à Marseille']);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'city_seo.updated']);
+        $this->assertSame(['city_name' => 'Marseille'], AdminAuditLog::where('action', 'city_seo.updated')->latest('id')->value('changes'));
         Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class, ['city' => 'Marseille'])
             ->assertSet('data.h1', 'Restaurants halal à Marseille');
     }
