@@ -56,7 +56,7 @@ test.describe('Filament administration', () => {
 
     for (const [path, label, column] of [['/admin/restaurant-reviews', 'Date historique de l’avis', 'Date de l’avis'], ['/admin/comments', 'Date historique du commentaire', 'Date du commentaire']]) {
       await page.goto(path);
-      await expect(page.getByRole('table')).toContainText(/\d{1,2} [a-zéû]+ 20\d{2} à \d{2}:\d{2}/i);
+      await expect(page.getByRole('table')).toContainText(/\d{2}\/\d{2}\/20\d{2} \d{2}:\d{2}/);
       const dateHeader = page.getByRole('columnheader', { name: column, exact: true });
       await expect(dateHeader).toBeVisible();
       expect(await dateHeader.evaluate((element) => element.getBoundingClientRect().right <= window.innerWidth)).toBe(true);
