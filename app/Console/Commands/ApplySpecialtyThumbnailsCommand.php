@@ -22,7 +22,7 @@ class ApplySpecialtyThumbnailsCommand extends Command
         $slugs = collect(explode(',', (string) $this->option('slugs')))->map(fn (string $slug) => Str::slug(trim($slug)))->filter()->values();
         $files = collect(File::files($source))->mapWithKeys(fn ($file) => [Str::slug(pathinfo($file->getFilename(), PATHINFO_FILENAME)) => $file->getPathname()]);
         $categories = Category::query()->when($slugs->isNotEmpty(), fn ($query) => $query->whereIn('slug', $slugs))->orderBy('name')->get();
-        $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'specialties' => [], 'thumbnails' => ['eligible' => 0, 'created' => 0, 'existing' => 0, 'skipped_without_specialty_image' => 0, 'skipped' => []], 'mauricienne' => null];
+        $report = ['mode' => $this->option('apply') ? 'apply' : 'dry-run', 'specialties' => [], 'thumbnails' => ['eligible' => 0, 'created' => 0, 'existing' => 0, 'replaced' => 0, 'skipped_without_specialty_image' => 0, 'skipped' => []], 'mauricienne' => null];
 
         if ($categories->isEmpty()) {
             $this->error('No requested V2 specialty exists.');
@@ -78,10 +78,15 @@ class ApplySpecialtyThumbnailsCommand extends Command
                     continue;
                 }
                 if ($this->option('apply')) {
+                    $obsolete = RestaurantMedia::query()->where('restaurant_id', $restaurant->id)->where('role', 'fallback_thumbnail')->where('media_asset_id', '!=', $asset->id)->get();
+                    foreach ($obsolete as $media) {
+                        $media->delete();
+                        $report['thumbnails']['replaced']++;
+                    }
                     $media = RestaurantMedia::firstOrCreate(['restaurant_id' => $restaurant->id, 'media_asset_id' => $asset->id], ['sort_order' => 0, 'status' => 'ready', 'role' => 'fallback_thumbnail']);
                     if ($media->wasRecentlyCreated) {
                         $report['thumbnails']['created']++;
-                        app(AdminAudit::class)->record('restaurant.specialty_thumbnail_assigned', $restaurant, ['category_id' => $category->id, 'media_asset_id' => $asset->id]);
+                        app(AdminAudit::class)->record('restaurant.specialty_thumbnail_assigned', $restaurant, ['category_id' => $category->id, 'media_asset_id' => $asset->id, 'replaced_fallbacks' => $obsolete->count()]);
                     } else {
                         $report['thumbnails']['existing']++;
                     }

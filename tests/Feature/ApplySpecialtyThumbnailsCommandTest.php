@@ -40,4 +40,33 @@ class ApplySpecialtyThumbnailsCommandTest extends TestCase
         $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $burger->media_asset_id, 'role' => 'fallback_thumbnail']);
         $this->assertFileExists($report);
     }
+
+    public function test_it_replaces_an_outdated_specialty_thumbnail_without_creating_a_duplicate(): void
+    {
+        Storage::fake('local');
+        $source = storage_path('framework/testing/specialty-replacement-source');
+        $output = storage_path('framework/testing/specialty-replacement-output');
+        $report = storage_path('framework/testing/specialty-replacement-report.json');
+        File::deleteDirectory($source);
+        File::deleteDirectory($output);
+        File::delete($report);
+        File::ensureDirectoryExists($source);
+        $image = imagecreatetruecolor(1600, 1000);
+        imagejpeg($image, $source.'/burger.jpg', 90);
+        imagedestroy($image);
+
+        $burger = Category::where('slug', 'burger')->firstOrFail();
+        $restaurant = Restaurant::create(['legacy_wp_id' => 700002, 'name' => 'Miniature à remplacer', 'slug' => 'miniature-a-remplacer', 'status' => 'published']);
+        $restaurant->categories()->attach($burger);
+        $old = \App\Models\MediaAsset::create(['original_path' => 'media/originals/old.webp', 'mime' => 'image/webp', 'width' => 1200, 'height' => 800, 'bytes' => 1, 'checksum' => str_repeat('b', 64)]);
+        \App\Models\RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'media_asset_id' => $old->id, 'sort_order' => 0, 'status' => 'ready', 'role' => 'fallback_thumbnail']);
+
+        $this->artisan('data:apply-specialty-thumbnails', ['--apply' => true, '--slugs' => 'burger', '--source' => $source, '--output' => $output, '--report' => $report])
+            ->assertExitCode(0);
+
+        $burger->refresh();
+        $this->assertDatabaseMissing('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $old->id]);
+        $this->assertDatabaseCount('restaurant_media', 1);
+        $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $burger->media_asset_id, 'role' => 'fallback_thumbnail']);
+    }
 }
