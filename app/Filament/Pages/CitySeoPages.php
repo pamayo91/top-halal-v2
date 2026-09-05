@@ -53,7 +53,7 @@ class CitySeoPages extends Page implements HasTable
                     default => $query,
                 };
             }),
-        ])->recordActions([Action::make('edit')->label('Modifier')->url(fn (Restaurant $record): string => static::getUrl(['city' => $record->city_name]))])
+        ])->recordActions([Action::make('edit')->label('Modifier')->url(fn (Restaurant $record): string => static::getUrl(['city' => $record->city_name]).'#city-seo-editor')])
             ->defaultSort('restaurants_count', 'desc')->paginated([25, 50]);
     }
 

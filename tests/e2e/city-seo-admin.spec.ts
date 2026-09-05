@@ -41,9 +41,10 @@ test.describe('Administration des pages villes SEO', () => {
     await expect(marseilleRow).toBeVisible();
     await marseilleRow.getByRole('link', { name: 'Modifier' }).click();
 
-    await expect(page).toHaveURL(/\/admin\/pages-villes-seo\?city=Marseille/);
+    await expect(page).toHaveURL(/\/admin\/pages-villes-seo\?city=Marseille#city-seo-editor/);
     const h1 = page.getByLabel('H1 personnalisé');
     await expect(h1).toBeVisible();
+    expect(await page.locator('#city-seo-editor').evaluate((editor) => editor.getBoundingClientRect().top < window.innerHeight)).toBe(true);
     await h1.fill('Restaurants halal à Marseille');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
     await expect(page.getByText('Réglages enregistrés', { exact: true })).toBeVisible();
