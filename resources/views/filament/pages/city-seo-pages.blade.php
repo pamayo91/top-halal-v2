@@ -1,1 +1,8 @@
-<x-filament-panels::page><div class="grid gap-6 lg:grid-cols-3"><div class="lg:col-span-2"><div class="rounded-xl border p-4">@foreach($this->cities as $city)<button type="button" wire:click="selectCity(@js($city->city_name))" class="block w-full border-b py-2 text-left"><strong>{{ $city->city_name }}</strong> · {{ $city->slug }} · {{ $city->restaurants_count }} restaurant(s) · {{ $city->config ? ($city->open ? 'Forcée ouverte' : 'Forcée fermée') : ($city->open ? 'Auto ouverte' : 'Auto fermée') }} · {{ filled($city->config?->content_top) || filled($city->config?->content_bottom) ? 'Contenu oui' : 'Contenu non' }}</button>@endforeach</div></div><form wire:submit="save"><p class="mb-3">@if($cityName)Modification : <strong>{{ $cityName }}</strong>@else Sélectionnez une ville pour personnaliser ses réglages.@endif</p>{{ $this->form }}<x-filament::button type="submit" class="mt-6">Enregistrer</x-filament::button></form></div></x-filament-panels::page>
+<x-filament-panels::page>
+    {{ $this->table }}
+    <form wire:submit="save" class="mt-8">
+        <p class="mb-3">@if($cityName)Modification : <strong>{{ $cityName }}</strong>@else Sélectionnez « Modifier » dans le tableau pour personnaliser une ville.@endif</p>
+        {{ $this->form }}
+        <x-filament::button type="submit" class="mt-6">Enregistrer</x-filament::button>
+    </form>
+</x-filament-panels::page>
