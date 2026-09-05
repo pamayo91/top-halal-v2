@@ -31,7 +31,7 @@ class CitySeoPages extends Page implements HasTable
     public ?array $data = [];
     public string $cityName = '';
 
-    public function mount(): void { $this->data = ['threshold' => app(CitySeoService::class)->threshold(), 'state' => 'auto']; }
+    public function mount(?string $city = null): void { $this->data = ['threshold' => app(CitySeoService::class)->threshold(), 'state' => 'auto']; if ($city !== null) $this->selectCity($city); }
 
     public function table(Table $table): Table
     {
@@ -51,7 +51,7 @@ class CitySeoPages extends Page implements HasTable
                     default => $query,
                 };
             }),
-        ])->recordActions([Action::make('edit')->label('Modifier')->action(fn (Restaurant $record) => $this->selectCity($record->city_name))])
+        ])->recordActions([Action::make('edit')->label('Modifier')->url(fn (Restaurant $record): string => static::getUrl(['city' => $record->city_name]))])
             ->defaultSort('restaurants_count', 'desc')->paginated([25, 50]);
     }
 
