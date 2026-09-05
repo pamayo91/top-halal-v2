@@ -151,6 +151,7 @@
 - Added the native V2 restaurant specialties Burger, Brunch and Grillades. They are available in directory filters, public submissions and administration; search suggestions no longer hide a specialty solely because it has no published restaurant yet.
 - Added the specialty-image pipeline: normalized 1200×800 WebP sources are attached to V2 specialties and may be assigned as card-only fallback thumbnails to restaurants with no raster image.
 - Removed the unused Mauricienne specialty after a V2-only relation audit confirmed zero associated restaurants.
+- Replaced the Fast-food specialty source with the supplied image, normalized it through the same V2 WebP 1200×800 pipeline, and idempotently updated the 6,700 affected card-only fallback thumbnails.
 
 ## 2026-09-01
 
