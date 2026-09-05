@@ -18,6 +18,10 @@ class CitySeoAdminTableTest extends TestCase
             Restaurant::create(['legacy_wp_id' => 90000 + $number, 'name' => "Ville $number", 'slug' => "ville-$number", 'status' => 'published', 'city_name' => "Ville $number"]);
         }
         $this->actingAs($admin)->get('/admin/pages-villes-seo')->assertOk()->assertSee('Ville')->assertSee('Nombre de restaurants')->assertSee('État SEO')->assertSee('Modifier')->assertSee('25');
+
+        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class)
+            ->set('tableSearch', 'Ville 1')
+            ->assertSee('Ville 1');
     }
 
     public function test_a_city_without_override_opens_an_editable_fallback_form_without_creating_a_record(): void

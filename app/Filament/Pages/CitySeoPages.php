@@ -36,7 +36,9 @@ class CitySeoPages extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table->query($this->cityQuery())->columns([
-            TextColumn::make('city_name')->label('Ville')->searchable()->sortable(),
+            TextColumn::make('city_name')->label('Ville')
+                ->searchable(query: fn (Builder $query, string $search): Builder => $query->where('restaurants.city_name', 'like', '%'.$search.'%'))
+                ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('restaurants.city_name', $direction)),
             TextColumn::make('city_slug')->label('Slug')->state(fn (Restaurant $record) => Str::slug($record->city_name))->sortable(),
             TextColumn::make('restaurants_count')->label('Nombre de restaurants')->numeric()->sortable(),
             BadgeColumn::make('seo_state')->label('État SEO')->state(fn (Restaurant $record) => $this->seoState($record))->color(fn (string $state) => str_contains($state, 'ouverte') ? 'success' : 'gray'),
