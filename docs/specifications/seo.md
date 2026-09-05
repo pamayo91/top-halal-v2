@@ -15,6 +15,10 @@
 - Arbitrary query parameters canonicalize to the parameter-free URL and are `noindex,follow`. Pagination is `?page=N`; page 1 is canonicalized to the root and pages above 1 are `noindex,follow` until a curated collection is approved.
 
 ## Structured data and facets
+
+## Pages villes SEO
+
+Les villes restent dérivées de `restaurants.city_name`. `city_seo_pages` ne contient que les overrides éditoriaux/SEO. Une page est indexable automatiquement au seuil global configurable, sauf override `forced_open` ou `forced_closed`; les pages fermées restent accessibles, `noindex,follow`, canoniques sur elles-mêmes et hors sitemap.
 - JSON-LD is native and derives only from visible facts. A restaurant emits exactly one `AggregateRating`, inside its `Restaurant` object, only when approved reviews are visible. External restaurant URLs never appear in public HTML or JSON-LD.
 - Search, sort, distance, price, amenity and multi-filter URLs are discovery controls, not indexable landing pages. They remain noindex and stay out of sitemaps unless explicitly promoted with a stable canonical path and unique content.
 

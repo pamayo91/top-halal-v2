@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, PublicRestaurantSearch};
 
 class PublicContentController extends Controller
 {
-    public function __construct(private readonly PublicRestaurantSearch $search, private readonly CityPageResolver $cities) {}
+    public function __construct(private readonly PublicRestaurantSearch $search, private readonly CityPageResolver $cities, private readonly CitySeoService $citySeo) {}
     public function home(): View
     {
         return view('public.home', [
@@ -84,7 +84,8 @@ class PublicContentController extends Controller
     {
         $cityName = $this->cities->cityNameForSlug($slug);
         abort_unless($cityName !== null, 404);
-        return response()->view('public.taxonomy', ['term' => (object) ['name' => $cityName], 'kind' => 'ville', 'restaurants' => $this->search->published()->where('city_name', $cityName)->paginate(12)->withQueryString()]);
+        $city = $this->citySeo->city($cityName);
+        return response()->view('public.taxonomy', ['term' => (object) ['name' => $cityName], 'kind' => 'ville', 'citySeo' => $city, 'restaurants' => $this->search->published()->where('city_name', $cityName)->paginate(12)->withQueryString()]);
     }
     public function category(string $slug): Response { return $this->taxonomy(Category::where('slug', $slug)->firstOrFail(), 'spécialité'); }
     public function feature(string $slug): Response { return $this->taxonomy(Feature::where('slug', $slug)->firstOrFail(), 'service'); }

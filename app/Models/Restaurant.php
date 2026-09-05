@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\CityPageResolver;
+use App\Services\CitySeoService;
 
 class Restaurant extends Model
 {
@@ -20,10 +21,11 @@ class Restaurant extends Model
         static::saved(function (self $restaurant): void {
             if ($restaurant->wasRecentlyCreated || $restaurant->wasChanged(['city_name', 'status'])) {
                 app(CityPageResolver::class)->forget();
+                app(CitySeoService::class)->forget();
             }
         });
-        static::deleted(fn (): mixed => app(CityPageResolver::class)->forget());
-        static::restored(fn (): mixed => app(CityPageResolver::class)->forget());
+        static::deleted(fn (): mixed => app(CitySeoService::class)->forget());
+        static::restored(fn (): mixed => app(CitySeoService::class)->forget());
     }
 
     protected function casts(): array

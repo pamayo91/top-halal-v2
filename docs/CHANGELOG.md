@@ -155,6 +155,8 @@
 
 ## 2026-09-05
 
+- Added lightweight city SEO controls: threshold, open/closed overrides and optional SSR editorial/SEO overrides without duplicating the city directory.
+
 - City pages now resolve solely from published `restaurants.city_name` and `Str::slug(city_name)`. Public filters, city links and the restaurant back-office no longer use Geography associations; the address search remains unchanged.
 - Preserved legacy-only city slugs through application-managed 301 rules generated at deployment, with an explicit homepage fallback only where no unique structured-city target exists. The `locations` and `restaurant_location` tables remain intact for the later removal lot.
 

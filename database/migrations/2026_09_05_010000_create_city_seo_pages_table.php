@@ -1,0 +1,3 @@
+<?php
+use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;
+return new class extends Migration {public function up():void{Schema::create('city_seo_pages',function(Blueprint $t){$t->id();$t->string('city_name')->unique();$t->string('state',20)->default('auto');$t->string('h1')->nullable();$t->string('seo_title')->nullable();$t->text('seo_description')->nullable();$t->longText('content_top')->nullable();$t->longText('content_bottom')->nullable();$t->timestamps();});}public function down():void{Schema::dropIfExists('city_seo_pages');}};
