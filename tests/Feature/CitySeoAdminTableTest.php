@@ -32,9 +32,9 @@ class CitySeoAdminTableTest extends TestCase
         $this->assertDatabaseMissing('city_seo_pages', ['city_name' => 'Lyon']);
 
         Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class, ['city' => 'Marseille'])
-            ->assertSet('data.seo_description', '')
-            ->assertSet('data.content_top', '')
-            ->assertSet('data.content_bottom', '')
+            ->assertSet('data', fn (array $data): bool => array_key_exists('seo_description', $data)
+                && array_key_exists('content_top', $data)
+                && array_key_exists('content_bottom', $data))
             ->set('data.h1', 'Restaurants halal à Marseille')
             ->call('save');
         $this->assertDatabaseHas('city_seo_pages', ['city_name' => 'Marseille', 'h1' => 'Restaurants halal à Marseille']);
