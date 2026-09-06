@@ -6,6 +6,8 @@ Latest: the user list now qualifies origin, linked restaurants, claims and activ
 
 Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; overrides remain sparse and are created only after an administrator saves a customization.
 
+Public-launch prerequisite: the first comment or restaurant review from an e-mail address must be confirmed through a signed, expiring link before that contribution can be approved. The current pending/moderation workflow alone does not prove ownership of the submitted e-mail address.
+
 Latest admin validation: the dedicated preproduction test administrator validates authenticated Filament flows on desktop and mobile. The City SEO table search, editor opening and override saving are covered; save audits retain only structured city metadata.
 
 Authenticated BO test access: the local-only `PREPROD_ADMIN_EMAIL` / `PREPROD_ADMIN_PASSWORD` environment variables designate the dedicated preproduction test administrator. They are mandatory for authenticated Playwright coverage and are never stored in Git.

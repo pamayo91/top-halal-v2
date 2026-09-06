@@ -14,6 +14,7 @@
 ## New comments
 Fields: author name, email, content; optional authenticated user relationship.
 - Moderated workflow: pending -> approved/rejected/spam.
+- Before public launch, a first comment from an e-mail address must require confirmation through a signed, expiring link. The comment remains pending and cannot be approved until that confirmation succeeds. A syntactically valid e-mail address alone is insufficient.
 - URLs are forbidden. Reject `http://`, `https://`, `www.`, link markup and robust URL/domain-like patterns server-side.
 - Comments render as escaped/sanitized safe text; user HTML is not executed.
 - Email is private.
