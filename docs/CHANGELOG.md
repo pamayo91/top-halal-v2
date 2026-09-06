@@ -3,7 +3,7 @@
 ## 2026-09-06
 
 - Added sortable `Avis` and `Commentaires` counters to the user list. Each counter matches preserved legacy authorship by WordPress user ID or author e-mail, without double-counting a contribution where both identifiers match.
-- Refreshed the `users >= 322` regression floor after the owner-confirmed, audited deletion of 223 accounts. The full preproduction gate is green.
+- Refreshed the `users >= 169` regression floor after the owner-confirmed, audited deletion of 376 accounts. The full preproduction gate is green.
 
 ## 2026-09-05
 
