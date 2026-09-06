@@ -21,6 +21,16 @@
             @endforelse
         </div>
         {{ $restaurants->links() }}
+        @if($kind === 'ville' && ($citySpecialties ?? collect())->isNotEmpty())
+            <section class="nearby-cities" aria-labelledby="city-specialties-title">
+                <h2 id="city-specialties-title">Restaurants halal par spécialité à {{ $term->name }}</h2>
+                <ul class="nearby-cities-grid">
+                    @foreach($citySpecialties as $specialty)
+                        <li><a href="{{ route('city-specialties.show', ['city' => $city->slug, 'specialty' => $specialty->slug]) }}">{{ $specialty->name }}</a></li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
         @if($kind === 'ville' && ($nearbyCities ?? collect())->isNotEmpty())
             <section class="nearby-cities" aria-labelledby="nearby-cities-title">
                 <h2 id="nearby-cities-title">Villes aux alentours</h2>
