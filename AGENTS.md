@@ -54,6 +54,7 @@ Every completed feature requires appropriate automated tests.
 - PHP/business rules: Pest/PHPUnit.
 - Browser flows: Playwright on preproduction.
 - Codex/browser validation: navigate as a real visitor/admin, fill forms, submit them, inspect visible results, console, network errors and relevant accessibility/performance issues.
+- For authenticated back-office validation on preproduction, use only the dedicated test administrator supplied through local `PREPROD_ADMIN_EMAIL` and `PREPROD_ADMIN_PASSWORD` environment variables. Never use, modify, reset or make a fixture of the project owner's human administrator account. Tests requiring these variables must skip with an explicit reason when they are unavailable.
 - If an E2E/browser test finds a defect, diagnose, fix, redeploy and rerun the failing flow before marking complete.
 - Run targeted tests during development; run the full relevant suite before completing a milestone.
 
@@ -96,6 +97,7 @@ Maintain:
 - The project owner's designated human administrator account is the sole human admin account. Never reset its password or change its role/status unless the project owner gives a specific request for that action.
 - The WordPress migration is finalized. Do not query, use, or rerun migrations against the legacy WordPress database unless the project owner specifically authorizes a new legacy-data task.
 - For development-only needs, Codex may use a separate provisional admin account when explicitly provisioned; never repurpose or alter the project owner's human administrator account for that purpose.
+- The dedicated preproduction browser-test account is configured locally via `PREPROD_ADMIN_EMAIL` and `PREPROD_ADMIN_PASSWORD`; these values remain outside the repository and are never printed, committed or copied into test artifacts.
 
 ## Critical data-operation safeguard
 - Never restore a database, rebuild/reseed V2 data, or import/reimport any data from the legacy database without **two distinct explicit confirmations** from the project owner in the current conversation.

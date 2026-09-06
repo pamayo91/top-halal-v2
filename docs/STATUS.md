@@ -8,6 +8,8 @@ Latest SEO cities: configurable threshold and per-city optional overrides are de
 
 Latest admin validation: the dedicated preproduction test administrator validates authenticated Filament flows on desktop and mobile. The City SEO table search, editor opening and override saving are covered; save audits retain only structured city metadata.
 
+Authenticated BO test access: the local-only `PREPROD_ADMIN_EMAIL` / `PREPROD_ADMIN_PASSWORD` environment variables designate the dedicated preproduction test administrator. They are mandatory for authenticated Playwright coverage and are never stored in Git.
+
 | Area | Status | Notes |
 |---|---|---|
 | Architecture | DECIDED | Laravel 13 / PHP 8.4 / Apache / MariaDB / no Docker |
