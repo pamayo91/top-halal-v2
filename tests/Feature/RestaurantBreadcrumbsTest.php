@@ -63,7 +63,7 @@ class RestaurantBreadcrumbsTest extends TestCase
         $this->assertMatchesRegularExpression('/<link rel="canonical" href="'.preg_quote(route('restaurants.show', $restaurant->slug), '/').'"/', $html);
 
         foreach (array_slice($expected, 0, -1) as [$label, $url]) {
-            $this->assertStringContainsString('<a href="'.$url.'">'.$label.'</a>', $html);
+            $this->assertStringContainsString('<a href="'.$url.'">'.e($label).'</a>', $html);
         }
     }
 
