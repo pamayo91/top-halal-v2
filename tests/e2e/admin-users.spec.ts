@@ -62,6 +62,9 @@ test.describe('Gestion des utilisateurs', () => {
     await expect(search).toBeVisible();
     await search.fill('simu.elyquin.org');
     await expect(page.getByRole('table')).toContainText('simu.elyquin.org');
+    await page.getByText('Corbeille', { exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/users\?tab=trash$/);
+    await expect(page.getByRole('heading', { name: 'Utilisateurs', exact: true })).toBeVisible();
     expect(consoleErrors).toEqual([]);
     expect(networkErrors).toEqual([]);
   });
