@@ -98,6 +98,11 @@ class CitySpecialtySeoPagesTest extends TestCase
             ->assertSee('Modification :')
             ->assertSee('Marseille + Burger');
         $this->assertDatabaseCount('city_specialty_seo_pages', 0);
+
+        CitySpecialtySeoPage::create(['city_code' => '13055', 'category_id' => $burger->id, 'state' => 'open']);
+        $this->actingAs($admin)->get('/admin/facettes-seo')
+            ->assertOk()
+            ->assertSee('/restos/marseille/burger', false);
     }
 
     private function published(string $name, string $slug, string $city, string $cityCode, Category $category): Restaurant

@@ -2,6 +2,8 @@
 
 ## 2026-09-06
 
+- The `Ouverte` state badge in the SEO facets back-office table now links directly to the public landing page; closed facets have no front link.
+
 - Added sparse, administrator-controlled city + specialty SEO facets. Only explicitly opened pairs publish `/restos/{city}/{specialty}`, with canonical metadata, structured geographic breadcrumbs, sitemap entry, SSR city internal linking and optional sanitized overrides/content. Closed or unconfigured pairs remain absent from the sitemap and internal linking while the existing filters continue to work unchanged.
 
 - Added the SSR « Villes aux alentours » internal-linking block on city pages. It uses local official commune centres keyed by canonical INSEE code, crosses department/region boundaries by distance, links only SEO-open precise city pages, suppresses empty blocks and has no public remote request or JavaScript dependency. Settings now expose the 30 km default radius and 15-result default cap; cache invalidation covers those settings, SEO overrides and published-city changes. Long pagination now wraps on mobile, keeping city pages free of horizontal overflow.
