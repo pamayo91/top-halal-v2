@@ -116,6 +116,6 @@ class CitySpecialtySeoPagesTest extends TestCase
 
     private function specialty(string $name, string $slug): Category
     {
-        return Category::create(['legacy_term_id' => 20000 + Category::count(), 'name' => $name, 'slug' => $slug]);
+        return Category::firstOrCreate(['slug' => $slug], ['legacy_term_id' => 20000 + Category::count(), 'name' => $name]);
     }
 }
