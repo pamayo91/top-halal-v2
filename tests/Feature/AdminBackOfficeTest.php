@@ -220,6 +220,8 @@ class AdminBackOfficeTest extends TestCase
         RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $claimant->id, 'status' => 'pending', 'submitted_at' => now()]);
         RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $owner->id, 'status' => 'approved', 'submitted_at' => now()]);
         \App\Models\LegacyRestaurantAuthorship::create(['restaurant_id' => $legacyRestaurant->id, 'user_id' => $legacyAuthor->id, 'legacy_wp_id' => $legacyRestaurant->legacy_wp_id, 'legacy_wp_user_id' => 124, 'source_post_status' => 'publish']);
+        Comment::create(['article_id' => $this->article()->id, 'legacy_user_id' => 124, 'author_name' => 'Auteur legacy', 'author_email' => $legacyAuthor->email, 'content' => 'Commentaire historique', 'status' => 'approved']);
+        RestaurantReview::create(['restaurant_id' => $legacyRestaurant->id, 'author_name' => 'Auteur legacy', 'author_email' => $legacyAuthor->email, 'rating' => 5, 'content' => 'Avis historique', 'status' => 'approved']);
 
         $users = \App\Filament\Resources\UserResource::getEloquentQuery()
             ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id, $legacyAuthor->id])
@@ -235,6 +237,8 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$owner->id]));
         $this->assertSame('Auteur legacy', \App\Filament\Resources\UserResource::activityLabel($users[$legacyAuthor->id]));
         $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$legacyAuthor->id]));
+        $this->assertSame(1, $users[$legacyAuthor->id]->comments_count);
+        $this->assertSame(1, $users[$legacyAuthor->id]->reviews_count);
     }
 
     public function test_admin_can_bulk_trash_and_restore_non_administrator_users_without_losing_claims(): void

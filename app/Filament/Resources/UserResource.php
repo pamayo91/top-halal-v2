@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\Comment;
+use App\Models\RestaurantReview;
 use App\Models\User;
 use App\Services\AdminAudit;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
@@ -32,7 +34,17 @@ class UserResource extends AdminResource
             'claims as pending_claims_count' => fn (Builder $query) => $query->where('status', 'pending'),
             'claims as approved_claims_count' => fn (Builder $query) => $query->where('status', 'approved'),
             'claims as rejected_claims_count' => fn (Builder $query) => $query->where('status', 'rejected'),
-        ]);
+        ])->selectSub(
+            Comment::query()->selectRaw('count(*)')->where(fn (Builder $query) => $query
+                ->whereColumn('comments.legacy_user_id', 'users.legacy_wp_user_id')
+                ->orWhereColumn('comments.author_email', 'users.email')),
+            'comments_count',
+        )->selectSub(
+            RestaurantReview::query()->selectRaw('count(*)')->where(fn (Builder $query) => $query
+                ->whereColumn('restaurant_reviews.legacy_user_id', 'users.legacy_wp_user_id')
+                ->orWhereColumn('restaurant_reviews.author_email', 'users.email')),
+            'reviews_count',
+        );
     }
 
     public static function originLabel(User $user): string
@@ -126,6 +138,8 @@ class UserResource extends AdminResource
                 TextColumn::make('status')->badge(),
                 TextColumn::make('email_verified_at')->label('E-mail vérifié')->dateTime('d/m/Y')->placeholder('Non'),
                 TextColumn::make('restaurants_linked_count')->label('Restaurants liés')->state(fn (User $user) => static::restaurantLinkCount($user))->numeric(),
+                TextColumn::make('reviews_count')->label('Avis')->numeric()->sortable(),
+                TextColumn::make('comments_count')->label('Commentaires')->numeric()->sortable(),
                 TextColumn::make('claims_count')->label('Revendications')->numeric()->description(fn (User $user) => static::claimSummary($user)),
                 TextColumn::make('activity')->label('Activité')->state(fn (User $user) => static::activityLabel($user))->badge(),
                 TextColumn::make('must_change_password')->label('MDP à changer')->badge()->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non'),
