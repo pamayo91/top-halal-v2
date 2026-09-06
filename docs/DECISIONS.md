@@ -2,6 +2,10 @@
 
 ## 2026-09-06
 
+### D027 — Facettes SEO ville + spécialité explicitement ouvertes
+
+Les landings ville + spécialité sont des configurations éditoriales rares, pas le reflet automatique des combinaisons de filtres. Elles sont donc stockées par paire `city_code` canonique + `category_id`, fermées par défaut, et ne deviennent publiques, indexables, maillées et sitemapables qu'à l'état explicite `open`. Les URLs filtrées existantes conservent leur rôle de découverte `noindex,follow`; une URL imbriquée fermée renvoie 404 afin de ne pas exposer une landing SEO non approuvée. Cette approche ne crée ni associations restaurant/spécialité dupliquées ni matrice pré-calculée.
+
 ### D026 — Points de référence locaux pour le maillage des villes proches
 
 Le projet ne disposait d'aucun centre de commune fiable : le référentiel administratif ne contenait que les relations code INSEE/département/région, et les GPS des restaurants ne sont pas un centre communal acceptable. Une table légère `city_reference_points`, cléée par le `city_code` INSEE canonique, conserve donc latitude/longitude et provenance pour les seules pages villes publiées. La commande explicite `city-reference-points:sync` charge le champ officiel `centre` de l'API française `geo.api.gouv.fr/communes` en une récupération de référentiel, puis écrit uniquement les points nécessaires ; le parcours public ne contacte jamais ce fournisseur.
