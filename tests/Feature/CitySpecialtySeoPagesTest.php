@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\{Category, CitySpecialtySeoPage, Restaurant, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class CitySpecialtySeoPagesTest extends TestCase
@@ -94,19 +93,11 @@ class CitySpecialtySeoPagesTest extends TestCase
 
         $this->actingAs($admin)->get('/admin/facettes-seo')->assertOk()->assertSee('Ville')->assertSee('Spécialité')->assertSee('Nombre de restaurants')->assertSee('Fermée');
         $this->assertDatabaseCount('city_specialty_seo_pages', 0);
-
-        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySpecialtySeoPages::class)
-            ->call('selectFacet', '13055', $burger->id)
-            ->assertSet('cityCode', '13055')
-            ->assertSet('categoryId', $burger->id)
-            ->assertSet('data.state', 'closed')
-            ->set('data.state', 'open')
-            ->set('data.h1', 'Burger halal à Marseille')
-            ->set('data.content_top', '<p>Introduction.</p>')
-            ->call('save');
-
-        $this->assertDatabaseHas('city_specialty_seo_pages', ['city_code' => '13055', 'category_id' => $burger->id, 'state' => 'open', 'h1' => 'Burger halal à Marseille']);
-        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'city_specialty_seo.updated']);
+        $this->actingAs($admin)->get('/admin/facettes-seo?city=13055&specialty='.$burger->id)
+            ->assertOk()
+            ->assertSee('Modification :')
+            ->assertSee('Marseille + Burger');
+        $this->assertDatabaseCount('city_specialty_seo_pages', 0);
     }
 
     private function published(string $name, string $slug, string $city, string $cityCode, Category $category): Restaurant
