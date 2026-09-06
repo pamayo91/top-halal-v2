@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-06
+
+- Added sortable `Avis` and `Commentaires` counters to the user list. Each counter matches preserved legacy authorship by WordPress user ID or author e-mail, without double-counting a contribution where both identifiers match.
+- Refreshed the `users >= 322` regression floor after the owner-confirmed, audited deletion of 223 accounts. The full preproduction gate is green.
+
 ## 2026-09-05
 
 - Added the separate `legacy_restaurant_authorships` provenance relationship and imported 7,616 exact legacy listing-author links. The correction retains 49 active exact V2 restaurants even when their current legacy source is pending; 68 records without a V2 match remain excluded. It did not create claims, change roles/permissions or recreate restaurants. The single `Restaurants liés` counter includes these historical links as well as approved claims.
