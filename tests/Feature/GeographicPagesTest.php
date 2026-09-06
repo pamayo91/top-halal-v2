@@ -72,12 +72,12 @@ class GeographicPagesTest extends TestCase
     public function test_a_department_slug_is_automatically_suffixed_when_a_distinct_city_owns_the_short_url(): void
     {
         $cases = [
-            ['Indre', '44074', 'Châteauroux', '36044', 'indre-36'],
-            ['Mayenne', '53147', 'Laval', '53130', 'mayenne-53'],
-            ['Vienne', '38544', 'Poitiers', '86194', 'vienne-86'],
+            ['Indre', '44074', 'Châteauroux', '36044', 'indre-36', false],
+            ['Mayenne', '53147', 'Laval', '53130', 'mayenne-53', true],
+            ['Vienne', '38544', 'Poitiers', '86194', 'vienne-86', false],
         ];
 
-        foreach ($cases as $index => [$cityName, $cityCode, $departmentCity, $departmentCityCode, $departmentSlug]) {
+        foreach ($cases as $index => [$cityName, $cityCode, $departmentCity, $departmentCityCode, $departmentSlug, $cityBelongsToDepartment]) {
             $cityRestaurant = $this->published(350 + $index * 2, $cityName.' commune', 'city-'.$index, $cityName, $cityCode);
             $departmentRestaurant = $this->published(351 + $index * 2, $departmentCity.' département', 'department-'.$index, $departmentCity, $departmentCityCode);
 
@@ -85,10 +85,12 @@ class GeographicPagesTest extends TestCase
                 ->assertOk()
                 ->assertSee($cityRestaurant->name)
                 ->assertDontSee($departmentRestaurant->name);
-            $this->get('/restos/'.$departmentSlug)
+            $departmentResponse = $this->get('/restos/'.$departmentSlug)
                 ->assertOk()
-                ->assertSee($departmentRestaurant->name)
-                ->assertDontSee($cityRestaurant->name);
+                ->assertSee($departmentRestaurant->name);
+            $cityBelongsToDepartment
+                ? $departmentResponse->assertSee($cityRestaurant->name)
+                : $departmentResponse->assertDontSee($cityRestaurant->name);
         }
     }
 
