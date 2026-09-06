@@ -22,7 +22,7 @@ Une facette SEO est une configuration sparse identifiée par le `city_code` INSE
 
 Une configuration `open` publie exclusivement `/restos/{slug-ville-précis}/{slug-specialite}`. Le slug ville provient du resolver actuel : un homonyme emploie donc son suffixe départemental (`/restos/saint-denis-93/burger`). Le listing joint les relations `restaurant_category` existantes et ne duplique aucune relation. Sa canonical est elle-même, ses pages paginées sont `noindex,follow`, et l'URL principale est `index,follow` et sitemapable.
 
-Sans override, H1, title et meta description sont générés à partir de la ville, de la spécialité et du nombre réel de restaurants. Les contenus haut/bas restent vides tant qu'ils ne sont pas saisis. Le fil d'Ariane visible et JSON-LD est `Accueil > Restaurants > région > département > ville > spécialité`, en réutilisant les règles de niveaux mutualisés Paris/DOM. Une page ville peut afficher un bloc SSR léger de ses seules facettes ouvertes ; il ne remplace jamais les filtres UX ni le bloc « Villes aux alentours ».
+Sans override, H1, title et meta description sont générés à partir de la ville, de la spécialité et du nombre réel de restaurants. Les contenus haut/bas restent vides tant qu'ils ne sont pas saisis. Le fil d'Ariane visible et JSON-LD est `Accueil > Restaurants > région > département > ville > spécialité`, en réutilisant les règles de niveaux mutualisés Paris/DOM. Une page ville peut afficher un bloc SSR léger de ses seules facettes ouvertes ; il ne remplace jamais les filtres UX ni le bloc « Villes aux alentours ». Dans le BO, le badge « Ouverte » est le lien vers cette URL publique ; une facette fermée n’a pas de lien front.
 
 ## Pages villes SEO
 
