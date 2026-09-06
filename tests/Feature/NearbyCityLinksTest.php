@@ -18,7 +18,7 @@ class NearbyCityLinksTest extends TestCase
     {
         $this->city('Marseille', '13055', 43.2803, 5.3806);
         $this->city('Allauch', '13002', 43.3350, 5.4820, 'forced_open');
-        $this->city('Saint-Zacharie', '83118', 43.3600, 5.6000, 'forced_open');
+        $this->city('Saint-Zacharie', '83120', 43.3600, 5.6000, 'forced_open');
         $this->city('Aix-en-Provence', '13001', 43.5297, 5.4474, 'forced_open');
         $this->city('Ville fermée', '13003', 43.2900, 5.3900, 'forced_closed');
         $this->city('Ville lointaine', '84007', 44.0000, 5.0000, 'forced_open');
@@ -28,7 +28,7 @@ class NearbyCityLinksTest extends TestCase
         $nearby = app(NearbyCityService::class)->nearbyFor($marseille);
 
         $this->assertSame(['Allauch', 'Saint-Zacharie', 'Aix-en-Provence'], $nearby->pluck('city_name')->all());
-        $this->assertSame('83118', $nearby->get(1)->city_code);
+        $this->assertSame('83120', $nearby->get(1)->city_code);
         $this->assertNotContains('Marseille', $nearby->pluck('city_name')->all());
         $this->assertNotContains('Ville fermée', $nearby->pluck('city_name')->all());
         $this->assertNotContains('Ville lointaine', $nearby->pluck('city_name')->all());
