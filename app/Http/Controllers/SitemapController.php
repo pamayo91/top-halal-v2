@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Article, CitySpecialtySeoPage, Page, Restaurant};
-use App\Services\{CityPageResolver, CitySeoService, CitySpecialtySeoService, GeographicPageResolver};
+use App\Models\{Article, CityServiceSeoPage, CitySpecialtySeoPage, Page, Restaurant};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, GeographicPageResolver};
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -13,6 +13,7 @@ class SitemapController extends Controller
         $citySeo = app(CitySeoService::class);
         $cities = app(CityPageResolver::class);
         $citySpecialties = app(CitySpecialtySeoService::class);
+        $cityServices = app(CityServiceSeoService::class);
         $geography = app(GeographicPageResolver::class);
         $threshold = $citySeo->threshold();
         $urls = collect([['loc' => route('home'), 'lastmod' => null]])
@@ -21,6 +22,10 @@ class SitemapController extends Controller
             ->merge(CitySpecialtySeoPage::query()->with('category')->where('state', 'open')->get()->map(function (CitySpecialtySeoPage $facet) use ($cities, $citySpecialties): ?array {
                 $city = $cities->cityForCode($facet->city_code);
                 return $city === null || $facet->category === null ? null : ['loc' => $citySpecialties->url($city, $facet->category), 'lastmod' => $facet->updated_at];
+            })->filter())
+            ->merge(CityServiceSeoPage::query()->with('feature')->where('state', 'open')->get()->map(function (CityServiceSeoPage $facet) use ($cities, $cityServices): ?array {
+                $city = $cities->cityForCode($facet->city_code);
+                return $city === null || $facet->feature === null ? null : ['loc' => $cityServices->url($city, $facet->feature), 'lastmod' => $facet->updated_at];
             })->filter())
             ->merge($geography->departments()->filter(fn ($department) => $department->restaurants_count >= $threshold)->map(fn ($department) => ['loc' => route('cities.show', $department->slug), 'lastmod' => null]))
             ->merge($geography->regions()->filter(fn ($region) => $region->restaurants_count >= $threshold)->map(fn ($region) => ['loc' => route('cities.show', $region->slug), 'lastmod' => null]))

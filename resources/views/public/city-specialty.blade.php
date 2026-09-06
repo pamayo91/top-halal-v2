@@ -2,7 +2,7 @@
     <section class="page-header">
         <div class="shell">
             <x-breadcrumbs :items="$breadcrumbs" />
-            <p class="eyebrow">Par spécialité</p>
+            <p class="eyebrow">Par {{ $facetType === 'service' ? 'service' : 'spécialité' }}</p>
             <h1>{{ $h1 }}</h1>
         </div>
     </section>

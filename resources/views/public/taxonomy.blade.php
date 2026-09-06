@@ -26,7 +26,17 @@
                 <h2 id="city-specialties-title">Restaurants halal par spécialité à {{ $term->name }}</h2>
                 <ul class="nearby-cities-grid">
                     @foreach($citySpecialties as $specialty)
-                        <li><a href="{{ route('city-specialties.show', ['city' => $city->slug, 'specialty' => $specialty->slug]) }}">{{ $specialty->name }}</a></li>
+                        <li><a href="{{ route('city-specialties.show', ['city' => $city->slug, 'facet' => $specialty->slug]) }}">{{ $specialty->name }}</a></li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+        @if($kind === 'ville' && ($cityServices ?? collect())->isNotEmpty())
+            <section class="nearby-cities" aria-labelledby="city-services-title">
+                <h2 id="city-services-title">Restaurants halal par service à {{ $term->name }}</h2>
+                <ul class="nearby-cities-grid">
+                    @foreach($cityServices as $service)
+                        <li><a href="{{ route('city-specialties.show', ['city' => $city->slug, 'facet' => $service->slug]) }}">{{ $service->name }}</a></li>
                     @endforeach
                 </ul>
             </section>
