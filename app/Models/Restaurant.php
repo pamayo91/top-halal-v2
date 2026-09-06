@@ -26,8 +26,8 @@ class Restaurant extends Model
                 app(GeographicPageResolver::class)->forget();
             }
         });
-        static::deleted(function (): void { app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
-        static::restored(function (): void { app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
+        static::deleted(function (): void { app(CityPageResolver::class)->forget(); app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
+        static::restored(function (): void { app(CityPageResolver::class)->forget(); app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
     }
 
     protected function casts(): array

@@ -5,7 +5,7 @@ Restaurant records migrate from ListingPro listings and keep `legacy_wp_id`.
 Suggested core data includes name/slug/description/status/owner, address/postcode/city/geolocation, contact info, pricing, halal/certification information, social/website URLs (private from crawlable public markup), media, hours, categories/features, verification/claim status and SEO fields.
 
 ## Geography
-Normalize legacy flat locations into useful region/department/city/postcode relationships where data allows. Keep geocoordinates and support spatial/distance queries using MariaDB capabilities.
+`city_code` est l'identifiant unique de la commune ; `city_name` est son libellé public. Les pages ville, département et région utilisent un référentiel administratif local versionné qui résout ce code, sans réutiliser `locations`/`restaurant_location`, sans appel distant et sans dupliquer département ou région dans chaque restaurant. Les cas Paris/Lyon/Marseille, 2A/2B et DOM/COM sont traités dans ce référentiel. Les coordonnées restent disponibles pour les recherches spatiales/distance de MariaDB.
 
 ## Structured address contract
 

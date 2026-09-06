@@ -2,6 +2,7 @@
 
 ## 2026-09-06
 
+- Added code-INSEE-based city identity, precise homonym city URLs and retained noindex disambiguation pages. The lightweight local administrative resolver now serves region and department listings, canonical breadcrumbs/JSON-LD and sitemap eligibility without legacy Geography or new restaurant geography fields. Real city/department collisions retain the city URL and suffix the department code automatically; Paris and equivalent overseas territories remain mutualized.
 - Added sortable `Avis` and `Commentaires` counters to the user list. Each counter matches preserved legacy authorship by WordPress user ID or author e-mail, without double-counting a contribution where both identifiers match.
 - Refreshed the `users >= 169` regression floor after the owner-confirmed, audited deletion of 376 accounts. The full preproduction gate is green.
 

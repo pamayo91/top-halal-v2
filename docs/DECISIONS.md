@@ -1,5 +1,13 @@
 # Architectural & Product Decisions
 
+## 2026-09-06
+
+### D025 — Code INSEE canonique pour les pages géographiques
+
+Une commune publique est identifiée par son `city_code` INSEE canonique, tandis que `city_name` demeure le libellé affiché. Les arrondissements municipaux de Paris, Lyon et Marseille sont rattachés à leur commune. Les homonymes obtiennent chacun une URL ville précise suffixée du département et leur ancienne URL non qualifiée devient une désambiguïsation `noindex,follow`, sans listing mêlé ni redirection arbitraire. Les overrides `city_seo_pages` sont exclusivement clés par `city_code`.
+
+Les pages département/région sont dérivées d'un petit référentiel administratif local. En collision réelle entre une ville et un département, la ville garde son URL et le département prend automatiquement le suffixe de son code. Seuls les territoires administrativement équivalents, notamment Paris, sont mutualisés ; les collectivités ultramarines région/département équivalentes ne créent pas de doublon.
+
 ## 2026-09-02
 
 ### D024 — Restaurant media is raster-image only
