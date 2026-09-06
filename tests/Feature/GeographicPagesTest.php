@@ -37,7 +37,7 @@ class GeographicPagesTest extends TestCase
         $this->get('/restos/provence-alpes-cote-d-azur')
             ->assertOk()
             ->assertSee('Aix visible')
-            ->assertSee('Avignon hors département')
+            ->assertSee('15 résultats')
             ->assertSee('"@type":"BreadcrumbList"', false);
     }
 
