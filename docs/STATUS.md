@@ -1,8 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-05
+Last updated: 2026-09-06
 
-Latest: user-list search now matches both names and any e-mail fragment, including a domain fragment such as `simu.elyquin.org`.
+Latest: user-list search now matches both names and any e-mail fragment, including a domain fragment such as `simu.elyquin.org`. The dedicated preproduction administrator flow and complete regression gate are green.
 
 Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; overrides remain sparse and are created only after an administrator saves a customization.
 
