@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-06
 
-Latest: the user list now qualifies origin, linked restaurants, claims and activity, with a filter for accounts requiring review. Suspect `user` and `restaurant_owner` accounts can be moved in bulk to an audited corbeille; from there, a second confirmed action can delete them and their claims permanently. Administrators remain protected. Following the owner-approved deletion of 11 accounts, the `users >= 534` regression floor was refreshed; the dedicated preproduction administrator flow and complete regression gate are green. The owner-approved legacy listing-author import created 7,567 exact historical relationships, with no claims, roles or restaurant records modified.
+Latest: the user list now qualifies origin, linked restaurants, claims and activity, with a filter for accounts requiring review. Suspect `user` and `restaurant_owner` accounts can be moved in bulk to an audited corbeille; from there, a second confirmed action can delete them and their claims permanently. Administrators remain protected. Following the owner-approved deletion of 11 accounts, the `users >= 534` regression floor was refreshed; the dedicated preproduction administrator flow and complete regression gate are green. The owner-approved legacy listing-author import created 7,616 exact historical relationships, including 49 active V2 restaurants whose legacy source is now pending; no claims, roles or restaurant records were modified.
 
 Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; overrides remain sparse and are created only after an administrator saves a customization.
 

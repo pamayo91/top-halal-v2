@@ -2,7 +2,7 @@
 
 ## 2026-09-05
 
-- Added the separate `legacy_restaurant_authorships` provenance relationship and imported 7,567 exact, published legacy listing-author links. The import excluded 51 non-published source listings and 66 published listings without a V2 restaurant match; it did not create claims, change roles/permissions or recreate restaurants. The single `Restaurants liés` counter includes these historical links as well as approved claims.
+- Added the separate `legacy_restaurant_authorships` provenance relationship and imported 7,616 exact legacy listing-author links. The correction retains 49 active exact V2 restaurants even when their current legacy source is pending; 68 records without a V2 match remain excluded. It did not create claims, change roles/permissions or recreate restaurants. The single `Restaurants liés` counter includes these historical links as well as approved claims.
 
 - Refreshed the `users >= 534` regression floor after the owner-approved, audited permanent deletion of 11 accounts. The full preproduction gate is green at the resulting V2 state.
 - Added user-origin, restaurant-link and claim-activity columns, plus an explicit filter for accounts with no restaurant link or claim. This is a review signal, never an automatic spam classification.
