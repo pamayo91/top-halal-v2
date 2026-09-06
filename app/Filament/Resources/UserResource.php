@@ -51,6 +51,15 @@ class UserResource extends AdminResource
         app(AdminAudit::class)->record('user.restored', $user, ['deleted_at' => null]);
     }
 
+    public static function forceDelete(User $user): void
+    {
+        if (static::isProtectedFromDeletion($user) || ! $user->trashed()) return;
+
+        $changes = ['claims_deleted' => $user->claims()->count(), 'deleted_at' => $user->deleted_at];
+        $user->forceDelete();
+        app(AdminAudit::class)->record('user.force_deleted', $user, $changes);
+    }
+
     private static function isProtectedFromDeletion(User $user): bool
     {
         return $user->role === 'admin' || $user->is(auth()->user());
@@ -97,6 +106,12 @@ class UserResource extends AdminResource
                 Action::make('restore')->label('Restaurer')->icon('heroicon-o-arrow-uturn-left')->color('success')
                     ->visible(fn (User $user) => $user->trashed())
                     ->action(fn (User $user) => static::restore($user)),
+                Action::make('force_delete')->label('Supprimer définitivement')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()
+                    ->modalHeading('Supprimer définitivement ce compte ?')
+                    ->modalDescription('Cette action est irréversible. Le compte et ses demandes de revendication associées seront définitivement effacés.')
+                    ->modalSubmitActionLabel('Supprimer définitivement')
+                    ->visible(fn (User $user) => $user->trashed() && ! static::isProtectedFromDeletion($user))
+                    ->action(fn (User $user) => static::forceDelete($user)),
                 Action::make('reset')->label('Réinitialiser MDP')->requiresConfirmation()->visible(fn (User $user) => ! $user->trashed())->action(function (User $user): void {
                     Password::sendResetLink(['email' => $user->email]);
                     app(AdminAudit::class)->record('user.password_reset_sent', $user);
@@ -120,6 +135,16 @@ class UserResource extends AdminResource
                         ->color('success')
                         ->visible(fn ($livewire): bool => $livewire->activeTab === 'trash')
                         ->action(fn ($records) => $records->each(fn (User $user) => static::restore($user))),
+                    BulkAction::make('force_delete')
+                        ->label('Supprimer définitivement la sélection')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Supprimer définitivement les comptes sélectionnés ?')
+                        ->modalDescription('Cette action est irréversible. Les comptes et leurs demandes de revendication associées seront définitivement effacés. Les administrateurs restent protégés.')
+                        ->modalSubmitActionLabel('Supprimer définitivement')
+                        ->visible(fn ($livewire): bool => $livewire->activeTab === 'trash')
+                        ->action(fn ($records) => $records->each(fn (User $user) => static::forceDelete($user))),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

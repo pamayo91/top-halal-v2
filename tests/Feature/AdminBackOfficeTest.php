@@ -227,6 +227,13 @@ class AdminBackOfficeTest extends TestCase
 
         $this->assertNotSoftDeleted('users', ['id' => $suspect->id]);
         $this->assertDatabaseHas('admin_audit_logs', ['action' => 'user.restored', 'subject_id' => $suspect->id]);
+
+        \App\Filament\Resources\UserResource::moveToTrash($suspect->fresh());
+        \App\Filament\Resources\UserResource::forceDelete(User::onlyTrashed()->findOrFail($suspect->id));
+
+        $this->assertDatabaseMissing('users', ['id' => $suspect->id]);
+        $this->assertDatabaseMissing('restaurant_claims', ['restaurant_id' => $restaurant->id, 'user_id' => $suspect->id]);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'user.force_deleted', 'subject_id' => $suspect->id]);
     }
 
     private function restaurant(array $attributes = []): Restaurant { return Restaurant::create([...['legacy_wp_id' => random_int(1, 999999999), 'name' => 'Resto test', 'slug' => 'resto-'.str()->random(8), 'status' => 'published'], ...$attributes]); }
