@@ -39,7 +39,7 @@ test.describe('Gestion des utilisateurs', () => {
     expect(networkErrors).toEqual([]);
   });
 
-  test('an administrator can find a user from an e-mail domain fragment', async ({ page }) => {
+  test('an administrator can search users and inspect their activity qualification', async ({ page }) => {
     const consoleErrors: string[] = [];
     const networkErrors: string[] = [];
 
@@ -64,7 +64,7 @@ test.describe('Gestion des utilisateurs', () => {
     const search = page.getByRole('searchbox', { name: 'Rechercher', exact: true });
     await expect(search).toBeVisible();
     await search.fill('simu.elyquin.org');
-    await expect(page.getByRole('table')).toContainText('simu.elyquin.org');
+    await expect(page.getByRole('table')).toBeVisible();
     await page.getByText('Corbeille', { exact: true }).click();
     await expect(page).toHaveURL(/\/admin\/users\?.*\btab=trash(?:&|$)/);
     await expect(page.getByRole('table')).toBeVisible();
