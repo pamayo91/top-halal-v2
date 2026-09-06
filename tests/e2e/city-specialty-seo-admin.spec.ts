@@ -45,6 +45,8 @@ test.describe('Administration des facettes SEO ville + spécialité', () => {
     await state.selectOption('open');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
     await expect(page.getByText('Facette SEO enregistrée', { exact: true })).toBeVisible();
+    await expect(table.getByRole('row').filter({ hasText: 'Marseille' }).filter({ hasText: specialty.name }).first().getByRole('link', { name: 'Ouverte', exact: true }))
+      .toHaveAttribute('href', new RegExp(`/restos/marseille/${specialty.slug}$`));
 
     await page.goto(`/restos/marseille/${specialty.slug}`);
     await expect(page.getByRole('heading', { name: `Restaurants ${specialty.name} halal à Marseille`, exact: true })).toBeVisible();
