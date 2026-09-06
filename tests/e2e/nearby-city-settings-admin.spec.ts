@@ -24,8 +24,8 @@ test.describe('Réglages du maillage local', () => {
     await expect(page).toHaveURL(/\/admin$/);
     await page.goto('/admin/settings');
 
-    const radius = page.getByLabel('Rayon des villes aux alentours (km)', { exact: true });
-    const maximum = page.getByLabel('Nombre maximum de villes proches', { exact: true });
+    const radius = page.getByRole('spinbutton', { name: /Rayon des villes aux alentours \(km\)/ });
+    const maximum = page.getByRole('spinbutton', { name: /Nombre maximum de villes proches/ });
     await expect(radius).toBeVisible();
     await expect(maximum).toBeVisible();
     const originalRadius = await radius.inputValue();
