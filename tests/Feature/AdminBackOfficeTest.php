@@ -208,6 +208,27 @@ class AdminBackOfficeTest extends TestCase
             ->assertCanNotSeeTableRecords([$otherUser]);
     }
 
+    public function test_admin_can_bulk_trash_and_restore_non_administrator_users_without_losing_claims(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $suspect = User::factory()->create(['role' => 'user']);
+        $restaurant = $this->restaurant();
+        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $suspect->id, 'status' => 'pending', 'submitted_at' => now()]);
+
+        $this->actingAs($admin);
+        \App\Filament\Resources\UserResource::moveManyToTrash([$suspect, $admin]);
+
+        $this->assertSoftDeleted('users', ['id' => $suspect->id]);
+        $this->assertNotSoftDeleted('users', ['id' => $admin->id]);
+        $this->assertDatabaseHas('restaurant_claims', ['restaurant_id' => $restaurant->id, 'user_id' => $suspect->id]);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'user.trashed', 'subject_id' => $suspect->id]);
+
+        \App\Filament\Resources\UserResource::restore(User::onlyTrashed()->findOrFail($suspect->id));
+
+        $this->assertNotSoftDeleted('users', ['id' => $suspect->id]);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'user.restored', 'subject_id' => $suspect->id]);
+    }
+
     private function restaurant(array $attributes = []): Restaurant { return Restaurant::create([...['legacy_wp_id' => random_int(1, 999999999), 'name' => 'Resto test', 'slug' => 'resto-'.str()->random(8), 'status' => 'published'], ...$attributes]); }
     private function article(): Article { return Article::create(['legacy_wp_id' => random_int(1, 999999999), 'original_title' => 'Original', 'title' => 'Article', 'slug' => 'article-'.str()->random(8), 'legacy_url' => '/article', 'status' => 'published']); }
 }

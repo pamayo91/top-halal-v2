@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use App\Services\AdminAudit;
-use Filament\Actions\{Action, EditAction};
+use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
 use Filament\Forms\Components\{Select, TextInput, Toggle};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -26,6 +26,34 @@ class UserResource extends AdminResource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withCount('ownedRestaurants');
+    }
+
+    public static function moveToTrash(User $user): void
+    {
+        if (static::isProtectedFromDeletion($user) || $user->trashed()) return;
+
+        $user->delete();
+        app(AdminAudit::class)->record('user.trashed', $user, ['deleted_at' => $user->deleted_at]);
+    }
+
+    public static function moveManyToTrash(iterable $users): void
+    {
+        foreach ($users as $user) {
+            if ($user instanceof User) static::moveToTrash($user);
+        }
+    }
+
+    public static function restore(User $user): void
+    {
+        if (! $user->trashed()) return;
+
+        $user->restore();
+        app(AdminAudit::class)->record('user.restored', $user, ['deleted_at' => null]);
+    }
+
+    private static function isProtectedFromDeletion(User $user): bool
+    {
+        return $user->role === 'admin' || $user->is(auth()->user());
     }
 
     public static function form(Schema $schema): Schema
@@ -59,11 +87,40 @@ class UserResource extends AdminResource
                 SelectFilter::make('status')->options(['active' => 'Actif', 'disabled' => 'Désactivé']),
             ])
             ->recordActions([
-                EditAction::make(),
-                Action::make('reset')->label('Réinitialiser MDP')->requiresConfirmation()->action(function (User $user): void {
+                EditAction::make()->visible(fn (User $user) => ! $user->trashed()),
+                Action::make('trash')->label('Supprimer')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()
+                    ->modalHeading('Supprimer ce compte ?')
+                    ->modalDescription('Le compte sera désactivé et placé dans la Corbeille. Ses demandes et son historique resteront conservés, et vous pourrez le restaurer.')
+                    ->modalSubmitActionLabel('Mettre à la corbeille')
+                    ->visible(fn (User $user) => ! $user->trashed() && ! static::isProtectedFromDeletion($user))
+                    ->action(fn (User $user) => static::moveToTrash($user)),
+                Action::make('restore')->label('Restaurer')->icon('heroicon-o-arrow-uturn-left')->color('success')
+                    ->visible(fn (User $user) => $user->trashed())
+                    ->action(fn (User $user) => static::restore($user)),
+                Action::make('reset')->label('Réinitialiser MDP')->requiresConfirmation()->visible(fn (User $user) => ! $user->trashed())->action(function (User $user): void {
                     Password::sendResetLink(['email' => $user->email]);
                     app(AdminAudit::class)->record('user.password_reset_sent', $user);
                 }),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('trash')
+                        ->label('Supprimer la sélection')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Supprimer les comptes sélectionnés ?')
+                        ->modalDescription('Les comptes sélectionnés seront désactivés et placés dans la Corbeille. Leurs demandes et leur historique resteront conservés. Les administrateurs ne peuvent pas être supprimés.')
+                        ->modalSubmitActionLabel('Mettre à la corbeille')
+                        ->visible(fn ($livewire): bool => $livewire->activeTab !== 'trash')
+                        ->action(fn ($records) => static::moveManyToTrash($records)),
+                    BulkAction::make('restore')
+                        ->label('Restaurer la sélection')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->visible(fn ($livewire): bool => $livewire->activeTab === 'trash')
+                        ->action(fn ($records) => $records->each(fn (User $user) => static::restore($user))),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }
