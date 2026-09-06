@@ -24,6 +24,7 @@ class GeographicPagesTest extends TestCase
             ->assertSee('Marseille 1')
             ->assertSee('Provence-Alpes-Côte d\'Azur')
             ->assertSee('Bouches-du-Rhône')
+            ->assertSee('"@context":"https://schema.org"', false)
             ->assertSee('"@type":"BreadcrumbList"', false)
             ->assertSee('rel="canonical" href="'.route('cities.show', 'marseille').'"', false);
 

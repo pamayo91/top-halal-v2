@@ -227,7 +227,7 @@ class PublicContentController extends Controller
             ['label' => $city->region['name'], 'url' => route('cities.show', $city->region['slug'])],
         ];
 
-        if ($city->department['slug'] !== $city->slug) {
+        if ($city->department['slug'] !== $city->slug && $city->department['slug'] !== $city->region['slug']) {
             $breadcrumbs[] = ['label' => $city->department['name'], 'url' => route('cities.show', $city->department['slug'])];
         }
 
