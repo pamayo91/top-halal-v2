@@ -200,7 +200,7 @@ class PublicContentController extends Controller
         $name = $term->name;
         $title = $citySeo?->config?->seo_title ?: match ($kind) {
             'ville' => "Restaurants halal à {$name} | Top Halal",
-            'département' => "Restaurants halal dans les {$name} | Top Halal",
+            'département' => "Restaurants halal dans le département {$name} | Top Halal",
             default => "Restaurants halal en {$name} | Top Halal",
         };
         $description = $citySeo?->config?->seo_description ?: "Découvrez {$restaurants->total()} restaurants halal en {$name}.";
