@@ -14,7 +14,7 @@ async function login(page: import('@playwright/test').Page): Promise<void> {
 test.describe('Administration des facettes SEO ville + spécialité', () => {
   test.skip(!email || !password, 'PREPROD_ADMIN_EMAIL and PREPROD_ADMIN_PASSWORD are required.');
 
-  test('Marseille + Burger can be opened, crawled, and closed again without leaving a default configuration', async ({ page }) => {
+  test('Marseille + Fast-food can be opened, crawled, and closed again without leaving a default configuration', async ({ page }) => {
     const consoleErrors: string[] = [];
     const networkErrors: string[] = [];
     page.on('console', (message) => {
@@ -31,7 +31,7 @@ test.describe('Administration des facettes SEO ville + spécialité', () => {
     const table = page.getByRole('table');
     await page.getByRole('searchbox', { name: 'Rechercher', exact: true }).fill('Marseille');
     await page.waitForTimeout(500);
-    const row = table.getByRole('row').filter({ hasText: 'Marseille' }).filter({ hasText: 'Burger' });
+    const row = table.getByRole('row').filter({ hasText: 'Marseille' }).filter({ hasText: 'Fast-food' }).first();
     await expect(row).toBeVisible();
     const href = await row.getByRole('link', { name: 'Modifier' }).getAttribute('href');
     expect(href).toBeTruthy();
@@ -42,21 +42,21 @@ test.describe('Administration des facettes SEO ville + spécialité', () => {
     await page.getByRole('button', { name: 'Enregistrer' }).click();
     await expect(page.getByText('Facette SEO enregistrée', { exact: true })).toBeVisible();
 
-    await page.goto('/restos/marseille/burger');
-    await expect(page.getByRole('heading', { name: 'Restaurants Burger halal à Marseille', exact: true })).toBeVisible();
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/restos\/marseille\/burger$/);
+    await page.goto('/restos/marseille/fast-food');
+    await expect(page.getByRole('heading', { name: 'Restaurants Fast-food halal à Marseille', exact: true })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/restos\/marseille\/fast-food$/);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
     await page.goto('/sitemap.xml');
-    await expect(page.locator('body')).toContainText('/restos/marseille/burger');
+    await expect(page.locator('body')).toContainText('/restos/marseille/fast-food');
 
     await page.goto(href!);
     await state.selectOption('closed');
     await page.getByRole('button', { name: 'Enregistrer' }).click();
     await expect(page.getByText('Facette SEO enregistrée', { exact: true })).toBeVisible();
-    await page.goto('/restos/marseille/burger');
+    await page.goto('/restos/marseille/fast-food');
     await expect(page.getByRole('heading', { name: 'Page introuvable', exact: true })).toBeVisible();
     await page.goto('/sitemap.xml');
-    await expect(page.locator('body')).not.toContainText('/restos/marseille/burger');
+    await expect(page.locator('body')).not.toContainText('/restos/marseille/fast-food');
     expect(consoleErrors).toEqual([]);
     expect(networkErrors).toEqual([]);
   });
