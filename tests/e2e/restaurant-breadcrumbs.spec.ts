@@ -32,7 +32,7 @@ async function assertRestaurantBreadcrumb(
   expect(cityResponse?.status()).toBe(200);
 
   const restaurantHref = await page.locator('.restaurant-card h3 a').first().getAttribute('href');
-  expect(restaurantHref).toMatch(/^\/resto\//);
+  expect(new URL(restaurantHref!).pathname).toMatch(/^\/resto\//);
 
   const restaurantResponse = await page.goto(restaurantHref!);
   expect(restaurantResponse?.status()).toBe(200);
