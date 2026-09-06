@@ -58,7 +58,7 @@ test.describe('Gestion des utilisateurs', () => {
     await expect(page).toHaveURL(/\/admin$/);
 
     await page.goto('/admin/users');
-    for (const label of ['Origine', 'Restaurants liés', 'Revendications', 'Activité']) {
+    for (const label of ['Origine', 'Restaurants liés', 'Fiches legacy créées', 'Revendications', 'Activité']) {
       await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
     }
     const search = page.getByRole('searchbox', { name: 'Rechercher', exact: true });
