@@ -24,8 +24,8 @@ class PublicRestaurantSearch
             $query->where(fn (Builder $search) => $search->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orWhereRaw('LOWER(city_name) LIKE ?', ["%{$escaped}%"]));
         }
         if ($city = trim((string) $request->input('ville'))) {
-            $cityName = $this->cities->cityNameForSlug($city);
-            $query->when($cityName !== null, fn (Builder $cities) => $cities->where('city_name', $cityName), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
+            $cityPage = $this->cities->cityForSlug($city);
+            $query->when($cityPage !== null, fn (Builder $cities) => $cities->whereIn('city_code', $cityPage->source_city_codes), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
         }
         foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
         foreach (array_filter((array) $request->input('features', []), 'is_string') as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));

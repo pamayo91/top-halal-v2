@@ -62,7 +62,7 @@ class PublicFrontendTest extends TestCase
 
     public function test_directory_filters_real_v2_relations_and_is_noindex_when_filtered(): void
     {
-        $restaurant = Restaurant::create(['legacy_wp_id' => 411, 'name' => 'Le Safran', 'slug' => 'le-safran', 'status' => 'published', 'city_name' => 'Lyon']);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 411, 'name' => 'Le Safran', 'slug' => 'le-safran', 'status' => 'published', 'city_name' => 'Lyon', 'city_code' => '69381', 'country_code' => 'FR']);
         $category = Category::create(['legacy_term_id' => 12, 'name' => 'Marocain', 'slug' => 'marocain']);
         $feature = Feature::create(['legacy_term_id' => 13, 'name' => 'À emporter', 'slug' => 'a-emporter']);
         $restaurant->categories()->attach($category);
@@ -138,7 +138,7 @@ class PublicFrontendTest extends TestCase
         $feature = Feature::create(['legacy_term_id' => 16, 'name' => "Chef d'œuvre", 'slug' => 'chef-oeuvre']);
         $restaurant->categories()->attach($category);
         $restaurant->features()->attach($feature);
-        $restaurant->update(['city_name' => "L'Haÿ-les-Roses"]);
+        $restaurant->update(['city_name' => "L'Haÿ-les-Roses", 'city_code' => '94038', 'country_code' => 'FR']);
         Article::create(['legacy_wp_id' => 18, 'original_title' => "L'article", 'title' => "L'article", 'slug' => 'article-test', 'legacy_url' => '/article-test', 'status' => 'published']);
         Page::create(['legacy_wp_id' => 19, 'original_title' => "La page d'accueil", 'title' => "La page d'accueil", 'slug' => 'page-test', 'legacy_url' => '/page-test', 'status' => 'published']);
         foreach (['/resto/adams-burger', '/article-test', '/page-test', '/restos/lhay-les-roses', '/specialites/orient', '/service/chef-oeuvre'] as $url) {

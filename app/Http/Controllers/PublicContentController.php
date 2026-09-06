@@ -10,11 +10,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, GeographicPageResolver, PublicRestaurantSearch};
 
 class PublicContentController extends Controller
 {
-    public function __construct(private readonly PublicRestaurantSearch $search, private readonly CityPageResolver $cities, private readonly CitySeoService $citySeo) {}
+    public function __construct(
+        private readonly PublicRestaurantSearch $search,
+        private readonly CityPageResolver $cities,
+        private readonly CitySeoService $citySeo,
+        private readonly GeographicPageResolver $geography,
+    ) {}
     public function home(): View
     {
         return view('public.home', [
@@ -30,7 +35,7 @@ class PublicContentController extends Controller
         return view('public.restaurants.index', [
             'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
-            'locations' => Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->where('city_name', '!=', '')->selectRaw('city_name, count(*) as restaurants_count')->groupBy('city_name')->orderBy('city_name')->get()->map(fn ($city) => (object) ['name' => $city->city_name, 'slug' => Str::slug($city->city_name)]),
+            'locations' => $this->citySeo->cities()->sortBy('city_name')->map(fn (object $city): object => (object) ['name' => $this->cityLabel($city), 'slug' => $city->slug]),
             'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
     }
@@ -82,10 +87,48 @@ class PublicContentController extends Controller
 
     public function location(string $slug): Response
     {
-        $cityName = $this->cities->cityNameForSlug($slug);
-        abort_unless($cityName !== null, 404);
-        $city = $this->citySeo->city($cityName);
-        return response()->view('public.taxonomy', ['term' => (object) ['name' => $cityName], 'kind' => 'ville', 'citySeo' => $city, 'restaurants' => $this->search->published()->where('city_name', $cityName)->paginate(12)->withQueryString()]);
+        if ($city = $this->cities->cityForSlug($slug)) {
+            $citySeo = $this->citySeo->city($city->city_code);
+
+            return $this->geographicListing(
+                term: (object) ['name' => $city->city_name],
+                kind: 'ville',
+                restaurants: $this->search->published()->whereIn('city_code', $city->source_city_codes)->paginate(12)->withQueryString(),
+                open: (bool) $citySeo?->open,
+                citySeo: $citySeo,
+                breadcrumbs: $this->cityBreadcrumbs($city),
+            );
+        }
+
+        if (($cities = $this->cities->ambiguityForSlug($slug))->isNotEmpty()) {
+            return response()->view('public.city-disambiguation', [
+                'cityName' => $cities->first()->city_name,
+                'cities' => $cities,
+                'breadcrumbs' => $this->breadcrumbs((object) ['name' => $cities->first()->city_name]),
+            ]);
+        }
+
+        if ($department = $this->geography->departmentForSlug($slug)) {
+            return $this->geographicListing(
+                term: (object) ['name' => $department->name],
+                kind: 'département',
+                restaurants: $this->geography->scopeDepartment($this->search->published(), $department)->paginate(12)->withQueryString(),
+                open: $department->restaurants_count >= $this->citySeo->threshold(),
+                breadcrumbs: $this->departmentBreadcrumbs($department),
+            );
+        }
+
+        if ($region = $this->geography->regionForSlug($slug)) {
+            return $this->geographicListing(
+                term: (object) ['name' => $region->name],
+                kind: 'région',
+                restaurants: $this->geography->scopeRegion($this->search->published(), $region)->paginate(12)->withQueryString(),
+                open: $region->restaurants_count >= $this->citySeo->threshold(),
+                breadcrumbs: $this->breadcrumbs((object) ['name' => $region->name]),
+            );
+        }
+
+        abort(404);
     }
     public function category(string $slug): Response { return $this->taxonomy(Category::where('slug', $slug)->firstOrFail(), 'spécialité'); }
     public function feature(string $slug): Response { return $this->taxonomy(Feature::where('slug', $slug)->firstOrFail(), 'service'); }
@@ -114,7 +157,12 @@ class PublicContentController extends Controller
             $term instanceof Category => $query->whereHas('categories', fn (Builder $q) => $q->whereKey($term->id)),
             $term instanceof Feature => $query->whereHas('features', fn (Builder $q) => $q->whereKey($term->id)),
         };
-        return response()->view('public.taxonomy', ['term' => $term, 'kind' => $kind, 'restaurants' => $query->paginate(12)->withQueryString()]);
+        return response()->view('public.taxonomy', [
+            'term' => $term,
+            'kind' => $kind,
+            'restaurants' => $query->paginate(12)->withQueryString(),
+            'breadcrumbs' => $this->breadcrumbs($term),
+        ]);
     }
 
     /**
@@ -139,6 +187,74 @@ class PublicContentController extends Controller
 
     private function topCities(): \Illuminate\Support\Collection
     {
-        return Restaurant::query()->where('status', 'published')->whereNotNull('city_name')->where('city_name', '!=', '')->selectRaw('city_name, count(*) as restaurants_count')->groupBy('city_name')->orderByDesc('restaurants_count')->limit(11)->get()->map(fn ($city) => ['name' => $city->city_name, 'slug' => Str::slug($city->city_name)])->sortByDesc(fn ($city) => $city['slug'] === 'paris')->values();
+        return $this->citySeo->cities()
+            ->sortByDesc('restaurants_count')
+            ->take(11)
+            ->map(fn (object $city): array => ['name' => $this->cityLabel($city), 'slug' => $city->slug])
+            ->sortByDesc(fn (array $city): bool => $city['slug'] === 'paris')
+            ->values();
+    }
+
+    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = []): Response
+    {
+        $name = $term->name;
+        $title = $citySeo?->config?->seo_title ?: match ($kind) {
+            'ville' => "Restaurants halal à {$name} | Top Halal",
+            'département' => "Restaurants halal dans les {$name} | Top Halal",
+            default => "Restaurants halal en {$name} | Top Halal",
+        };
+        $description = $citySeo?->config?->seo_description ?: "Découvrez {$restaurants->total()} restaurants halal en {$name}.";
+
+        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description'));
+    }
+
+    /** @return list<array{label:string,url:?string}> */
+    private function breadcrumbs(object $current): array
+    {
+        return [
+            ['label' => 'Accueil', 'url' => route('home')],
+            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
+            ['label' => $current->name, 'url' => null],
+        ];
+    }
+
+    /** @return list<array{label:string,url:?string}> */
+    private function cityBreadcrumbs(object $city): array
+    {
+        $breadcrumbs = [
+            ['label' => 'Accueil', 'url' => route('home')],
+            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
+            ['label' => $city->region['name'], 'url' => route('cities.show', $city->region['slug'])],
+        ];
+
+        if ($city->department['slug'] !== $city->slug) {
+            $breadcrumbs[] = ['label' => $city->department['name'], 'url' => route('cities.show', $city->department['slug'])];
+        }
+
+        $breadcrumbs[] = ['label' => $city->city_name, 'url' => null];
+
+        return $breadcrumbs;
+    }
+
+    /** @return list<array{label:string,url:?string}> */
+    private function departmentBreadcrumbs(object $department): array
+    {
+        $breadcrumbs = [
+            ['label' => 'Accueil', 'url' => route('home')],
+            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
+        ];
+
+        if ($department->region['slug'] !== $department->slug) {
+            $breadcrumbs[] = ['label' => $department->region['name'], 'url' => route('cities.show', $department->region['slug'])];
+        }
+
+        $breadcrumbs[] = ['label' => $department->name, 'url' => null];
+
+        return $breadcrumbs;
+    }
+
+    private function cityLabel(object $city): string
+    {
+        return $city->city_name.($city->is_ambiguous ? ' — '.$city->department['name'] : '');
     }
 }

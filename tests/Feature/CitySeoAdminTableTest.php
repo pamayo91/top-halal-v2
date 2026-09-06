@@ -15,7 +15,7 @@ class CitySeoAdminTableTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'admin']);
         foreach (range(1, 26) as $number) {
-            Restaurant::create(['legacy_wp_id' => 90000 + $number, 'name' => "Ville $number", 'slug' => "ville-$number", 'status' => 'published', 'city_name' => "Ville $number"]);
+            Restaurant::create(['legacy_wp_id' => 90000 + $number, 'name' => "Ville $number", 'slug' => "ville-$number", 'status' => 'published', 'city_name' => "Ville $number", 'city_code' => '13'.str_pad((string) $number, 3, '0', STR_PAD_LEFT), 'country_code' => 'FR']);
         }
         $this->actingAs($admin)->get('/admin/pages-villes-seo')->assertOk()->assertSee('Ville')->assertSee('Nombre de restaurants')->assertSee('État SEO')->assertSee('Modifier')->assertSee('25');
 
@@ -27,24 +27,24 @@ class CitySeoAdminTableTest extends TestCase
     public function test_a_city_without_override_opens_an_editable_fallback_form_without_creating_a_record(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
-        Restaurant::create(['legacy_wp_id' => 99001, 'name' => 'Marseille test', 'slug' => 'marseille-test', 'status' => 'published', 'city_name' => 'Marseille']);
-        Restaurant::create(['legacy_wp_id' => 99002, 'name' => 'Lyon test', 'slug' => 'lyon-test', 'status' => 'published', 'city_name' => 'Lyon']);
+        Restaurant::create(['legacy_wp_id' => 99001, 'name' => 'Marseille test', 'slug' => 'marseille-test', 'status' => 'published', 'city_name' => 'Marseille', 'city_code' => '13206', 'country_code' => 'FR']);
+        Restaurant::create(['legacy_wp_id' => 99002, 'name' => 'Lyon test', 'slug' => 'lyon-test', 'status' => 'published', 'city_name' => 'Lyon', 'city_code' => '69381', 'country_code' => 'FR']);
 
-        $this->actingAs($admin)->get('/admin/pages-villes-seo?city=Marseille')
+        $this->actingAs($admin)->get('/admin/pages-villes-seo?city=13055')
             ->assertOk()->assertSee('Modification :')->assertSee('Marseille');
-        $this->assertDatabaseMissing('city_seo_pages', ['city_name' => 'Marseille']);
-        $this->assertDatabaseMissing('city_seo_pages', ['city_name' => 'Lyon']);
+        $this->assertDatabaseMissing('city_seo_pages', ['city_code' => '13055']);
+        $this->assertDatabaseMissing('city_seo_pages', ['city_code' => '69123']);
 
-        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class, ['city' => 'Marseille'])
+        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class, ['city' => '13055'])
             ->assertSet('data', fn (array $data): bool => array_key_exists('seo_description', $data)
                 && array_key_exists('content_top', $data)
                 && array_key_exists('content_bottom', $data))
             ->set('data.h1', 'Restaurants halal à Marseille')
             ->call('save');
-        $this->assertDatabaseHas('city_seo_pages', ['city_name' => 'Marseille', 'h1' => 'Restaurants halal à Marseille']);
+        $this->assertDatabaseHas('city_seo_pages', ['city_code' => '13055', 'city_name' => 'Marseille', 'h1' => 'Restaurants halal à Marseille']);
         $this->assertDatabaseHas('admin_audit_logs', ['action' => 'city_seo.updated']);
-        $this->assertSame(['city_name' => 'Marseille'], AdminAuditLog::where('action', 'city_seo.updated')->latest('id')->value('changes'));
-        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class, ['city' => 'Marseille'])
+        $this->assertSame(['city_code' => '13055', 'city_name' => 'Marseille'], AdminAuditLog::where('action', 'city_seo.updated')->latest('id')->value('changes'));
+        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySeoPages::class, ['city' => '13055'])
             ->assertSet('data.h1', 'Restaurants halal à Marseille');
     }
 }

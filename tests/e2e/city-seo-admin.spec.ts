@@ -41,7 +41,7 @@ test.describe('Administration des pages villes SEO', () => {
     await expect(marseilleRow).toBeVisible();
     await marseilleRow.getByRole('link', { name: 'Modifier' }).click();
 
-    await expect(page).toHaveURL(/\/admin\/pages-villes-seo\?city=Marseille#city-seo-editor/);
+    await expect(page).toHaveURL(/\/admin\/pages-villes-seo\?city=13055#city-seo-editor/);
     const h1 = page.getByLabel('H1 personnalisé');
     await expect(h1).toBeVisible();
     expect(await page.locator('#city-seo-editor').evaluate((editor) => editor.getBoundingClientRect().top < window.innerHeight)).toBe(true);

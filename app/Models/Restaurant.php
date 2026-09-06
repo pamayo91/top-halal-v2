@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\CityPageResolver;
 use App\Services\CitySeoService;
+use App\Services\GeographicPageResolver;
 
 class Restaurant extends Model
 {
@@ -19,13 +20,14 @@ class Restaurant extends Model
     protected static function booted(): void
     {
         static::saved(function (self $restaurant): void {
-            if ($restaurant->wasRecentlyCreated || $restaurant->wasChanged(['city_name', 'status'])) {
+            if ($restaurant->wasRecentlyCreated || $restaurant->wasChanged(['city_name', 'city_code', 'status'])) {
                 app(CityPageResolver::class)->forget();
                 app(CitySeoService::class)->forget();
+                app(GeographicPageResolver::class)->forget();
             }
         });
-        static::deleted(fn (): mixed => app(CitySeoService::class)->forget());
-        static::restored(fn (): mixed => app(CitySeoService::class)->forget());
+        static::deleted(function (): void { app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
+        static::restored(function (): void { app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
     }
 
     protected function casts(): array

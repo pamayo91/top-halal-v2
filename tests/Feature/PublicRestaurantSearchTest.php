@@ -13,7 +13,7 @@ class PublicRestaurantSearchTest extends TestCase
 
     public function test_home_search_defaults_to_paris_and_only_exposes_published_city_data(): void
     {
-        Restaurant::create(['legacy_wp_id' => 1, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris']);
+        Restaurant::create(['legacy_wp_id' => 1, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         Restaurant::create(['legacy_wp_id' => 2, 'name' => 'Caché', 'slug' => 'cache', 'status' => 'pending', 'city_name' => 'Ville cachée']);
 
         $this->get('/')->assertOk()->assertSee('Localisation')->assertSee('value="Paris"', false)->assertSee('Paris publié')->assertDontSee('Ville cachée');
@@ -23,8 +23,8 @@ class PublicRestaurantSearchTest extends TestCase
     public function test_suggestions_return_real_specialties_and_prioritize_selected_city_restaurants(): void
     {
         $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 1, 'name' => 'Burger']);
-        $paris = Restaurant::create(['legacy_wp_id' => 3, 'name' => 'Black Paris', 'slug' => 'black-paris', 'status' => 'published', 'city_name' => 'Paris']);
-        $lyon = Restaurant::create(['legacy_wp_id' => 4, 'name' => 'Black Lyon', 'slug' => 'black-lyon', 'status' => 'published', 'city_name' => 'Lyon']);
+        $paris = Restaurant::create(['legacy_wp_id' => 3, 'name' => 'Black Paris', 'slug' => 'black-paris', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
+        $lyon = Restaurant::create(['legacy_wp_id' => 4, 'name' => 'Black Lyon', 'slug' => 'black-lyon', 'status' => 'published', 'city_name' => 'Lyon', 'city_code' => '69381', 'country_code' => 'FR']);
         $paris->categories()->attach($burger);
         $lyon->categories()->attach($burger);
 
@@ -35,7 +35,7 @@ class PublicRestaurantSearchTest extends TestCase
     public function test_city_only_search_uses_city_name_slug_and_other_combinations_stay_noindex_results(): void
     {
         $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 2, 'name' => 'Burger']);
-        $restaurant = Restaurant::create(['legacy_wp_id' => 5, 'name' => 'Burger Paris', 'slug' => 'burger-paris', 'status' => 'published', 'city_name' => 'Paris']);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 5, 'name' => 'Burger Paris', 'slug' => 'burger-paris', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         $restaurant->categories()->attach($burger);
 
         $this->get('/restaurants/recherche?ville=paris')->assertRedirect('/restos/paris');
@@ -46,7 +46,7 @@ class PublicRestaurantSearchTest extends TestCase
 
     public function test_search_routes_are_not_intercepted_by_a_legacy_redirect_rule(): void
     {
-        Restaurant::create(['legacy_wp_id' => 6, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris']);
+        Restaurant::create(['legacy_wp_id' => 6, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         RedirectRule::create(['source_path' => '/restaurants/recherche', 'match_type' => 'exact', 'destination' => '/resto/recherche', 'status_code' => 301, 'priority' => 1, 'is_active' => true]);
 
         $this->get('/restaurants/recherche?ville=paris')->assertRedirect('/restos/paris');
