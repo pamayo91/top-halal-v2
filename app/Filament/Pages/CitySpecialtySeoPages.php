@@ -37,6 +37,7 @@ class CitySpecialtySeoPages extends Page implements HasTable
 
     public function mount(?string $city = null, ?int $specialty = null, ?int $service = null, ?string $type = null): void
     {
+        $type ??= request()->query('type');
         $this->facetType = $type === 'service' || $service !== null ? 'service' : 'specialty';
         $this->data = $this->defaults();
         $city ??= request()->query('city');
