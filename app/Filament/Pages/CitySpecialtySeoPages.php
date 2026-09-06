@@ -80,7 +80,9 @@ class CitySpecialtySeoPages extends Page implements HasTable
 
     public function selectFacet(string $cityCode, int $categoryId): void
     {
-        $city = app(CityPageResolver::class)->cityForCode($cityCode);
+        $cities = app(CityPageResolver::class);
+        $cities->forget();
+        $city = $cities->cityForCode($cityCode);
         $category = Category::find($categoryId);
         if ($city === null || $category === null) return;
 
