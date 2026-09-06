@@ -2,6 +2,8 @@
 
 ## 2026-09-06
 
+- Added sparse city + service SEO facets, reusing public routing, resolver, listings, sitemap and the shared Facettes SEO back-office screen.
+
 - The `Ouverte` state badge in the SEO facets back-office table now links directly to the public landing page; closed facets have no front link.
 
 - Added sparse, administrator-controlled city + specialty SEO facets. Only explicitly opened pairs publish `/restos/{city}/{specialty}`, with canonical metadata, structured geographic breadcrumbs, sitemap entry, SSR city internal linking and optional sanitized overrides/content. Closed or unconfigured pairs remain absent from the sitemap and internal linking while the existing filters continue to work unchanged.

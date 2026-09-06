@@ -24,6 +24,12 @@ Une configuration `open` publie exclusivement `/restos/{slug-ville-précis}/{slu
 
 Sans override, H1, title et meta description sont générés à partir de la ville, de la spécialité et du nombre réel de restaurants. Les contenus haut/bas restent vides tant qu'ils ne sont pas saisis. Le fil d'Ariane visible et JSON-LD est `Accueil > Restaurants > région > département > ville > spécialité`, en réutilisant les règles de niveaux mutualisés Paris/DOM. Une page ville peut afficher un bloc SSR léger de ses seules facettes ouvertes ; il ne remplace jamais les filtres UX ni le bloc « Villes aux alentours ». Dans le BO, le badge « Ouverte » est le lien vers cette URL publique ; une facette fermée n’a pas de lien front.
 
+### Facettes ville + service
+
+Les facettes Service réutilisent le moteur sparse des spécialités : `city_service_seo_pages` est identifié par `city_code` et `feature_id`, et s'appuie exclusivement sur `restaurant_feature`. Aucune matrice ville × service ni relation restaurant/service n'est créée. Sans ligne, ou à l'état `closed`, une combinaison n'est ni une landing, ni liée, ni présente dans le sitemap.
+
+Une configuration ouverte publie `/restos/{slug-ville-précis}/{slug-service}` avec le resolver ville, SSR, canonical self, `index,follow`, pagination noindex, breadcrumb et `BreadcrumbList` existants. Sans override, son H1 est « Restaurants halal avec {service} à {ville} » et aucun contenu haut/bas n'est généré. Les pages villes présentent séparément leurs seules facettes Service ouvertes. Les filtres `features[]` restent utilisables lorsqu'une facette est fermée. Le routeur refuse toute URL qui deviendrait ambiguë entre une spécialité et un service ouverts ; l'audit initial des slugs V2 n'a détecté aucune collision.
+
 ## Pages villes SEO
 
 L'identité technique d'une commune est son `city_code` INSEE canonique ; `city_name` reste le seul nom d'affichage. Paris, Lyon et Marseille absorbent leurs codes d'arrondissements dans leur code communal. Une page ville dont le nom est unique utilise `/restos/{Str::slug(city_name)}`. Pour chaque groupe de communes distinctes partageant ce slug, chaque page précise utilise `/restos/{slug}-{code_departement}` ; le slug non qualifié devient une page de désambiguïsation HTTP 200, `noindex,follow`, canonique sur elle-même et absente du sitemap. Elle ne mélange jamais les restaurants et présente seulement les communes, département, région et liens précis.

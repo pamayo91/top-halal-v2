@@ -34,7 +34,7 @@ class CitySpecialtySeoPagesTest extends TestCase
             ->assertDontSee('Marseille Indienne')
             ->assertSee('Restaurants Burger halal à Marseille')
             ->assertSee('index,follow', false)
-            ->assertSee('rel="canonical" href="'.route('city-specialties.show', ['city' => 'marseille', 'specialty' => 'burger']).'"', false)
+            ->assertSee('rel="canonical" href="'.route('city-specialties.show', ['city' => 'marseille', 'facet' => 'burger']).'"', false)
             ->assertSee('Contenu haut contrôlé.')
             ->assertSee('Contenu bas contrôlé.')
             ->assertSee('Provence-Alpes-Côte d\'Azur')
@@ -43,7 +43,7 @@ class CitySpecialtySeoPagesTest extends TestCase
 
         $this->get('/restos/marseille')->assertOk()
             ->assertSee('Restaurants halal par spécialité à Marseille')
-            ->assertSee(route('city-specialties.show', ['city' => 'marseille', 'specialty' => 'burger']), false)
+            ->assertSee(route('city-specialties.show', ['city' => 'marseille', 'facet' => 'burger']), false)
             ->assertDontSee('/restos/marseille/indienne', false);
         $this->get('/sitemap.xml')->assertSee('/restos/marseille/burger', false)->assertDontSee('/restos/marseille/indienne', false);
 

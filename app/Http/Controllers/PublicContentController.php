@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, CitySpecialtySeoService, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
 
 class PublicContentController extends Controller
 {
@@ -19,6 +19,7 @@ class PublicContentController extends Controller
         private readonly CityPageResolver $cities,
         private readonly CitySeoService $citySeo,
         private readonly CitySpecialtySeoService $citySpecialties,
+        private readonly CityServiceSeoService $cityServices,
         private readonly GeographicPageResolver $geography,
         private readonly NearbyCityService $nearbyCities,
     ) {}
@@ -53,6 +54,13 @@ class PublicContentController extends Controller
             $category = Category::where('slug', $categories[0])->first();
             if ($cityPage !== null && $category !== null && $this->citySpecialties->isOpen($cityPage, $category)) {
                 return redirect()->to($this->citySpecialties->url($cityPage, $category));
+            }
+        }
+        if ($city !== '' && $query === '' && $categories === [] && count($features) === 1) {
+            $cityPage = $this->cities->cityForSlug($city);
+            $feature = Feature::where('slug', $features[0])->first();
+            if ($cityPage !== null && $feature !== null && $this->cityServices->isOpen($cityPage, $feature)) {
+                return redirect()->to($this->cityServices->url($cityPage, $feature));
             }
         }
         if ($city !== '' && $query === '' && $categories === [] && $features === []) return redirect()->route('cities.show', $city);
@@ -111,6 +119,7 @@ class PublicContentController extends Controller
                 nearbyCities: $this->nearbyCities->nearbyFor($city),
                 city: $city,
                 citySpecialties: $this->citySpecialties->openedForCity($city),
+                cityServices: $this->cityServices->openedForCity($city),
             );
         }
 
@@ -145,30 +154,38 @@ class PublicContentController extends Controller
         abort(404);
     }
 
-    public function citySpecialty(string $city, string $specialty): Response
+    public function cityFacet(string $city, string $facet): Response
     {
         $cityPage = $this->cities->cityForSlug($city);
-        $category = Category::where('slug', $specialty)->firstOrFail();
         abort_if($cityPage === null, 404);
-        $facet = $this->citySpecialties->pageFor($cityPage, $category);
-        abort_if($facet === null, 404);
+
+        $category = Category::where('slug', $facet)->first();
+        $feature = Feature::where('slug', $facet)->first();
+        $specialtyPage = $category === null ? null : $this->citySpecialties->pageFor($cityPage, $category);
+        $servicePage = $feature === null ? null : $this->cityServices->pageFor($cityPage, $feature);
+        abort_if(($specialtyPage === null && $servicePage === null) || ($specialtyPage !== null && $servicePage !== null), 404);
+
+        $term = $category !== null && $specialtyPage !== null ? $category : $feature;
+        $seoPage = $specialtyPage ?? $servicePage;
+        $service = $servicePage !== null;
 
         $restaurants = $this->search->published()
             ->whereIn('city_code', $cityPage->source_city_codes)
-            ->whereHas('categories', fn (Builder $query) => $query->whereKey($category->id))
+            ->whereHas($service ? 'features' : 'categories', fn (Builder $query) => $query->whereKey($term->id))
             ->paginate(12)
             ->withQueryString();
-        $defaults = $this->citySpecialties->defaults($cityPage, $category, $restaurants->total());
-        $breadcrumbs = $this->citySpecialtyBreadcrumbs($cityPage, $category);
+        $defaults = ($service ? $this->cityServices : $this->citySpecialties)->defaults($cityPage, $term, $restaurants->total());
+        $breadcrumbs = $this->cityFacetBreadcrumbs($cityPage, $term);
 
         return response()->view('public.city-specialty', [
             'city' => $cityPage,
-            'category' => $category,
-            'facet' => $facet,
+            'term' => $term,
+            'facet' => $seoPage,
+            'facetType' => $service ? 'service' : 'specialty',
             'restaurants' => $restaurants,
-            'h1' => $facet->h1 ?: $defaults['h1'],
-            'title' => $facet->seo_title ?: $defaults['title'],
-            'description' => $facet->seo_description ?: $defaults['description'],
+            'h1' => $seoPage->h1 ?: $defaults['h1'],
+            'title' => $seoPage->seo_title ?: $defaults['title'],
+            'description' => $seoPage->seo_description ?: $defaults['description'],
             'breadcrumbs' => $breadcrumbs,
         ]);
     }
@@ -237,7 +254,7 @@ class PublicContentController extends Controller
             ->values();
     }
 
-    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = [], mixed $nearbyCities = null, ?object $city = null, mixed $citySpecialties = null): Response
+    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = [], mixed $nearbyCities = null, ?object $city = null, mixed $citySpecialties = null, mixed $cityServices = null): Response
     {
         $name = $term->name;
         $title = $citySeo?->config?->seo_title ?: match ($kind) {
@@ -247,7 +264,7 @@ class PublicContentController extends Controller
         };
         $description = $citySeo?->config?->seo_description ?: "Découvrez {$restaurants->total()} restaurants halal en {$name}.";
 
-        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description', 'nearbyCities', 'city', 'citySpecialties'));
+        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description', 'nearbyCities', 'city', 'citySpecialties', 'cityServices'));
     }
 
     /** @return list<array{label:string,url:?string}> */
@@ -279,12 +296,12 @@ class PublicContentController extends Controller
     }
 
     /** @return list<array{label:string,url:?string}> */
-    private function citySpecialtyBreadcrumbs(object $city, Category $category): array
+    private function cityFacetBreadcrumbs(object $city, object $term): array
     {
         $breadcrumbs = $this->cityBreadcrumbs($city);
         array_pop($breadcrumbs);
         $breadcrumbs[] = ['label' => $city->city_name, 'url' => route('cities.show', $city->slug)];
-        $breadcrumbs[] = ['label' => $category->name, 'url' => null];
+        $breadcrumbs[] = ['label' => $term->name, 'url' => null];
 
         return $breadcrumbs;
     }
