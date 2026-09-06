@@ -48,7 +48,7 @@ async function assertRestaurantBreadcrumb(
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`${restaurantPath}$`));
 
   if (citySlug === 'saint-denis-93') {
-    await expect(page.locator('.breadcrumbs a').filter({ hasText: 'Saint-Denis' })).toHaveAttribute('href', /\/restos\/saint-denis-93$/);
+    await expect(page.locator('.breadcrumbs').getByRole('link', { name: 'Saint-Denis', exact: true })).toHaveAttribute('href', /\/restos\/saint-denis-93$/);
   }
 }
 
