@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\{CityServiceSeoPage, Feature, Restaurant, User};
 use App\Services\{CityPageResolver, CityServiceSeoService};
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class CityServiceSeoPagesTest extends TestCase
@@ -35,6 +36,7 @@ class CityServiceSeoPagesTest extends TestCase
 
     public function test_services_reuse_precise_city_urls_and_the_single_admin_facets_screen(): void
     {
+        Cache::flush();
         $terrace = $this->service('Terrasse', 'terrasse');
         foreach ([['Paris', '75111', '75056', 'paris'], ['Lyon', '69381', '69123', 'lyon'], ['Saint-Denis', '93066', '93066', 'saint-denis-93']] as [$name, $source, $canonical, $slug]) {
             $this->published($name.' Terrasse', $slug.'-terrasse', $name, $source, $terrace);
