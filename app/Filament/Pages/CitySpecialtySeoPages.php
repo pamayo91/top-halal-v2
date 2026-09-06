@@ -105,7 +105,10 @@ class CitySpecialtySeoPages extends Page implements HasTable
     {
         if ($this->cityCode === '' || $this->categoryId === null) return;
         $data = $this->form->getState();
-        foreach (['content_top', 'content_bottom'] as $key) $data[$key] = app(ContentSanitizer::class)->sanitize($data[$key] ?? '')['html'];
+        foreach (['content_top', 'content_bottom'] as $key) {
+            $html = app(ContentSanitizer::class)->sanitize($data[$key] ?? '')['html'];
+            $data[$key] = filled(trim(strip_tags($html))) ? $html : null;
+        }
         foreach (['h1', 'seo_title', 'seo_description'] as $key) $data[$key] = filled($data[$key] ?? null) ? $data[$key] : null;
 
         $isDefaultClosed = $data['state'] === 'closed' && collect(['h1', 'seo_title', 'seo_description', 'content_top', 'content_bottom'])->every(fn (string $key): bool => ! filled($data[$key]));
