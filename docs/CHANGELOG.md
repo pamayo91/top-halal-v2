@@ -2,6 +2,7 @@
 
 ## 2026-09-06
 
+- Added the SSR « Villes aux alentours » internal-linking block on city pages. It uses local official commune centres keyed by canonical INSEE code, crosses department/region boundaries by distance, links only SEO-open precise city pages, suppresses empty blocks and has no public remote request or JavaScript dependency. Settings now expose the 30 km default radius and 15-result default cap; cache invalidation covers those settings, SEO overrides and published-city changes.
 - Restaurant-detail breadcrumbs and their `BreadcrumbList` JSON-LD now reuse the structured city/administrative resolver output. They link the existing region, department and precise city pages, keep the restaurant current/non-clickable, omit mutualized Paris/DOM levels and retain automatic department collision URLs.
 - Added code-INSEE-based city identity, precise homonym city URLs and retained noindex disambiguation pages. The lightweight local administrative resolver now serves region and department listings, canonical breadcrumbs/JSON-LD and sitemap eligibility without legacy Geography or new restaurant geography fields. Real city/department collisions retain the city URL and suffix the department code automatically; Paris and equivalent overseas territories remain mutualized.
 - Added sortable `Avis` and `Commentaires` counters to the user list. Each counter matches preserved legacy authorship by WordPress user ID or author e-mail, without double-counting a contribution where both identifiers match.

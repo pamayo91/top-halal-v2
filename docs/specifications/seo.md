@@ -22,6 +22,12 @@ L'identité technique d'une commune est son `city_code` INSEE canonique ; `city_
 
 `city_seo_pages` est identifié par `city_code` et ne contient que les overrides éditoriaux/SEO. Les éventuels overrides historiques sont migrés vers leur code canonique sans créer d'override par défaut. Une page est indexable automatiquement au seuil global configurable, sauf override `forced_open` ou `forced_closed`; les pages fermées restent accessibles, `noindex,follow`, canoniques sur elles-mêmes et hors sitemap. Tous les liens internes générés vers une ville utilisent le slug précis.
 
+### Villes aux alentours
+
+Les pages villes peuvent rendre, après la pagination, un bloc SSR « Villes aux alentours ». Il relie exclusivement les pages villes SEO ouvertes, hors commune courante, triées par distance géographique croissante et limitées par les réglages globaux `city_nearby_radius_km` (30 km par défaut, borné à 250 km) et `city_nearby_maximum` (15 par défaut, borné à 30). Le département et la région n'interviennent pas dans le calcul ; un homonyme utilise toujours son slug précis et aucune désambiguïsation ne peut être liée. Si aucune commune éligible ne relève du rayon, le bloc est absent.
+
+Les points de référence sont stockés localement, un point officiel par `city_code` canonique dans `city_reference_points`. La commande de maintenance explicite `city-reference-points:sync` récupère le champ `centre` de l'API française `geo.api.gouv.fr/communes`, ne conserve que les communes ayant une page ville publiée et n'est jamais appelée par une requête publique. Les coordonnées de restaurants ne servent pas de centre de commune. Les résultats sont mis en cache douze heures avec une génération invalidée à chaque modification de rayon, de maximum, de statut SEO ou de commune publiée.
+
 ## Pages administratives
 
 Le référentiel administratif versionné résout localement `city_code → département → région`, sans champ géographique supplémentaire sur `restaurants`, appel distant, legacy Geography ni filtrage PHP massif. Il gère les codes 2A/2B, DOM/COM et les arrondissements municipaux. Régions et départements utilisent aussi `/restos/{slug}` et sont indexables/sitemapables au même seuil global que les villes ; une pagination reste `noindex,follow`.

@@ -16,6 +16,8 @@ Le tableau de bord expose des compteurs réels. L’administration propose la ge
 
 Chaque opération sensible est enregistrée dans `admin_audit_logs`, avec l’administrateur, l’objet, l’action et un résumé filtré des changements. Les mots de passe, tokens et URL sortantes ne sont jamais mis dans ce résumé.
 
+La page « Réglages » comprend une section « SEO local — pages villes » avec le rayon global des villes aux alentours (30 km par défaut, 250 km maximum) et leur nombre maximum (15 par défaut, 30 maximum). Ces valeurs sont globales, ne créent aucun override par commune et invalident le cache de maillage géographique lorsqu'elles sont enregistrées.
+
 ## Localisation des restaurants
 
 L’onglet « Localisation » ne présente que l’adresse structurée V2 (recherche, adresse, complément, code postal, ville, code INSEE, pays) et la carte. Les données d’origine et les métadonnées techniques de géocodage restent conservées en base, mais ne surchargent pas le parcours courant. La recherche d’adresse est servie par Laravel (`GET /admin/location/autocomplete`) et l’abstraction Géoplateforme : aucun navigateur ne contacte directement le fournisseur. Une sélection ne sauvegarde pas la fiche ; elle préremplit les champs, l’admin confirme ensuite la modification normale. Les associations Geography historiques restent conservées hors du formulaire Restaurant jusqu’au lot de suppression dédié.

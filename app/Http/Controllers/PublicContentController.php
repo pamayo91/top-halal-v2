@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, GeographicPageResolver, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
 
 class PublicContentController extends Controller
 {
@@ -19,6 +19,7 @@ class PublicContentController extends Controller
         private readonly CityPageResolver $cities,
         private readonly CitySeoService $citySeo,
         private readonly GeographicPageResolver $geography,
+        private readonly NearbyCityService $nearbyCities,
     ) {}
     public function home(): View
     {
@@ -98,6 +99,7 @@ class PublicContentController extends Controller
                 open: (bool) $citySeo?->open,
                 citySeo: $citySeo,
                 breadcrumbs: $this->cityBreadcrumbs($city),
+                nearbyCities: $this->nearbyCities->nearbyFor($city),
             );
         }
 
@@ -196,7 +198,7 @@ class PublicContentController extends Controller
             ->values();
     }
 
-    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = []): Response
+    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = [], mixed $nearbyCities = null): Response
     {
         $name = $term->name;
         $title = $citySeo?->config?->seo_title ?: match ($kind) {
@@ -206,7 +208,7 @@ class PublicContentController extends Controller
         };
         $description = $citySeo?->config?->seo_description ?: "Découvrez {$restaurants->total()} restaurants halal en {$name}.";
 
-        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description'));
+        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description', 'nearbyCities'));
     }
 
     /** @return list<array{label:string,url:?string}> */

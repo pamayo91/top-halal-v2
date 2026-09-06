@@ -13,6 +13,7 @@ Internal CWV budgets: LCP < 1.8s, INP < 150ms, CLS < 0.05.
 - Lazy-load below-the-fold media, never the LCP image.
 - Preload/priority only when measured and justified.
 - Strong browser/server caching.
+- Nearby-city internal-link candidates use a bounded local-reference query plus a 12-hour application cache; public rendering makes no remote geospatial request and never scans restaurant coordinates.
 - Brotli/Gzip as server supports.
 - OPcache enabled and Laravel optimized in deployed environments.
 - Stable reserved dimensions for ads/media to prevent CLS.

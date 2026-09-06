@@ -21,6 +21,7 @@ class CitySeoService
     {
         Cache::forget(self::KEY);
         $this->cities->forget();
+        app(NearbyCityService::class)->forget();
     }
 
     /** @return Collection<int, object> */

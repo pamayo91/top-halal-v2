@@ -21,6 +21,16 @@
             @endforelse
         </div>
         {{ $restaurants->links() }}
+        @if($kind === 'ville' && ($nearbyCities ?? collect())->isNotEmpty())
+            <section class="nearby-cities" aria-labelledby="nearby-cities-title">
+                <h2 id="nearby-cities-title">Villes aux alentours</h2>
+                <ul class="nearby-cities-grid">
+                    @foreach($nearbyCities as $nearbyCity)
+                        <li><a href="{{ route('cities.show', $nearbyCity->slug) }}">{{ $nearbyCity->city_name }}</a></li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
         @if(filled($cityPage?->config?->content_bottom))<div class="city-seo-content">{!! $cityPage->config->content_bottom !!}</div>@endif
     </section>
 </x-layouts.app>
