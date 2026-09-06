@@ -74,8 +74,9 @@ class PublicContentController extends Controller
         $restaurant = $this->search->published()->where('slug', $slug)->firstOrFail();
         $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
         $adminEditUrl = $this->adminEditUrlFor($restaurant);
+        $breadcrumbs = $this->restaurantBreadcrumbs($restaurant);
 
-        return response()->view('public.restaurant', compact('restaurant', 'reviews', 'adminEditUrl'));
+        return response()->view('public.restaurant', compact('restaurant', 'reviews', 'adminEditUrl', 'breadcrumbs'));
     }
 
     public function storeReview(StoreRestaurantReviewRequest $request, string $slug): RedirectResponse
@@ -232,6 +233,32 @@ class PublicContentController extends Controller
         }
 
         $breadcrumbs[] = ['label' => $city->city_name, 'url' => null];
+
+        return $breadcrumbs;
+    }
+
+    /** @return list<array{label:string,url:?string}> */
+    private function restaurantBreadcrumbs(Restaurant $restaurant): array
+    {
+        $breadcrumbs = [
+            ['label' => 'Accueil', 'url' => route('home')],
+            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
+        ];
+
+        $city = $this->cities->cityForCode((string) $restaurant->city_code);
+
+        if ($city !== null) {
+            $breadcrumbs[] = ['label' => $city->region['name'], 'url' => route('cities.show', $city->region['slug'])];
+
+            $department = $this->geography->departments()->firstWhere('code', $city->department['code']);
+            if ($department !== null && $department->slug !== $city->slug && $department->slug !== $city->region['slug']) {
+                $breadcrumbs[] = ['label' => $department->name, 'url' => route('cities.show', $department->slug)];
+            }
+
+            $breadcrumbs[] = ['label' => $city->city_name, 'url' => route('cities.show', $city->slug)];
+        }
+
+        $breadcrumbs[] = ['label' => $restaurant->name, 'url' => null];
 
         return $breadcrumbs;
     }
