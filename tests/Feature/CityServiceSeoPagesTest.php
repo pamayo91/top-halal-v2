@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\{CityServiceSeoPage, Feature, Restaurant, User};
+use App\Services\{CityPageResolver, CityServiceSeoService};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -38,6 +39,7 @@ class CityServiceSeoPagesTest extends TestCase
         foreach ([['Paris', '75111', '75056', 'paris'], ['Lyon', '69381', '69123', 'lyon'], ['Saint-Denis', '93066', '93066', 'saint-denis-93']] as [$name, $source, $canonical, $slug]) {
             $this->published($name.' Terrasse', $slug.'-terrasse', $name, $source, $terrace);
             CityServiceSeoPage::create(['city_code' => $canonical, 'feature_id' => $terrace->id, 'state' => 'open']);
+            $this->assertNotNull(app(CityServiceSeoService::class)->pageFor(app(CityPageResolver::class)->cityForSlug($slug), $terrace));
             $this->get('/restos/'.$slug.'/terrasse')->assertOk();
         }
 
