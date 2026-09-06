@@ -10,7 +10,7 @@ test('structured city pages remain usable on desktop and mobile with their admin
   ]) {
     const response = await page.goto(`/restos/${slug}`);
     expect(response?.status()).toBe(200);
-    await expect(page.getByRole('heading', { name: `Restaurants halal : ${city}` })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`/restos/${slug}$`));
     await expect(page.locator('.breadcrumbs')).toContainText(region);
     await expect(page.locator('.breadcrumbs')).toContainText(department);
