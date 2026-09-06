@@ -16,8 +16,8 @@ test.describe('Administration des facettes SEO ville + spécialité', () => {
 
   test('a Marseille specialty can be opened, crawled, and closed again without leaving a default configuration', async ({ page }, testInfo) => {
     const specialty = testInfo.project.name === 'mobile-chromium'
-      ? { name: 'Turque', slug: 'turque' }
-      : { name: 'Fast-food', slug: 'fast-food' };
+      ? { name: 'Turque', slug: 'cuisine-turque' }
+      : { name: 'Fast-food', slug: 'cuisine-fast-food' };
     const consoleErrors: string[] = [];
     const networkErrors: string[] = [];
     page.on('console', (message) => {
