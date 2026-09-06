@@ -95,7 +95,10 @@ class CitySpecialtySeoPagesTest extends TestCase
         $this->actingAs($admin)->get('/admin/facettes-seo')->assertOk()->assertSee('Ville')->assertSee('Spécialité')->assertSee('Nombre de restaurants')->assertSee('Fermée');
         $this->assertDatabaseCount('city_specialty_seo_pages', 0);
 
-        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySpecialtySeoPages::class, ['city' => '13055', 'specialty' => $burger->id])
+        Livewire::actingAs($admin)->test(\App\Filament\Pages\CitySpecialtySeoPages::class)
+            ->call('selectFacet', '13055', $burger->id)
+            ->assertSet('cityCode', '13055')
+            ->assertSet('categoryId', $burger->id)
             ->assertSet('data.state', 'closed')
             ->set('data.state', 'open')
             ->set('data.h1', 'Burger halal à Marseille')
