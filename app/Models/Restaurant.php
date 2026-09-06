@@ -50,6 +50,7 @@ class Restaurant extends Model
     public function media(): HasMany { return $this->hasMany(RestaurantMedia::class)->orderBy('sort_order'); }
     public function reviews(): HasMany { return $this->hasMany(RestaurantReview::class); }
     public function claims(): HasMany { return $this->hasMany(RestaurantClaim::class); }
+    public function legacyAuthorships(): HasMany { return $this->hasMany(LegacyRestaurantAuthorship::class); }
     public function outboundLinks(): HasMany { return $this->hasMany(RestaurantOutboundLink::class); }
     public function webEnrichment(): HasOne { return $this->hasOne(RestaurantWebEnrichment::class); }
     public function submission(): HasOne { return $this->hasOne(RestaurantSubmission::class); }

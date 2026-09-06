@@ -27,6 +27,7 @@ class UserResource extends AdminResource
     {
         return parent::getEloquentQuery()->withCount([
             'ownedRestaurants',
+            'legacyRestaurantAuthorships',
             'claims',
             'claims as pending_claims_count' => fn (Builder $query) => $query->where('status', 'pending'),
             'claims as approved_claims_count' => fn (Builder $query) => $query->where('status', 'approved'),
@@ -44,6 +45,7 @@ class UserResource extends AdminResource
         if ($user->owned_restaurants_count > 0) return 'Restaurateur';
         if ($user->pending_claims_count > 0) return 'Revendication en cours';
         if ($user->claims_count > 0) return 'Revendication traitée';
+        if ($user->legacy_restaurant_authorships_count > 0) return 'Auteur legacy';
 
         return 'Aucune activité';
     }
@@ -119,6 +121,7 @@ class UserResource extends AdminResource
                 TextColumn::make('status')->badge(),
                 TextColumn::make('email_verified_at')->label('E-mail vérifié')->dateTime('d/m/Y')->placeholder('Non'),
                 TextColumn::make('owned_restaurants_count')->label('Restaurants liés')->numeric(),
+                TextColumn::make('legacy_restaurant_authorships_count')->label('Fiches legacy créées')->numeric()->description('Relation historique, sans droit de gestion'),
                 TextColumn::make('claims_count')->label('Revendications')->numeric()->description(fn (User $user) => static::claimSummary($user)),
                 TextColumn::make('activity')->label('Activité')->state(fn (User $user) => static::activityLabel($user))->badge(),
                 TextColumn::make('must_change_password')->label('MDP à changer')->badge()->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non'),
@@ -128,7 +131,7 @@ class UserResource extends AdminResource
             ->filters([
                 SelectFilter::make('role')->options(['user' => 'Utilisateur', 'restaurant_owner' => 'Restaurateur', 'admin' => 'Administrateur']),
                 SelectFilter::make('status')->options(['active' => 'Actif', 'disabled' => 'Désactivé']),
-                Filter::make('without_business_activity')->label('Sans lien restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')),
+                Filter::make('without_business_activity')->label('Sans lien restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')->doesntHave('legacyRestaurantAuthorships')),
             ])
             ->recordActions([
                 EditAction::make()->visible(fn (User $user) => ! $user->trashed()),

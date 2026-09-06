@@ -214,12 +214,15 @@ class AdminBackOfficeTest extends TestCase
         $inactive = User::factory()->create(['role' => 'user']);
         $claimant = User::factory()->create(['role' => 'user']);
         $owner = User::factory()->create(['role' => 'restaurant_owner']);
+        $legacyAuthor = User::factory()->create(['legacy_wp_user_id' => 124, 'role' => 'user']);
         $restaurant = $this->restaurant();
+        $legacyRestaurant = $this->restaurant();
         RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $claimant->id, 'status' => 'pending', 'submitted_at' => now()]);
         RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $owner->id, 'status' => 'approved', 'submitted_at' => now()]);
+        \App\Models\LegacyRestaurantAuthorship::create(['restaurant_id' => $legacyRestaurant->id, 'user_id' => $legacyAuthor->id, 'legacy_wp_id' => $legacyRestaurant->legacy_wp_id, 'legacy_wp_user_id' => 124, 'source_post_status' => 'publish']);
 
         $users = \App\Filament\Resources\UserResource::getEloquentQuery()
-            ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id])
+            ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id, $legacyAuthor->id])
             ->get()
             ->keyBy('id');
 
@@ -230,6 +233,8 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame('1 en attente', \App\Filament\Resources\UserResource::claimSummary($users[$claimant->id]));
         $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$owner->id]));
         $this->assertSame(1, $users[$owner->id]->owned_restaurants_count);
+        $this->assertSame('Auteur legacy', \App\Filament\Resources\UserResource::activityLabel($users[$legacyAuthor->id]));
+        $this->assertSame(1, $users[$legacyAuthor->id]->legacy_restaurant_authorships_count);
     }
 
     public function test_admin_can_bulk_trash_and_restore_non_administrator_users_without_losing_claims(): void
