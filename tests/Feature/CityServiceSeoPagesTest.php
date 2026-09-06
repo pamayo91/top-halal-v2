@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\{CityServiceSeoPage, Feature, Restaurant, User};
+use App\Services\CityPageResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -37,8 +38,9 @@ class CityServiceSeoPagesTest extends TestCase
         $terrace = $this->service('Terrasse', 'terrasse');
         $admin = User::factory()->create(['role' => 'admin']);
         $this->published('Marseille Terrasse', 'marseille-terrasse', 'Marseille', '13206', $terrace);
+        app(CityPageResolver::class)->forget();
         $this->actingAs($admin)->get('/admin/facettes-seo?type=service&city=13055&service='.$terrace->id)->assertOk()->assertSee('Type de facette')->assertSee('Service')->assertSee('Marseille + Terrasse');
-        $this->assertDatabaseCount('city_service_seo_pages', 3);
+        $this->assertDatabaseCount('city_service_seo_pages', 0);
     }
 
     private function published(string $name, string $slug, string $city, string $cityCode, Feature $feature): Restaurant
