@@ -38,4 +38,31 @@ test.describe('Gestion des utilisateurs', () => {
     expect(consoleErrors).toEqual([]);
     expect(networkErrors).toEqual([]);
   });
+
+  test('an administrator can find a user from an e-mail domain fragment', async ({ page }) => {
+    const consoleErrors: string[] = [];
+    const networkErrors: string[] = [];
+
+    page.on('console', (message) => {
+      if (message.type() === 'error' && !message.text().startsWith('Failed to load resource:')) consoleErrors.push(message.text());
+    });
+    page.on('requestfailed', (request) => networkErrors.push(`${request.method()} ${request.url()}`));
+    page.on('response', (response) => {
+      if (response.status() >= 400) networkErrors.push(`${response.status()} ${response.url()}`);
+    });
+
+    await page.goto('/admin');
+    await page.locator('input[type="email"]').fill(email!);
+    await page.locator('input[type="password"]').fill(password!);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/admin$/);
+
+    await page.goto('/admin/users');
+    const search = page.getByRole('searchbox', { name: 'Rechercher', exact: true });
+    await expect(search).toBeVisible();
+    await search.fill('simu.elyquin.org');
+    await expect(page.getByRole('table')).toContainText('simu.elyquin.org');
+    expect(consoleErrors).toEqual([]);
+    expect(networkErrors).toEqual([]);
+  });
 });
