@@ -9,7 +9,7 @@ use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
 use Filament\Forms\Components\{Select, TextInput, Toggle};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\{Filter, SelectFilter};
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Password;
@@ -25,7 +25,38 @@ class UserResource extends AdminResource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withCount('ownedRestaurants');
+        return parent::getEloquentQuery()->withCount([
+            'ownedRestaurants',
+            'claims',
+            'claims as pending_claims_count' => fn (Builder $query) => $query->where('status', 'pending'),
+            'claims as approved_claims_count' => fn (Builder $query) => $query->where('status', 'approved'),
+            'claims as rejected_claims_count' => fn (Builder $query) => $query->where('status', 'rejected'),
+        ]);
+    }
+
+    public static function originLabel(User $user): string
+    {
+        return $user->legacy_wp_user_id === null ? 'Inscription V2' : 'Migré WordPress';
+    }
+
+    public static function activityLabel(User $user): string
+    {
+        if ($user->owned_restaurants_count > 0) return 'Restaurateur';
+        if ($user->pending_claims_count > 0) return 'Revendication en cours';
+        if ($user->claims_count > 0) return 'Revendication traitée';
+
+        return 'Aucune activité';
+    }
+
+    public static function claimSummary(User $user): string
+    {
+        return collect([
+            ['count' => $user->pending_claims_count, 'label' => 'en attente'],
+            ['count' => $user->approved_claims_count, 'label' => 'approuvée(s)'],
+            ['count' => $user->rejected_claims_count, 'label' => 'refusée(s)'],
+        ])->filter(fn (array $claim): bool => $claim['count'] > 0)
+            ->map(fn (array $claim): string => $claim['count'].' '.$claim['label'])
+            ->implode(' · ') ?: 'Aucune revendication';
     }
 
     public static function moveToTrash(User $user): void
@@ -83,10 +114,13 @@ class UserResource extends AdminResource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable(['name', 'email'])->description(fn (User $user) => $user->email),
+                TextColumn::make('origin')->label('Origine')->state(fn (User $user) => static::originLabel($user))->badge(),
                 TextColumn::make('role')->badge(),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('email_verified_at')->label('E-mail vérifié')->dateTime('d/m/Y')->placeholder('Non'),
-                TextColumn::make('owned_restaurants_count')->label('Restaurants')->numeric(),
+                TextColumn::make('owned_restaurants_count')->label('Restaurants liés')->numeric(),
+                TextColumn::make('claims_count')->label('Revendications')->numeric()->description(fn (User $user) => static::claimSummary($user)),
+                TextColumn::make('activity')->label('Activité')->state(fn (User $user) => static::activityLabel($user))->badge(),
                 TextColumn::make('must_change_password')->label('MDP à changer')->badge()->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non'),
                 TextColumn::make('created_at')->label('Inscription')->dateTime('d/m/Y H:i')->sortable(),
                 TextColumn::make('updated_at')->label('Modifié')->dateTime('d/m/Y H:i')->sortable()->toggleable(),
@@ -94,6 +128,7 @@ class UserResource extends AdminResource
             ->filters([
                 SelectFilter::make('role')->options(['user' => 'Utilisateur', 'restaurant_owner' => 'Restaurateur', 'admin' => 'Administrateur']),
                 SelectFilter::make('status')->options(['active' => 'Actif', 'disabled' => 'Désactivé']),
+                Filter::make('without_business_activity')->label('Sans lien restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')),
             ])
             ->recordActions([
                 EditAction::make()->visible(fn (User $user) => ! $user->trashed()),

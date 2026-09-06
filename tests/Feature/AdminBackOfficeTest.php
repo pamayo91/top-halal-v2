@@ -208,6 +208,30 @@ class AdminBackOfficeTest extends TestCase
             ->assertCanNotSeeTableRecords([$otherUser]);
     }
 
+    public function test_user_list_qualifies_origin_restaurant_links_and_claim_activity(): void
+    {
+        $legacy = User::factory()->create(['legacy_wp_user_id' => 123, 'role' => 'user']);
+        $inactive = User::factory()->create(['role' => 'user']);
+        $claimant = User::factory()->create(['role' => 'user']);
+        $owner = User::factory()->create(['role' => 'restaurant_owner']);
+        $restaurant = $this->restaurant();
+        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $claimant->id, 'status' => 'pending', 'submitted_at' => now()]);
+        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $owner->id, 'status' => 'approved', 'submitted_at' => now()]);
+
+        $users = \App\Filament\Resources\UserResource::getEloquentQuery()
+            ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id])
+            ->get()
+            ->keyBy('id');
+
+        $this->assertSame('Migré WordPress', \App\Filament\Resources\UserResource::originLabel($users[$legacy->id]));
+        $this->assertSame('Inscription V2', \App\Filament\Resources\UserResource::originLabel($users[$inactive->id]));
+        $this->assertSame('Aucune activité', \App\Filament\Resources\UserResource::activityLabel($users[$inactive->id]));
+        $this->assertSame('Revendication en cours', \App\Filament\Resources\UserResource::activityLabel($users[$claimant->id]));
+        $this->assertSame('1 en attente', \App\Filament\Resources\UserResource::claimSummary($users[$claimant->id]));
+        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$owner->id]));
+        $this->assertSame(1, $users[$owner->id]->owned_restaurants_count);
+    }
+
     public function test_admin_can_bulk_trash_and_restore_non_administrator_users_without_losing_claims(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

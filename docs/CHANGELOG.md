@@ -2,6 +2,7 @@
 
 ## 2026-09-05
 
+- Added user-origin, restaurant-link and claim-activity columns, plus an explicit filter for accounts with no restaurant link or claim. This is a review signal, never an automatic spam classification.
 - Added audited, reversible bulk user deletion. Selected standard and restaurant-owner accounts move to a dedicated trash and retain their claims/history; administrator accounts are protected and cannot be removed.
 - Added an irreversible, confirmed bulk permanent-delete action in the user trash. It deletes only non-administrator accounts and their associated claims, with an audit record for each account.
 - Fixed the Filament user-list search to match e-mail addresses as well as names; arbitrary e-mail fragments, including domain-only queries, are covered by a Livewire regression test.
