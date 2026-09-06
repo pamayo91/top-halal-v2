@@ -45,7 +45,7 @@ class UserResource extends AdminResource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->searchable()->description(fn (User $user) => $user->email),
+                TextColumn::make('name')->searchable(['name', 'email'])->description(fn (User $user) => $user->email),
                 TextColumn::make('role')->badge(),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('email_verified_at')->label('E-mail vérifié')->dateTime('d/m/Y')->placeholder('Non'),

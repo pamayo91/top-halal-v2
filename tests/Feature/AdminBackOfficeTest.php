@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
@@ -192,6 +193,19 @@ class AdminBackOfficeTest extends TestCase
         $this->assertTrue(Hash::check('a-secure-test-password', $created->password));
         $audit = AdminAuditLog::where('action', 'user.created')->where('subject_id', $created->id)->firstOrFail();
         $this->assertArrayNotHasKey('password', $audit->changes ?? []);
+    }
+
+    public function test_user_list_searches_email_fragments(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $matchingUser = User::factory()->create(['name' => 'Compte sans domaine', 'email' => 'contact@simu.elyquin.org']);
+        $otherUser = User::factory()->create(['name' => 'Autre compte', 'email' => 'contact@example.test']);
+
+        Livewire::actingAs($admin)
+            ->test(ListUsers::class)
+            ->set('tableSearch', 'simu.elyquin.org')
+            ->assertCanSeeTableRecords([$matchingUser])
+            ->assertCanNotSeeTableRecords([$otherUser]);
     }
 
     private function restaurant(array $attributes = []): Restaurant { return Restaurant::create([...['legacy_wp_id' => random_int(1, 999999999), 'name' => 'Resto test', 'slug' => 'resto-'.str()->random(8), 'status' => 'published'], ...$attributes]); }

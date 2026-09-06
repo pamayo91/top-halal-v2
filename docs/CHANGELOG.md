@@ -2,6 +2,7 @@
 
 ## 2026-09-05
 
+- Fixed the Filament user-list search to match e-mail addresses as well as names; arbitrary e-mail fragments, including domain-only queries, are covered by a Livewire regression test.
 - Added a dedicated Filament user-creation screen for active administrators. It supports standard, restaurant-owner and administrator roles, requires a confirmed initial password, defaults to forcing a password change, and records the creation without retaining any password in the audit log.
 - Fixed the City SEO editor save flow: its audit entry now records the city as structured metadata, so saving a custom H1 or content no longer produces a Livewire 500.
 - The City SEO « Modifier » action now targets the editor anchor, bringing administrators directly to the selected city’s customization form.
