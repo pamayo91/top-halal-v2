@@ -2,6 +2,7 @@
 
 ## 2026-09-05
 
+- Refreshed the `users >= 534` regression floor after the owner-approved, audited permanent deletion of 11 accounts. The full preproduction gate is green at the resulting V2 state.
 - Added user-origin, restaurant-link and claim-activity columns, plus an explicit filter for accounts with no restaurant link or claim. This is a review signal, never an automatic spam classification.
 - Added audited, reversible bulk user deletion. Selected standard and restaurant-owner accounts move to a dedicated trash and retain their claims/history; administrator accounts are protected and cannot be removed.
 - Added an irreversible, confirmed bulk permanent-delete action in the user trash. It deletes only non-administrator accounts and their associated claims, with an audit record for each account.
