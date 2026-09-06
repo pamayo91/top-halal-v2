@@ -14,7 +14,7 @@ return [
         'nouvelle-aquitaine' => 'Nouvelle-Aquitaine',
         'occitanie' => 'Occitanie',
         'pays-de-la-loire' => 'Pays de la Loire',
-        'provence-alpes-cote-d-azur' => "Provence-Alpes-Côte d'Azur",
+        'provence-alpes-cote-d-azur' => ['name' => "Provence-Alpes-Côte d'Azur", 'slug' => 'provence-alpes-cote-d-azur'],
         'guadeloupe' => 'Guadeloupe',
         'martinique' => 'Martinique',
         'guyane' => 'Guyane',

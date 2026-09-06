@@ -22,10 +22,12 @@ class AdministrativeGeography
     public function region(string $code): ?array
     {
         $code = trim($code);
-        $name = config("administrative-geography.regions.{$code}");
+        $region = config("administrative-geography.regions.{$code}");
+        $name = is_array($region) ? ($region['name'] ?? null) : $region;
+        $slug = is_array($region) ? ($region['slug'] ?? null) : null;
 
         return is_string($name)
-            ? ['code' => $code, 'name' => $name, 'slug' => Str::slug($name)]
+            ? ['code' => $code, 'name' => $name, 'slug' => $slug ?? Str::slug($name)]
             : null;
     }
 

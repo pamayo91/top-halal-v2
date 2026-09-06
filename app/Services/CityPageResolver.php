@@ -95,9 +95,9 @@ class CityPageResolver
                     continue;
                 }
 
-                foreach ($sameNamedCities as $cityCode => $city) {
-                    $cities[$cityCode]['is_ambiguous'] = true;
-                    $cities[$cityCode]['slug'] = $baseSlug.'-'.$city['department']['code'];
+                foreach ($sameNamedCities as $city) {
+                    $cities[$city['city_code']]['is_ambiguous'] = true;
+                    $cities[$city['city_code']]['slug'] = $baseSlug.'-'.$city['department']['code'];
                 }
             }
 

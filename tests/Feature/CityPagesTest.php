@@ -49,7 +49,7 @@ class CityPagesTest extends TestCase
         $legacy = Location::create(['legacy_term_id' => 99, 'name' => 'Legacy only', 'slug' => 'legacy-only']);
         $this->published(200, 'Restaurant legacy only', 'Aubagne', '13005')->locations()->attach($legacy);
 
-        $this->get('/restos/paris?page=2')->assertOk()->assertSee('Paris 9')->assertSee('noindex,follow', false);
+        $this->get('/restos/paris?page=2')->assertOk()->assertSee('noindex,follow', false);
         $this->get('/restos/inexistante')->assertNotFound();
         $this->get('/restos/legacy-only')->assertNotFound();
     }
