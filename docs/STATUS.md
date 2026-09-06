@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-06
 
-Latest: user-list search now matches both names and any e-mail fragment, including a domain fragment such as `simu.elyquin.org`. Suspect `user` and `restaurant_owner` accounts can now be selected and moved in bulk to a restorable, audited corbeille without losing their claims; administrators remain protected. The dedicated preproduction administrator flow and complete regression gate are green.
+Latest: user-list search now matches both names and any e-mail fragment, including a domain fragment such as `simu.elyquin.org`. Suspect `user` and `restaurant_owner` accounts can now be selected and moved in bulk to a restorable, audited corbeille without losing their claims; from that corbeille, a second confirmed action can delete them and their claims permanently. Administrators remain protected. The dedicated preproduction administrator flow and complete regression gate are green.
 
 Latest SEO cities: configurable threshold and per-city optional overrides are deployed. At the default threshold of 5, 296 city pages are automatically open and 1,597 remain usable but `noindex,follow`; overrides remain sparse and are created only after an administrator saves a customization.
 
