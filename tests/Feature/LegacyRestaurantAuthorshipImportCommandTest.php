@@ -36,10 +36,11 @@ class LegacyRestaurantAuthorshipImportCommandTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_dry_run_excludes_unpublished_and_missing_restaurants_without_writing_a_relationship(): void
+    public function test_dry_run_includes_a_pending_legacy_listing_when_its_exact_v2_restaurant_is_active_without_writing_a_relationship(): void
     {
         $user = User::factory()->create(['legacy_wp_user_id' => 400]);
         $restaurant = $this->restaurant(700);
+        $pendingRestaurant = $this->restaurant(701);
         $this->legacyUser(400);
         $this->legacyPost(700, 400, 'publish');
         $this->legacyPost(701, 400, 'pending');
@@ -52,6 +53,7 @@ class LegacyRestaurantAuthorshipImportCommandTest extends TestCase
         $this->assertDatabaseCount('legacy_restaurant_authorships', 0);
         $this->assertSame($user->id, User::where('legacy_wp_user_id', 400)->value('id'));
         $this->assertSame($restaurant->id, Restaurant::where('legacy_wp_id', 700)->value('id'));
+        $this->assertSame($pendingRestaurant->id, Restaurant::where('legacy_wp_id', 701)->value('id'));
     }
 
     public function test_apply_creates_only_the_exact_author_relationship_with_a_rollback_batch(): void
@@ -59,7 +61,7 @@ class LegacyRestaurantAuthorshipImportCommandTest extends TestCase
         $user = User::factory()->create(['legacy_wp_user_id' => 401]);
         $restaurant = $this->restaurant(703);
         $this->legacyUser(401);
-        $this->legacyPost(703, 401, 'publish');
+        $this->legacyPost(703, 401, 'pending');
         $batch = '2d1c97b0-7d64-4d91-a430-3c7d96b2f2d6';
 
         $this->artisan('legacy:import-restaurant-authorships', ['--apply' => true, '--batch' => $batch, '--out' => 'storage/framework/testing/authorship-report'])

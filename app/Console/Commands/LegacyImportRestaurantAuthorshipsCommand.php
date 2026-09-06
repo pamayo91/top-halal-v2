@@ -54,11 +54,12 @@ class LegacyImportRestaurantAuthorshipsCommand extends Command
         $restaurantIds = collect($source)->pluck('ID')->map(fn ($id) => (int) $id)->values();
         $users = User::withTrashed()->whereIn('legacy_wp_user_id', $userIds)->get()->keyBy('legacy_wp_user_id');
         $restaurants = Restaurant::withTrashed()->whereIn('legacy_wp_id', $restaurantIds)->get()->keyBy('legacy_wp_id');
-        $summary = ['source_links' => count($source), 'source_non_published' => 0, 'user_missing' => 0, 'user_trashed' => 0, 'restaurant_missing' => 0, 'restaurant_trashed' => 0, 'eligible' => 0, 'created' => 0, 'existing' => 0, 'conflicts' => 0];
+        $summary = ['source_links' => count($source), 'source_non_published' => 0, 'eligible_non_published' => 0, 'user_missing' => 0, 'user_trashed' => 0, 'restaurant_missing' => 0, 'restaurant_trashed' => 0, 'eligible' => 0, 'created' => 0, 'existing' => 0, 'conflicts' => 0];
         $eligible = []; $anomalies = [];
         foreach ($source as $sourceRow) {
             $row = ['legacy_wp_id' => (int) $sourceRow->ID, 'legacy_wp_user_id' => (int) $sourceRow->post_author, 'source_post_status' => (string) $sourceRow->post_status];
-            if ($sourceRow->post_status !== 'publish') { $summary['source_non_published']++; $anomalies[] = $this->anomaly($row, 'source_listing_not_published'); continue; }
+            $sourceIsNonPublished = $sourceRow->post_status !== 'publish';
+            if ($sourceIsNonPublished) $summary['source_non_published']++;
             $user = $users->get($row['legacy_wp_user_id']);
             if (! $user) { $summary['user_missing']++; $anomalies[] = $this->anomaly($row, 'v2_user_missing'); continue; }
             if ($user->trashed()) { $summary['user_trashed']++; $anomalies[] = $this->anomaly($row, 'v2_user_trashed'); continue; }
@@ -66,6 +67,7 @@ class LegacyImportRestaurantAuthorshipsCommand extends Command
             if (! $restaurant) { $summary['restaurant_missing']++; $anomalies[] = $this->anomaly($row, 'v2_restaurant_missing'); continue; }
             if ($restaurant->trashed()) { $summary['restaurant_trashed']++; $anomalies[] = $this->anomaly($row, 'v2_restaurant_trashed'); continue; }
             $summary['eligible']++;
+            if ($sourceIsNonPublished) $summary['eligible_non_published']++;
             $eligible[] = $row + ['user_id' => $user->id, 'restaurant_id' => $restaurant->id, 'import_batch' => $batch];
         }
         return ['summary' => $summary, 'eligible_rows' => $eligible, 'anomalies' => $anomalies];
