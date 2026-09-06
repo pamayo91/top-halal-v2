@@ -68,7 +68,7 @@ class LegacyImportRestaurantAuthorshipsCommand extends Command
             $summary['eligible']++;
             $eligible[] = $row + ['user_id' => $user->id, 'restaurant_id' => $restaurant->id, 'import_batch' => $batch];
         }
-        return compact('summary', 'eligible', 'anomalies');
+        return ['summary' => $summary, 'eligible_rows' => $eligible, 'anomalies' => $anomalies];
     }
 
     /** @param array<string, mixed> $report */
