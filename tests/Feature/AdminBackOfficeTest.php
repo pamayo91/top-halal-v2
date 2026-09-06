@@ -232,9 +232,9 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame('Revendication en cours', \App\Filament\Resources\UserResource::activityLabel($users[$claimant->id]));
         $this->assertSame('1 en attente', \App\Filament\Resources\UserResource::claimSummary($users[$claimant->id]));
         $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$owner->id]));
-        $this->assertSame(1, $users[$owner->id]->owned_restaurants_count);
+        $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$owner->id]));
         $this->assertSame('Auteur legacy', \App\Filament\Resources\UserResource::activityLabel($users[$legacyAuthor->id]));
-        $this->assertSame(1, $users[$legacyAuthor->id]->legacy_restaurant_authorships_count);
+        $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$legacyAuthor->id]));
     }
 
     public function test_admin_can_bulk_trash_and_restore_non_administrator_users_without_losing_claims(): void

@@ -50,6 +50,11 @@ class UserResource extends AdminResource
         return 'Aucune activité';
     }
 
+    public static function restaurantLinkCount(User $user): int
+    {
+        return (int) $user->owned_restaurants_count + (int) $user->legacy_restaurant_authorships_count;
+    }
+
     public static function claimSummary(User $user): string
     {
         return collect([
@@ -120,8 +125,7 @@ class UserResource extends AdminResource
                 TextColumn::make('role')->badge(),
                 TextColumn::make('status')->badge(),
                 TextColumn::make('email_verified_at')->label('E-mail vérifié')->dateTime('d/m/Y')->placeholder('Non'),
-                TextColumn::make('owned_restaurants_count')->label('Restaurants liés')->numeric(),
-                TextColumn::make('legacy_restaurant_authorships_count')->label('Fiches legacy créées')->numeric()->description('Relation historique, sans droit de gestion'),
+                TextColumn::make('restaurants_linked_count')->label('Restaurants liés')->state(fn (User $user) => static::restaurantLinkCount($user))->numeric(),
                 TextColumn::make('claims_count')->label('Revendications')->numeric()->description(fn (User $user) => static::claimSummary($user)),
                 TextColumn::make('activity')->label('Activité')->state(fn (User $user) => static::activityLabel($user))->badge(),
                 TextColumn::make('must_change_password')->label('MDP à changer')->badge()->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non'),
