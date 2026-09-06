@@ -19,13 +19,13 @@ class GeographicPageResolver
     /** @return Collection<int, object> */
     public function departments(): Collection
     {
-        return $this->pages()['departments'];
+        return collect($this->pages()['departments'])->map(fn (array $department): object => (object) $department);
     }
 
     /** @return Collection<int, object> */
     public function regions(): Collection
     {
-        return $this->pages()['regions'];
+        return collect($this->pages()['regions'])->map(fn (array $region): object => (object) $region);
     }
 
     public function departmentForSlug(string $slug): ?object
@@ -57,7 +57,7 @@ class GeographicPageResolver
         });
     }
 
-    /** @return array{departments:Collection<int, object>,regions:Collection<int, object>} */
+    /** @return array{departments:list<array<string,mixed>>,regions:list<array<string,mixed>>} */
     private function pages(): array
     {
         return Cache::rememberForever(self::CACHE_KEY, function (): array {
@@ -86,12 +86,12 @@ class GeographicPageResolver
             }
 
             return [
-                'departments' => collect($departments)->map(fn (array $department): object => (object) $department)->sortBy('name')->values(),
-                'regions' => collect($regions)->map(function (array $region): object {
+                'departments' => collect($departments)->sortBy('name')->values()->all(),
+                'regions' => collect($regions)->map(function (array $region): array {
                     $region['department_codes'] = array_values($region['department_codes']);
 
-                    return (object) $region;
-                })->sortBy('name')->values(),
+                    return $region;
+                })->sortBy('name')->values()->all(),
             ];
         });
     }
