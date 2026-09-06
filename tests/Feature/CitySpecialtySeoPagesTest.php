@@ -13,8 +13,8 @@ class CitySpecialtySeoPagesTest extends TestCase
 
     public function test_only_an_explicitly_open_city_specialty_is_a_public_seo_landing_page(): void
     {
-        $burger = Category::create(['name' => 'Burger', 'slug' => 'burger']);
-        $indienne = Category::create(['name' => 'Indienne', 'slug' => 'indienne']);
+        $burger = $this->specialty('Burger', 'burger');
+        $indienne = $this->specialty('Indienne', 'indienne');
         $marseilleBurger = $this->published('Marseille Burger', 'marseille-burger', 'Marseille', '13206', $burger);
         $this->published('Marseille Indienne', 'marseille-indienne', 'Marseille', '13206', $indienne);
 
@@ -56,7 +56,7 @@ class CitySpecialtySeoPagesTest extends TestCase
 
     public function test_filters_remain_usable_when_a_matching_facet_is_closed_and_an_open_facet_can_use_its_canonical_url(): void
     {
-        $burger = Category::create(['name' => 'Burger', 'slug' => 'burger']);
+        $burger = $this->specialty('Burger', 'burger');
         $restaurant = $this->published('Burger Marseille', 'burger-marseille', 'Marseille', '13206', $burger);
 
         $this->get('/restaurants?ville=marseille&categories[]=burger')->assertOk()->assertSee($restaurant->name);
@@ -68,7 +68,7 @@ class CitySpecialtySeoPagesTest extends TestCase
 
     public function test_precise_city_resolver_is_reused_for_paris_lyon_and_homonymous_city_facets(): void
     {
-        $burger = Category::create(['name' => 'Burger', 'slug' => 'burger']);
+        $burger = $this->specialty('Burger', 'burger');
         $this->published('Paris Burger', 'paris-burger', 'Paris', '75111', $burger);
         $this->published('Lyon Burger', 'lyon-burger', 'Lyon', '69381', $burger);
         $north = $this->published('Saint-Denis 93 Burger', 'saint-denis-93-burger', 'Saint-Denis', '93066', $burger);
@@ -87,8 +87,8 @@ class CitySpecialtySeoPagesTest extends TestCase
     public function test_admin_explores_sparse_city_specialty_opportunities_and_only_persists_configuration(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
-        $burger = Category::create(['name' => 'Burger', 'slug' => 'burger']);
-        $indienne = Category::create(['name' => 'Indienne', 'slug' => 'indienne']);
+        $burger = $this->specialty('Burger', 'burger');
+        $indienne = $this->specialty('Indienne', 'indienne');
         $this->published('Marseille Burger', 'admin-marseille-burger', 'Marseille', '13206', $burger);
         $this->published('Paris Indienne', 'admin-paris-indienne', 'Paris', '75056', $indienne);
 
@@ -112,5 +112,10 @@ class CitySpecialtySeoPagesTest extends TestCase
         $restaurant->categories()->attach($category);
 
         return $restaurant;
+    }
+
+    private function specialty(string $name, string $slug): Category
+    {
+        return Category::create(['legacy_term_id' => 20000 + Category::count(), 'name' => $name, 'slug' => $slug]);
     }
 }
