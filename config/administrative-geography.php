@@ -1,6 +1,12 @@
 <?php
 
 return [
+    // A single published page is retained when a commune and its department
+    // are the same administrative territory, rather than merely homonymous.
+    'city_department_equivalences' => [
+        '75056' => '75',
+    ],
+
     'regions' => [
         'auvergne-rhone-alpes' => 'Auvergne-Rhône-Alpes',
         'bourgogne-franche-comte' => 'Bourgogne-Franche-Comté',

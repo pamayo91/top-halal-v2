@@ -70,6 +70,14 @@ class AdministrativeGeography
         return $cityCode;
     }
 
+    public function cityAndDepartmentShareTerritory(string $cityCode, string $departmentCode): bool
+    {
+        $canonicalCode = $this->canonicalCityCode($cityCode);
+
+        return $canonicalCode !== null
+            && config("administrative-geography.city_department_equivalences.{$canonicalCode}") === $departmentCode;
+    }
+
     /** @return list<string> */
     public function sourceCityCodes(string $canonicalCityCode): array
     {

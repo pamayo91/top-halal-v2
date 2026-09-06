@@ -42,3 +42,25 @@ test('Paris remains a single URL and Corsica and DOM pages stay usable', async (
   expect(sitemap.status()).toBe(200);
   expect((await sitemap.text()).match(/<loc>[^<]*\/restos\/paris<\/loc>/g)?.length).toBe(1);
 });
+
+test('a department with a distinct homonymous city uses its code suffix', async ({ page }) => {
+  for (const [citySlug, departmentSlug] of [
+    ['indre', 'indre-36'],
+    ['mayenne', 'mayenne-53'],
+    ['vienne', 'vienne-86'],
+  ]) {
+    const city = await page.goto(`/restos/${citySlug}`);
+    expect(city?.status()).toBe(200);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`/restos/${citySlug}$`));
+
+    const department = await page.goto(`/restos/${departmentSlug}`);
+    expect(department?.status()).toBe(200);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`/restos/${departmentSlug}$`));
+  }
+
+  const sitemap = await page.request.get('/sitemap.xml');
+  const body = await sitemap.text();
+  for (const slug of ['indre-36', 'mayenne-53', 'vienne-86']) {
+    expect(body).toContain(`/restos/${slug}</loc>`);
+  }
+});

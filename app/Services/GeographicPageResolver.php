@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 /** Builds only the administrative landing pages represented by published structured communes. */
 class GeographicPageResolver
 {
-    private const CACHE_KEY = 'public-administrative-pages-v1';
+    private const CACHE_KEY = 'public-administrative-pages-v3';
 
     public function __construct(
         private readonly AdministrativeGeography $administrative,
@@ -63,7 +63,9 @@ class GeographicPageResolver
         return Cache::rememberForever(self::CACHE_KEY, function (): array {
             $departments = [];
 
-            foreach ($this->cities->cities() as $city) {
+            $cities = $this->cities->cities();
+
+            foreach ($cities as $city) {
                 $code = $city->department['code'];
                 $departments[$code] ??= [
                     ...$city->department,
@@ -72,6 +74,16 @@ class GeographicPageResolver
                 ];
                 $departments[$code]['restaurants_count'] += $city->restaurants_count;
             }
+
+            $citiesBySlug = $cities->keyBy('slug');
+            foreach ($departments as &$department) {
+                $city = $citiesBySlug->get($department['slug']);
+
+                if ($city !== null && ! $this->administrative->cityAndDepartmentShareTerritory($city->city_code, $department['code'])) {
+                    $department['slug'] .= '-'.$department['code'];
+                }
+            }
+            unset($department);
 
             $regions = [];
             foreach ($departments as $department) {
@@ -95,4 +107,5 @@ class GeographicPageResolver
             ];
         });
     }
+
 }
