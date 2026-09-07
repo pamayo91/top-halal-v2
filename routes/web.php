@@ -112,4 +112,5 @@ Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name
 Route::get('/specialites/{slug}', [PublicContentController::class, 'category'])->name('categories.show');
 Route::get('/service/{slug}', [PublicContentController::class, 'feature'])->name('features.show');
 Route::post('/{slug}/commentaires', [PublicContentController::class, 'storeComment'])->middleware('throttle:10,1')->where('slug', '[a-z0-9-]+')->name('editorial.comments.store');
+Route::post('/{slug}/signaler-une-erreur', [PublicContentController::class, 'storeEditorialReport'])->middleware('throttle:5,1')->where('slug', '[a-z0-9-]+')->name('editorial.reports.store');
 Route::get('/{slug}', [PublicContentController::class, 'editorial'])->where('slug', '[a-z0-9-]+')->name('editorial.show');

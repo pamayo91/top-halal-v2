@@ -75,6 +75,7 @@ Authenticated BO test access: the local-only `PREPROD_ADMIN_EMAIL` / `PREPROD_AD
 | Auto-géocodage GPS manquants | DONE (Phase 6A.2) | Après suppression manuelle des dernières fiches non géocodables, les 7 683 restaurants actifs possèdent tous un GPS. La repasse idempotente n’a ajouté ni modifié aucune coordonnée. Rapport : `docs/generated/missing-gps-autogeocoding-report.md`. |
 | Corbeille restaurants | DONE | La suppression admin est un soft delete réversible, avec restauration, suppression définitive et vidage audité de la Corbeille. Les anciennes fiches archivées ont été déplacées dans cette Corbeille. |
 | Enrichissement web restaurants | DONE (reprise contrôlée) | Checkpoints persistants, réservation de batch, preuves web privées, rapports CSV et garde-fous fermeture. Le batch réservé des IDs 172–271 est clôturé et consolidé dans `docs/generated/web-enrichment/batch-20260831-075919-consolidated.csv`; les alertes fermeture/conflit restent sans modification automatique. |
+| Sidebar éditoriale Articles / Pages | IN PROGRESS | Moteur Blade SSR commun, configurations globales distinctes et overrides sparse ajoutés ; validation préproduction restante. |
 | Advertising | TODO | Native/sponsored placements |
 | Email | DONE (transactional preprod) | Laravel queued notifications, signed verification/reset, claims and technical test command validated; no real-recipient campaign. |
 | AI provider abstraction | TODO | OpenAI + alternative providers |

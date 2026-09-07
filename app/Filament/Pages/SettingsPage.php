@@ -3,6 +3,8 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
+use App\Filament\Support\EditorialSidebarFields;
+use App\Services\EditorialSidebar;
 use App\Services\{AdminAudit, NearbyCityService};
 use Filament\Forms\Components\{TextInput, Toggle};
 use Filament\Notifications\Notification;
@@ -32,6 +34,8 @@ class SettingsPage extends Page
             'ai_disclosure_default' => $settings['ai_disclosure_default']['enabled'] ?? false,
             'city_nearby_radius_km' => $settings['city_nearby_radius_km']['value'] ?? NearbyCityService::DEFAULT_RADIUS_KM,
             'city_nearby_maximum' => $settings['city_nearby_maximum']['value'] ?? NearbyCityService::DEFAULT_LIMIT,
+            'editorial_sidebar_articles' => $settings['editorial_sidebar_articles'] ?? ['blocks' => app(EditorialSidebar::class)->global('articles')],
+            'editorial_sidebar_pages' => $settings['editorial_sidebar_pages'] ?? ['blocks' => app(EditorialSidebar::class)->global('pages')],
         ]);
     }
 
@@ -55,6 +59,8 @@ class SettingsPage extends Page
                         ->label('Nombre maximum de villes proches')
                         ->integer()->minValue(1)->maxValue(NearbyCityService::MAX_LIMIT)->required(),
                 ]),
+            EditorialSidebarFields::section('editorial_sidebar_articles', 'Sidebar éditoriale — Articles')->description('Configuration par défaut des Articles. Les Articles affichent la sidebar sauf override explicite.'),
+            EditorialSidebarFields::section('editorial_sidebar_pages', 'Sidebar éditoriale — Pages')->description('Configuration utilisée seulement lorsqu’une Page active explicitement sa sidebar.'),
         ])->statePath('data');
     }
 
@@ -64,11 +70,12 @@ class SettingsPage extends Page
 
         foreach ($data as $key => $value) {
             $nearbySetting = in_array($key, ['city_nearby_radius_km', 'city_nearby_maximum'], true);
+            $sidebarSetting = in_array($key, ['editorial_sidebar_articles', 'editorial_sidebar_pages'], true);
             Setting::updateOrCreate(
                 ['key' => $key],
                 [
-                    'value' => $nearbySetting ? ['value' => (int) $value] : (is_bool($value) ? ['enabled' => $value] : ['text' => $value]),
-                    'group' => $nearbySetting ? 'seo' : 'general',
+                    'value' => $sidebarSetting ? ['blocks' => app(EditorialSidebar::class)->normalize((array) ($value['blocks'] ?? []))] : ($nearbySetting ? ['value' => (int) $value] : (is_bool($value) ? ['enabled' => $value] : ['text' => $value])),
+                    'group' => $sidebarSetting ? 'editorial' : ($nearbySetting ? 'seo' : 'general'),
                 ],
             );
         }
