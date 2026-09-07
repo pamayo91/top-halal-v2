@@ -6,6 +6,7 @@ use App\Services\Geocoding\GeocodingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class GeocodingPilotCommand extends Command
 {
@@ -53,5 +54,6 @@ class GeocodingPilotCommand extends Command
     }
     private function parts(string $a): array { return preg_match('/\\b((?:0[1-9]|[1-8]\\d|9[0-5]|97[1-8]|98[0-8])\\d{3})\\s+([^,;\\n]+)\\s*$/u',trim($a),$m) ? [$m[1],trim($m[2])] : [null,null]; }
     private function hasAddress($r): bool { return trim((string) $r->address) !== ''; }
+    private function normal(?string $v): string { return preg_replace('/[^a-z0-9]/','',Str::ascii(Str::lower(trim((string)$v)))) ?: ''; }
     public function distance(float $a,float $b,float $c,float $d): float { $x=sin(deg2rad($a))*sin(deg2rad($c))+cos(deg2rad($a))*cos(deg2rad($c))*cos(deg2rad($d-$b)); return 6371000*acos(min(1,max(-1,$x))); }
 }
