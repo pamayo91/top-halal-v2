@@ -20,6 +20,10 @@ Les pages département/région sont dérivées d'un petit référentiel administ
 
 ## 2026-09-07
 
+### D028 — Filament displays and edits dates in Europe/Paris
+
+Laravel continues to store technical instants in UTC, avoiding a rewrite or reinterpretation of existing V2 timestamps. Filament's global timezone manager is explicitly set to `Europe/Paris`, so every standard date-time table column and input is converted for French back-office users, including summer/winter time changes. Components requiring an exceptional timezone must opt out explicitly and be covered by tests.
+
 ### D026 — Retire the completed legacy Geography runtime
 
 The former `locations` / `restaurant_location` taxonomy is neither a public-city source nor an administrative reference. After the completed migration, its only columns were legacy term identity, hierarchy, name and slug; current public geography uses `city_name`, canonical `city_code`, the versioned administrative resolver, `city_reference_points` and sparse SEO tables. Historical city-slug redirects are materialized in `redirect_rules`, and restaurant `legacy_wp_id` remains the reconciliation key. The obsolete tables, model, Filament resource, runtime joins and Geography-specific migration support are therefore removed by a forward-only migration; only the already-executed historical create/redirect migrations retain their references.

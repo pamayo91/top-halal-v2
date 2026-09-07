@@ -2,6 +2,7 @@
 
 ## 2026-09-07
 
+- Forced the Filament back-office date-time timezone to `Europe/Paris` for both tables and inputs, while retaining UTC technical storage and leaving existing V2 data untouched.
 - Retired the obsolete legacy Geography runtime: removed the `Location` model, restaurant relation/pivot, Filament Geography resource, legacy runtime joins and Geography-specific migration support. A forward-only migration drops `restaurant_location` then `locations` without altering restaurants, structured addresses, administrative resolution, nearby-city data, city SEO pages or facet relations.
 - Audited preproduction before the drop: the two tables held 1,971 legacy term rows and 7,613 historical links only; every linked restaurant has `city_name`, and 168 independent city-slug cutover redirects (including two approved homepage fallbacks) were already materialized in `redirect_rules`.
 

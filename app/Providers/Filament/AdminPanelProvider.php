@@ -12,6 +12,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\Support\Facades\FilamentTimezone;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -24,6 +25,10 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        // Persist technical instants in UTC, but present and edit all back-office
+        // date-times in the application's French business timezone.
+        FilamentTimezone::set('Europe/Paris');
+
         return $panel->default()->id('admin')->path('admin')->login()->authGuard('web')->maxContentWidth(Width::Full)
             ->colors(['primary' => Color::Amber])->darkMode()->globalSearch()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

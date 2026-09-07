@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Support\Facades\FilamentTimezone;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
@@ -27,6 +30,13 @@ class AdminBackOfficeTest extends TestCase
         $this->withSession(['url.intended' => 'https://dev.top-halal.fr/admin'])
             ->post('/login', ['email' => $admin->email, 'password' => 'password'])
             ->assertRedirect('/admin');
+    }
+
+    public function test_back_office_forces_europe_paris_for_datetime_display_and_input(): void
+    {
+        $this->assertSame('Europe/Paris', FilamentTimezone::get());
+        $this->assertSame('Europe/Paris', TextColumn::make('created_at')->dateTime()->getTimezone());
+        $this->assertSame('Europe/Paris', DateTimePicker::make('published_at')->getTimezone());
     }
 
     public function test_admin_can_create_restaurant_without_exposing_external_url(): void
