@@ -26,7 +26,10 @@ test.describe('Médias restaurant Filament', () => {
     await expect(page.getByText('Couverture · position 1')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Monter' }).first()).toBeDisabled();
     await expect(page.getByRole('button', { name: 'Descendre' }).first()).toBeEnabled();
-    await expect(page.locator('img.object-contain').first()).toBeVisible();
+    const preview = page.locator('img.object-contain').first();
+    await expect(preview).toBeVisible();
+    await expect(preview).toHaveAttribute('width', '480');
+    await expect(preview).toHaveAttribute('height', '270');
     expect(errors).toEqual([]);
   });
 });

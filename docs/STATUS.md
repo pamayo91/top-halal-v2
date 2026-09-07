@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-07
 
-Latest back-office media: restaurant media previews now preserve the whole image rather than crop it. The first ordinary photo is visibly labelled as the cover, while explicit up/down controls persist and audit gallery order changes; specialty fallback thumbnails remain separate and cannot become a cover. The authenticated Playwright flow verifies the reported restaurant (ID 7699) exposes those controls without browser errors.
+Latest back-office media: restaurant media previews now preserve the whole image rather than crop it or upscale it: their HTML dimensions match the delivered variant (480 × 270 for restaurant 7699), rather than the 2880 × 1620 original. The first ordinary photo is visibly labelled as the cover, while explicit up/down controls persist and audit gallery order changes; specialty fallback thumbnails remain separate and cannot become a cover. The authenticated Playwright flow verifies the reported restaurant (ID 7699) exposes those controls without browser errors.
 
 Latest cleanup: the obsolete legacy Geography runtime has been removed after a preproduction data/dependency audit. `locations` (1,971 legacy-term rows) and `restaurant_location` (7,613 historical links) contained only legacy identifiers, hierarchy and labels; all linked restaurants have structured `city_name`, while the 168 city-slug cutover redirects (including two approved homepage fallbacks) already live independently in `redirect_rules`. Public city, administrative, nearby-city and sparse facet systems remain exclusively structured-data/resolver based. The forward-only migration removes both tables; historical create/cutover migrations remain for migration history only.
 

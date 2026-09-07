@@ -10,7 +10,7 @@
         @if($asset = $media->asset)
             <figure class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
                 @php($variant = $asset->variants->where('width', '>=', 480)->sortBy('width')->first() ?? $asset->variants->sortByDesc('width')->first())
-                <div class="flex aspect-[4/3] items-center justify-center bg-gray-100 p-2 dark:bg-gray-800"><img src="{{ $asset->deliveryUrl($variant?->width) }}" width="{{ $asset->width }}" height="{{ $asset->height }}" loading="lazy" class="max-h-full max-w-full object-contain" alt="{{ $asset->alt_text ?: $restaurant->name }}"></div>
+                <div class="flex aspect-[4/3] items-center justify-center bg-gray-100 p-2 dark:bg-gray-800"><img src="{{ $asset->deliveryUrl($variant?->width) }}" width="{{ $variant?->width ?? $asset->width }}" height="{{ $variant?->height ?? $asset->height }}" loading="lazy" class="max-h-full max-w-full object-contain" alt="{{ $asset->alt_text ?: $restaurant->name }}"></div>
                 <figcaption class="space-y-3 p-3 text-sm text-gray-600 dark:text-gray-300">
                     <div><strong class="text-gray-950 dark:text-white">{{ $loop->first ? 'Couverture · position 1' : 'Galerie · position '.($loop->index + 1) }}</strong>@if($asset->caption || $asset->alt_text)<span class="mt-1 block">{{ $asset->caption ?: $asset->alt_text }}</span>@endif</div>
                     <div class="flex gap-2" role="group" aria-label="Réorganiser la photo en position {{ $loop->index + 1 }}">
@@ -32,7 +32,7 @@
                 @foreach($fallbacks as $media)
                     @if($asset = $media->asset)
                         @php($variant = $asset->variants->where('width', '>=', 480)->sortBy('width')->first() ?? $asset->variants->sortByDesc('width')->first())
-                        <figure class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"><div class="flex aspect-[4/3] items-center justify-center bg-gray-100 p-2 dark:bg-gray-800"><img src="{{ $asset->deliveryUrl($variant?->width) }}" width="{{ $asset->width }}" height="{{ $asset->height }}" loading="lazy" class="max-h-full max-w-full object-contain" alt="{{ $asset->alt_text ?: $restaurant->name }}"></div><figcaption class="p-3 text-sm text-gray-600 dark:text-gray-300">Miniature de spécialité (sans couverture)</figcaption></figure>
+                        <figure class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"><div class="flex aspect-[4/3] items-center justify-center bg-gray-100 p-2 dark:bg-gray-800"><img src="{{ $asset->deliveryUrl($variant?->width) }}" width="{{ $variant?->width ?? $asset->width }}" height="{{ $variant?->height ?? $asset->height }}" loading="lazy" class="max-h-full max-w-full object-contain" alt="{{ $asset->alt_text ?: $restaurant->name }}"></div><figcaption class="p-3 text-sm text-gray-600 dark:text-gray-300">Miniature de spécialité (sans couverture)</figcaption></figure>
                     @endif
                 @endforeach
             </div>

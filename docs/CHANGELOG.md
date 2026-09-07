@@ -3,6 +3,7 @@
 ## 2026-09-07
 
 - Back-office restaurants : l’onglet Médias affiche désormais les images entières, identifie clairement la couverture et permet de réordonner la galerie avec des commandes explicites et auditées.
+- Correctif : les aperçus média utilisent maintenant les dimensions de la variante diffusée, évitant l’agrandissement d’une miniature 480 px selon les dimensions de l’original.
 
 ## 2026-09-07
 
