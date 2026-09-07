@@ -6,6 +6,8 @@
 
 Le rapprochement combine nom sans marque Quick, adresse, CP, ville, téléphone et distance GPS. Les statuts `MATCH_EXACT`, `MATCH_UPDATE`, `MATCH_PROBABLE`, `MISSING_TOP_HALAL`, `DUPLICATE_TOP_HALAL` et `HALAL_NOT_CONFIRMED` restent des propositions de revue : la commande ne crée, ne met à jour ni ne supprime jamais de fiche. Le halal n'est confirmé que lorsque les indicateurs officiels par restaurant (`halal` ou `certifHalal`) le sont; l'absence de certificateur est conservée comme telle.
 
+`restaurants:sync-quick --apply` is the explicit, idempotent write phase. It uses the private snapshot plus reviewed CSV, snapshots existing affected rows privately before changes, creates only audited `MISSING_TOP_HALAL` rows, refreshes the reviewed matches, and never creates taxonomy records. It maps only existing equivalent features and stores Quick hours under source-owned keys.
+
 ## Portée et sécurité
 
 `restaurants:web-enrich` ne modifie jamais l’identité, l’adresse, les coordonnées, les taxonomies, la publication, les claims, les avis ou les médias. Il peut uniquement ajouter des horaires absents et remplacer une description vide ou commençant (casse/espaces insensibles) par `Kebab frites de` ou `Description de votre restaurant unique`.

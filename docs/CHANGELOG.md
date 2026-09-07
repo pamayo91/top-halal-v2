@@ -240,3 +240,4 @@
 ## Unreleased
 
 - Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. The preproduction run found 198 official Quick restaurants and performed no restaurant business write.
+- Added idempotent `restaurants:sync-quick` import for the audited Quick snapshot, including official GPS/hours, existing Fast-food/category features and the ARGML certification sentence.

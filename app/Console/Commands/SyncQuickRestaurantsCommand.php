@@ -36,7 +36,8 @@ class SyncQuickRestaurantsCommand extends Command
             if($apply){ $restaurant=$restaurant->fresh(); $restaurant->categories()->syncWithoutDetaching([$fast->id]); $ids=$this->featureIds($a,$features); if($ids){$restaurant->features()->syncWithoutDetaching($ids);$summary['service_mappings']+=count($ids);} foreach($quick['quick_opening_hours'] as $day=>$range) $this->hour($restaurant,$slug,$day,$range); }
             $summary[$new?'created':($before?'updated':'unchanged')]++; if(($auditRow['match_status']??'')==='MATCH_PROBABLE')$summary['probable_resolved']++; $summary['argml_descriptions']++;
         } catch(\Throwable $e) {$summary['errors']++;$this->error(($quick['quick_slug']??'?').': '.$e->getMessage());}
-        $summary['fast_food']= $apply ? Restaurant::whereIn('slug',collect($data)->map(fn($q)=>'quick-'.$q['quick_slug']))->whereHas('categories',fn($q)=>$q->whereKey($fast->id))->count()+$auditBySlug->pluck('top_halal_restaurant_id')->filter()->unique()->count() : 0;
+        $reviewedIds=$auditBySlug->filter(fn($row)=>in_array($row['match_status']??'', ['MATCH_EXACT','MATCH_UPDATE','MATCH_PROBABLE'], true))->pluck('top_halal_restaurant_id')->filter()->unique();
+        $summary['fast_food']= $apply ? Restaurant::where(fn($q)=>$q->whereIn('slug',collect($data)->map(fn($item)=>'quick-'.$item['quick_slug']))->orWhereIn('id',$reviewedIds))->whereHas('categories',fn($q)=>$q->whereKey($fast->id))->count() : 0;
         File::put(base_path((string)$this->option('out')),"# Import Quick\n\nMode: `".($apply?'apply':'dry-run')."`\n\n".collect($summary)->map(fn($v,$k)=>"- {$k}: **{$v}**")->implode("\n")."\n");
         $this->info(json_encode($summary)); return $summary['errors']?self::FAILURE:self::SUCCESS;
     }
