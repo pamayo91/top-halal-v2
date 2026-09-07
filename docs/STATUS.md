@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-07
 
+Latest back-office media: restaurant media previews now preserve the whole image rather than crop it. The first ordinary photo is visibly labelled as the cover, while explicit up/down controls persist and audit gallery order changes; specialty fallback thumbnails remain separate and cannot become a cover.
+
 Latest cleanup: the obsolete legacy Geography runtime has been removed after a preproduction data/dependency audit. `locations` (1,971 legacy-term rows) and `restaurant_location` (7,613 historical links) contained only legacy identifiers, hierarchy and labels; all linked restaurants have structured `city_name`, while the 168 city-slug cutover redirects (including two approved homepage fallbacks) already live independently in `redirect_rules`. Public city, administrative, nearby-city and sparse facet systems remain exclusively structured-data/resolver based. The forward-only migration removes both tables; historical create/cutover migrations remain for migration history only.
 
 Latest Quick audit: completed on preproduction with no restaurant business write detected. Quick's official server-rendered Next.js directory payload yielded 198 restaurants, all explicitly marked halal in the per-restaurant source rows; 2 are exact V2 matches, 7 are update proposals, 3 remain probable, 186 are missing, and no duplicate or scrape error was found. The reusable command retains its raw snapshot privately under `storage/app/audits/quick/`; versioned summaries are `docs/generated/quick-restaurants-audit.csv` and `.md`.
