@@ -25,7 +25,10 @@ class EditorialSidebarTest extends TestCase
         $article = $this->article(['editorial_sidebar_overrides' => ['blocks' => [['type' => 'articles', 'title' => 'Sélection', 'limit' => 2]]]]);
 
         $block = collect(app(EditorialSidebar::class)->for($article)['blocks'])->firstWhere('type', 'articles');
-        self::assertSame(['enabled' => true, 'title' => 'Sélection', 'limit' => 2, 'order' => 4], collect($block)->only(['enabled', 'title', 'limit', 'order'])->all());
+        self::assertTrue($block['enabled']);
+        self::assertSame('Sélection', $block['title']);
+        self::assertSame(2, $block['limit']);
+        self::assertSame(4, $block['order']);
     }
 
     public function test_table_of_contents_anchors_are_deterministic_and_unique(): void
