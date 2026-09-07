@@ -6,6 +6,8 @@ Latest cleanup: the obsolete legacy Geography runtime has been removed after a p
 
 Latest Quick audit: completed on preproduction with no restaurant business write detected. Quick's official server-rendered Next.js directory payload yielded 198 restaurants, all explicitly marked halal in the per-restaurant source rows; 2 are exact V2 matches, 7 are update proposals, 3 remain probable, 186 are missing, and no duplicate or scrape error was found. The reusable command retains its raw snapshot privately under `storage/app/audits/quick/`; versioned summaries are `docs/generated/quick-restaurants-audit.csv` and `.md`.
 
+Latest Quick sync: 186 official Quick restaurants were created and 12 reviewed matches (including the three formerly probable matches) were refreshed on preproduction. All 198 are assigned to existing `Fast-food`, with only existing feature mappings; all retain the official ARGML sentence. The immediate second run created and changed zero restaurant rows.
+
 Latest back-office timezone: Filament explicitly presents and edits date-times in `Europe/Paris`, including daylight-saving transitions. Laravel technical instants remain UTC; no existing V2 data was rewritten.
 
 Latest: city + service SEO facets now reuse the sparse specialty-facet engine and the existing `restaurant_feature` relation. `city_service_seo_pages` stays empty until an administrator configures a combination; only open rows become canonical, indexable, sitemapable SSR landings and city links. The shared Facettes SEO screen switches between Specialty and Service opportunities without rendering a city × term matrix. The V2 category/service slug audit found no collision.
