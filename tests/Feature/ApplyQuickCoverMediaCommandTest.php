@@ -12,7 +12,7 @@ class ApplyQuickCoverMediaCommandTest extends TestCase
 
     public function test_it_normalizes_and_assigns_a_standard_cover_relation_idempotently(): void
     {
-        $restaurant = Restaurant::factory()->create(['slug' => 'quick-test', 'legacy_wp_id' => null]);
+        $restaurant = Restaurant::create(['name' => 'Quick test', 'slug' => 'quick-test', 'legacy_wp_id' => null, 'status' => 'published']);
         $source = storage_path('app/private/test-quick-logo.png'); $output = storage_path('app/private/test-quick-logo.webp');
         @mkdir(dirname($source), 0777, true); $image = imagecreatetruecolor(1600, 1200); imagepng($image, $source); imagedestroy($image);
         $arguments = ['--apply' => true, '--source' => $source, '--output' => $output, '--report' => 'docs/generated/test-quick-cover.md'];
