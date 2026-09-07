@@ -11,7 +11,7 @@ class QuickRestaurantMatcher
     public function normalise(?string $value, bool $stripQuick = false): string
     {
         $value = Str::ascii(Str::lower(trim((string) $value)));
-        if ($stripQuick) $value = preg_replace('/^quick(?: restaurant)?\s*/', '', $value);
+        if ($stripQuick) $value = preg_replace('/^quick(?: restaurant)?(?:\s+hal+al)?\s*/', '', $value);
         return preg_replace('/[^a-z0-9]+/', '', $value) ?: '';
     }
 

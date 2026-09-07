@@ -15,7 +15,7 @@ class QuickRestaurantMatcherTest extends TestCase
     public function test_it_normalises_accents_punctuation_and_quick_prefixes(): void
     {
         $matcher=new QuickRestaurantMatcher;
-        $this->assertSame('parisopera',$matcher->normalise(' Quick Restaurant Paris-Opéra ',true));
+        $this->assertSame('parisopera',$matcher->normalise(' Quick Hallal Paris-Opéra ',true));
     }
     public function test_it_detects_an_exact_match_despite_address_formatting(): void { $this->assertSame('MATCH_EXACT',(new QuickRestaurantMatcher)->match($this->quick(),collect([$this->restaurant()]))['status']); }
     public function test_it_detects_an_update_for_a_strong_match_with_a_changed_name(): void
