@@ -37,6 +37,7 @@ Thumbs.db
 
 # Generated audit scratch files
 /docs/generated/server-audit-*.txt
+/storage/app/audits/quick/
 
 # Python
 __pycache__/

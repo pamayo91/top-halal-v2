@@ -236,3 +236,7 @@
 
 - Refonte de la recherche publique en composant SSR réutilisable à deux champs : villes issues de `city_name`, autocomplete limité de villes/spécialités/restaurants, priorité de ville, navigation directe vers la fiche et proximité déclenchée uniquement après choix volontaire.
 - Les recherches combinées conservent le moteur de filtres et la politique `noindex,follow`; une ville seule mène à la page `/restos/{slug}` correspondante.
+
+## Unreleased
+
+- Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. It never writes restaurant business data.
