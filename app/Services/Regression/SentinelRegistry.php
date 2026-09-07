@@ -61,7 +61,7 @@ class SentinelRegistry
             return;
         }
 
-        $restaurant->load(['media.asset.variants', 'categories', 'features', 'locations', 'reviews', 'openingHours']);
+        $restaurant->load(['media.asset.variants', 'categories', 'features', 'reviews', 'openingHours']);
         $routePath = $public ? '/resto/'.$restaurant->slug : null;
         $sentinels[$key] = ['subject_type' => 'restaurant', 'subject_id' => $restaurant->id, 'route_path' => $routePath, 'baseline' => [
             'id' => $restaurant->id,
@@ -70,7 +70,6 @@ class SentinelRegistry
             'status' => $restaurant->status,
             'categories' => $restaurant->categories->pluck('id')->sort()->values()->all(),
             'features' => $restaurant->features->pluck('id')->sort()->values()->all(),
-            'locations' => $restaurant->locations->pluck('id')->sort()->values()->all(),
             'reviews' => $restaurant->reviews->pluck('id')->sort()->values()->all(),
             'opening_hours' => $restaurant->openingHours->pluck('id')->sort()->values()->all(),
             'address' => $restaurant->only(['address_line1', 'address_line2', 'postal_code', 'city_name', 'city_code', 'country_code', 'latitude', 'longitude']),
@@ -187,8 +186,8 @@ class SentinelRegistry
     /** @param array<string, mixed> $baseline @param array<int, string> $errors @param array<int, string> $mediaUrls */
     private function verifyRestaurant(string $key, Restaurant $restaurant, array $baseline, array &$errors, array &$mediaUrls): void
     {
-        $restaurant->load(['media.asset.variants', 'categories', 'features', 'locations', 'reviews', 'openingHours']);
-        foreach (['categories' => 'categories', 'features' => 'features', 'locations' => 'locations', 'reviews' => 'reviews', 'opening_hours' => 'openingHours'] as $baselineKey => $relation) {
+        $restaurant->load(['media.asset.variants', 'categories', 'features', 'reviews', 'openingHours']);
+        foreach (['categories' => 'categories', 'features' => 'features', 'reviews' => 'reviews', 'opening_hours' => 'openingHours'] as $baselineKey => $relation) {
             $actual = $restaurant->{$relation}->pluck('id')->sort()->values()->all();
             if ($actual !== ($baseline[$baselineKey] ?? [])) $errors[] = "{$key}: {$baselineKey} relation changed unexpectedly.";
         }

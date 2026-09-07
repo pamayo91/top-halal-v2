@@ -41,8 +41,8 @@
 - Legacy post `27` has four inline references (`rouleaux-300x225.jpg`, `img_0147.jpg`, `img_0150.jpg`, `img_0149.jpg`). Their attachment rows and physical sources are absent, so each is an explicit `missing_physical_source` anomaly and no V2 relation is invented.
 
 ### Restaurant pilot implementation
-- V2 uses compact `categories`, `features` and hierarchical `locations` tables rather than separate region/department/city tables. A location parent preserves legacy WordPress hierarchy where available.
-- `restaurant_category`, `restaurant_feature` and `restaurant_location` preserve many-to-many ListingPro terms.
+- Historical pilot only: V2 initially kept compact category, feature and hierarchical Geography tables. The obsolete Geography tables and pivot were retired after the completed migration; current city/department/region resolution uses structured restaurant data and the versioned administrative reference.
+- `restaurant_category` and `restaurant_feature` preserve the active many-to-many ListingPro terms.
 - `restaurant_opening_hours` stores recognized ListingPro schedules and retains only the technical legacy key alongside parsed times; no raw contact data is exported in reports.
 - `restaurant_media` records gallery attachment IDs and legacy paths as pending reconciliation, without copying uploads or exposing legacy source URLs.
 - The validated pilot selection is `13453`, `13454`, `13455`, `13456`, `13457`, `13465`, `13567`, `21293`, `21333`, `22184`. It covers published, pending, claimed, multiple-category, multiple-feature, gallery, GPS and unusual ListingPro metadata cases.

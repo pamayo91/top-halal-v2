@@ -26,7 +26,7 @@ Preproduction verification on 2026-08-25 confirmed all of the above. No WordPres
 ## Core mapping
 - WordPress posts of ListingPro listing type -> restaurants.
 - ListingPro listing meta/options -> restaurant details.
-- listing categories/features/locations -> normalized V2 taxonomies/geography.
+- listing categories/features -> normalized V2 taxonomies; historical Geography terms were retired after migration and are not a runtime dependency.
 - `lp-reviews` and rating metadata -> restaurant reviews.
 - legitimate WordPress comments -> editorial comments; exclude spam.
 - WordPress users -> V2 users as applicable.

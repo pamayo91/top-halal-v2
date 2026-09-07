@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Location;
 use App\Models\Restaurant;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -27,8 +26,6 @@ class AuditAddressesCommandTest extends TestCase
         DB::connection('audit_legacy')->table('posts')->insert(['ID' => 77, 'post_type' => 'listing']);
         DB::connection('audit_legacy')->table('postmeta')->insert(['post_id' => 77, 'meta_key' => 'lp_listingpro_options', 'meta_value' => 'x']);
         $restaurant = Restaurant::create(['legacy_wp_id' => 77, 'name' => 'Audit', 'slug' => 'audit', 'status' => 'published', 'address' => '1 rue Test', 'postal_code' => '75001', 'city_name' => 'Paris', 'latitude' => '48.8566000', 'longitude' => '2.3522000']);
-        $location = Location::create(['legacy_term_id' => 8, 'name' => 'Paris', 'slug' => 'paris']);
-        $restaurant->locations()->attach($location);
         $beforeRestaurant = $restaurant->fresh()->getAttributes(); $beforeLegacy = DB::connection('audit_legacy')->table('postmeta')->get()->map(fn ($x) => (array) $x)->all();
         $out = 'docs/generated/testing-address-audit.md'; $csv = 'docs/generated/testing-address-sample.csv';
         $this->artisan('data:audit-addresses', ['--legacy-connection' => 'audit_legacy', '--out' => $out, '--sample-out' => $csv])->assertSuccessful();
