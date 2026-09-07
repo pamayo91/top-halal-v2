@@ -8,10 +8,10 @@ class CleanUpLegacyQuickRestaurantsCommand extends Command {
  protected $signature='restaurants:cleanup-legacy-quick {--apply} {--out=docs/generated/quick-legacy-cleanup.md}';
  protected $description='Retire des parcours publics les anciennes fiches Quick absentes du référentiel officiel.';
  public function handle():int {
-  $current=Restaurant::query()->where('slug','like','quick-%')->get();
+  $current=Restaurant::query()->whereNull('legacy_wp_id')->where('slug','like','quick-%')->get();
   $reviewed=collect(array_map('str_getcsv',file(base_path('docs/generated/quick-restaurants-audit.csv'))));$head=$reviewed->shift();$ids=$reviewed->map(fn($r)=>array_combine($head,$r))->filter(fn($r)=>in_array($r['match_status'],['MATCH_EXACT','MATCH_UPDATE','MATCH_PROBABLE']))->pluck('top_halal_restaurant_id')->filter();
   $current=$current->merge(Restaurant::whereIn('id',$ids)->get())->keyBy('id');
-  $old=Restaurant::query()->whereNotNull('legacy_wp_id')->where('name','like','%quick%')->whereNotIn('id',$current->keys())->get();
+  $old=Restaurant::query()->whereNotNull('legacy_wp_id')->whereRaw("LOWER(name) REGEXP '(^| )quick( |$)'")->whereNotIn('id',$current->keys())->get();
   $summary=['legacy_found'=>$old->count(),'current'=>$current->count(),'replaced'=>0,'obsolete'=>0,'deactivated'=>0,'redirects_created'=>0,'anomalies'=>0];$lines=['# Nettoyage anciens Quick',''];
   foreach($old as $legacy){$matches=$current->filter(fn($r)=>$this->n($r->postal_code)===$this->n($legacy->postal_code)&&$this->n($r->city_name)===$this->n($legacy->city_name));$target=$matches->count()===1?$matches->first():null;$kind=$target?'replaced':'obsolete';$summary[$kind]++;
    if($this->option('apply')){if($target){RedirectRule::updateOrCreate(['source_path'=>'/resto/'.$legacy->slug,'match_type'=>'exact','query_pattern'=>null],['destination'=>'/resto/'.$target->slug,'status_code'=>301,'preserve_query'=>false,'priority'=>100,'is_active'=>true,'origin'=>'quick_cleanup','source_rule'=>'Official Quick replacement']);$summary['redirects_created']++;}$legacy->delete();$summary['deactivated']++;}
