@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\{Article, Category, Comment, Feature, Location, Page, Restaurant, RestaurantReview, User};
+use App\Models\{Article, Category, Comment, Feature, Page, Restaurant, RestaurantReview, User};
 use App\Services\TextNormalizer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -19,7 +19,7 @@ class AuditTextEncodingCommand extends Command
             Article::class => ['original_title', 'title', 'excerpt', 'seo_title', 'seo_description'],
             Page::class => ['original_title', 'title', 'excerpt', 'seo_title', 'seo_description'],
             Comment::class => ['author_name', 'author_email', 'content'], RestaurantReview::class => ['author_name', 'author_email', 'title', 'content'],
-            User::class => ['name', 'email'], Category::class => ['name', 'slug'], Feature::class => ['name', 'slug'], Location::class => ['name', 'slug'],
+            User::class => ['name', 'email'], Category::class => ['name', 'slug'], Feature::class => ['name', 'slug'],
         ];
         $detected = $corrected = $ambiguous = 0; $examples = [];
         foreach ($targets as $model => $columns) {

@@ -5,7 +5,7 @@ Restaurant records migrate from ListingPro listings and keep `legacy_wp_id`.
 Suggested core data includes name/slug/description/status/owner, address/postcode/city/geolocation, contact info, pricing, halal/certification information, social/website URLs (private from crawlable public markup), media, hours, categories/features, verification/claim status and SEO fields.
 
 ## Geography
-`city_code` est l'identifiant unique de la commune ; `city_name` est son libellé public. Les pages ville, département et région utilisent un référentiel administratif local versionné qui résout ce code, sans réutiliser `locations`/`restaurant_location`, sans appel distant et sans dupliquer département ou région dans chaque restaurant. Les cas Paris/Lyon/Marseille, 2A/2B et DOM/COM sont traités dans ce référentiel. Les coordonnées restent disponibles pour les recherches spatiales/distance de MariaDB.
+`city_code` est l'identifiant unique de la commune ; `city_name` est son libellé public. Les pages ville, département et région utilisent un référentiel administratif local versionné qui résout ce code, sans appel distant et sans dupliquer département ou région dans chaque restaurant. Les cas Paris/Lyon/Marseille, 2A/2B et DOM/COM sont traités dans ce référentiel. Les coordonnées restent disponibles pour les recherches spatiales/distance de MariaDB.
 
 ## Structured address contract
 
@@ -19,7 +19,7 @@ Suggested core data includes name/slug/description/status/owner, address/postcod
 - Public restaurant pages and JSON-LD use only `address_line1`, `postal_code` and `city_name` whenever structured fields exist; they must not expose the historical/raw `address` in that case.
 
 ## Controlled legacy migration
-- The pilot schema uses `restaurants`, `categories`, `features`, hierarchical `locations`, their pivots, `restaurant_opening_hours` and `restaurant_media`.
+- Historical note: the completed pilot originally used legacy hierarchical Geography terms. The runtime schema and migration tooling now retain only `restaurants`, V2 categories/features, `restaurant_opening_hours` and `restaurant_media`.
 - Each imported entity keeps its WordPress identifier (`legacy_wp_id`, `legacy_term_id` or `legacy_attachment_id`).
 - `legacy:migrate-restaurants` is read-only on `legacy_wp`; its default and `--dry-run` modes write no V2 data. `--apply --limit=10` is the only currently supported write mode.
 - Missing gallery, hours, coordinates or location terms are reported record-by-record. Hours are only persisted when ListingPro contains an enabled, parseable value; no schedule is inferred.

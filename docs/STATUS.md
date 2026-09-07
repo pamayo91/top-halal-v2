@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-06
+Last updated: 2026-09-07
+
+Latest cleanup: the obsolete legacy Geography runtime has been removed after a preproduction data/dependency audit. `locations` (1,971 legacy-term rows) and `restaurant_location` (7,613 historical links) contained only legacy identifiers, hierarchy and labels; all linked restaurants have structured `city_name`, while the 168 city-slug cutover redirects (including two approved homepage fallbacks) already live independently in `redirect_rules`. Public city, administrative, nearby-city and sparse facet systems remain exclusively structured-data/resolver based. The forward-only migration removes both tables; historical create/cutover migrations remain for migration history only.
 
 Latest: city + service SEO facets now reuse the sparse specialty-facet engine and the existing `restaurant_feature` relation. `city_service_seo_pages` stays empty until an administrator configures a combination; only open rows become canonical, indexable, sitemapable SSR landings and city links. The shared Facettes SEO screen switches between Specialty and Service opportunities without rendering a city × term matrix. The V2 category/service slug audit found no collision.
 
@@ -32,7 +34,7 @@ Authenticated BO test access: the local-only `PREPROD_ADMIN_EMAIL` / `PREPROD_AD
 | App DB connection | DONE | Preprod `.env` configured server-side only; `meyo5199_top_halal_v2` read/write verified with the dedicated app user |
 | Legacy DB connection | DONE | Existing `meyo5199_th` database uses dedicated SELECT-only user and WordPress prefix `tp_`; SELECT works and INSERT/UPDATE/DELETE/ALTER/DROP are denied |
 | Migration: restaurants | DONE (pilot) | Ten deterministic listings migrated and idempotence verified. Opening-hours audit found no usable legacy schedule; no full import authorized. |
-| Migration: taxonomies/geography | DONE (pilot) | Categories, features and hierarchical locations migrated only for the ten restaurant records. |
+| Migration: taxonomies/geography | RETIRED | Historical pilot Geography terms were removed after audit; active taxonomy relations are categories and features only. |
 | Migration: articles/pages | DONE (pilot) | Five posts and five pages migrated idempotently; PHP and Playwright desktop/mobile validations are green. |
 | Migration: comments | DONE (pilot) | Aggregate audit completed; ten deterministic approved/pending editorial comments migrated idempotently to migrated articles/pages only. Spam, pingbacks, reviews and all non-pilot comments remain untouched. |
 | Migration: reviews | DONE (pilot) | Eight deterministic ListingPro reviews migrated idempotently; three malformed/unrated links reported and skipped. |

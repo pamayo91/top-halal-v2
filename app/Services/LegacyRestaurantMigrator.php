@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Feature;
-use App\Models\Location;
 use App\Models\Restaurant;
 use App\Models\RestaurantMedia;
 use Illuminate\Database\ConnectionInterface;
@@ -64,20 +63,16 @@ class LegacyRestaurantMigrator
             ->join($prefix.'term_taxonomy as taxonomy', 'taxonomy.term_taxonomy_id', '=', 'relationship.term_taxonomy_id')
             ->join($prefix.'terms as term', 'term.term_id', '=', 'taxonomy.term_id')
             ->where('relationship.object_id', $legacyId)
-            ->whereIn('taxonomy.taxonomy', ['listing-category', 'features', 'location'])
+            ->whereIn('taxonomy.taxonomy', ['listing-category', 'features'])
             ->select('term.term_id', 'term.name', 'term.slug', 'taxonomy.taxonomy', 'taxonomy.parent')
             ->orderBy('taxonomy.taxonomy')->orderBy('term.term_id')->get();
         $attachments = $this->attachments($connection, $prefix, $meta['gallery_image_ids'] ?? '');
-        if ($terms->where('taxonomy', 'location')->contains(fn ($term) => app(TaxonomyValueClassifier::class)->isMalicious($term->name))) {
-            $anomalies[] = 'malicious_location_term_excluded';
-        }
         $flat = $this->flattenMeta($meta);
         $anomalies = [];
         $description = $this->plainDescription((string) $post->post_content, $anomalies);
         $slug = $this->slug((string) $post->post_name, (string) $post->post_title, $legacyId, $anomalies);
         $coordinates = $this->coordinates($flat);
         if ($coordinates['latitude'] === null || $coordinates['longitude'] === null) $anomalies[] = 'missing_or_invalid_coordinates';
-        if ($terms->where('taxonomy', 'location')->isEmpty()) $anomalies[] = 'no_legacy_location_term';
         if ($attachments === []) $anomalies[] = 'no_gallery_media';
 
         $hours = $this->hours($flat);
@@ -137,7 +132,6 @@ class LegacyRestaurantMigrator
             $terms = collect($record['target']['terms']);
             $restaurant->categories()->sync($terms->where('taxonomy', 'listing-category')->map(fn ($term) => Category::updateOrCreate(['legacy_term_id' => $term['legacy_term_id']], Arr::only($term, ['name', 'slug']))->id));
             $restaurant->features()->sync($terms->where('taxonomy', 'features')->map(fn ($term) => Feature::updateOrCreate(['legacy_term_id' => $term['legacy_term_id']], Arr::only($term, ['name', 'slug']))->id));
-            $restaurant->locations()->sync($terms->where('taxonomy', 'location')->map(fn ($term) => $this->persistLocation($term, $terms))->filter());
             $restaurant->openingHours()->delete();
             foreach ($record['target']['hours'] as $hour) $restaurant->openingHours()->create($hour);
             $attachmentIds = collect($record['target']['media'])->pluck('legacy_attachment_id')->all();
@@ -248,15 +242,4 @@ class LegacyRestaurantMigrator
 
     private function day(string $path): ?string { return preg_match('/(monday|lundi|tuesday|mardi|wednesday|mercredi|thursday|jeudi|friday|vendredi|saturday|samedi|sunday|dimanche)/i', $path, $match) ? Str::lower($match[1]) : null; }
 
-    /** @param array<string, mixed> $term */
-    private function persistLocation(array $term, $terms): ?int
-    {
-        if (app(TaxonomyValueClassifier::class)->isMalicious($term['name'])) return null;
-        $parentId = null;
-        if ($term['legacy_parent_term_id']) {
-            $parent = $terms->firstWhere('legacy_term_id', $term['legacy_parent_term_id']);
-            if ($parent) $parentId = $this->persistLocation($parent, $terms);
-        }
-        return Location::updateOrCreate(['legacy_term_id' => $term['legacy_term_id']], ['name' => $term['name'], 'slug' => $term['slug'], 'parent_id' => $parentId])->id;
-    }
 }

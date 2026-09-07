@@ -38,7 +38,7 @@ class PublicContentController extends Controller
         return view('public.restaurants.index', [
             'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
-            'locations' => $this->citySeo->cities()->sortBy('city_name')->map(fn (object $city): object => (object) ['name' => $this->cityLabel($city), 'slug' => $city->slug]),
+            'cities' => $this->citySeo->cities()->sortBy('city_name')->map(fn (object $city): object => (object) ['name' => $this->cityLabel($city), 'slug' => $city->slug]),
             'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
     }

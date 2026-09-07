@@ -85,7 +85,7 @@ class AdminBackOfficeTest extends TestCase
         foreach ([
             '/admin/articles', '/admin/pages', '/admin/media-assets', '/admin/restaurant-reviews',
             '/admin/comments', '/admin/restaurant-claims', '/admin/users', '/admin/redirect-rules',
-            '/admin/categories', '/admin/features', '/admin/locations', '/admin/settings', '/admin/admin-audit-logs',
+            '/admin/categories', '/admin/features', '/admin/settings', '/admin/admin-audit-logs',
         ] as $path) {
             $this->actingAs($admin)->get($path)->assertOk();
         }

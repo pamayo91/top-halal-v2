@@ -45,7 +45,6 @@ class LegacyRestaurantMigratorTest extends TestCase
         $this->assertSame('48.8566000', $restaurant->latitude);
         $this->assertSame(2, $restaurant->categories()->count());
         $this->assertSame(2, $restaurant->features()->count());
-        $this->assertSame(1, $restaurant->locations()->count());
         $this->assertSame(1, $restaurant->media()->count());
         $this->assertNotEmpty($restaurant->openingHours);
     }
@@ -109,6 +108,6 @@ class LegacyRestaurantMigratorTest extends TestCase
         if ($complete) { $meta[] = ['post_id' => $id, 'meta_key' => 'gallery_image_ids', 'meta_value' => '900']; $legacy->table('posts')->insert(['ID' => 900, 'post_author' => 0, 'post_date_gmt' => '2025-01-01 12:00:00', 'post_modified_gmt' => '2025-01-01 12:00:00', 'post_content' => '', 'post_title' => '', 'post_status' => 'inherit', 'post_name' => '', 'post_type' => 'attachment', 'guid' => 'https://legacy.test/uploads/image.jpg', 'post_excerpt' => 'Photo été']); }
         if ($claimed) $meta[] = ['post_id' => $id, 'meta_key' => 'claimed', 'meta_value' => '1'];
         $legacy->table('postmeta')->insert($meta);
-        foreach ([[1, 'Marocain', 'marocain', 'listing-category'], [2, 'Libanais', 'libanais', 'listing-category'], [3, 'Terrasse', 'terrasse', 'features'], [4, 'À emporter', 'a-emporter', 'features'], [5, 'Paris', 'paris', 'location']] as [$termId, $name, $termSlug, $taxonomy]) { $legacy->table('terms')->insert(['term_id' => $termId, 'name' => $name, 'slug' => $termSlug]); $legacy->table('term_taxonomy')->insert(['term_taxonomy_id' => $termId, 'term_id' => $termId, 'taxonomy' => $taxonomy, 'parent' => 0]); $legacy->table('term_relationships')->insert(['object_id' => $id, 'term_taxonomy_id' => $termId]); }
+        foreach ([[1, 'Marocain', 'marocain', 'listing-category'], [2, 'Libanais', 'libanais', 'listing-category'], [3, 'Terrasse', 'terrasse', 'features'], [4, 'À emporter', 'a-emporter', 'features']] as [$termId, $name, $termSlug, $taxonomy]) { $legacy->table('terms')->insert(['term_id' => $termId, 'name' => $name, 'slug' => $termSlug]); $legacy->table('term_taxonomy')->insert(['term_taxonomy_id' => $termId, 'term_id' => $termId, 'taxonomy' => $taxonomy, 'parent' => 0]); $legacy->table('term_relationships')->insert(['object_id' => $id, 'term_taxonomy_id' => $termId]); }
     }
 }

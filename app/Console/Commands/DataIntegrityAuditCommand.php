@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\{Article, Category, EditorialCategory, EditorialTag, Feature, Location, MediaAsset, Page, Restaurant};
+use App\Models\{Article, Category, EditorialCategory, EditorialTag, Feature, MediaAsset, Page, Restaurant};
 use App\Services\TaxonomyValueClassifier;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\{DB, File};
 
 class DataIntegrityAuditCommand extends Command
 {
-    protected $signature = 'data:integrity-audit {--apply : Repair deterministic date mappings and remove manifestly malicious unused locations}';
+    protected $signature = 'data:integrity-audit {--apply : Repair deterministic date mappings}';
 
     protected $description = 'Audits legacy/V2 dates and taxonomy integrity, then optionally applies safe idempotent repairs.';
 
     public function handle(TaxonomyValueClassifier $classifier): int
     {
         $before = $this->audit($classifier);
-        $changes = ['articles' => 0, 'pages' => 0, 'restaurants' => 0, 'media' => 0, 'malicious_locations_removed' => []];
+        $changes = ['articles' => 0, 'pages' => 0, 'restaurants' => 0, 'media' => 0];
 
         if ($this->option('apply')) {
             $changes['articles'] = $this->syncPostDates(Article::class, 'articles', 'post');
@@ -26,14 +26,6 @@ class DataIntegrityAuditCommand extends Command
             $changes['restaurants'] = $this->syncRestaurantDates();
             $changes['media'] = $this->syncMediaDates();
 
-            foreach ($before['geography']['malicious'] as $location) {
-                if ($location['restaurants'] !== []) {
-                    continue;
-                }
-
-                Location::whereKey($location['id'])->delete();
-                $changes['malicious_locations_removed'][] = $location;
-            }
         }
 
         $after = $this->audit($classifier);
@@ -55,7 +47,6 @@ class DataIntegrityAuditCommand extends Command
     {
         return [
             'dates' => $this->dateAudit(),
-            'geography' => $this->geographyAudit($classifier),
             'taxonomies' => $this->taxonomyAudit($classifier),
         ];
     }
@@ -110,38 +101,6 @@ class DataIntegrityAuditCommand extends Command
             'v2_with_legacy_identity' => (clone $v2)->whereNotNull($v2LegacyColumn)->count(),
             'v2_import_timestamps' => (clone $v2)->selectRaw('min(created_at) as first, max(created_at) as last')->first(),
             'legacy_key' => $legacyIdColumn,
-        ];
-    }
-
-    /** @return array<string, mixed> */
-    private function geographyAudit(TaxonomyValueClassifier $classifier): array
-    {
-        $locations = Location::query()->with(['restaurants:id,name,status'])->orderBy('id')->get();
-        $classes = ['valid' => [], 'suspect' => [], 'malicious' => [], 'empty' => []];
-
-        foreach ($locations as $location) {
-            $class = $classifier->classify($location->name);
-            $classes[$class][] = [
-                'id' => $location->id, 'legacy_term_id' => $location->legacy_term_id, 'name' => $location->name,
-                'slug' => $location->slug, 'parent_id' => $location->parent_id,
-                'restaurants' => $location->restaurants->map(fn (Restaurant $restaurant) => [
-                    'id' => $restaurant->id, 'legacy_wp_id' => $restaurant->legacy_wp_id,
-                    'name' => $restaurant->name, 'status' => $restaurant->status,
-                ])->all(),
-            ];
-        }
-
-        $duplicates = $locations->groupBy(fn (Location $location) => $classifier->normalizedKey($location->name))
-            ->filter(fn ($group, $key) => $key !== '' && $group->count() > 1)
-            ->map(fn ($group) => $group->map(fn (Location $location) => ['id' => $location->id, 'legacy_term_id' => $location->legacy_term_id, 'name' => $location->name, 'slug' => $location->slug])->values()->all())
-            ->values()->all();
-
-        return [
-            'total' => $locations->count(),
-            'used' => $locations->filter(fn (Location $location) => $location->restaurants->isNotEmpty())->count(),
-            'unused' => $locations->filter(fn (Location $location) => $location->restaurants->isEmpty())->count(),
-            'valid' => count($classes['valid']), 'suspect' => $classes['suspect'], 'malicious' => $classes['malicious'],
-            'empty' => $classes['empty'], 'duplicates' => $duplicates,
         ];
     }
 
@@ -232,16 +191,6 @@ class DataIntegrityAuditCommand extends Command
             $lines[] = '';
         }
         $lines[] = 'Les `created_at`/`updated_at` V2 restent des traces V2 lorsqu’ils ne sont pas déjà historiques. Les dates WordPress sont conservées dans les champs `legacy_*`; les articles/pages utilisent aussi `published_at` pour la publication historique.';
-        $lines[] = '';
-        $lines[] = '## Géographie';
-        $lines[] = '- Total avant : '.$before['geography']['total'].' ; utilisées : '.$before['geography']['used'].' ; inutilisées : '.$before['geography']['unused'].'.';
-        $lines[] = '- Valides : '.$before['geography']['valid'].' ; suspectes : '.count($before['geography']['suspect']).' ; manifestement malveillantes : '.count($before['geography']['malicious']).' ; vides : '.count($before['geography']['empty']).'.';
-        $lines[] = '- Doublons potentiels (non fusionnés automatiquement) : '.count($before['geography']['duplicates']).'.';
-        $lines[] = '- Supprimées : '.count($changes['malicious_locations_removed']).'.';
-        $lines[] = '- Après correction : '.$after['geography']['total'].' lieux ; utilisées : '.$after['geography']['used'].' ; inutilisées : '.$after['geography']['unused'].' ; malveillantes restantes : '.count($after['geography']['malicious']).'.';
-        foreach ($changes['malicious_locations_removed'] as $location) $lines[] = '- Supprimée V2 #'.$location['id'].' / legacy term #'.$location['legacy_term_id'].' : `'.$location['name'].'` (aucun restaurant associé).';
-        foreach ($before['geography']['suspect'] as $location) $lines[] = '- Revue manuelle — suspecte V2 #'.$location['id'].' / legacy term #'.$location['legacy_term_id'].' : `'.$location['name'].'`.';
-        foreach ($before['geography']['malicious'] as $location) if ($location['restaurants'] !== []) $lines[] = '- Revue manuelle — malveillante mais associée : V2 #'.$location['id'].' / legacy term #'.$location['legacy_term_id'].' ; restaurants : '.json_encode($location['restaurants'], JSON_UNESCAPED_UNICODE).'.';
         $lines[] = '';
         $lines[] = '## Autres taxonomies';
         foreach ($before['taxonomies'] as $taxonomy => $data) $lines[] = '- '.$taxonomy.' : '.$data['total'].' entrées, '.count($data['anomalies']).' anomalie(s) détectée(s).';

@@ -18,6 +18,12 @@ Une commune publique est identifiée par son `city_code` INSEE canonique, tandis
 
 Les pages département/région sont dérivées d'un petit référentiel administratif local. En collision réelle entre une ville et un département, la ville garde son URL et le département prend automatiquement le suffixe de son code. Seuls les territoires administrativement équivalents, notamment Paris, sont mutualisés ; les collectivités ultramarines région/département équivalentes ne créent pas de doublon.
 
+## 2026-09-07
+
+### D026 — Retire the completed legacy Geography runtime
+
+The former `locations` / `restaurant_location` taxonomy is neither a public-city source nor an administrative reference. After the completed migration, its only columns were legacy term identity, hierarchy, name and slug; current public geography uses `city_name`, canonical `city_code`, the versioned administrative resolver, `city_reference_points` and sparse SEO tables. Historical city-slug redirects are materialized in `redirect_rules`, and restaurant `legacy_wp_id` remains the reconciliation key. The obsolete tables, model, Filament resource, runtime joins and Geography-specific migration support are therefore removed by a forward-only migration; only the already-executed historical create/redirect migrations retain their references.
+
 ## 2026-09-02
 
 ### D024 — Restaurant media is raster-image only

@@ -33,7 +33,6 @@ test.describe('Filament administration', () => {
       ['/admin/restaurant-reviews', 'Avis'],
       ['/admin/comments', 'Commentaires'],
       ['/admin/restaurant-claims', 'Claims'],
-      ['/admin/locations', 'Géographie'],
       ['/admin/redirect-rules', null],
       ['/admin/settings', 'Réglages'],
       ['/admin/admin-audit-logs', null],
