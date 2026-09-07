@@ -239,4 +239,4 @@
 
 ## Unreleased
 
-- Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. It never writes restaurant business data.
+- Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. The preproduction run found 198 official Quick restaurants and performed no restaurant business write.
