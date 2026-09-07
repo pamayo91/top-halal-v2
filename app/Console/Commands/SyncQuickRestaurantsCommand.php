@@ -40,7 +40,7 @@ class SyncQuickRestaurantsCommand extends Command
         File::put(base_path((string)$this->option('out')),"# Import Quick\n\nMode: `".($apply?'apply':'dry-run')."`\n\n".collect($summary)->map(fn($v,$k)=>"- {$k}: **{$v}**")->implode("\n")."\n");
         $this->info(json_encode($summary)); return $summary['errors']?self::FAILURE:self::SUCCESS;
     }
-    private function description(?string $current): string { $current=trim((string)$current); if(preg_match('/Association Rituelle de la Grande Mosquée de Lyon \(ARGML\)/u',$current)) return preg_replace('/[^.]*Association Rituelle de la Grande Mosquée de Lyon \(ARGML\)\.?/u',self::ARGML,$current,1); return $current===''?self::ARGML:$current."\n\n".self::ARGML; }
+    private function description(?string $current): string { $current=trim((string)$current); if(str_contains($current,self::ARGML)) return $current; if(preg_match('/Association Rituelle de la Grande Mosquée de Lyon \(ARGML\)/u',$current)) return $current."\n\n".self::ARGML; return $current===''?self::ARGML:$current."\n\n".self::ARGML; }
     private function featureIds(array $a,$features): array { $map=['terrace'=>'terrasse','takeaway'=>'vente-a-emporter','wifi'=>'wi-fi','pmr'=>'acces-handicape','certifHalal'=>'certifie-halal']; return collect($map)->filter(fn($slug,$field)=>($a[$field]??null)==='Oui'&&$features->has($slug))->map(fn($slug)=>$features[$slug])->values()->all(); }
     private function hour(Restaurant $r,string $slug,string $day,string $range): void { if(!preg_match('/^(\d\d:\d\d)\s*-\s*(\d\d:\d\d)$/',$range,$m))return; $r->openingHours()->updateOrCreate(['legacy_key'=>"quick:$slug:dining:$day"],['day'=>$day,'slot'=>1,'opens_at'=>$m[1],'closes_at'=>$m[2],'is_closed'=>false]); }
 }
