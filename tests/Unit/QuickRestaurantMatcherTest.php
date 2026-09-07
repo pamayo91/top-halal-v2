@@ -26,7 +26,7 @@ class QuickRestaurantMatcherTest extends TestCase
     public function test_it_keeps_a_lower_confidence_match_as_probable(): void
     {
         $restaurant=$this->restaurant(['city_name'=>'Lyon','address_line1'=>'99 avenue Exemple']);
-        $this->assertSame('MATCH_PROBABLE',(new QuickRestaurantMatcher)->match($this->quick(),collect([$restaurant]))['status']);
+        $this->assertSame('MATCH_PROBABLE',(new QuickRestaurantMatcher)->match($this->quick(['quick_latitude'=>null,'quick_longitude'=>null]),collect([$restaurant]))['status']);
     }
     public function test_it_marks_absent_restaurants_without_a_candidate(): void { $this->assertSame('MISSING_TOP_HALAL',(new QuickRestaurantMatcher)->match($this->quick(),new Collection)['status']); }
     public function test_it_flags_several_strong_candidates_as_duplicates(): void
