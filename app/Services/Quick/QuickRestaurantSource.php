@@ -14,7 +14,7 @@ class QuickRestaurantSource
     public function restaurants(): array
     {
         try {
-            $html = Http::acceptHtml()
+            $html = Http::accept('text/html,application/xhtml+xml')
                 ->withUserAgent('Top-Halal Quick audit/1.0 (+https://top-halal.fr)')
                 ->timeout(20)->retry(2, 800, throw: false)
                 ->get(self::DIRECTORY_URL);
