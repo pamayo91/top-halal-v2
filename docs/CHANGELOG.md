@@ -2,6 +2,10 @@
 
 ## 2026-09-07
 
+- Back-office restaurants : l’onglet Médias affiche désormais les images entières, identifie clairement la couverture et permet de réordonner la galerie avec des commandes explicites et auditées.
+
+## 2026-09-07
+
 - Added the reviewed Quick logo through the normal V2 media pipeline: a non-cropped WebP original plus responsive derivatives, linked as editable first gallery media to each current official Quick rather than as a special-case fallback.
 - Forced the Filament back-office date-time timezone to `Europe/Paris` for both tables and inputs, while retaining UTC technical storage and leaving existing V2 data untouched.
 - Retired the obsolete legacy Geography runtime: removed the `Location` model, restaurant relation/pivot, Filament Geography resource, legacy runtime joins and Geography-specific migration support. A forward-only migration drops `restaurant_location` then `locations` without altering restaurants, structured addresses, administrative resolution, nearby-city data, city SEO pages or facet relations.
