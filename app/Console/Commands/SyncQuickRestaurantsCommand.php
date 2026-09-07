@@ -25,7 +25,7 @@ class SyncQuickRestaurantsCommand extends Command
         $summary=['official'=>count($data),'created'=>0,'updated'=>0,'unchanged'=>0,'probable_resolved'=>0,'errors'=>0,'service_mappings'=>0,'argml_descriptions'=>0];
         if($apply) { $backup=storage_path('app/backups/quick/quick-before-'.now()->format('Ymd-His').'.json'); File::ensureDirectoryExists(dirname($backup)); File::put($backup,Restaurant::whereIn('id',$auditBySlug->pluck('top_halal_restaurant_id')->filter())->with(['categories','features','openingHours'])->get()->toJson(JSON_PRETTY_PRINT)); }
         foreach($data as $quick) try {
-            $slug=(string)$quick['quick_slug']; $auditRow=$auditBySlug[$slug]??null; $existingId=(int)($auditRow['top_halal_restaurant_id']??0);
+            $slug=(string)$quick['quick_slug']; $auditRow=$auditBySlug[$slug]??null; $existingId=in_array($auditRow['match_status']??'', ['MATCH_EXACT','MATCH_UPDATE','MATCH_PROBABLE'], true) ? (int)($auditRow['top_halal_restaurant_id']??0) : 0;
             $restaurant=$existingId?Restaurant::find($existingId):Restaurant::where('slug','quick-'.$slug)->first(); $new=!$restaurant;
             $a=$quick['quick_raw']['attributes']; $line1=trim((string)($a['address2']?:$a['address1']?:'')); $line2=filled($a['address2']??null)?trim((string)$a['address1']):null;
             $cityCode=$restaurant?->city_code ?: Restaurant::where('postal_code',$quick['quick_postal_code'])->where('city_name',$quick['quick_city'])->whereNotNull('city_code')->value('city_code');
