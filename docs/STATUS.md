@@ -8,6 +8,8 @@ Latest Quick audit: completed on preproduction with no restaurant business write
 
 Latest Quick sync: 186 official Quick restaurants were created and 12 reviewed matches (including the three formerly probable matches) were refreshed on preproduction. All 198 are assigned to existing `Fast-food`, with only existing feature mappings; all retain the official ARGML sentence. The immediate second run created and changed zero restaurant rows.
 
+Latest Quick media: the reviewed Quick logo is normalized without cropping to a 1440 px maximum WebP original, with the regular 480/960/1440 WebP derivatives. It is associated as normal first gallery media (not a fallback) to the 198 current official Quick records, so the public cover/card and back-office media management use the standard path.
+
 Latest back-office timezone: Filament explicitly presents and edits date-times in `Europe/Paris`, including daylight-saving transitions. Laravel technical instants remain UTC; no existing V2 data was rewritten.
 
 Latest: city + service SEO facets now reuse the sparse specialty-facet engine and the existing `restaurant_feature` relation. `city_service_seo_pages` stays empty until an administrator configures a combination; only open rows become canonical, indexable, sitemapable SSR landings and city links. The shared Facettes SEO screen switches between Specialty and Service opportunities without rendering a city × term matrix. The V2 category/service slug audit found no collision.
