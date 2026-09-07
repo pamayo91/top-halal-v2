@@ -15,6 +15,12 @@ No page-builder dependency. Use a constrained set of lightweight content blocks 
 
 ## AI visibility
 AI source/provenance stays internal even when public disclosure is disabled.
+
+## Sidebar éditoriale partagée
+
+Les Articles et Pages utilisent le même moteur Blade SSR de sidebar. Elle est active par défaut pour un Article et inactive par défaut pour une Page ; une Page doit l’activer explicitement dans Filament. Les deux configurations globales (`editorial_sidebar_articles`, `editorial_sidebar_pages`) sont séparées et les overrides par contenu restent sparse.
+
+Les blocs disponibles sont : sommaire, recherche restaurant, restaurants liés, articles liés, signalement, proximité, restos à la une, explorer aussi, partage et contact. Aucun bloc sans données exploitables n’est rendu. Le sommaire construit des ancres déterministes H2/H3. Sur mobile, seul le sommaire précède le contenu ; les autres compléments le suivent.
 ## Inline legacy media debt
 
 During the controlled editorial pilot, direct `top-halal.fr/wp-content` and `top-halal.fr/wp-contenu` inline images are removed from stored V2 HTML rather than being rendered from WordPress. `legacy:audit-inline-media` records the legacy source URL/path, content type and ID, ordinal position, nearby context and resolved attachment ID when available. This is a media-reconciliation backlog only: no physical file is copied in this phase.

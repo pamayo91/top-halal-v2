@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Filament\Resources\{ArticleResource, PageResource, RestaurantResource};
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\StoreRestaurantReviewRequest;
-use App\Models\{Article, Category, Comment, Feature, Page, Restaurant, RestaurantReview};
+use App\Models\{Article, Category, Comment, EditorialContentReport, Feature, Page, Restaurant, RestaurantReview};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
 
 class PublicContentController extends Controller
 {
@@ -22,6 +22,7 @@ class PublicContentController extends Controller
         private readonly CityServiceSeoService $cityServices,
         private readonly GeographicPageResolver $geography,
         private readonly NearbyCityService $nearbyCities,
+        private readonly EditorialSidebar $sidebar,
     ) {}
     public function home(): View
     {
@@ -198,8 +199,9 @@ class PublicContentController extends Controller
         $comments = $content->comments()->where('status', 'approved')->latest('created_at')->get();
         $isArticle = $content instanceof Article;
         $adminEditUrl = $this->adminEditUrlFor($content);
+        $sidebar = $this->sidebar->for($content);
 
-        return response()->view('public.editorial', compact('content', 'comments', 'isArticle', 'adminEditUrl'));
+        return response()->view('public.editorial', compact('content', 'comments', 'isArticle', 'adminEditUrl', 'sidebar'));
     }
 
     public function storeComment(StoreCommentRequest $request, string $slug): RedirectResponse
@@ -207,6 +209,14 @@ class PublicContentController extends Controller
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
         Comment::create([$content instanceof Page ? 'page_id' : 'article_id' => $content->id, 'author_name' => $request->validated('name'), 'author_email' => $request->validated('email'), 'content' => trim(strip_tags($request->validated('content'))), 'status' => 'pending']);
         return back()->with('comment_submitted', true);
+    }
+
+    public function storeEditorialReport(Request $request, string $slug): RedirectResponse
+    {
+        $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
+        $data = $request->validate(['message' => ['required', 'string', 'max:2000'], 'website' => ['nullable', 'max:0']]);
+        EditorialContentReport::create(['content_type' => $content instanceof Article ? 'article' : 'page', 'content_id' => $content->id, 'content_url' => route('editorial.show', $content->slug), 'message' => trim(strip_tags($data['message'])), 'ip_hash' => hash('sha256', (string) $request->ip())]);
+        return back()->with('editorial_report_submitted', true);
     }
 
     private function taxonomy(object $term, string $kind): Response

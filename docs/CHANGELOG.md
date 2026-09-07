@@ -247,3 +247,8 @@
 
 - Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. The preproduction run found 198 official Quick restaurants and performed no restaurant business write.
 - Added idempotent `restaurants:sync-quick` import for the audited Quick snapshot, including official GPS/hours, existing Fast-food/category features and the ARGML certification sentence.
+# 2026-09-07 — Sidebar éditoriale commune
+
+- Ajout du moteur Blade SSR commun aux Articles et Pages, avec configurations globales distinctes, overrides sparse et administration Filament.
+- Sidebar activée par défaut sur les Articles et désactivée par défaut sur les Pages.
+- Ajout du sommaire à ancres déterministes, des blocs éditoriaux réutilisables et du signalement contextualisé limité.
