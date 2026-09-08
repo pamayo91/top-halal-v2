@@ -18,7 +18,7 @@ class EmailContactManagementTest extends TestCase
     {
         Mail::fake();
         Setting::create(['key' => 'contact_settings', 'group' => 'contact', 'value' => ['recipient' => 'admin@top-halal.fr', 'send_confirmation' => true, 'success_message' => 'Merci']]);
-        $this->post('/contact', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => '<b>Texte</b>', 'website' => '])->assertRedirect(route('contact.create'))->assertSessionHas('status', 'Merci');
+        $this->post('/contact', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => '<b>Texte</b>', 'website' => ''])->assertRedirect(route('contact.create'))->assertSessionHas('status', 'Merci');
         $this->assertDatabaseHas('contact_messages', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'status' => 'new']); $this->assertDatabaseCount('email_delivery_logs', 2);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contact_admin' && $mail->replyToAddress === 'alice@top-halal.fr');
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contact_confirmation');
