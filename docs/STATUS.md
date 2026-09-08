@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-07
+Last updated: 2026-09-08
+
+Latest editorial sidebar UI: the existing SSR/Filament sidebar configuration now renders as a differentiated, compact editorial rail. Desktop gives the article a 70/30 layout; related articles and restaurants use responsive V2-media thumbnails, the local-search, correction, proximity, exploration, sharing and contact blocks each have a distinct lightweight treatment, and mobile keeps only the TOC before the article. The proximity CTA requests browser location only after an explicit click and falls back to the existing directory search.
 
 Latest back-office media: restaurant media previews now preserve the whole image rather than crop it or upscale it: their HTML dimensions match the delivered variant (480 × 270 for restaurant 7699), rather than the 2880 × 1620 original. The first ordinary photo is visibly labelled as the cover, while explicit up/down controls persist and audit gallery order changes; specialty fallback thumbnails remain separate and cannot become a cover. The authenticated Playwright flow verifies the reported restaurant (ID 7699) exposes those controls without browser errors.
 

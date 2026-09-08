@@ -5,6 +5,10 @@
 - Back-office restaurants : l’onglet Médias affiche désormais les images entières, identifie clairement la couverture et permet de réordonner la galerie avec des commandes explicites et auditées.
 - Correctif : les aperçus média utilisent maintenant les dimensions de la variante diffusée, évitant l’agrandissement d’une miniature 480 px selon les dimensions de l’original.
 
+## 2026-09-08
+
+- Refonte visuelle ciblée de la sidebar éditoriale SSR : proportions article/sidebar corrigées, cartes hiérarchisées, miniatures V2 compactes pour contenus liés, CTA de proximité distinct à géolocalisation volontaire, boutons de partage accessibles et états mobile conservant uniquement le sommaire avant l’article.
+
 ## 2026-09-07
 
 - Added the reviewed Quick logo through the normal V2 media pipeline: a non-cropped WebP original plus responsive derivatives, linked as editable first gallery media to each current official Quick rather than as a special-case fallback.

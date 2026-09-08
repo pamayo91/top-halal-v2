@@ -256,3 +256,21 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     [location, query].forEach(input => input.addEventListener('keydown', event => { const container = input === location ? cities : suggestions; const options = buttons(container); if (event.key === 'Escape') { close(container); return; } if (!options.length || container.hidden) return; if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); active = (active + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length; options[active].focus(); } }));
     form.addEventListener('submit', event => { if (selectedRestaurant) { event.preventDefault(); window.location.assign(`/resto/${encodeURIComponent(selectedRestaurant)}`); } });
 });
+
+document.querySelectorAll('[data-near-me-cta]').forEach(link => {
+    link.addEventListener('click', event => {
+        if (!navigator.geolocation) return;
+        event.preventDefault();
+        link.setAttribute('aria-busy', 'true');
+        navigator.geolocation.getCurrentPosition(({ coords }) => {
+            const url = new URL(link.href);
+            url.searchParams.set('lat', coords.latitude.toFixed(5));
+            url.searchParams.set('lng', coords.longitude.toFixed(5));
+            url.hash = '';
+            window.location.assign(url);
+        }, () => {
+            link.removeAttribute('aria-busy');
+            window.location.assign(link.href);
+        }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
+    });
+});
