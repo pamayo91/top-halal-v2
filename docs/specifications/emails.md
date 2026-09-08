@@ -21,5 +21,8 @@
 - Contact messages are stored before notification delivery. SMTP failure cannot invalidate an accepted contact submission.
 
 ## Operations
+
+`Emails > Templates` présente l’identifiant technique, le nom fonctionnel et la description de chaque template. Les deux derniers proviennent du registre applicatif et ne sont pas des champs administrables.
+
 - Required worker: `/opt/alt/php84/usr/bin/php artisan queue:work --tries=3 --backoff=30,120,300`.
 - Before SMTP is approved, use the configured capture/log transport on preproduction. Real-recipient testing requires an address explicitly supplied by an operator.

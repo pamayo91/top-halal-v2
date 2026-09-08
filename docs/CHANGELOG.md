@@ -2,6 +2,7 @@
 
 ## 2026-09-08
 
+- Emails : le tableau des templates affiche de manière fiable leur nom fonctionnel et leur description.
 - Added centralized, administrable transactional email templates, runtime mail configuration and safe delivery history.
 - Added the public Contact form and its Filament moderation/settings workflow.
 - Fixed central queued mailables so Laravel notifications retain their recipient, and fixed the Filament template-list rendering and Mailable Reply-To property collision discovered during preproduction validation.
