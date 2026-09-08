@@ -27,7 +27,7 @@ class EmailContactManagementTest extends TestCase
     public function test_contact_confirmation_can_be_disabled_without_losing_the_message(): void
     {
         Mail::fake(); Setting::create(['key' => 'contact_settings', 'group' => 'contact', 'value' => ['recipient' => 'admin@top-halal.fr', 'send_confirmation' => false]]);
-        $this->post('/contact', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => 'Texte', 'website' => '])->assertRedirect();
+        $this->post('/contact', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => 'Texte', 'website' => ''])->assertRedirect();
         $this->assertDatabaseCount('contact_messages', 1); $this->assertDatabaseCount('email_delivery_logs', 1); Mail::assertNotQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contact_confirmation');
     }
 
