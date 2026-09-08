@@ -4,6 +4,7 @@
 
 - Added centralized, administrable transactional email templates, runtime mail configuration and safe delivery history.
 - Added the public Contact form and its Filament moderation/settings workflow.
+- Fixed central queued mailables so Laravel notifications retain their recipient, and fixed the Filament template-list rendering and Mailable Reply-To property collision discovered during preproduction validation.
 
 ## 2026-09-07
 
