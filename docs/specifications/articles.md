@@ -23,6 +23,8 @@ Les Articles et Pages utilisent le même moteur Blade SSR de sidebar. Elle est a
 Les blocs disponibles sont : sommaire, recherche restaurant, restaurants liés, articles liés, signalement, proximité, restos à la une, explorer aussi, partage et contact. Aucun bloc sans données exploitables n’est rendu. Le sommaire construit des ancres déterministes H2/H3. Sur mobile, seul le sommaire précède le contenu ; les autres compléments le suivent.
 
 La présentation publique utilise une colonne éditoriale principale et une rail secondaire d’environ 70/30 sur desktop. Les contenus liés utilisent les variantes média V2 compactes lorsqu’elles existent, avec un fallback de hauteur stable. Le CTA de proximité ne duplique pas le formulaire de recherche : sa géolocalisation navigateur reste volontaire, déclenchée uniquement après clic, et son fallback mène au parcours de recherche existant.
+
+Les libellés des cartes de sidebar ne sont pas des titres H2 afin de préserver le plan sémantique du contenu éditorial. Dans le sommaire, seuls les H2 reçoivent une numérotation continue ; les H3 restent des liens indentés sans numéro.
 ## Inline legacy media debt
 
 During the controlled editorial pilot, direct `top-halal.fr/wp-content` and `top-halal.fr/wp-contenu` inline images are removed from stored V2 HTML rather than being rendered from WordPress. `legacy:audit-inline-media` records the legacy source URL/path, content type and ID, ordinal position, nearby context and resolved attachment ID when available. This is a media-reconciliation backlog only: no physical file is copied in this phase.
