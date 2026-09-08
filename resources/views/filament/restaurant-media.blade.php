@@ -3,7 +3,7 @@
 @php($fallbacks = collect($restaurant?->media ?? [])->where('role', 'fallback_thumbnail')->values())
 
 <div class="space-y-5">
-    <p class="text-sm text-gray-600 dark:text-gray-300">La première photo est la couverture de la fiche et apparaît sur le site. Utilisez les boutons pour changer son ordre. Les aperçus conservent l’image entière.</p>
+    <p class="text-sm text-gray-600 dark:text-gray-300">Ajoutez des photos avec le bouton « Ajouter des photos » en haut de la fiche. La première photo est la couverture de la fiche et apparaît sur le site. Utilisez les boutons pour changer son ordre ou retirer une photo de cette fiche. Les aperçus conservent l’image entière.</p>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     @forelse($photos as $media)
@@ -16,6 +16,7 @@
                     <div class="flex gap-2" role="group" aria-label="Réorganiser la photo en position {{ $loop->index + 1 }}">
                         <button type="button" wire:click="moveRestaurantMedia({{ $media->id }}, 'up')" wire:loading.attr="disabled" @disabled($loop->first) class="fi-btn fi-btn-size-sm fi-btn-color-gray">Monter</button>
                         <button type="button" wire:click="moveRestaurantMedia({{ $media->id }}, 'down')" wire:loading.attr="disabled" @disabled($loop->last) class="fi-btn fi-btn-size-sm fi-btn-color-gray">Descendre</button>
+                        <button type="button" wire:click="detachRestaurantMedia({{ $media->id }})" wire:confirm="Retirer cette photo de la fiche ? Elle restera disponible dans la médiathèque." wire:loading.attr="disabled" class="fi-btn fi-btn-size-sm fi-btn-color-danger">Retirer</button>
                     </div>
                 </figcaption>
             </figure>
