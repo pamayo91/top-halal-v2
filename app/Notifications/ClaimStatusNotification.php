@@ -5,7 +5,7 @@ namespace App\Notifications;
 use App\Models\RestaurantClaim;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use App\Mail\TemplateMailable;
 use Illuminate\Notifications\Notification;
 
 class ClaimStatusNotification extends Notification implements ShouldQueue
@@ -16,13 +16,10 @@ class ClaimStatusNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array { return ['mail']; }
 
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(object $notifiable): TemplateMailable
     {
         $restaurant = $this->claim->restaurant->name;
-        return match ($this->event) {
-            'submitted' => (new MailMessage)->subject('Demande de revendication reçue - Top-Halal')->greeting('Bonjour '.$notifiable->name.',')->line('Votre demande pour '.$restaurant.' est en attente de modération.')->action('Voir ma demande', route('claims.show', $this->claim)),
-            'approved' => (new MailMessage)->subject('Revendication acceptée - Top-Halal')->greeting('Bonjour '.$notifiable->name.',')->line('Votre revendication de '.$restaurant.' a été acceptée.')->action('Gérer mon restaurant', route('owner.restaurants.edit', $this->claim->restaurant)),
-            default => (new MailMessage)->subject('Revendication refusée - Top-Halal')->greeting('Bonjour '.$notifiable->name.',')->line('Votre revendication de '.$restaurant.' a été refusée.')->line($this->claim->admin_note ? 'Note : '.$this->claim->admin_note : 'Vous pouvez contacter la modération avec les justificatifs nécessaires.'),
-        };
+        $key=match($this->event){'submitted'=>'claim_received','approved'=>'claim_approved',default=>'claim_rejected'}; $url=$this->event==='submitted'?route('claims.show',$this->claim):($this->event==='approved'?route('owner.restaurants.edit',$this->claim->restaurant):null);
+        return new TemplateMailable($key,['site_name'=>config('app.name','Top Halal'),'user_name'=>$notifiable->name,'restaurant_name'=>$restaurant,'action_url'=>$url,'claim_note'=>$this->claim->admin_note ?: 'Vous pouvez contacter la modération avec les justificatifs nécessaires.']);
     }
 }
