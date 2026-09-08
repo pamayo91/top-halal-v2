@@ -18,6 +18,8 @@ Chaque opération sensible est enregistrée dans `admin_audit_logs`, avec l’ad
 
 La page « Réglages » comprend une section « SEO local — pages villes » avec le rayon global des villes aux alentours (30 km par défaut, 250 km maximum) et leur nombre maximum (15 par défaut, 30 maximum). Ces valeurs sont globales, ne créent aucun override par commune et invalident le cache de maillage géographique lorsqu'elles sont enregistrées.
 
+Dans une fiche restaurant existante, l’action « Ajouter des photos » charge directement des JPEG, PNG ou WebP (10 Mo maximum par fichier) dans le pipeline V2, puis les associe à la fin de sa galerie. L’administrateur peut remonter la nouvelle photo pour en faire la couverture, ou la retirer de la fiche ; ce retrait ne supprime jamais l’asset partagé de la médiathèque. Les ajouts et retraits sont audités.
+
 ## Localisation des restaurants
 
 L’onglet « Localisation » ne présente que l’adresse structurée V2 (recherche, adresse, complément, code postal, ville, code INSEE, pays) et la carte. Les données d’origine et les métadonnées techniques de géocodage restent conservées en base, mais ne surchargent pas le parcours courant. La recherche d’adresse est servie par Laravel (`GET /admin/location/autocomplete`) et l’abstraction Géoplateforme : aucun navigateur ne contacte directement le fournisseur. Une sélection ne sauvegarde pas la fiche ; elle préremplit les champs, l’admin confirme ensuite la modification normale. Aucune association Geography legacy n’est chargée ou administrée.

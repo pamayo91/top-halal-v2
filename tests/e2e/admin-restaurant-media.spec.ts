@@ -22,10 +22,12 @@ test.describe('Médias restaurant Filament', () => {
     await page.goto('/admin/restaurants/7699/edit');
     await page.getByRole('tab', { name: 'Médias' }).click();
 
-    await expect(page.getByText('La première photo est la couverture de la fiche et apparaît sur le site.')).toBeVisible();
+    await expect(page.getByText(/Ajoutez des photos avec le bouton/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Ajouter des photos' })).toBeVisible();
     await expect(page.getByText('Couverture · position 1')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Monter' }).first()).toBeDisabled();
     await expect(page.getByRole('button', { name: 'Descendre' }).first()).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Retirer' }).first()).toBeVisible();
     const preview = page.locator('img.object-contain').first();
     await expect(preview).toBeVisible();
     await expect(preview).toHaveAttribute('width', '480');

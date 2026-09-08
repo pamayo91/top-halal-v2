@@ -5,10 +5,13 @@ namespace Tests\Feature;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
+use App\Services\MediaIngestor;
+use App\Services\RestaurantMediaManager;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Support\Facades\FilamentTimezone;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
@@ -76,6 +79,30 @@ class AdminBackOfficeTest extends TestCase
 
         $this->actingAs($admin)->get("/admin/restaurants/{$restaurant->id}/edit")->assertOk()->assertSee('Photos de la fiche')->assertSee($asset->deliveryUrl(), false);
         $this->get(route('restaurants.preview', $restaurant->legacy_wp_id))->assertOk()->assertSee($restaurant->name)->assertSee('Restaurant halal')->assertSee('noindex,nofollow', false);
+    }
+
+    public function test_admin_can_attach_and_detach_restaurant_photos_without_deleting_media_library_assets(): void
+    {
+        $restaurant = $this->restaurant();
+        $asset = MediaAsset::create(['original_path' => 'media/originals/new.jpg', 'mime' => 'image/jpeg', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('n', 64), 'status' => 'ready']);
+        $fallback = MediaAsset::create(['original_path' => 'media/originals/fallback.webp', 'mime' => 'image/webp', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('f', 64), 'status' => 'ready']);
+        RestaurantMedia::create(['restaurant_id' => $restaurant->id, 'media_asset_id' => $fallback->id, 'sort_order' => 0, 'status' => 'ready', 'role' => 'fallback_thumbnail']);
+
+        $upload = UploadedFile::fake()->image('nouvelle-photo.jpg', 1200, 800);
+        $ingestor = \Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->with($upload, $restaurant->name)->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $manager = app(RestaurantMediaManager::class);
+        $this->assertSame(['added' => 1, 'already_attached' => 0], $manager->attachUploads($restaurant, [$upload]));
+        $gallery = RestaurantMedia::where('restaurant_id', $restaurant->id)->where('media_asset_id', $asset->id)->firstOrFail();
+        $this->assertSame('gallery', $gallery->role);
+        $this->assertSame(1, $gallery->sort_order);
+
+        $this->assertTrue($manager->detach($restaurant, $gallery->id));
+        $this->assertDatabaseMissing('restaurant_media', ['id' => $gallery->id]);
+        $this->assertDatabaseHas('media_assets', ['id' => $asset->id]);
+        $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $fallback->id]);
     }
 
     public function test_pending_restaurant_without_a_legacy_id_has_a_signed_front_preview(): void
