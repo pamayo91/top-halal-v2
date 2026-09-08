@@ -57,4 +57,12 @@ class RestaurantMediaManager
             ->where(fn ($query) => $query->whereNull('role')->orWhere('role', '!=', 'fallback_thumbnail'))
             ->delete();
     }
+
+    public function detachFallback(Restaurant $restaurant, int $mediaId): bool
+    {
+        return (bool) $restaurant->media()
+            ->whereKey($mediaId)
+            ->where('role', 'fallback_thumbnail')
+            ->delete();
+    }
 }
