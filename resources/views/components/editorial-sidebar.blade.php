@@ -9,7 +9,7 @@
 @foreach($blocks as $block)
     @php($title = $block['title'] ?: app(\App\Services\EditorialSidebar::class)->defaultBlock($block['type'])['title'])
     @if($block['type'] === 'toc' && count($sidebar['toc']) >= 2)
-        <section class="sidebar-card sidebar-toc"><p class="sidebar-title">{{ $title }}</p><ol>@foreach($sidebar['toc'] as $heading)@php($tocLabel = $heading['level'] === 3 ? preg_replace('/^\s*\d+[.)]\s*/u', '', $heading['label']) : $heading['label'])<li class="toc-level-{{ $heading['level'] }}"><a href="#{{ $heading['id'] }}">{{ $tocLabel }}</a></li>@endforeach</ol></section>
+        <section class="sidebar-card sidebar-toc"><p class="sidebar-title">{{ $title }}</p><ol>@foreach($sidebar['toc'] as $heading)<li class="toc-level-{{ $heading['level'] }}"><a href="#{{ $heading['id'] }}">{{ $heading['label'] }}</a></li>@endforeach</ol></section>
     @elseif($block['type'] === 'search')
         <section class="sidebar-card sidebar-search"><p class="sidebar-title">{{ $title }}</p><x-restaurant-search :compact="true" /></section>
     @elseif($block['type'] === 'restaurants')
