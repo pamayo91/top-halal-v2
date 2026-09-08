@@ -11,5 +11,5 @@ class PasswordChangedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
     public function via(object $notifiable): array { return ['mail']; }
-    public function toMail(object $notifiable): TemplateMailable { return (new TemplateMailable('password_changed',['site_name'=>config('app.name','Top Halal'),'user_name'=>$notifiable->name]))->to($notifiable->routeNotificationForMail()); }
+    public function toMail(object $notifiable): TemplateMailable { return (new TemplateMailable('password_changed',['site_name'=>config('app.name','Top Halal'),'user_name'=>$notifiable->name]))->to($notifiable->email); }
 }
