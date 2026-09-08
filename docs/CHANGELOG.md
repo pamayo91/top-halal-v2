@@ -2,6 +2,7 @@
 
 ## 2026-09-08
 
+- Contact : le champ honeypot anti-spam est de nouveau correctement hors écran pour les visiteurs.
 - Emails : le tableau des templates affiche de manière fiable leur nom fonctionnel et leur description.
 - Added centralized, administrable transactional email templates, runtime mail configuration and safe delivery history.
 - Added the public Contact form and its Filament moderation/settings workflow.

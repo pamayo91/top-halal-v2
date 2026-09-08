@@ -8,6 +8,7 @@ test.describe('Contact public', () => {
 
     await page.goto('/contact');
     await expect(page.getByRole('heading', { name: 'Nous contacter' })).toBeVisible();
+    await expect.poll(async () => page.locator('.hp').evaluate((element) => element.getBoundingClientRect().right < 0)).toBe(true);
     await page.getByRole('button', { name: 'Envoyer le message' }).click();
     await expect(page.locator('input[name="name"]')).toBeFocused();
     await page.locator('input[name="name"]').fill('Validation Playwright');
