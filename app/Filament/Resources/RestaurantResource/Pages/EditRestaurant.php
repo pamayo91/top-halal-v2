@@ -66,4 +66,14 @@ class EditRestaurant extends EditAuditedRecord {
             app(AdminAudit::class)->record('restaurant.media_detached', $restaurant, ['media_id' => $mediaId]);
         }
     }
+
+    public function detachFallbackRestaurantMedia(int $mediaId): void
+    {
+        /** @var Restaurant $restaurant */
+        $restaurant = $this->getRecord();
+
+        if (app(RestaurantMediaManager::class)->detachFallback($restaurant, $mediaId)) {
+            app(AdminAudit::class)->record('restaurant.fallback_media_detached', $restaurant, ['media_id' => $mediaId]);
+        }
+    }
 }

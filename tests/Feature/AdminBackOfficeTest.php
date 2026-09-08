@@ -103,6 +103,11 @@ class AdminBackOfficeTest extends TestCase
         $this->assertDatabaseMissing('restaurant_media', ['id' => $gallery->id]);
         $this->assertDatabaseHas('media_assets', ['id' => $asset->id]);
         $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $fallback->id]);
+
+        $fallbackRelation = RestaurantMedia::where('restaurant_id', $restaurant->id)->where('media_asset_id', $fallback->id)->firstOrFail();
+        $this->assertTrue($manager->detachFallback($restaurant, $fallbackRelation->id));
+        $this->assertDatabaseMissing('restaurant_media', ['id' => $fallbackRelation->id]);
+        $this->assertDatabaseHas('media_assets', ['id' => $fallback->id]);
     }
 
     public function test_pending_restaurant_without_a_legacy_id_has_a_signed_front_preview(): void
