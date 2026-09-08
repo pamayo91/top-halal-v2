@@ -1,3 +1,4 @@
+import '../css/editorial-sidebar-overrides.css';
 import { initializeAddressSelectors } from './address-selector';
 
 const menu = document.querySelector('.menu-toggle');
