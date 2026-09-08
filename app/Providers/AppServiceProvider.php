@@ -11,6 +11,9 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Mail\Events\MessageSent;
+use App\Models\EmailDeliveryLog;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -39,5 +42,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('public-address-autocomplete', fn (Request $request): Limit => Limit::perMinute(20)->by('address|'.$request->ip()));
         RateLimiter::for('restaurant-duplicate-check', fn (Request $request): Limit => Limit::perMinute(30)->by('restaurant-duplicates|'.$request->ip()));
         RateLimiter::for('restaurant-submission', fn (Request $request): Limit => Limit::perHour(5)->by('restaurant|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
+        RateLimiter::for('contact', fn (Request $request): Limit => Limit::perHour(5)->by('contact|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
+        Event::listen(MessageSent::class, function (MessageSent $event): void { $id = $event->message->getHeaders()->get('X-Top-Halal-Email-Log')?->getBodyAsString(); if ($id) EmailDeliveryLog::whereKey($id)->update(['status'=>'sent','error_message'=>null]); });
     }
 }

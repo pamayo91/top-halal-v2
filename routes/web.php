@@ -15,6 +15,7 @@ use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
 use App\Http\Controllers\AdminAddressAutocompleteController;
 use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
+use App\Http\Controllers\ContactController;
 
 Route::get('/', [PublicContentController::class, 'home'])->name('home');
 
@@ -35,6 +36,8 @@ Route::get('/ajouter-un-restaurant/adresses', [PublicRestaurantSubmissionControl
 Route::get('/ajouter-un-restaurant/doublons', [PublicRestaurantSubmissionController::class, 'duplicates'])->middleware('throttle:restaurant-duplicate-check')->name('restaurant-submissions.duplicates');
 Route::post('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'store'])->middleware('throttle:restaurant-submission')->name('restaurant-submissions.store');
 Route::get('/ajouter-un-restaurant/merci', [PublicRestaurantSubmissionController::class, 'thanks'])->name('restaurant-submissions.thanks');
+Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));

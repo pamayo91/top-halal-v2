@@ -38,4 +38,8 @@ Les secrets restent dans `.env`; les réglages V2 ne contiennent que des valeurs
 
 ## Non-régression
 
+## E-mails et Contact
+
+`Emails > Configuration` centralise le mailer et les paramètres SMTP. Le secret SMTP est chiffré, non lisible dans le BO et n’est jamais journalisé. `Emails > Templates` édite uniquement l’objet, du texte sûr et le CTA des types déclarés par le registre. `Emails > Historique` expose les tentatives sans contenu sensible. `Contact > Messages` permet de consulter et modérer les messages persistés ; `Contact > Réglages` définit le destinataire unique et l’accusé de réception.
+
 Les sauvegardes Filament sont couvertes par une vérification de conservation : modifier uniquement un champ éditorial d'une fiche sentinelle ne doit ni synchroniser à vide ni supprimer médias, catégories, services, géographie, avis ou horaires. Une fiche `pending`, y compris une proposition sans `legacy_wp_id`, possède une prévisualisation front signée et `noindex,nofollow`. Les tests navigateur authentifiés de préproduction utilisent uniquement le compte administrateur de test provisoire, fourni localement par `PREPROD_ADMIN_EMAIL` et `PREPROD_ADMIN_PASSWORD` ; ils indiquent explicitement qu’ils sont ignorés si ces variables manquent. Aucun compte humain n'est une fixture et aucun identifiant ne rejoint le dépôt.

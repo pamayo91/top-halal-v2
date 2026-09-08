@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-08
+
+- Added centralized, administrable transactional email templates, runtime mail configuration and safe delivery history.
+- Added the public Contact form and its Filament moderation/settings workflow.
+
 ## 2026-09-07
 
 - Back-office restaurants : l’onglet Médias affiche désormais les images entières, identifie clairement la couverture et permet de réordonner la galerie avec des commandes explicites et auditées.

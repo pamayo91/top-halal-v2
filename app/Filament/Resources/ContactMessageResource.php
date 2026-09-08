@@ -1,0 +1,10 @@
+<?php
+namespace App\Filament\Resources;
+use App\Models\ContactMessage; use App\Services\AdminAudit; use Filament\Actions\EditAction; use Filament\Forms\Components\{Select,Textarea,TextInput}; use Filament\Schemas\Schema; use Filament\Tables\Columns\TextColumn; use Filament\Tables\Filters\SelectFilter; use Filament\Tables\Table;
+class ContactMessageResource extends AdminResource
+{
+ protected static ?string $model=ContactMessage::class; protected static ?string $recordTitleAttribute='subject'; protected static string|null|\BackedEnum $navigationIcon='heroicon-o-envelope'; protected static string|\UnitEnum|null $navigationGroup='Contact'; protected static ?string $navigationLabel='Messages'; protected static ?int $navigationSort=1; public static function canCreate():bool{return false;}
+ public static function form(Schema $schema):Schema{return $schema->components([TextInput::make('name')->disabled(),TextInput::make('email')->disabled(),TextInput::make('subject')->disabled()->columnSpanFull(),Textarea::make('message')->disabled()->rows(10)->columnSpanFull(),Select::make('status')->options(['new'=>'Nouveau','read'=>'Lu','handled'=>'Traité','spam'=>'Spam'])->required()]);}
+ public static function table(Table $table):Table{return $table->columns([TextColumn::make('created_at')->label('Date')->dateTime('d/m/Y H:i')->sortable(),TextColumn::make('name')->searchable(),TextColumn::make('email')->searchable(),TextColumn::make('subject')->searchable()->limit(60),TextColumn::make('status')->badge()->formatStateUsing(fn($s)=>['new'=>'Nouveau','read'=>'Lu','handled'=>'Traité','spam'=>'Spam'][$s]??$s)])->filters([SelectFilter::make('status')->options(['new'=>'Nouveau','read'=>'Lu','handled'=>'Traité','spam'=>'Spam'])])->recordActions([EditAction::make()->label('Consulter')])->defaultSort('created_at','desc');}
+ public static function getPages():array{return ['index'=>ContactMessageResource\Pages\ListContactMessages::route('/'),'edit'=>ContactMessageResource\Pages\EditContactMessage::route('/{record}/edit')];}
+}
