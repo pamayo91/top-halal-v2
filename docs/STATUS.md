@@ -1,6 +1,6 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-08
+Last updated: 2026-09-09
 
 Latest email/contact: central runtime mail settings, encrypted SMTP secret handling, safe registered transactional templates and delivery history are implemented with the existing Laravel queue. Existing verification, reset, password-change and claim emails now render through the central template layer, including explicit Mailable recipients. The SSR `/contact` page now has a lightweight editorial two-column layout (single-column mobile), local CSS/SVG decorations, an accessible field-icon form card, a 5,000-character progressive counter and an in-card success state. It preserves persistence-before-queueing, honeypot, rate limit, CSRF, validation, notifications and configured acknowledgement unchanged. Filament adds Emails (Configuration, Templates, Historique) and Contact (Messages, Réglages). The template list exposes each immutable functional name and description from the registry; an authenticated preproduction Playwright check guards that rendering. Public contact is covered on preproduction in desktop/mobile Playwright, and the deployment keeps `MAIL_MAILER=log`.
 
