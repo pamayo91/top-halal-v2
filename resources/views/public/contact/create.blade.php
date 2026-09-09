@@ -4,7 +4,7 @@
             <div class="contact-editorial">
                 <p class="contact-kicker"><span aria-hidden="true"></span>TOP HALAL, le site incontournable du halal au quotidien</p>
                 <h1>Une question ?<br>On vous écoute.</h1>
-                <p class="contact-introduction">{{ $settings['introduction'] ?? "Une information à corriger, une question sur un restaurant, un sujet autour du halal ou de l'islam ? Écrivez-nous." }}</p>
+                <p class="contact-introduction">Une information à corriger, une question sur un restaurant, un sujet autour du halal ou de l'islam ? Écrivez-nous.</p>
                 <ul class="contact-topics" aria-label="Nous pouvons vous aider">
                     <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2"/></svg><span>Restaurant<br>à signaler</span></li>
                     <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m4 20 4.1-1 10.3-10.3a2.2 2.2 0 0 0-3.1-3.1L5 15.9 4 20Z"/><path d="m13.8 7.2 3.1 3.1"/></svg><span>Information<br>à corriger</span></li>
