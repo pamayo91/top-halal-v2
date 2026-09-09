@@ -3,7 +3,7 @@
         <div class="contact-layout shell">
             <div class="contact-editorial">
                 <p class="contact-kicker"><span aria-hidden="true"></span>TOP HALAL, le site incontournable du halal au quotidien</p>
-                <h1>Une question ?<br>On vous écoute.</h1>
+                <h1><span>Une question ?</span><span>On vous écoute.</span></h1>
                 <p class="contact-introduction">Une information à corriger, une question sur un restaurant, un sujet autour du halal ou de l'islam ? Écrivez-nous.</p>
                 <ul class="contact-topics" aria-label="Nous pouvons vous aider">
                     <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2"/></svg><span>Restaurant<br>à signaler</span></li>

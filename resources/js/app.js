@@ -1,6 +1,7 @@
 import '../css/editorial-sidebar-overrides.css';
 import '../css/contact.css';
 import '../css/contact-responsive.css';
+import '../css/contact-proportions.css';
 import { initializeAddressSelectors } from './address-selector';
 
 const menu = document.querySelector('.menu-toggle');
