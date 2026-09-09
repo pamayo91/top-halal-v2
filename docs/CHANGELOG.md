@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-09
+
+- Refonte visuelle SSR de la page Contact : composition éditoriale responsive, décorations CSS/SVG locales, carte formulaire accessible, compteur aligné sur la limite serveur de 5 000 caractères et confirmation intégrée, sans changement du flux de stockage, anti-spam ou e-mail.
+
 ## 2026-09-08
 
 - Contact : le champ honeypot anti-spam est de nouveau correctement hors écran pour les visiteurs.

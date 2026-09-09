@@ -1,8 +1,18 @@
 import '../css/editorial-sidebar-overrides.css';
+import '../css/contact.css';
 import { initializeAddressSelectors } from './address-selector';
 
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
+
+const contactForm = document.querySelector('[data-contact-form]');
+if (contactForm) {
+    const message = contactForm.querySelector('#contact-message');
+    const count = contactForm.querySelector('#contact-message-count');
+    const updateCount = () => { count.textContent = `${message.value.length} / ${message.maxLength}`; };
+    message.addEventListener('input', updateCount);
+    updateCount();
+}
 
 const submission = document.querySelector('[data-restaurant-submission]');
 
