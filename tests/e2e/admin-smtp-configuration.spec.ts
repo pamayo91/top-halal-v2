@@ -26,6 +26,8 @@ test.describe('SMTP configuration administration', () => {
     await signIn(page);
     const response = await page.goto('/admin/email-settings');
     expect(response?.status()).toBe(200);
+    await expect(page.getByText('Mailer', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Administrateur principal', { exact: true })).toHaveCount(0);
     await page.getByRole('button', { name: 'Envoyer un e-mail de test' }).click();
     await expect(page.getByRole('dialog')).toContainText('Envoyer un e-mail de test');
     await expect(page.getByRole('dialog').locator('input[type="email"]')).toBeVisible();

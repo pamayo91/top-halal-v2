@@ -24,14 +24,13 @@ class MailSettingsPage extends Page
     {
         $values = app(MailSettings::class)->values();
         $values['password'] = '';
-        $this->form->fill($values + ['mailer' => config('mail.default'), 'port' => 587, 'encryption' => 'tls', 'timeout' => 10, 'tries' => 3]);
+        $this->form->fill($values + ['port' => 587, 'encryption' => 'tls', 'timeout' => 10, 'tries' => 3]);
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema->components([
             Section::make()->columns(2)->schema([
-                Select::make('mailer')->options(['log' => 'Journal (préproduction sûre)', 'smtp' => 'SMTP'])->required(),
                 TextInput::make('host')->label('Hôte SMTP'),
                 TextInput::make('port')->numeric()->minValue(1)->maxValue(65535),
                 Select::make('encryption')->options(['tls' => 'TLS', 'ssl' => 'SSL', 'none' => 'Aucun']),
@@ -40,7 +39,6 @@ class MailSettingsPage extends Page
                 TextInput::make('from_address')->label('Adresse expéditeur')->email(),
                 TextInput::make('from_name')->label('Nom expéditeur'),
                 TextInput::make('reply_to')->label('Reply-To')->email(),
-                TextInput::make('admin_email')->label('Administrateur principal')->email(),
                 TextInput::make('timeout')->numeric()->minValue(1)->maxValue(60),
                 TextInput::make('tries')->numeric()->minValue(1)->maxValue(10),
             ]),

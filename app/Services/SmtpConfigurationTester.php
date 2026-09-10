@@ -16,10 +16,6 @@ class SmtpConfigurationTester
             $settings = app(MailSettings::class);
             $values = $settings->values();
 
-            if (($values['mailer'] ?? config('mail.default')) !== 'smtp') {
-                throw new \RuntimeException('Sélectionnez le transport SMTP avant de lancer le test.');
-            }
-
             if (blank($values['host'] ?? null)) {
                 throw new \RuntimeException('Renseignez l’hôte SMTP avant de lancer le test.');
             }

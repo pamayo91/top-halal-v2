@@ -64,4 +64,15 @@ class EmailContactManagementTest extends TestCase
 
         $this->assertSame('smtps', config('mail.mailers.smtp.scheme'));
     }
+
+    public function test_mail_settings_always_use_smtp_and_discard_the_obsolete_administrator_address(): void
+    {
+        app(MailSettings::class)->update(['mailer' => 'log', 'host' => 'smtp.example.test', 'admin_email' => 'admin@example.test']);
+
+        $stored = Setting::where('key', 'mail_settings')->value('value');
+
+        $this->assertSame('smtp', $stored['mailer']);
+        $this->assertArrayNotHasKey('admin_email', $stored);
+        $this->assertSame('smtp', app(MailSettings::class)->apply());
+    }
 }
