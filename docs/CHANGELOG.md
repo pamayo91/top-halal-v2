@@ -274,6 +274,7 @@
 - Corrected the runtime SSL option mapping to Symfony’s `smtps` SMTP scheme, verified by the back-office configuration test.
 - Simplified e-mail configuration to SMTP only: removed the transport selector and obsolete primary-administrator address; the contact recipient remains configured solely in `Contact > Réglages`.
 - Added o2switch-safe automatic transactional queue processing: a two-minute Cron invokes a `flock`-guarded finite worker, while queued mailables and notifications carry Laravel 13-compatible progressive retry settings.
+- Cleared 26 explicitly audited obsolete preproduction jobs while retaining the active contact job; validated automatic Cron delivery end to end with an empty `failed_jobs` table and no persistent worker.
 
 - Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. The preproduction run found 198 official Quick restaurants and performed no restaurant business write.
 - Added idempotent `restaurants:sync-quick` import for the audited Quick snapshot, including official GPS/hours, existing Fast-food/category features and the ARGML certification sentence.
