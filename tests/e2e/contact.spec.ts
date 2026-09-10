@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Contact public', () => {
-  test('is responsive, validates and accepts a message without browser failures', async ({ page }) => {
+  test('is responsive, validates and accepts a message without browser failures', async ({ page }, testInfo) => {
     const errors: string[] = [];
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('pageerror', (error) => errors.push(error.message));
@@ -12,6 +12,15 @@ test.describe('Contact public', () => {
     await expect(page.locator('.contact-topics li')).toHaveCount(3);
     await expect(page.locator('.contact-sticker')).toBeVisible();
     await expect(page.locator('.contact-illustration')).toHaveAttribute('src', /images\/contact\/contact-illustration\.png/);
+    if (testInfo.project.name === 'mobile-chromium') {
+      await expect(page.locator('.contact-topics')).toBeHidden();
+      await expect(page.locator('.contact-art')).toBeHidden();
+      await expect(page.locator('.contact-signoff')).toBeHidden();
+    } else {
+      await expect(page.locator('.contact-topics')).toBeVisible();
+      await expect(page.locator('.contact-art')).toBeVisible();
+      await expect(page.locator('.contact-signoff')).toBeVisible();
+    }
     await expect(page.locator('.contact-count')).toHaveText('0 / 5000');
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await expect.poll(async () => page.locator('.hp').evaluate((element) => element.getBoundingClientRect().right < 0)).toBe(true);
