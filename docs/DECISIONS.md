@@ -65,6 +65,10 @@ Any database restoration, V2 rebuild/reseed, or import/reimport from the legacy 
 ### D019 — Non-regression gate
 Significant functional work is not DONE until the complete V2 non-regression suite passes on preproduction. The baseline is held in the V2 database, is refreshed only deliberately after a reviewed legitimate data change, and never uses WordPress as a runtime dependency. Count decreases, lost relations/media, HTTP 500s, browser failures and new Laravel exceptions are release blockers.
 
+### D023 — Cron-drained queue on o2switch mutualised hosting
+
+Preproduction processes Laravel's database queue through a two-minute user Cron rather than a permanent worker. A non-blocking `flock` guards the finite `queue:work --stop-when-empty` execution. Worker timeout is 75 seconds while database `retry_after` remains 90 seconds; transactional jobs carry their own four-attempt, `30/120/300` progressive backoff policy. This keeps the synchronous SMTP BO test separate from real queued delivery without requiring Supervisor/systemd.
+
 ## 2026-08-24
 
 ### D001 — Leave WordPress entirely

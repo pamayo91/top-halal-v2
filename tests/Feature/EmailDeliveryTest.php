@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\TestEmail;
+use App\Mail\TemplateMailable;
 use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
 use App\Models\Setting;
@@ -81,5 +82,23 @@ class EmailDeliveryTest extends TestCase
                 && str_contains($context['error'], 'password=[masqué]')
                 && ! str_contains($context['error'], 'not-for-display');
         });
+    }
+
+    public function test_all_transactional_email_jobs_define_progressive_retry_settings(): void
+    {
+        foreach ([
+            TemplateMailable::class,
+            \App\Notifications\VerifyEmailNotification::class,
+            \App\Notifications\QueuedResetPasswordNotification::class,
+            \App\Notifications\PasswordChangedNotification::class,
+            \App\Notifications\ClaimStatusNotification::class,
+            \App\Notifications\LegacyAccountMigrationNotification::class,
+        ] as $class) {
+            $defaults = (new \ReflectionClass($class))->getDefaultProperties();
+
+            $this->assertSame(4, $defaults['tries']);
+            $this->assertSame(75, $defaults['timeout']);
+            $this->assertSame([30, 120, 300], $defaults['backoff']);
+        }
     }
 }

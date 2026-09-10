@@ -113,9 +113,16 @@ After deploying this release to preproduction, run the forward-only `city_refere
 Laravel scheduler should have one server Cron entry (exact path/user decided after server audit), calling `php artisan schedule:run` every minute.
 
 ## Queue worker
-Use systemd or Supervisor after server audit. Do not rely on a browser request to process mail/AI queues.
+
+Preproduction is hosted on o2switch mutualised and has no persistent Supervisor/systemd worker. Use the user Cron every two minutes instead, with a non-blocking `flock` lock so overlapping runs cannot process a job twice:
+
+```cron
+*/2 * * * * /home/meyo5199/top-halal-v2/scripts/run-queue-worker-cron.sh >> /home/meyo5199/top-halal-v2/storage/logs/queue-worker.log 2>&1
+```
+
+The executable script uses `/opt/alt/php84/usr/bin/php artisan queue:work database --queue=default --stop-when-empty --tries=4 --timeout=75 --sleep=1 --no-interaction` behind `/usr/bin/flock -n`. `config/queue.php` sets database `retry_after=90`, leaving a 15-second safety margin above the worker timeout. New transactional mailables and notifications define their own progressive `30,120,300`-second backoff arrays; Laravel 13 serialises these into queue payloads. Do not run a permanent worker for this setup.
 
 ## Transactional email
-- Keep `MAIL_*` values exclusively in server `.env`; preproduction may use a log/capture transport until an operator supplies a real test recipient.
-- Run the database queue worker with three attempts and progressive backoff: `/opt/alt/php84/usr/bin/php artisan queue:work --tries=3 --backoff=30,120,300`.
+- Keep SMTP settings server-side / encrypted in the V2 settings; do not put credentials in Cron or logs.
+- The BO SMTP test remains synchronous and bypasses the queue. Site transactional messages use the Cron-drained database queue.
 - Inspect failures with `artisan queue:failed`; do not paste message content or credentials into deployment logs.

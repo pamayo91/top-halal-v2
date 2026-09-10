@@ -6,6 +6,9 @@ use Illuminate\Bus\Queueable; use Illuminate\Contracts\Queue\ShouldQueue; use Il
 class TemplateMailable extends Mailable implements ShouldQueue
 {
     use Queueable;
+    public int $tries = 4;
+    public int $timeout = 75;
+    public array $backoff = [30, 120, 300];
     public function __construct(public string $templateKey, public array $values, public ?int $logId = null, public ?string $replyToAddress = null) {}
     public function envelope(): Envelope { $r=app(EmailTemplateRenderer::class)->render($this->templateKey,$this->values); return new Envelope(subject: $r['subject'] ?? ''); }
     public function content(): Content { $r=app(EmailTemplateRenderer::class)->render($this->templateKey,$this->values); return new Content(view:'emails.transactional', with:['email'=>$r]); }

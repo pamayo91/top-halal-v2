@@ -6,7 +6,7 @@
 - `MailSettings` stores runtime SMTP settings in `settings.mail_settings`; SMTP is the sole back-office transport, the password is Laravel-encrypted and an empty edit never replaces it. Contact recipients are configured only under `Contact > Réglages`.
 - `TransactionalMailService` queues `TemplateMailable` instances and records safe operational metadata in `email_delivery_logs`. The journal never retains a body, token, URL or SMTP secret.
 - `Emails > Configuration > Envoyer un e-mail de test` is deliberately separate: it calls the configured SMTP transport synchronously and never creates a queue job or a delivery-history row. A successful SMTP hand-off is confirmed in the BO; a sanitised actionable failure is displayed there and recorded in `storage/logs/laravel.log` without credentials.
-- Transactional messages implement `ShouldQueue`. Preproduction uses the database queue already created by Laravel; failed jobs remain inspectable with `queue:failed` and retries use Laravel worker options.
+- Transactional messages implement `ShouldQueue`. Preproduction uses the database queue already created by Laravel; failed jobs remain inspectable with `queue:failed`. Every queued transactional mailable/notification carries four attempts, a 75-second timeout and progressive backoffs of 30, 120 and 300 seconds.
 - Controllers only enqueue notifications. A real SMTP failure occurs in the worker and cannot turn a user request into an error page.
 
 ## Implemented events
@@ -25,5 +25,5 @@
 
 `Emails > Templates` présente l’identifiant technique, le nom fonctionnel et la description de chaque template. Les deux derniers proviennent du registre applicatif et ne sont pas des champs administrables.
 
-- Required worker: `/opt/alt/php84/usr/bin/php artisan queue:work --tries=3 --backoff=30,120,300`.
+- On o2switch mutualised preproduction, Cron runs `scripts/run-queue-worker-cron.sh` every two minutes. It uses non-blocking `flock`, database queue `retry_after=90`, `queue:work --timeout=75 --tries=4 --stop-when-empty`, and exits after the queue drains. The job-level backoff array is serialised by Laravel 13 into its queue payload; it is not passed as an unverified CLI list.
 - Before SMTP is approved, use the configured capture/log transport on preproduction. Real-recipient testing requires an address explicitly supplied by an operator.

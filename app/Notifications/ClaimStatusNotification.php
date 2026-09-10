@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 
 class ClaimStatusNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, TransactionalMailQueueSettings;
 
     public function __construct(private readonly RestaurantClaim $claim, private readonly string $event) {}
 

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Config;
 
 class VerifyEmailNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, TransactionalMailQueueSettings;
 
     public function via(object $notifiable): array { return ['mail']; }
 
