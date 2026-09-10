@@ -50,7 +50,7 @@ class TransactionalMailService
                 throw new EmailDeliveryUnavailableException('L’e-mail est déjà en cours de traitement.');
             }
 
-            DB::table('jobs')->whereKey($job->id)->update(['available_at' => now()->timestamp]);
+            DB::table('jobs')->where('id', $job->id)->update(['available_at' => now()->timestamp]);
         });
     }
 
@@ -70,7 +70,7 @@ class TransactionalMailService
                 throw new EmailDeliveryUnavailableException('L’e-mail est déjà en cours de traitement et ne peut plus être annulé.');
             }
 
-            DB::table('jobs')->whereKey($job->id)->whereNull('reserved_at')->delete();
+            DB::table('jobs')->where('id', $job->id)->whereNull('reserved_at')->delete();
             $log->update([
                 'status' => EmailDeliveryLog::STATUS_CANCELLED,
                 'cancelled_at' => now(),
@@ -130,7 +130,7 @@ class TransactionalMailService
             return null;
         }
 
-        $query = DB::table('jobs')->whereKey($log->queue_job_id);
+        $query = DB::table('jobs')->where('id', $log->queue_job_id);
 
         if ($lock) {
             $query->lockForUpdate();
