@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListEmailDeliveryLogs extends ListRecords
 {
     protected static string $resource = EmailDeliveryLogResource::class;
+    protected static ?string $title = 'Historique des e-mails';
 
     protected function getHeaderWidgets(): array
     {
