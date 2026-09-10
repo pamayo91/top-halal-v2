@@ -37,7 +37,7 @@
 
 ## Frontend build and test safety
 
-The preproduction SSH environment has no Node.js executable in PATH. After the Git deployment, build Vite assets with the approved workstation runtime and copy only the resulting `public/build/` artifacts to the exact preproduction `public/build/` directory; do not copy source files or secrets.
+The preproduction SSH environment has no Node.js executable in PATH. After the Git deployment, build Vite assets with the approved workstation runtime and copy only the resulting `public/build/` artifacts to the exact preproduction `public/build/` directory; copy the *contents* (including `manifest.json`) into that exact directory, rather than nesting a `build/` directory or leaving an older manifest in place. Do not copy source files or secrets.
 
 Before running `artisan test` on preproduction, run `artisan optimize:clear` first so PHPUnit’s SQLite testing configuration is not shadowed by the cached preproduction configuration. Recreate the configuration, route and view caches after the test run. Never run database-migrating tests against a cached preproduction configuration.
 
