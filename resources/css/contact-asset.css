@@ -1,0 +1,4 @@
+/* Supplied transparent contact illustration: intentionally displayed without effects. */
+.contact-art{height:auto;max-width:650px;margin-top:1.7rem;overflow:visible}.contact-art::before{display:none}.contact-illustration{display:block;width:100%;height:auto;object-fit:contain}.contact-editorial h1{font-size:clamp(3.8rem,4.55vw,4.2rem)}.contact-form-card header h2,.contact-success h2{font-size:clamp(2.15rem,2.75vw,2.45rem)}.contact-sticker{font-style:italic;font-weight:500}
+@media(max-width:1100px){.contact-editorial h1{font-size:clamp(3.3rem,5vw,3.8rem)}.contact-form-card header h2{font-size:clamp(2rem,3vw,2.3rem)}}
+@media(max-width:760px){.contact-topics,.contact-art,.contact-signoff{display:none}.contact-editorial{margin-bottom:1.5rem}.contact-editorial h1{font-size:clamp(2.45rem,11.8vw,3.15rem)}.contact-introduction{margin-bottom:0}.contact-sticker{font-weight:500}}

@@ -11,10 +11,7 @@
                     <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-8.5 8 8.7 8.7 0 0 1-3.5-.8L4 20l1.3-3.5A8 8 0 1 1 20 11.5Z"/></svg><span>Un sujet à<br>nous proposer</span></li>
                 </ul>
                 <div class="contact-art" aria-hidden="true">
-                    <svg class="contact-art-pin" viewBox="0 0 90 130"><path d="M45 2C21 2 4 20 4 44c0 30 41 80 41 80s41-50 41-80C86 20 69 2 45 2Z"/><circle cx="45" cy="44" r="15"/></svg>
-                    <span class="contact-art-plate"></span><span class="contact-art-bubble">•••</span>
-                    <svg class="contact-art-curve" viewBox="0 0 330 130"><path d="M3 118C90 8 258 8 327 70"/></svg>
-                    <p>Partager. Découvrir.<br>Transmettre.</p>
+                    <img class="contact-illustration" src="{{ asset('images/contact/contact-illustration.png') }}" width="1774" height="887" alt="" aria-hidden="true">
                 </div>
                 <p class="contact-signoff"><span aria-hidden="true">→</span> Le halal au quotidien, et bien plus encore.</p>
             </div>

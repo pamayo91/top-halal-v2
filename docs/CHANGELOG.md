@@ -2,6 +2,7 @@
 
 ## 2026-09-09
 
+- Contact : l’illustration basse fournie est intégrée comme PNG transparent avec dimensions réservées ; la hiérarchie des titres et le sticker sont allégés, tandis que les décorations secondaires sont masquées sur mobile.
 - Contact : proportions desktop/tablette corrigées — conteneur élargi, H1 sur deux lignes explicites, carte et textarea compactés, et zone illustrative aérée.
 - Refonte visuelle SSR de la page Contact : composition éditoriale responsive, décorations CSS/SVG locales, carte formulaire accessible, compteur aligné sur la limite serveur de 5 000 caractères et confirmation intégrée, sans changement du flux de stockage, anti-spam ou e-mail.
 

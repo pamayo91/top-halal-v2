@@ -11,6 +11,7 @@ test.describe('Contact public', () => {
     await expect(page.getByRole('heading', { name: 'Envoyez-nous un message' })).toBeVisible();
     await expect(page.locator('.contact-topics li')).toHaveCount(3);
     await expect(page.locator('.contact-sticker')).toBeVisible();
+    await expect(page.locator('.contact-illustration')).toHaveAttribute('src', /images\/contact\/contact-illustration\.png/);
     await expect(page.locator('.contact-count')).toHaveText('0 / 5000');
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await expect.poll(async () => page.locator('.hp').evaluate((element) => element.getBoundingClientRect().right < 0)).toBe(true);
