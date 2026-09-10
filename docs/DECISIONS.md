@@ -67,7 +67,7 @@ Significant functional work is not DONE until the complete V2 non-regression sui
 
 ### D023 — Cron-drained queue on o2switch mutualised hosting
 
-Preproduction processes Laravel's database queue through a two-minute user Cron rather than a permanent worker. A non-blocking `flock` guards the finite `queue:work --stop-when-empty` execution. Worker timeout is 75 seconds while database `retry_after` remains 90 seconds; transactional jobs carry their own four-attempt, `30/120/300` progressive backoff policy. This keeps the synchronous SMTP BO test separate from real queued delivery without requiring Supervisor/systemd.
+Preproduction processes Laravel's database queue through a one-minute user Cron rather than a permanent worker. A non-blocking `flock` guards the finite `queue:work --stop-when-empty` execution. Worker timeout is 75 seconds while database `retry_after` remains 90 seconds; transactional jobs carry their own four-attempt, `30/120/300` progressive backoff policy. This keeps the synchronous SMTP BO test separate from real queued delivery without requiring Supervisor/systemd.
 
 ## 2026-08-24
 

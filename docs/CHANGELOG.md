@@ -273,7 +273,7 @@
 - Separated the back-office SMTP configuration test from transactional delivery: `Emails > Configuration > Envoyer un e-mail de test` now sends immediately through SMTP without creating a Laravel queue job, shows a clear success or sanitised actionable failure, and logs failures without credentials. Transactional site e-mails remain queued.
 - Corrected the runtime SSL option mapping to Symfony’s `smtps` SMTP scheme, verified by the back-office configuration test.
 - Simplified e-mail configuration to SMTP only: removed the transport selector and obsolete primary-administrator address; the contact recipient remains configured solely in `Contact > Réglages`.
-- Added o2switch-safe automatic transactional queue processing: a two-minute Cron invokes a `flock`-guarded finite worker, while queued mailables and notifications carry Laravel 13-compatible progressive retry settings.
+- Added o2switch-safe automatic transactional queue processing: a one-minute Cron invokes a `flock`-guarded finite worker, while queued mailables and notifications carry Laravel 13-compatible progressive retry settings.
 - Cleared 26 explicitly audited obsolete preproduction jobs while retaining the active contact job; validated automatic Cron delivery end to end with an empty `failed_jobs` table and no persistent worker.
 
 - Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. The preproduction run found 198 official Quick restaurants and performed no restaurant business write.
