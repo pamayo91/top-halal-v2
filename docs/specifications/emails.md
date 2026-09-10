@@ -5,6 +5,7 @@
 - `EmailTemplate` rows are administrative overrides over deterministic application defaults. A new transactional type is declared once in `EmailTemplateRegistry`; it then appears in Filament after opening `Emails > Templates`.
 - `MailSettings` stores runtime SMTP settings in `settings.mail_settings`; the SMTP password is Laravel-encrypted and an empty edit never replaces it. The existing Laravel mailer remains the fallback, including the preproduction `log` transport.
 - `TransactionalMailService` queues `TemplateMailable` instances and records safe operational metadata in `email_delivery_logs`. The journal never retains a body, token, URL or SMTP secret.
+- `Emails > Configuration > Envoyer un e-mail de test` is deliberately separate: it calls the configured SMTP transport synchronously and never creates a queue job or a delivery-history row. A successful SMTP hand-off is confirmed in the BO; a sanitised actionable failure is displayed there and recorded in `storage/logs/laravel.log` without credentials.
 - Transactional messages implement `ShouldQueue`. Preproduction uses the database queue already created by Laravel; failed jobs remain inspectable with `queue:failed` and retries use Laravel worker options.
 - Controllers only enqueue notifications. A real SMTP failure occurs in the worker and cannot turn a user request into an error page.
 

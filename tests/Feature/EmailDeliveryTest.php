@@ -5,13 +5,18 @@ namespace Tests\Feature;
 use App\Mail\TestEmail;
 use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
+use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\ClaimStatusNotification;
 use App\Notifications\VerifyEmailNotification;
 use App\Services\ClaimModeration;
+use App\Services\SmtpConfigurationTestException;
+use App\Services\SmtpConfigurationTester;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use RuntimeException;
 use Tests\TestCase;
 
 class EmailDeliveryTest extends TestCase
@@ -43,5 +48,38 @@ class EmailDeliveryTest extends TestCase
         Mail::fake();
         $this->artisan('mail:test', ['address' => 'test@example.test'])->assertExitCode(0);
         Mail::assertQueued(TestEmail::class);
+    }
+
+    public function test_smtp_configuration_test_is_sent_immediately_without_a_queue_job(): void
+    {
+        Setting::create(['key' => 'mail_settings', 'group' => 'email', 'value' => ['mailer' => 'smtp', 'host' => 'smtp.example.test', 'port' => 587, 'encryption' => 'tls', 'from_address' => 'noreply@example.test']]);
+        Mail::fake();
+
+        app(SmtpConfigurationTester::class)->send('recipient@example.test');
+
+        Mail::assertSent(TestEmail::class, fn (TestEmail $mail) => true);
+        Mail::assertNothingQueued();
+        $this->assertDatabaseCount('jobs', 0);
+    }
+
+    public function test_smtp_configuration_test_logs_a_sanitised_error(): void
+    {
+        Setting::create(['key' => 'mail_settings', 'group' => 'email', 'value' => ['mailer' => 'smtp', 'host' => 'smtp.example.test']]);
+        Log::spy();
+        Mail::shouldReceive('mailer')->once()->with('smtp')->andThrow(new RuntimeException('SMTP authentication failed: password=not-for-display'));
+
+        try {
+            app(SmtpConfigurationTester::class)->send('recipient@example.test');
+            $this->fail('The SMTP test should have failed.');
+        } catch (SmtpConfigurationTestException $exception) {
+            $this->assertStringContainsString('SMTP authentication failed', $exception->getMessage());
+            $this->assertStringNotContainsString('not-for-display', $exception->getMessage());
+        }
+
+        Log::shouldHaveReceived('error')->once()->withArgs(function (string $message, array $context): bool {
+            return $message === 'SMTP configuration test failed.'
+                && str_contains($context['error'], 'password=[masqué]')
+                && ! str_contains($context['error'], 'not-for-display');
+        });
     }
 }

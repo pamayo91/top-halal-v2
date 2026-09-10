@@ -270,6 +270,8 @@
 
 ## Unreleased
 
+- Separated the back-office SMTP configuration test from transactional delivery: `Emails > Configuration > Envoyer un e-mail de test` now sends immediately through SMTP without creating a Laravel queue job, shows a clear success or sanitised actionable failure, and logs failures without credentials. Transactional site e-mails remain queued.
+
 - Added the read-only `restaurants:audit-quick` command, deterministic Quick/Top-Halal matching, private raw snapshot and CSV/Markdown audit reports. The preproduction run found 198 official Quick restaurants and performed no restaurant business write.
 - Added idempotent `restaurants:sync-quick` import for the audited Quick snapshot, including official GPS/hours, existing Fast-food/category features and the ARGML certification sentence.
 # 2026-09-07 — Sidebar éditoriale commune
