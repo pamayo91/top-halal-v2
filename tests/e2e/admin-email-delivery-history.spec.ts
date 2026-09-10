@@ -32,7 +32,8 @@ test.describe('Historique des e-mails', () => {
     await page.getByRole('button', { name: /Filtre|Filtres/ }).click();
     await expect(page.getByText('Statut', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Type', { exact: true }).last()).toBeVisible();
-    await expect(page.getByText('Période', { exact: true }).last()).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Du' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'Au' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Voir les détails' }).first().click();
     const dialog = page.getByRole('dialog');
