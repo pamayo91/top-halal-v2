@@ -42,7 +42,7 @@ test.describe('SMTP configuration administration', () => {
     await page.getByRole('button', { name: 'Envoyer un e-mail de test' }).click();
     const dialog = page.getByRole('dialog');
     await dialog.locator('input[type="email"]').fill(testRecipient!);
-    await dialog.getByRole('button', { name: 'Envoyer un e-mail de test' }).click();
+    await dialog.getByRole('button', { name: 'Soumettre' }).click();
     await expect(page.getByText('E-mail de test envoyé avec succès')).toBeVisible();
   });
 });
