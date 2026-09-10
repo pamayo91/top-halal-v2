@@ -2,6 +2,7 @@
 
 ## 2026-09-09
 
+- Contact : la zone de respiration entre les trois repères et l’illustration desktop est désormais structurée par une courbe vert pâle et un discret motif géométrique en arrière-plan, sans déplacer l’illustration ni affecter le mobile.
 - Contact : l’illustration desktop s’aligne désormais au bas de la carte formulaire ; l’espace entre l’introduction et les trois repères est resserré.
 - Contact : suppression du signoff inférieur devenu redondant avec l’illustration fournie.
 - Contact : l’illustration basse fournie est intégrée comme PNG transparent avec dimensions réservées ; la hiérarchie des titres et le sticker sont allégés, tandis que les décorations secondaires sont masquées sur mobile.
