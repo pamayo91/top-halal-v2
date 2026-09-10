@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+const adminEmail = process.env.PREPROD_ADMIN_EMAIL;
+const adminPassword = process.env.PREPROD_ADMIN_PASSWORD;
+
 test('desktop navigation is SSR, has no search control, and keeps the account CTAs', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop-only header assertions.');
   const errors: string[] = []; const failures: string[] = [];
@@ -34,5 +37,24 @@ test('mobile navigation opens, closes with Escape, and does not overflow horizon
   await expect(page.locator('#mobile-nav')).toBeHidden();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await expect(page.locator('.site-footer')).toBeVisible();
+  expect(errors).toEqual([]); expect(failures).toEqual([]);
+});
+
+test('navigation back office groups Menus, Header and Footer without browser errors', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium' || !adminEmail || !adminPassword, 'Dedicated preproduction administrator required.');
+  const errors: string[] = []; const failures: string[] = [];
+  page.on('console', message => { if (message.type() === 'error' && !message.text().startsWith('Failed to load resource:')) errors.push(message.text()); });
+  page.on('requestfailed', request => failures.push(request.url()));
+
+  await page.goto('/admin');
+  await page.locator('input[type="email"]').fill(adminEmail!);
+  await page.locator('input[type="password"]').fill(adminPassword!);
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/admin$/);
+  for (const [path, heading] of [['/admin/menus', 'Menus'], ['/admin/navigation/header', 'Header'], ['/admin/navigation/footer', 'Footer']]) {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  }
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });
