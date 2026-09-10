@@ -12,8 +12,11 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Mail\Events\MessageSent;
 use App\Models\EmailDeliveryLog;
+use App\Services\EmailDeliveryErrorSanitizer;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -43,6 +46,36 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('restaurant-duplicate-check', fn (Request $request): Limit => Limit::perMinute(30)->by('restaurant-duplicates|'.$request->ip()));
         RateLimiter::for('restaurant-submission', fn (Request $request): Limit => Limit::perHour(5)->by('restaurant|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
         RateLimiter::for('contact', fn (Request $request): Limit => Limit::perHour(5)->by('contact|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
-        Event::listen(MessageSent::class, function (MessageSent $event): void { $id = $event->message->getHeaders()->get('X-Top-Halal-Email-Log')?->getBodyAsString(); if ($id) EmailDeliveryLog::whereKey($id)->update(['status'=>'sent','error_message'=>null]); });
+        Event::listen(MessageSent::class, function (MessageSent $event): void {
+            $id = $event->message->getHeaders()->get('X-Top-Halal-Email-Log')?->getBodyAsString();
+            if (! $id) return;
+            EmailDeliveryLog::whereKey($id)->whereIn('status', [EmailDeliveryLog::STATUS_QUEUED, EmailDeliveryLog::STATUS_PROCESSING])->update([
+                'status' => EmailDeliveryLog::STATUS_SENT,
+                'sent_at' => now(),
+                'message_id' => method_exists($event->sent, 'getMessageId') ? $event->sent->getMessageId() : null,
+                'error_message' => null,
+            ]);
+        });
+        Event::listen(JobExceptionOccurred::class, function (JobExceptionOccurred $event): void {
+            $id = $this->emailLogIdFromPayload($event->job->payload());
+            if ($id) EmailDeliveryLog::whereKey($id)->where('status', EmailDeliveryLog::STATUS_PROCESSING)->update([
+                'status' => EmailDeliveryLog::STATUS_QUEUED,
+                'error_message' => EmailDeliveryErrorSanitizer::message($event->exception),
+            ]);
+        });
+        Event::listen(JobFailed::class, function (JobFailed $event): void {
+            $id = $this->emailLogIdFromPayload($event->job->payload());
+            if ($id) EmailDeliveryLog::whereKey($id)->whereNotIn('status', [EmailDeliveryLog::STATUS_SENT, EmailDeliveryLog::STATUS_CANCELLED, EmailDeliveryLog::STATUS_EXPIRED])->update([
+                'status' => EmailDeliveryLog::STATUS_FAILED,
+                'failed_job_uuid' => $event->job->uuid(),
+                'error_message' => EmailDeliveryErrorSanitizer::message($event->exception),
+            ]);
+        });
+    }
+
+    private function emailLogIdFromPayload(array $payload): ?int
+    {
+        $command = $payload['data']['command'] ?? null;
+        return is_string($command) && preg_match('/logId";i:(\d+);/', $command, $matches) ? (int) $matches[1] : null;
     }
 }

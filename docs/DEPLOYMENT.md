@@ -120,7 +120,7 @@ Preproduction is hosted on o2switch mutualised and has no persistent Supervisor/
 * * * * * /home/meyo5199/top-halal-v2/scripts/run-queue-worker-cron.sh >> /home/meyo5199/top-halal-v2/storage/logs/queue-worker.log 2>&1
 ```
 
-The executable script uses `/opt/alt/php84/usr/bin/php artisan queue:work database --queue=default --stop-when-empty --tries=4 --timeout=75 --sleep=1 --no-interaction` behind `/usr/bin/flock -n`. `config/queue.php` sets database `retry_after=90`, leaving a 15-second safety margin above the worker timeout. New transactional mailables and notifications define their own progressive `30,120,300`-second backoff arrays; Laravel 13 serialises these into queue payloads. Do not run a permanent worker for this setup.
+The executable script first reconciles tracked delivery-history rows whose database job has disappeared, then uses `/opt/alt/php84/usr/bin/php artisan queue:work database --queue=default --stop-when-empty --tries=4 --timeout=75 --sleep=1 --no-interaction` behind `/usr/bin/flock -n`. `config/queue.php` sets database `retry_after=90`, leaving a 15-second safety margin above the worker timeout. New transactional mailables and notifications define their own progressive `30,120,300`-second backoff arrays; Laravel 13 serialises these into queue payloads. Do not run a permanent worker for this setup.
 
 ## Transactional email
 - Keep SMTP settings server-side / encrypted in the V2 settings; do not put credentials in Cron or logs.

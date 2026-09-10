@@ -2,6 +2,11 @@
 
 ## 2026-09-10
 
+- Converted `Emails > Historique` into a French operational delivery history with queue-linked status, safe details, filters, counters, contextual and bulk retry/cancellation actions, and no resend action for delivered mail.
+- Added explicit `annulé` and `expiré` states, safe SMTP error redaction, sent timestamp/Message-ID capture and Cron reconciliation of journal entries whose Laravel job no longer exists.
+
+## 2026-09-10
+
 - Ajout de la navigation administrable Filament : menus, header, footer, sous-menus à deux niveaux, règles de visibilité et rendu SSR sécurisé/caché.
 
 ## 2026-09-09

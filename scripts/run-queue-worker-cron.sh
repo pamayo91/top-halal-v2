@@ -8,6 +8,8 @@ readonly LOCK_FILE="$APP_PATH/storage/framework/queue-worker.lock"
 
 cd "$APP_PATH"
 
+"$PHP_BINARY" artisan emails:reconcile-delivery-logs --no-interaction
+
 exec /usr/bin/flock -n "$LOCK_FILE" \
     "$PHP_BINARY" artisan queue:work database \
     --queue=default \
