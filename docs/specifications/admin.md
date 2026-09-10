@@ -38,6 +38,14 @@ Les secrets restent dans `.env`; les réglages V2 ne contiennent que des valeurs
 
 ## Non-régression
 
+## Navigation publique
+
+Le groupe Filament « Navigation » rassemble les Menus, le Header et le Footer. Les templates Blade restent propriétaires de la structure et des styles : le BO ne permet que de gérer des menus, leurs éléments, leur ordre et quelques réglages de contenu. Les emplacements sont `header_main`, `footer_1` à `footer_4` et `footer_legal`.
+
+Un menu contient des éléments racine et, au maximum, un niveau de sous-menu. Les éléments peuvent être réordonnés dans Filament. Une destination est soit absente, une URL interne sûre, une URL externe http(s), soit un modèle V2 (Page, Article, Spécialité, Service) ou une ville résolue par le routeur V2. Les URLs des modèles sont toujours générées côté serveur. Une Page ou un Article non publié, une cible supprimée, ou une URL invalide est ignoré au rendu public : aucun lien cassé ne sort dans le HTML. `target=_blank` ajoute systématiquement `noopener noreferrer`; `nofollow` reste opt-in.
+
+Le rendu public est SSR, chargé en une requête relationnelle par menu et mis en cache. Une modification de menu, d’élément ou de réglage Header/Footer invalide immédiatement ce cache. Le header ne comporte ni recherche ni loupe ; le même menu alimente desktop et mobile, avec exceptions de visibilité. Le menu mobile et les sous-menus gardent des boutons, des états `aria-expanded` / `aria-controls` et une fermeture Escape légère.
+
 ## E-mails et Contact
 
 `Emails > Configuration` centralise le mailer et les paramètres SMTP. Le secret SMTP est chiffré, non lisible dans le BO et n’est jamais journalisé. `Emails > Templates` édite uniquement l’objet, du texte sûr et le CTA des types déclarés par le registre. `Emails > Historique` expose les tentatives sans contenu sensible. `Contact > Messages` permet de consulter et modérer les messages persistés ; `Contact > Réglages` définit le destinataire unique et l’accusé de réception.

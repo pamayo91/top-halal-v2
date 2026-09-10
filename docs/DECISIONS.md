@@ -1,5 +1,11 @@
 # Architectural & Product Decisions
 
+## 2026-09-10
+
+### D029 — Navigation administrable sans page builder
+
+Les menus sont stockés dans `menus` / `menu_items`; les réglages éditoriaux réduits du header et footer restent dans le système `settings` existant. Les layouts Blade conservent entièrement la structure et le style public. Les destinations de contenus V2 sont des identifiants de modèles et sont résolues avec les routes nommées au rendu, ce qui évite de persister des URLs fragiles.
+
 ## 2026-09-06
 
 ### D027 — Facettes SEO ville + spécialité explicitement ouvertes

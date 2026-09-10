@@ -238,6 +238,23 @@ if (submission) {
 }
 menu?.addEventListener('click', () => { const open = menu.getAttribute('aria-expanded') === 'true'; menu.setAttribute('aria-expanded', String(!open)); mobileNav.hidden = open; });
 
+document.querySelectorAll('[data-submenu-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+        const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+        if (!panel) return;
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open)); panel.hidden = open;
+    });
+});
+document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('[data-submenu-toggle][aria-expanded="true"]').forEach(toggle => {
+        document.getElementById(toggle.getAttribute('aria-controls'))?.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+    });
+    if (menu?.getAttribute('aria-expanded') === 'true') { menu.setAttribute('aria-expanded', 'false'); mobileNav.hidden = true; menu.focus(); }
+});
+
 document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     const location = form.querySelector('[data-location-input]'); const cityValue = form.querySelector('[data-location-value]');
     const query = form.querySelector('[data-query-input]'); const category = form.querySelector('[data-category-input]');

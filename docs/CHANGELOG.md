@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-10
+
+- Ajout de la navigation administrable Filament : menus, header, footer, sous-menus à deux niveaux, règles de visibilité et rendu SSR sécurisé/caché.
+
 ## 2026-09-09
 
 - Contact : la zone de respiration entre les trois repères et l’illustration desktop est désormais structurée par une courbe vert pâle et un discret motif géométrique en arrière-plan, sans déplacer l’illustration ni affecter le mobile.
