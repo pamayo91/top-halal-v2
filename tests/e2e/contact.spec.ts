@@ -19,7 +19,7 @@ test.describe('Contact public', () => {
     } else {
       await expect(page.locator('.contact-topics')).toBeVisible();
       await expect(page.locator('.contact-art')).toBeVisible();
-      await expect(page.locator('.contact-signoff')).toBeVisible();
+      await expect(page.locator('.contact-signoff')).toBeHidden();
     }
     await expect(page.locator('.contact-count')).toHaveText('0 / 5000');
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
