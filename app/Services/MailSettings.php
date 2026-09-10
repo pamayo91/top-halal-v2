@@ -11,7 +11,7 @@ class MailSettings
     {
         $v = $this->values(); $mailer = $v['mailer'] ?? config('mail.default');
         if ($mailer !== 'smtp' || blank($v['host'] ?? null)) return $mailer;
-        Config::set('mail.mailers.smtp', array_filter(['transport'=>'smtp','host'=>$v['host'],'port'=>(int)($v['port'] ?? 587),'scheme'=>($v['encryption'] ?? null) === 'none' ? null : ($v['encryption'] ?? null),'username'=>$v['username'] ?? null,'password'=>filled($v['password'] ?? null) ? Crypt::decryptString($v['password']) : null,'timeout'=>(int)($v['timeout'] ?? 10)], fn($x) => $x !== null));
+        Config::set('mail.mailers.smtp', array_filter(['transport'=>'smtp','host'=>$v['host'],'port'=>(int)($v['port'] ?? 587),'scheme'=>($v['encryption'] ?? null) === 'ssl' ? 'smtps' : 'smtp','username'=>$v['username'] ?? null,'password'=>filled($v['password'] ?? null) ? Crypt::decryptString($v['password']) : null,'timeout'=>(int)($v['timeout'] ?? 10)], fn($x) => $x !== null));
         Config::set('mail.from', ['address'=>$v['from_address'] ?? config('mail.from.address'),'name'=>$v['from_name'] ?? config('mail.from.name')]);
         return $mailer;
     }

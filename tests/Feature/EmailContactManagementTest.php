@@ -55,4 +55,13 @@ class EmailContactManagementTest extends TestCase
         $settings->update(['mailer' => 'smtp', 'host' => 'smtp.example.test', 'password' => '']);
         $this->assertSame('secret-value', Crypt::decryptString(Setting::where('key', 'mail_settings')->value('value')['password']));
     }
+
+    public function test_mail_settings_translate_the_ssl_choice_to_the_smtps_transport_scheme(): void
+    {
+        app(MailSettings::class)->update(['mailer' => 'smtp', 'host' => 'smtp.example.test', 'port' => 465, 'encryption' => 'ssl']);
+
+        app(MailSettings::class)->apply();
+
+        $this->assertSame('smtps', config('mail.mailers.smtp.scheme'));
+    }
 }
