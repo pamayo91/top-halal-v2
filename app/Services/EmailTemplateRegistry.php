@@ -3,7 +3,7 @@ namespace App\Services;
 
 class EmailTemplateRegistry
 {
-    /** @return array<string, array{name:string,description:string,variables:array<int,string>,subject:string,body:string,cta_label:?string,active:bool}> */
+    /** @return array<string, array{name:string,description:string,variables:array<int,string>,subject:string,body:string,cta_label:?string}> */
     public function all(): array
     {
         return [
@@ -18,5 +18,5 @@ class EmailTemplateRegistry
         ];
     }
     public function get(string $key): array { return $this->all()[$key] ?? throw new \InvalidArgumentException('Type d’e-mail inconnu.'); }
-    private function definition(string $name, string $description, array $variables, string $subject, string $body, ?string $cta): array { return compact('name','description','variables','subject','body') + ['cta_label' => $cta, 'active' => true]; }
+    private function definition(string $name, string $description, array $variables, string $subject, string $body, ?string $cta): array { return compact('name','description','variables','subject','body') + ['cta_label' => $cta]; }
 }

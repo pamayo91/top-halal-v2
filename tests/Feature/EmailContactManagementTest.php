@@ -43,15 +43,14 @@ class EmailContactManagementTest extends TestCase
         $fallback = $renderer->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => '<Alice>', 'contact_subject' => 'Bonjour']);
         $this->assertStringContainsString('<Alice>', $fallback['body']);
         $this->assertStringContainsString('&lt;Alice&gt;', view('emails.transactional', ['email' => $fallback, 'global' => app(EmailGlobalSettings::class)->forRender()])->render());
-        EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Bonjour {{ contact_name }} {{ unknown }}', 'body' => 'Texte {{ site_name }}', 'is_active' => true]);
+        EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Bonjour {{ contact_name }} {{ unknown }}', 'body' => 'Texte {{ site_name }}']);
         $rendered = $renderer->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => 'Alice']);
         $this->assertSame('Bonjour Alice {{ unknown }}', $rendered['subject']); $this->assertSame('Texte Top Halal', $rendered['body']);
-        EmailTemplate::where('key', 'contact_confirmation')->update(['is_active' => false]); $this->assertFalse($renderer->render('contact_confirmation', [])['active']);
     }
 
     public function test_template_rendering_normalises_legacy_newline_escapes_and_escapes_html(): void
     {
-        EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Sujet', 'body' => 'Premier\\n\\nDeuxième <script>alert(1)</script>', 'is_active' => true]);
+        EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Sujet', 'body' => 'Premier\\n\\nDeuxième <script>alert(1)</script>']);
 
         $rendered = app(EmailTemplateRenderer::class)->render('contact_confirmation', []);
         $html = view('emails.transactional', ['email' => $rendered, 'global' => app(EmailGlobalSettings::class)->forRender()])->render();

@@ -280,6 +280,8 @@
 
 ## Unreleased
 
+- Removed transactional-template activation controls and the obsolete `email_templates.is_active` column. Declared templates are always rendered and queued when their application event occurs.
+
 - Added a configurable shared transactional-email layout: global identity, optional V2 media-library logo, primary colour, footer, dynamic year and supporting text are managed in `Emails > Configuration globale` and are reflected in previews and delivered HTML/text e-mails.
 - Corrected literal `\\n` output caused by PHP single-quoted default bodies. New defaults use actual LF characters, the renderer safely normalises old stored bodies, and a forward migration repairs existing override rows.
 

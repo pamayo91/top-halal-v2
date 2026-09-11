@@ -15,10 +15,6 @@ class TransactionalMailService
     {
         $rendered = app(EmailTemplateRenderer::class)->render($templateKey, $values);
 
-        if (! ($rendered['active'] ?? false)) {
-            return null;
-        }
-
         return DB::transaction(function () use ($templateKey, $recipient, $values, $replyTo, $rendered): EmailDeliveryLog {
             $log = EmailDeliveryLog::create([
                 'template_key' => $templateKey,
