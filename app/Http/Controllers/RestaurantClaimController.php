@@ -11,11 +11,18 @@ use App\Notifications\ClaimStatusNotification;
 
 class RestaurantClaimController extends Controller
 {
-    public function create(Restaurant $restaurant): View
+    public function create(Request $request, Restaurant $restaurant): View|RedirectResponse
     {
         abort_unless($restaurant->isClaimable(), 409, 'Ce restaurant est déjà géré ou fait actuellement l’objet d’une demande de revendication.');
-        return view('claims.create', ['restaurant' => $restaurant, 'claim' => $restaurant->claims()->where('user_id', request()->user()->id)->first()]);
+        if (! $request->user()) return view('claims.authenticate', ['restaurant' => $restaurant]);
+        if ($request->user()->must_change_password) {
+            $request->session()->put('url.intended', route('claims.create', $restaurant));
+            return redirect()->route('password.change');
+        }
+        return view('claims.create', ['restaurant' => $restaurant, 'claim' => $restaurant->claims()->where('user_id', $request->user()->id)->first()]);
     }
+    public function login(Request $request, Restaurant $restaurant): RedirectResponse { return $this->redirectToAuthentication($request, $restaurant, 'login'); }
+    public function register(Request $request, Restaurant $restaurant): RedirectResponse { return $this->redirectToAuthentication($request, $restaurant, 'register'); }
 
     public function store(Request $request, Restaurant $restaurant): RedirectResponse
     {
@@ -36,6 +43,12 @@ class RestaurantClaimController extends Controller
         abort_unless($claim->user_id === request()->user()->id || request()->user()->role === 'admin', 403);
 
         return view('claims.show', compact('claim'));
+    }
+    private function redirectToAuthentication(Request $request, Restaurant $restaurant, string $route): RedirectResponse
+    {
+        abort_unless($restaurant->isClaimable(), 409, 'Ce restaurant est déjà géré ou fait actuellement l’objet d’une demande de revendication.');
+        $request->session()->put('url.intended', route('claims.create', $restaurant));
+        return redirect()->route($route);
     }
     private function isValidSiret(string $siret): bool { if (!preg_match('/^\d{14}$/',$siret)) return false; $sum=0; foreach(str_split($siret) as $i=>$digit){$n=(int)$digit;if($i%2===0){$n*=2;if($n>9)$n-=9;}$sum+=$n;}return $sum%10===0; }
 }

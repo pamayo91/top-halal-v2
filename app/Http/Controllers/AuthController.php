@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use App\Support\IntendedClaimRedirect;
 
 class AuthController extends Controller
 {
@@ -35,18 +36,13 @@ class AuthController extends Controller
         // Never replay a stale legacy intended URL after authentication. In
         // particular, a URL that is not part of the protected panel must not escape to a
         // historical public redirect after an administrator signs in.
-        $intended = (string) $request->session()->pull('url.intended', '');
-        $path = (string) (parse_url($intended, PHP_URL_PATH) ?: '');
-        $host = (string) (parse_url($intended, PHP_URL_HOST) ?: '');
-        $isLocalIntended = $host === '' || hash_equals($request->getHost(), $host);
+        $claimIntended = IntendedClaimRedirect::pull($request);
 
         if ($request->user()->role === 'admin') {
-            return $isLocalIntended && str_starts_with($path, '/admin')
-                ? redirect()->to($intended)
-                : redirect()->to('/admin');
+            return redirect()->to('/admin');
         }
 
-        return redirect()->route('account.dashboard');
+        return $claimIntended ? redirect()->to($claimIntended) : redirect()->route('account.dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse

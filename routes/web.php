@@ -38,6 +38,9 @@ Route::post('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::cla
 Route::get('/ajouter-un-restaurant/merci', [PublicRestaurantSubmissionController::class, 'thanks'])->name('restaurant-submissions.thanks');
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
+Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
+Route::get('/restaurants/{restaurant}/claim/login', [RestaurantClaimController::class, 'login'])->name('claims.login');
+Route::get('/restaurants/{restaurant}/claim/register', [RestaurantClaimController::class, 'register'])->name('claims.register');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));
@@ -92,7 +95,6 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('password.change.required')->group(function (): void {
         Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
-        Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
         Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
         Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
         Route::get('/claims/{claim}/identity-document', ClaimIdentityDocumentController::class)->middleware('admin')->name('claims.identity-document');

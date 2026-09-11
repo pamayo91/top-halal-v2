@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Support\IntendedClaimRedirect;
 
 class RegisteredUserController extends Controller
 {
@@ -36,6 +37,6 @@ class RegisteredUserController extends Controller
         $request->session()->regenerate();
         $user->sendEmailVerificationNotification();
 
-        return redirect()->route('account.dashboard');
+        return ($intended = IntendedClaimRedirect::pull($request)) ? redirect()->to($intended) : redirect()->route('account.dashboard');
     }
 }

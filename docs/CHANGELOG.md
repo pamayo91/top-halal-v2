@@ -221,6 +221,10 @@
 - Recorded the preproduction audit and official Composer bootstrap as hard prerequisites before Laravel initialization.
 # Changelog
 
+## 2026-09-11
+
+- Added the authenticated-claim introduction screen for guests. It reuses the Contact form card, preserves the selected claim as the intended destination through login/registration, and rechecks claimability before any claim form can be accessed.
+
 ## 2026-09-04
 
 - Added the native V2 restaurant specialties Burger, Brunch and Grillades. They are available in directory filters, public submissions and administration; search suggestions no longer hide a specialty solely because it has no published restaurant yet.

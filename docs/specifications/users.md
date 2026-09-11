@@ -12,6 +12,7 @@
 - A claim starts as `pending`; an administrator can approve or reject it with audit timestamps and reviewer reference.
 - Approval associates the user and restaurant through `restaurant_claims` and promotes only a standard user to `restaurant_owner`.
 - `RestaurantPolicy::manage` is enforced server-side; owners cannot access another owner's restaurant.
+- A guest who opens a claimable restaurant claim first sees the Contact-form-card styled account explanation, with Login and Registration actions. Both preserve the claim form as Laravel's intended destination; after successful authentication (or the required legacy password change), the user returns to that exact claim form. Claimability is checked before the explanation, when entering the authentication hand-off and again when loading/submitting the protected form.
 
 ## Historical listing authorship
 - `legacy_restaurant_authorships` preserves only the WordPress `post_author` relationship to its exact migrated restaurant (`legacy_wp_id`).

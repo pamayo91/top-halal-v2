@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\PasswordChangedNotification;
+use App\Support\IntendedClaimRedirect;
 use Illuminate\View\View;
 
 class PasswordChangeController extends Controller
@@ -29,7 +30,8 @@ class PasswordChangeController extends Controller
         $request->user()->notify(new PasswordChangedNotification());
         $request->session()->regenerate();
 
-        return redirect()->to($request->user()->role === 'admin' ? '/admin' : route('account.dashboard'))
+        $intended = IntendedClaimRedirect::pull($request);
+        return redirect()->to($request->user()->role === 'admin' ? '/admin' : ($intended ?: route('account.dashboard')))
             ->with('status', 'Mot de passe mis à jour.');
     }
 }

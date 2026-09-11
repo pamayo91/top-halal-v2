@@ -91,6 +91,74 @@ class AuthenticationAndClaimsTest extends TestCase
         $this->assertSame('L’Étoile mise à jour', $restaurant->fresh()->name);
     }
 
+    public function test_guest_claim_flow_explains_authentication_and_preserves_the_restaurant_destination(): void
+    {
+        $restaurant = $this->restaurant();
+        $claimUrl = route('claims.create', $restaurant);
+
+        $this->get($claimUrl)
+            ->assertOk()
+            ->assertSee('Revendiquer ce restaurant')
+            ->assertSee($restaurant->name)
+            ->assertSee(route('claims.login', $restaurant))
+            ->assertSee(route('claims.register', $restaurant));
+
+        $this->get(route('claims.login', $restaurant))
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('url.intended', $claimUrl);
+
+        $user = User::factory()->create(['password' => Hash::make('password-long-123')]);
+        $this->post('/login', ['email' => $user->email, 'password' => 'password-long-123'])
+            ->assertRedirect($claimUrl);
+        $this->get($claimUrl)->assertOk()->assertSee('Nom / prénom');
+    }
+
+    public function test_registration_returns_to_the_claim_form_when_started_from_claim_authentication(): void
+    {
+        $restaurant = $this->restaurant();
+        $claimUrl = route('claims.create', $restaurant);
+
+        $this->get(route('claims.register', $restaurant))
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('url.intended', $claimUrl);
+        $this->post('/register', ['name' => 'Amina Martin', 'email' => 'amina@example.test', 'password' => 'password-long-123', 'password_confirmation' => 'password-long-123'])
+            ->assertRedirect($claimUrl);
+        $this->get($claimUrl)->assertOk()->assertSee('Nom / prénom');
+    }
+
+    public function test_claim_form_is_direct_for_authenticated_users_and_claimability_is_rechecked(): void
+    {
+        $restaurant = $this->restaurant();
+        $this->actingAs(User::factory()->create())->get(route('claims.create', $restaurant))
+            ->assertOk()
+            ->assertSee('Nom / prénom')
+            ->assertDontSee('Pour revendiquer cet établissement');
+
+        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => User::factory()->create()->id, 'status' => 'pending', 'submitted_at' => now()]);
+        $this->get(route('claims.create', $restaurant))->assertStatus(409);
+        $this->get(route('claims.login', $restaurant))->assertStatus(409);
+    }
+
+    public function test_guest_cannot_bypass_claim_authentication_with_the_post_url(): void
+    {
+        $restaurant = $this->restaurant();
+        $this->post(route('claims.store', $restaurant), $this->claimPayload())
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_claim_form_is_refused_if_the_restaurant_becomes_unclaimable_during_login(): void
+    {
+        $restaurant = $this->restaurant();
+        $user = User::factory()->create(['password' => Hash::make('password-long-123')]);
+        $claimUrl = route('claims.create', $restaurant);
+
+        $this->get(route('claims.login', $restaurant))->assertRedirect(route('login'));
+        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => User::factory()->create()->id, 'status' => 'pending', 'submitted_at' => now()]);
+
+        $this->post('/login', ['email' => $user->email, 'password' => 'password-long-123'])->assertRedirect($claimUrl);
+        $this->get($claimUrl)->assertStatus(409)->assertSee('Ce restaurant est déjà géré ou fait actuellement l’objet d’une demande de revendication.');
+    }
+
     public function test_only_admin_can_moderate_and_rejection_does_not_promote_user(): void
     {
         $restaurant = $this->restaurant();
