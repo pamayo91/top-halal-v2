@@ -4,7 +4,7 @@ Last updated: 2026-09-11
 
 Latest ownership V2: first restaurateur claims create no account or password, require a private document and expiring e-mail confirmation before manual review, then send a password-activation link after approval. A verified restaurateur signs in and submits only certification for each manually reviewed additional restaurant. Claimability remains central and owners can request — never directly perform — non-destructive removal.
 
-Latest claim presentation: the unauthenticated claim page uses compact Contact-aligned cards: a 42/58 desktop grid, with the four first-claim details in two columns only on large screens. Tablet and mobile retain single-column fields and stacked cards. The identity upload instruction and certification checkbox are independent, accessible visual blocks; business logic is unchanged.
+Latest claim presentation: the unauthenticated claim page uses compact Contact-aligned cards within a 1,120 px maximum: a 44/56 desktop grid with a 28 px gap, and the four first-claim details in two columns only on large screens. Below 840 px, fields and cards retain a single-column flow. The identity upload instruction and certification checkbox are independent, accessible visual blocks; business logic is unchanged.
 
 Latest claim UX: a guest clicking a claimable restaurant’s claim CTA now sees a focused Contact-card-styled explanation instead of an abrupt login redirect. Login and registration preserve the exact claim URL and resume there after authentication; claimability is rechecked at the screen, hand-off, form and submit boundaries.
 
