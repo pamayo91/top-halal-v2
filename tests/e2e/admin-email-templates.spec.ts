@@ -38,6 +38,14 @@ test.describe('Email templates administration', () => {
       await expect(page.getByRole('table')).toContainText(name);
     }
 
+    await page.getByRole('button', { name: 'Aperçu' }).first().click();
+    const preview = page.getByRole('dialog');
+    await expect(preview).toBeVisible();
+    await expect(preview).toContainText('Top Halal');
+    await expect(preview).toContainText('Exemple');
+    await expect(preview.locator('table[width="600"]')).toBeVisible();
+    await expect(preview).not.toContainText('\\n');
+
     expect(consoleErrors).toEqual([]);
     expect(failedRequests).toEqual([]);
   });
