@@ -4,6 +4,7 @@
 
 - Converted `Emails > Historique` into a French operational delivery history with queue-linked status, safe details, filters, counters, contextual and bulk retry/cancellation actions, and no resend action for delivered mail.
 - Added explicit `annulé` and `expiré` states, safe SMTP error redaction, sent timestamp/Message-ID capture and Cron reconciliation of journal entries whose Laravel job no longer exists.
+- Added a daily, controlled 60-day retention purge for cancelled and expired delivery logs only, including a no-delete audit mode.
 
 ## 2026-09-10
 

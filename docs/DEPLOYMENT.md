@@ -126,3 +126,13 @@ The executable script first reconciles tracked delivery-history rows whose datab
 - Keep SMTP settings server-side / encrypted in the V2 settings; do not put credentials in Cron or logs.
 - The BO SMTP test remains synchronous and bypasses the queue. Site transactional messages use the Cron-drained database queue.
 - Inspect failures with `artisan queue:failed`; do not paste message content or credentials into deployment logs.
+
+## Delivery-history retention
+
+Keep this daily preproduction Cron entry alongside the queue-worker Cron. It deletes only `cancelled` and `expired` e-mail history records older than 60 days; it never removes sent or failed audit records:
+
+```cron
+5 3 * * * cd /home/meyo5199/top-halal-v2 && /opt/alt/php84/usr/bin/php artisan emails:purge-delivery-logs --days=60 --no-interaction >> /home/meyo5199/top-halal-v2/storage/logs/queue-worker.log 2>&1
+```
+
+Audit a pending purge without deletion using `artisan emails:purge-delivery-logs --days=60 --dry-run`.

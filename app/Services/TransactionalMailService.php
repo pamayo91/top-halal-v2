@@ -124,6 +124,32 @@ class TransactionalMailService
         return $expired;
     }
 
+    public function purgeTerminalLogs(int $days = 60, bool $dryRun = false): int
+    {
+        $cutoff = now()->subDays($days);
+        $query = EmailDeliveryLog::query()->where(function ($query) use ($cutoff): void {
+            $query->where(function ($query) use ($cutoff): void {
+                $query->where('status', EmailDeliveryLog::STATUS_CANCELLED)
+                    ->where(function ($query) use ($cutoff): void {
+                        $query->where('cancelled_at', '<=', $cutoff)
+                            ->orWhere(function ($query) use ($cutoff): void {
+                                $query->whereNull('cancelled_at')->where('created_at', '<=', $cutoff);
+                            });
+                    });
+            })->orWhere(function ($query) use ($cutoff): void {
+                $query->where('status', EmailDeliveryLog::STATUS_EXPIRED)
+                    ->where(function ($query) use ($cutoff): void {
+                        $query->where('expired_at', '<=', $cutoff)
+                            ->orWhere(function ($query) use ($cutoff): void {
+                                $query->whereNull('expired_at')->where('created_at', '<=', $cutoff);
+                            });
+                    });
+            });
+        });
+
+        return $dryRun ? $query->count() : $query->delete();
+    }
+
     private function pendingJob(EmailDeliveryLog $log, bool $lock = false): ?object
     {
         if (! $log->queue_job_id) {

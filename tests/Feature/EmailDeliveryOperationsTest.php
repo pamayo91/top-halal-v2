@@ -99,4 +99,18 @@ class EmailDeliveryOperationsTest extends TestCase
         $this->assertDatabaseHas('email_delivery_logs', ['id' => $log->id, 'status' => EmailDeliveryLog::STATUS_FAILED]);
         $this->assertStringNotContainsString('not-for-display', $log->fresh()->error_message);
     }
+
+    public function test_only_expired_and_cancelled_logs_are_purged_after_sixty_days(): void
+    {
+        $old = now()->subDays(61);
+        $expired = EmailDeliveryLog::create(['template_key' => 'contact_confirmation', 'recipient' => 'expired@example.test', 'status' => EmailDeliveryLog::STATUS_EXPIRED, 'expired_at' => $old, 'created_at' => $old, 'updated_at' => $old]);
+        $cancelled = EmailDeliveryLog::create(['template_key' => 'contact_confirmation', 'recipient' => 'cancelled@example.test', 'status' => EmailDeliveryLog::STATUS_CANCELLED, 'cancelled_at' => $old, 'created_at' => $old, 'updated_at' => $old]);
+        $sent = EmailDeliveryLog::create(['template_key' => 'contact_confirmation', 'recipient' => 'sent@example.test', 'status' => EmailDeliveryLog::STATUS_SENT, 'sent_at' => $old, 'created_at' => $old, 'updated_at' => $old]);
+
+        $service = app(TransactionalMailService::class);
+        $this->assertSame(2, $service->purgeTerminalLogs());
+        $this->assertDatabaseMissing('email_delivery_logs', ['id' => $expired->id]);
+        $this->assertDatabaseMissing('email_delivery_logs', ['id' => $cancelled->id]);
+        $this->assertDatabaseHas('email_delivery_logs', ['id' => $sent->id]);
+    }
 }
