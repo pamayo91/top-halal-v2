@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
-use App\Models\{EmailTemplate, Setting};
+use App\Models\{EmailTemplate, MediaAsset, Setting};
 use App\Services\{EmailGlobalSettings, EmailTemplateRenderer, MailSettings};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
@@ -62,29 +62,39 @@ class EmailContactManagementTest extends TestCase
         $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
     }
 
-    public function test_global_layout_is_used_by_preview_html_and_text_email(): void
+    public function test_global_layout_inherits_footer_presentation_and_site_design(): void
     {
-        app(EmailGlobalSettings::class)->update(['display_name' => 'Halal Courrier', 'primary_color' => '#123456', 'footer_text' => 'Le footer', 'show_current_year' => true, 'footer_additional_text' => 'Informations complémentaires']);
-        $email = app(EmailTemplateRenderer::class)->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => 'Alice', 'contact_subject' => 'Question']);
+        Setting::create(['key' => 'footer_navigation', 'group' => 'navigation', 'value' => ['introduction' => 'Le guide des restaurants halal en France']]);
+        app(EmailGlobalSettings::class)->update(['display_name' => 'Halal Courrier', 'footer_text' => "Une question ?\nÀ très bientôt !\nL'équipe Halal Courrier", 'primary_color' => '#ffffff', 'show_current_year' => true, 'footer_additional_text' => 'Obsolète']);
+        $email = app(EmailTemplateRenderer::class)->render('password_reset', ['site_name' => 'Top Halal', 'user_name' => 'Alice', 'reset_url' => 'https://example.test/reset']);
         $global = app(EmailGlobalSettings::class)->forRender();
         $html = view('emails.transactional', compact('email', 'global'))->render();
         $text = view('emails.transactional-text', compact('email', 'global'))->render();
 
         $this->assertStringContainsString('Halal Courrier', $html);
-        $this->assertStringContainsString('#123456', $html);
-        $this->assertStringContainsString('Le footer', $html);
-        $this->assertStringContainsString((string) now()->year, $html);
-        $this->assertStringContainsString('Informations complémentaires', $text);
+        $this->assertStringContainsString('Le guide des restaurants halal en France', $html);
+        $this->assertStringContainsString(config('design.primary'), $html);
+        $this->assertStringContainsString('https://example.test/reset', $html);
+        $this->assertStringContainsString("Une question ?\nÀ très bientôt !\nL'équipe Halal Courrier", $text);
+        $this->assertStringNotContainsString('©', $html);
+        $this->assertStringNotContainsString('Obsolète', $html);
         $this->assertStringContainsString('Bonjour Alice', $html);
     }
 
-    public function test_global_settings_change_is_reflected_in_a_rendered_mailable(): void
+    public function test_footer_presentation_change_and_logo_are_reflected_in_a_rendered_mailable(): void
     {
-        app(EmailGlobalSettings::class)->update(['display_name' => 'Nouvelle identité', 'footer_text' => 'Nouveau footer']);
+        $logo = MediaAsset::create(['original_path' => 'email-logo.webp', 'mime' => 'image/webp', 'width' => 320, 'height' => 120, 'bytes' => 1000, 'checksum' => str_repeat('a', 64), 'alt_text' => 'Logo Top Halal']);
+        Setting::create(['key' => 'footer_navigation', 'group' => 'navigation', 'value' => ['introduction' => 'Première présentation']]);
+        app(EmailGlobalSettings::class)->update(['display_name' => 'Nouvelle identité', 'logo_media_asset_id' => $logo->id]);
         $html = (new TemplateMailable('contact_confirmation', ['contact_name' => 'Alice']))->render();
 
-        $this->assertStringContainsString('Nouvelle identité', $html);
-        $this->assertStringContainsString('Nouveau footer', $html);
+        $this->assertStringContainsString($logo->deliveryUrl(480), $html);
+        $this->assertStringContainsString('Première présentation', $html);
+        $this->assertStringNotContainsString('<h1', $html);
+
+        Setting::where('key', 'footer_navigation')->firstOrFail()->update(['value' => ['introduction' => 'Présentation mise à jour']]);
+        $updated = (new TemplateMailable('contact_confirmation', ['contact_name' => 'Alice']))->render();
+        $this->assertStringContainsString('Présentation mise à jour', $updated);
     }
 
     public function test_mail_settings_encrypt_and_preserve_an_existing_password(): void

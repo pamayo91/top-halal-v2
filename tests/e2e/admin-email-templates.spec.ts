@@ -46,6 +46,15 @@ test.describe('Email templates administration', () => {
     await expect(preview.locator('table[width="600"]')).toHaveCount(1);
     await expect(preview).not.toContainText('\\n');
 
+    const globalResponse = await page.goto('/admin/email-global-settings');
+    expect(globalResponse?.status()).toBe(200);
+    await expect(page.getByLabel('Nom affiché')).toBeVisible();
+    await expect(page.getByLabel('Logo e-mail')).toBeVisible();
+    await expect(page.getByLabel('Texte du footer')).toBeVisible();
+    await expect(page.getByText('Couleur principale')).toHaveCount(0);
+    await expect(page.getByText('Afficher automatiquement l’année courante')).toHaveCount(0);
+    await expect(page.getByText('Texte complémentaire sous le footer')).toHaveCount(0);
+
     expect(consoleErrors).toEqual([]);
     expect(failedRequests).toEqual([]);
   });
