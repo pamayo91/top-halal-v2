@@ -2,7 +2,7 @@
 
 ## Architecture
 - Business code uses Laravel Mail/Notifications only. Transactional content is resolved by `EmailTemplateRegistry`, then safely rendered by `EmailTemplateRenderer`; business code only supplies an allow-listed data map and sensitive signed links.
-- `EmailTemplate` rows are administrative overrides over deterministic application defaults. A new transactional type is declared once in `EmailTemplateRegistry`; it then appears in Filament after opening `Emails > Templates`.
+- `EmailTemplate` rows are administrative overrides over deterministic application defaults. A new transactional type is declared once in `EmailTemplateRegistry`; it then appears in Filament after opening `Emails > Templates`. `EmailGlobalSettings` owns the common 600px header/footer layout (display name, managed-media logo, primary colour, footer and optional dynamic year/additional text); template bodies remain plain text only.
 - `MailSettings` stores runtime SMTP settings in `settings.mail_settings`; SMTP is the sole back-office transport, the password is Laravel-encrypted and an empty edit never replaces it. Contact recipients, acknowledgement option and post-send message are configured only under `Contact > Réglages`; the public editorial introduction is no longer a setting.
 - `TransactionalMailService` queues `TemplateMailable` instances and records safe operational metadata in `email_delivery_logs`. Each tracked job retains its database-queue ID; the journal never retains a body, token, URL or SMTP secret.
 - `Emails > Configuration > Envoyer un e-mail de test` is deliberately separate: it calls the configured SMTP transport synchronously and never creates a queue job or a delivery-history row. A successful SMTP hand-off is confirmed in the BO; a sanitised actionable failure is displayed there and recorded in `storage/logs/laravel.log` without credentials.
@@ -19,6 +19,7 @@
 - Verification links use Laravel temporary signed URLs; reset links use Laravel password broker tokens and expire after 60 minutes.
 - Credentials remain server-only. No campaign is sent to legacy users in this phase.
 - Template variables are plain allow-listed placeholders only (`{{ variable }}`); Blade, PHP and unknown placeholders are never evaluated.
+- Template bodies are normalised to LF at render time and the one-off forward migration rewrites historical literal `\\n` sequences. HTML and text alternatives both use the same rendered body; template text and substitutions are Blade-escaped and never treated as administrator-supplied HTML.
 - Contact messages are stored before notification delivery. SMTP failure cannot invalidate an accepted contact submission.
 
 ## Operations

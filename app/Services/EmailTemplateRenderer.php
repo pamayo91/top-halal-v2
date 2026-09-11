@@ -1,7 +1,6 @@
 <?php
 namespace App\Services;
 use App\Models\EmailTemplate;
-use Illuminate\Support\HtmlString;
 
 class EmailTemplateRenderer
 {
@@ -12,7 +11,13 @@ class EmailTemplateRenderer
         if ($override && ! $override->is_active) return ['active' => false];
         $allowed = array_flip($default['variables']); $safe = [];
         foreach ($allowed as $variable => $_) $safe[$variable] = (string) ($values[$variable] ?? '');
-        $replace = fn (?string $text) => preg_replace_callback('/{{\s*([a-z_]+)\s*}}/', fn ($m) => array_key_exists($m[1], $safe) ? e($safe[$m[1]]) : $m[0], (string) $text);
-        return ['active' => true, 'subject' => html_entity_decode($replace($override?->subject ?? $default['subject']), ENT_QUOTES, 'UTF-8'), 'body' => $replace($override?->body ?? $default['body']), 'cta_label' => $replace($override?->cta_label ?? $default['cta_label']), 'cta_url' => $safe['action_url'] ?? $safe['verification_url'] ?? $safe['reset_url'] ?? null];
+        $replace = fn (?string $text) => preg_replace_callback('/{{\s*([a-z_]+)\s*}}/', fn ($m) => array_key_exists($m[1], $safe) ? $safe[$m[1]] : $m[0], $this->normaliseLineBreaks((string) $text));
+        return ['active' => true, 'subject' => $replace($override?->subject ?? $default['subject']), 'body' => $replace($override?->body ?? $default['body']), 'cta_label' => $replace($override?->cta_label ?? $default['cta_label']), 'cta_url' => $safe['action_url'] ?? $safe['verification_url'] ?? $safe['reset_url'] ?? null];
+    }
+
+    /** Converts historical literal escape sequences and all newline styles to real line feeds. */
+    private function normaliseLineBreaks(string $text): string
+    {
+        return str_replace(["\\r\\n", "\\n", "\r\n", "\r"], "\n", $text);
     }
 }

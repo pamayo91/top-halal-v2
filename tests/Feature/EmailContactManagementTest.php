@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
 use App\Models\{EmailTemplate, Setting};
-use App\Services\{EmailTemplateRenderer, MailSettings};
+use App\Services\{EmailGlobalSettings, EmailTemplateRenderer, MailSettings};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
@@ -46,6 +46,45 @@ class EmailContactManagementTest extends TestCase
         $rendered = $renderer->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => 'Alice']);
         $this->assertSame('Bonjour Alice {{ unknown }}', $rendered['subject']); $this->assertSame('Texte Top Halal', $rendered['body']);
         EmailTemplate::where('key', 'contact_confirmation')->update(['is_active' => false]); $this->assertFalse($renderer->render('contact_confirmation', [])['active']);
+    }
+
+    public function test_template_rendering_normalises_legacy_newline_escapes_and_escapes_html(): void
+    {
+        EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Sujet', 'body' => 'Premier\\n\\nDeuxième <script>alert(1)</script>', 'is_active' => true]);
+
+        $rendered = app(EmailTemplateRenderer::class)->render('contact_confirmation', []);
+        $html = view('emails.transactional', ['email' => $rendered, 'global' => app(EmailGlobalSettings::class)->forRender()])->render();
+
+        $this->assertSame("Premier\n\nDeuxième <script>alert(1)</script>", $rendered['body']);
+        $this->assertStringNotContainsString('\\n', $html);
+        $this->assertStringContainsString('Premier' . "\n\n" . 'Deuxième', $html);
+        $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+    }
+
+    public function test_global_layout_is_used_by_preview_html_and_text_email(): void
+    {
+        app(EmailGlobalSettings::class)->update(['display_name' => 'Halal Courrier', 'primary_color' => '#123456', 'footer_text' => 'Le footer', 'show_current_year' => true, 'footer_additional_text' => 'Informations complémentaires']);
+        $email = app(EmailTemplateRenderer::class)->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => 'Alice', 'contact_subject' => 'Question']);
+        $global = app(EmailGlobalSettings::class)->forRender();
+        $html = view('emails.transactional', compact('email', 'global'))->render();
+        $text = view('emails.transactional-text', compact('email', 'global'))->render();
+
+        $this->assertStringContainsString('Halal Courrier', $html);
+        $this->assertStringContainsString('#123456', $html);
+        $this->assertStringContainsString('Le footer', $html);
+        $this->assertStringContainsString((string) now()->year, $html);
+        $this->assertStringContainsString('Informations complémentaires', $text);
+        $this->assertStringContainsString('Bonjour Alice', $html);
+    }
+
+    public function test_global_settings_change_is_reflected_in_a_rendered_mailable(): void
+    {
+        app(EmailGlobalSettings::class)->update(['display_name' => 'Nouvelle identité', 'footer_text' => 'Nouveau footer']);
+        $html = (new TemplateMailable('contact_confirmation', ['contact_name' => 'Alice']))->render();
+
+        $this->assertStringContainsString('Nouvelle identité', $html);
+        $this->assertStringContainsString('Nouveau footer', $html);
     }
 
     public function test_mail_settings_encrypt_and_preserve_an_existing_password(): void

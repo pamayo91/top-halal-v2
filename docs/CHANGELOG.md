@@ -280,6 +280,9 @@
 
 ## Unreleased
 
+- Added a configurable shared transactional-email layout: global identity, optional V2 media-library logo, primary colour, footer, dynamic year and supporting text are managed in `Emails > Configuration globale` and are reflected in previews and delivered HTML/text e-mails.
+- Corrected literal `\\n` output caused by PHP single-quoted default bodies. New defaults use actual LF characters, the renderer safely normalises old stored bodies, and a forward migration repairs existing override rows.
+
 - Separated the back-office SMTP configuration test from transactional delivery: `Emails > Configuration > Envoyer un e-mail de test` now sends immediately through SMTP without creating a Laravel queue job, shows a clear success or sanitised actionable failure, and logs failures without credentials. Transactional site e-mails remain queued.
 - Corrected the runtime SSL option mapping to Symfony’s `smtps` SMTP scheme, verified by the back-office configuration test.
 - Simplified e-mail configuration to SMTP only: removed the transport selector and obsolete primary-administrator address; the contact recipient remains configured solely in `Contact > Réglages`.

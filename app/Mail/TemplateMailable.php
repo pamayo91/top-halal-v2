@@ -12,7 +12,7 @@ class TemplateMailable extends Mailable implements ShouldQueue
     public array $backoff = [30, 120, 300];
     public function __construct(public string $templateKey, public array $values, public ?int $logId = null, public ?string $replyToAddress = null) {}
     public function envelope(): Envelope { $r=app(EmailTemplateRenderer::class)->render($this->templateKey,$this->values); return new Envelope(subject: $r['subject'] ?? ''); }
-    public function content(): Content { $r=app(EmailTemplateRenderer::class)->render($this->templateKey,$this->values); return new Content(view:'emails.transactional', with:['email'=>$r]); }
+    public function content(): Content { $r=app(EmailTemplateRenderer::class)->render($this->templateKey,$this->values); return new Content(view:'emails.transactional', text:'emails.transactional-text', with:['email'=>$r, 'global'=>app(\App\Services\EmailGlobalSettings::class)->forRender()]); }
     public function build(): static {
         $mailer=app(MailSettings::class)->apply();
         $this->mailer($mailer);
