@@ -8,6 +8,8 @@ Latest claim presentation: the unauthenticated claim page uses compact Contact-a
 
 Latest submission verification UX: step five now uses accessible full-width manager/owner radio cards with clear selected states. Choosing `Non` leaves only the contributor e-mail, while `Oui` exposes the existing manager fields and truthful follow-up wording; no submission workflow changed.
 
+Latest submission layout: the five-step form uses the full 1,120 px desktop shell, keeping the 280 px progress sidebar compact and giving the main form column the additional space. Below 840 px it remains a single-column flow.
+
 Latest claim UX: a guest clicking a claimable restaurant’s claim CTA now sees a focused Contact-card-styled explanation instead of an abrupt login redirect. Login and registration preserve the exact claim URL and resume there after authentication; claimability is rechecked at the screen, hand-off, form and submit boundaries.
 
 Latest navigation: header and footer navigation are now configured from the dedicated Filament « Navigation » group. Blade retains the public structure and styling; `menus` / `menu_items` only manage labels, order, destinations, visibility and two-level submenus. The initial header is Restaurants, Villes, Cuisines, Guides and Blog, with no search icon; the account secondary CTA and green restaurant-submission CTA remain route-backed. Footer columns, legal links and valid social URLs are configurable, and public navigation is SSR with targeted cache invalidation.

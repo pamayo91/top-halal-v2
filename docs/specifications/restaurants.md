@@ -39,7 +39,7 @@ Create/edit/moderate records, media, hours, categories/features and ownership/cl
 
 ## Public restaurant proposal
 
-`/ajouter-un-restaurant` is a `noindex,nofollow` public Blade form. It requires no account and is protected by Laravel CSRF, server-side validation and an e-mail/IP rate limit. JavaScript progressively enhances the five-step interaction; it is required solely for the mandatory remote address-selection control.
+`/ajouter-un-restaurant` is a `noindex,nofollow` public Blade form. It requires no account and is protected by Laravel CSRF, server-side validation and an e-mail/IP rate limit. JavaScript progressively enhances the five-step interaction; it is required solely for the mandatory remote address-selection control. Its desktop shell uses the shared 1,120 px maximum with a deliberately compact 280 px step sidebar; the form column receives the remaining space and stacks below 840 px.
 
 - Step 1 requires a restaurant name and at least one of `has_halal_meat` or `has_halal_chicken`; it performs an informative name-similarity lookup.
 - Step 2 uses the reusable Géoplateforme address-selection service in the public form, Filament and owner-edit flow. Selecting a suggestion is mandatory: it is resolved again server-side and supplies `address_line1`, postcode, city, INSEE code, country and valid GPS. The public UI never exposes the INSEE code or manual postcode/city/GPS inputs. When the precise address is missing, the contributor selects the closest suggestion then moves the marker; this changes only latitude/longitude, does not reverse-geocode and never rewrites the selected structured address. Similarity candidates combine name, structured address and a 250m GPS radius without automatic merge or publication.

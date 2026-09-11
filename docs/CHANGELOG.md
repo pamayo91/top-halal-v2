@@ -288,6 +288,7 @@
 - Rebalanced the claim page desktop presentation only: 42/58 cards, large-screen two-column identity details, shorter explanatory text and preserved single-column tablet/mobile flow.
 - Widened the claim page presentation only: 1,120 px maximum, 44/56 desktop cards with a 28 px gap, and an earlier 840 px stacked breakpoint for comfortable tablet sizing.
 - Refined public restaurant-submission step five only: accessible owner/customer selection cards, conditionally presented existing manager fields and accurate contributor follow-up wording.
+- Widened the public restaurant-submission desktop layout only: the shared 1,120 px shell now gives the existing form column more space while retaining the compact steps sidebar and the responsive stacked flow.
 
 - Reworked restaurant claims: a first claim has no password, uses a private identity document and expiring e-mail confirmation, then an activation link after review; a verified restaurateur submits only certification for later restaurants.
 
