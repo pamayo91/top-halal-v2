@@ -6,14 +6,15 @@ use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 use App\Notifications\ClaimStatusNotification;
 
 class RestaurantClaimController extends Controller
 {
-    public function create(Request $request, Restaurant $restaurant): View|RedirectResponse
+    public function create(Request $request, Restaurant $restaurant): View|RedirectResponse|Response
     {
-        abort_unless($restaurant->isClaimable(), 409, 'Ce restaurant est déjà géré ou fait actuellement l’objet d’une demande de revendication.');
+        if (! $restaurant->isClaimable()) return response()->view('claims.unavailable', status: 409);
         if (! $request->user()) return view('claims.authenticate', ['restaurant' => $restaurant]);
         if ($request->user()->must_change_password) {
             $request->session()->put('url.intended', route('claims.create', $restaurant));

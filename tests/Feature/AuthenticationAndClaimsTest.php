@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
@@ -115,6 +116,7 @@ class AuthenticationAndClaimsTest extends TestCase
 
     public function test_registration_returns_to_the_claim_form_when_started_from_claim_authentication(): void
     {
+        Notification::fake();
         $restaurant = $this->restaurant();
         $claimUrl = route('claims.create', $restaurant);
 
