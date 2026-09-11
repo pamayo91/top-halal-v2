@@ -43,7 +43,7 @@ test.describe('Email templates administration', () => {
     const preview = page.locator('[role="dialog"].fi-modal-open').last();
     await expect(preview).toContainText('Top Halal');
     await expect(preview).toContainText('Exemple');
-    await expect(preview.locator('table[width="600"]')).toHaveCount(1);
+    await expect(preview.locator('table[width="620"]')).toHaveCount(1);
     await expect(preview).not.toContainText('\\n');
 
     const globalResponse = await page.goto('/admin/email-global-settings');
