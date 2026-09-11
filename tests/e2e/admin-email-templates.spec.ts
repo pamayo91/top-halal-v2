@@ -39,7 +39,7 @@ test.describe('Email templates administration', () => {
     }
 
     await page.getByRole('button', { name: 'Aperçu' }).first().click();
-    const preview = page.getByRole('dialog');
+    const preview = page.locator('[role="dialog"]:visible');
     await expect(preview).toBeVisible();
     await expect(preview).toContainText('Top Halal');
     await expect(preview).toContainText('Exemple');
