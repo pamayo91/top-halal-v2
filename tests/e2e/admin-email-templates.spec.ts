@@ -24,6 +24,7 @@ test.describe('Email templates administration', () => {
     const response = await page.goto('/admin/email-templates');
     expect(response?.status()).toBe(200);
     await expect(page.getByRole('heading', { name: 'Email Templates', exact: true })).toBeVisible();
+    await expect(page.getByRole('table')).not.toContainText('Is active');
 
     for (const name of [
       'Vérification e-mail',
