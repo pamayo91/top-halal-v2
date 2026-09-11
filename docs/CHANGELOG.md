@@ -280,6 +280,8 @@
 
 ## Unreleased
 
+- Emails : le renderer transactionnel commun convertit désormais le texte simple normalisé en paragraphes HTML sûrs et en retours simples explicites ; l’aperçu Filament et le message envoyé rendent les mêmes sauts de ligne sans dépendre de `white-space`. L’espacement avant le séparateur du footer passe à 40 px supplémentaires, via le `padding` inline de la cellule de contenu.
+
 - Simplified the global e-mail configuration to display-name fallback, optional V2-media logo and a single three-line footer. Transactional headers now reuse the public Footer presentation text and shared design tokens; obsolete per-e-mail colour, year and secondary-footer values no longer affect rendering.
 
 - Removed transactional-template activation controls and the obsolete `email_templates.is_active` column. Declared templates are always rendered and queued when their application event occurs.

@@ -44,6 +44,7 @@ test.describe('Email templates administration', () => {
     await expect(preview).toContainText('Top Halal');
     await expect(preview).toContainText('Exemple');
     await expect(preview.locator('table[width="620"]')).toHaveCount(1);
+    await expect(preview.locator('[data-email-body-paragraph]')).toHaveCount(2);
     await expect(preview).not.toContainText('\\n');
 
     const globalResponse = await page.goto('/admin/email-global-settings');

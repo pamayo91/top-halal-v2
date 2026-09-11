@@ -19,7 +19,7 @@
 - Verification links use Laravel temporary signed URLs; reset links use Laravel password broker tokens and expire after 60 minutes.
 - Credentials remain server-only. No campaign is sent to legacy users in this phase.
 - Template variables are plain allow-listed placeholders only (`{{ variable }}`); Blade, PHP and unknown placeholders are never evaluated.
-- Template bodies are normalised to LF at render time and the one-off forward migration rewrites historical literal `\\n` sequences. HTML and text alternatives both use the same rendered body; template text and substitutions are Blade-escaped and never treated as administrator-supplied HTML.
+- Template bodies are normalised to LF at render time and the one-off forward migration rewrites historical literal `\\n` sequences. The shared renderer converts safe plain text into explicit HTML paragraphs (blank lines) and `<br>` elements (single line breaks); the preview and delivered HTML therefore share the same robust rendering without interpreting administrator content as HTML. The text alternative retains the same normalised plain-text body.
 - Contact messages are stored before notification delivery. SMTP failure cannot invalidate an accepted contact submission.
 
 ## Operations

@@ -56,10 +56,31 @@ class EmailContactManagementTest extends TestCase
         $html = view('emails.transactional', ['email' => $rendered, 'global' => app(EmailGlobalSettings::class)->forRender()])->render();
 
         $this->assertSame("Premier\n\nDeuxième <script>alert(1)</script>", $rendered['body']);
+        $this->assertSame([['Premier'], ['Deuxième <script>alert(1)</script>']], $rendered['body_paragraphs']);
         $this->assertStringNotContainsString('\\n', $html);
-        $this->assertStringContainsString('Premier' . "\n\n" . 'Deuxième', $html);
+        $this->assertSame(2, substr_count($html, 'data-email-body-paragraph'));
         $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
         $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+    }
+
+    public function test_renderer_safely_builds_paragraphs_for_html_preview_and_delivery(): void
+    {
+        $renderer = app(EmailTemplateRenderer::class);
+        $email = $renderer->render('password_changed', ['site_name' => 'Top Halal', 'user_name' => 'Alice']);
+        $global = app(EmailGlobalSettings::class)->forRender();
+        $html = view('emails.transactional', compact('email', 'global'))->render();
+
+        $this->assertSame([['Bonjour Alice,'], ['Votre mot de passe Top Halal vient d’être modifié. Si vous n’êtes pas à l’origine de cette action, contactez la modération.']], $email['body_paragraphs']);
+        $this->assertSame(2, substr_count($html, 'data-email-body-paragraph'));
+        $this->assertStringNotContainsString('<br><br>', $html);
+        $this->assertStringContainsString('padding:36px 32px 76px', $html);
+        $deliveryHtml = (new TemplateMailable('password_changed', ['site_name' => 'Top Halal', 'user_name' => 'Alice']))->render();
+        $this->assertSame(2, substr_count($deliveryHtml, 'data-email-body-paragraph'));
+        $this->assertStringContainsString('Bonjour Alice,', $deliveryHtml);
+
+        EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Sujet', 'body' => "Une ligne\navec un retour simple.\n\nUn second paragraphe.\n\nUn troisième paragraphe."]);
+        $threeParagraphs = $renderer->render('contact_confirmation', []);
+        $this->assertSame([['Une ligne', 'avec un retour simple.'], ['Un second paragraphe.'], ['Un troisième paragraphe.']], $threeParagraphs['body_paragraphs']);
     }
 
     public function test_global_layout_inherits_footer_presentation_and_site_design(): void
