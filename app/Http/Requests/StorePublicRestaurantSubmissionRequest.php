@@ -43,10 +43,10 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'gallery_photos' => ['nullable', 'array', 'max:10'],
             'gallery_photos.*' => ['file', 'image', 'dimensions:min_width=800', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             'submitter_role' => ['required', Rule::in(['owner', 'employee', 'customer'])],
-            'owner_full_name' => ['nullable', 'string', 'max:255', 'required_if:submitter_role,owner'],
-            'owner_company' => ['nullable', 'string', 'max:255', 'required_if:submitter_role,owner'],
-            'owner_siret' => ['nullable', 'digits:14', 'required_if:submitter_role,owner'],
-            'owner_certified' => ['nullable', 'accepted', 'required_if:submitter_role,owner'],
+            'owner_full_name' => ['exclude_unless:submitter_role,owner', 'required', 'string', 'max:255'],
+            'owner_company' => ['exclude_unless:submitter_role,owner', 'required', 'string', 'max:255'],
+            'owner_siret' => ['exclude_unless:submitter_role,owner', 'required', 'digits:14'],
+            'owner_certified' => ['exclude_unless:submitter_role,owner', 'accepted'],
             'email' => ['required', 'email:rfc', 'max:255'],
         ];
     }
