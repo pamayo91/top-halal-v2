@@ -52,6 +52,9 @@ test('public restaurant contribution requires a cover photo and validates the em
   await page.locator('[data-cover-input]').setInputFiles(cover);
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Vérification' })).toBeVisible();
+  await page.getByLabel('Oui').check();
+  await expect(page.locator('[data-owner-fields]')).toBeVisible();
+  await expect(page.locator('[data-owner-email-help="owner"]')).toBeVisible();
   await page.getByLabel('Non').check();
   await expect(page.locator('[data-owner-fields]')).toBeHidden();
   await expect(page.locator('[data-owner-email-help="customer"]')).toBeVisible();
