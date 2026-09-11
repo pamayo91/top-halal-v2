@@ -146,23 +146,30 @@
                         <p class="muted">Relisez la proposition avant de l’envoyer. Elle restera en attente de modération.</p>
                         <div class="submission-summary" data-submission-summary aria-live="polite"></div>
 
-                        <fieldset class="submission-choice-group">
+                        <fieldset class="submission-choice-group submission-owner-choice">
                             <legend>Êtes-vous le gérant ou propriétaire de cet établissement ?</legend>
-                            <label class="choice-card"><input type="radio" name="submitter_role" value="owner" required @checked(old('submitter_role') === 'owner') data-owner-choice> <span><b>Oui</b><small>Vous pourrez gérer la fiche après sa publication.</small></span></label>
-                            <label class="choice-card"><input type="radio" name="submitter_role" value="customer" required @checked(old('submitter_role') === 'customer') data-owner-choice> <span><b>Non</b><small>Le restaurant pourra être revendiqué après publication.</small></span></label>
-                            <div data-owner-fields @unless(old('submitter_role') === 'owner') hidden @endunless>
+                            <label class="choice-card choice-card--role">
+                                <input type="radio" name="submitter_role" value="owner" required @checked(old('submitter_role') === 'owner') data-owner-choice>
+                                <span><b>Oui</b><small>Je suis le gérant ou propriétaire de cet établissement. Je pourrai gérer cette fiche après validation.</small></span>
+                            </label>
+                            <label class="choice-card choice-card--role">
+                                <input type="radio" name="submitter_role" value="customer" required @checked(old('submitter_role') === 'customer') data-owner-choice>
+                                <span><b>Non</b><small>Je propose simplement ce restaurant. Il pourra être revendiqué plus tard par son gérant.</small></span>
+                            </label>
+                            <div class="submission-owner-fields" data-owner-fields @unless(old('submitter_role') === 'owner') hidden @endunless>
                                 <label>Nom / prénom <input name="owner_full_name" maxlength="255" value="{{ old('owner_full_name') }}"></label>
                                 <label>Société <input name="owner_company" maxlength="255" value="{{ old('owner_company') }}"></label>
                                 <label>SIRET <input name="owner_siret" inputmode="numeric" maxlength="20" value="{{ old('owner_siret') }}"></label>
-                                <label><input type="checkbox" name="owner_certified" value="1" @checked(old('owner_certified'))> Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement.</label>
-                                <p class="form-help">Vous devez être connecté à votre compte Top Halal pour gérer cette fiche après publication.</p>
+                                <label class="submission-owner-certification"><input type="checkbox" name="owner_certified" value="1" @checked(old('owner_certified'))><span>Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement.</span></label>
+                                <p class="form-help">Après validation de votre proposition, nous vous recontacterons pour la gestion de cette fiche.</p>
                                 @foreach(['owner_full_name','owner_company','owner_siret','owner_certified'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
                             </div>
                             @error('submitter_role')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>
                         <label for="submitter-email">Votre e-mail</label>
                         <input id="submitter-email" name="email" type="email" autocomplete="email" required maxlength="255" value="{{ old('email') }}">
-                        <p class="form-help">Nous l’utilisons pour le suivi de cette proposition et comme e-mail de contact à vérifier par la modération. Aucun nom ni prénom n’est demandé.</p>
+                        <p class="form-help" data-owner-email-help="customer" @if(old('submitter_role') === 'owner') hidden @endif>Nous utilisons votre e-mail pour le suivi de cette proposition et pour vous recontacter si nécessaire.</p>
+                        <p class="form-help" data-owner-email-help="owner" @unless(old('submitter_role') === 'owner') hidden @endunless>Nous utilisons votre e-mail pour le suivi de cette proposition et pour vous contacter au sujet de la gestion de cette fiche.</p>
                         @error('email')<p class="field-error">{{ $message }}</p>@enderror
 
                         <div class="submission-actions">

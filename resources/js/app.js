@@ -50,7 +50,15 @@ if (submission) {
     const galleryPreview = form.querySelector('[data-gallery-preview]');
     const summary = form.querySelector('[data-submission-summary]');
     const ownerFields = form.querySelector('[data-owner-fields]');
-    form.querySelectorAll('[data-owner-choice]').forEach(input => input.addEventListener('change', () => { if (ownerFields) ownerFields.hidden = form.querySelector('[name="submitter_role"]:checked')?.value !== 'owner'; }));
+    const ownerChoices = [...form.querySelectorAll('[data-owner-choice]')];
+    const ownerEmailHelp = [...form.querySelectorAll('[data-owner-email-help]')];
+    const syncOwnerChoice = () => {
+        const selectedRole = form.querySelector('[name="submitter_role"]:checked')?.value;
+        if (ownerFields) ownerFields.hidden = selectedRole !== 'owner';
+        ownerChoices.forEach(input => input.closest('.choice-card')?.classList.toggle('is-selected', input.checked));
+        ownerEmailHelp.forEach(help => { help.hidden = help.dataset.ownerEmailHelp !== (selectedRole === 'owner' ? 'owner' : 'customer'); });
+    };
+    ownerChoices.forEach(input => input.addEventListener('change', syncOwnerChoice));
     let currentStep = Number.parseInt(submission.dataset.initialStep || '1', 10) || 1;
     let nameTimer;
     let galleryFiles = [];
@@ -240,6 +248,7 @@ if (submission) {
     coverInput.addEventListener('change', renderCover);
     galleryInput.addEventListener('change', () => { galleryFiles = [...galleryFiles, ...galleryInput.files].slice(0, 10); syncGalleryInput(); renderGallery(); });
     form.addEventListener('submit', event => { if (!validateStep(5)) event.preventDefault(); });
+    syncOwnerChoice();
     setStep(currentStep, false);
 }
 menu?.addEventListener('click', () => { const open = menu.getAttribute('aria-expanded') === 'true'; menu.setAttribute('aria-expanded', String(!open)); mobileNav.hidden = open; });

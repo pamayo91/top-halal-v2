@@ -52,7 +52,9 @@ test('public restaurant contribution requires a cover photo and validates the em
   await page.locator('[data-cover-input]').setInputFiles(cover);
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Vérification' })).toBeVisible();
-  await page.getByLabel('Je suis client').check();
+  await page.getByLabel('Non').check();
+  await expect(page.locator('[data-owner-fields]')).toBeHidden();
+  await expect(page.locator('[data-owner-email-help="customer"]')).toBeVisible();
   await page.getByLabel('Votre e-mail').fill('email-invalide');
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
   await expect.poll(() => page.getByLabel('Votre e-mail').evaluate((input: HTMLInputElement) => input.validationMessage)).not.toBe('');
@@ -65,7 +67,7 @@ test('public restaurant contribution submits a pending restaurant successfully',
   await page.locator('[data-cover-input]').setInputFiles(cover);
   await expect(page.locator('[data-cover-preview] img')).toBeVisible();
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await page.getByLabel('Je suis client').check();
+  await page.getByLabel('Non').check();
   await page.getByLabel('Votre e-mail').fill(`contribution-${testInfo.project.name}@example.invalid`);
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
   await expect(page.getByRole('heading', { name: 'Merci pour votre aide !' })).toBeVisible();
