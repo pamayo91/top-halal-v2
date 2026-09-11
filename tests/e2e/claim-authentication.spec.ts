@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Authentification avant revendication', () => {
-  test('explains the account requirement and resumes the selected claim after registration and login', async ({ page }, testInfo) => {
+  test('explains the account requirement and resumes the selected claim after registration and login', async ({ page, context }, testInfo) => {
     const errors: string[] = [];
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('pageerror', error => errors.push(error.message));
 
-    await page.goto('/restaurants');
-    const claimLink = page.locator('a[href^="/restaurants/"][href$="/claim"]').first();
+    await page.goto('/resto/01-kebab');
+    const claimLink = page.getByRole('link', { name: 'Revendiquer ce restaurant' });
     await expect(claimLink).toBeVisible();
     const claimUrl = await claimLink.getAttribute('href');
     await claimLink.click();
@@ -34,7 +34,7 @@ test.describe('Authentification avant revendication', () => {
     await expect(page).toHaveURL(claimUrl!);
     await expect(page.getByText('Nom / prénom')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Déconnexion' }).click();
+    await context.clearCookies();
     await page.goto(claimUrl!);
     await page.getByRole('link', { name: 'Se connecter' }).click();
     await page.locator('input[name="email"]').fill(email);
