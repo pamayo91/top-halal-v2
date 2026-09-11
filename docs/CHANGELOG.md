@@ -281,6 +281,7 @@
 ## Unreleased
 
 - Emails : le renderer transactionnel commun convertit désormais le texte simple normalisé en paragraphes HTML sûrs et en retours simples explicites ; l’aperçu Filament et le message envoyé rendent les mêmes sauts de ligne sans dépendre de `white-space`. L’espacement avant le séparateur du footer passe à 40 px supplémentaires, via le `padding` inline de la cellule de contenu.
+- Emails : les CTA transactionnels retrouvent 28 px d’espacement vertical inline au-dessus du bouton, sans modifier le design validé du bouton ni l’espace avant le footer.
 
 - Simplified the global e-mail configuration to display-name fallback, optional V2-media logo and a single three-line footer. Transactional headers now reuse the public Footer presentation text and shared design tokens; obsolete per-e-mail colour, year and secondary-footer values no longer affect rendering.
 
