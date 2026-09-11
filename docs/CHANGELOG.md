@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-11
+
+- Contact : suppression du champ BO inutilisé « Texte d’introduction », de son chargement public et de sa clé résiduelle dans `contact_settings`.
+
 ## 2026-09-10
 
 - Converted `Emails > Historique` into a French operational delivery history with queue-linked status, safe details, filters, counters, contextual and bulk retry/cancellation actions, and no resend action for delivered mail.

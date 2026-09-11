@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreContactMessageRequest; use App\Models\{ContactMessage,Setting}; use App\Services\TransactionalMailService; use Illuminate\Http\{RedirectResponse,Request}; use Illuminate\View\View;
 class ContactController extends Controller
 {
-    public function create(): View { $s=(array)(Setting::where('key','contact_settings')->value('value') ?? []); return view('public.contact.create',['settings'=>$s]); }
+    public function create(): View { return view('public.contact.create'); }
     public function store(StoreContactMessageRequest $request, TransactionalMailService $mail): RedirectResponse
     {
         if (filled($request->input('website'))) return back()->withInput()->withErrors(['message'=>'Votre envoi n’a pas pu être traité.']);
