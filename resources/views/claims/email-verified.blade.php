@@ -1,0 +1,1 @@
+<x-layouts.app title="Adresse confirmée"><section class="contact-page"><div class="shell"><div class="contact-form-wrap"><div class="contact-form-card"><h1>Adresse confirmée</h1><p>Votre adresse e-mail est confirmée. Votre demande va maintenant être vérifiée par l’équipe Top Halal.</p></div></div></div></section></x-layouts.app>

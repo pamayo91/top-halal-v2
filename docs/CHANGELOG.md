@@ -284,6 +284,8 @@
 
 ## Unreleased
 
+- Reworked restaurant claims: a first claim has no password, uses a private identity document and expiring e-mail confirmation, then an activation link after review; a verified restaurateur submits only certification for later restaurants.
+
 - Finalisation V1 propriétaires : déclaration SIRET pour les nouveaux dépôts, claims existantes avec justificatif privé et validation manuelle, et demandes de suppression soumises à modération.
 
 - Emails : le renderer transactionnel commun convertit désormais le texte simple normalisé en paragraphes HTML sûrs et en retours simples explicites ; l’aperçu Filament et le message envoyé rendent les mêmes sauts de ligne sans dépendre de `white-space`. L’espacement avant le séparateur du footer passe à 40 px supplémentaires, via le `padding` inline de la cellule de contenu.

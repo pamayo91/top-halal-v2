@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-11
 
-Latest ownership V1: public restaurant submissions now distinguish a simple non-manager contribution from a manager/owner submission. The latter requires an authenticated account, declaration, company and normalized SIRET, but no identity document, and the existing ownership claim activates only on normal publication. Existing-record claims require the same declaration plus a private identity photo and manual back-office validation. A central claimability rule prevents parallel claims and controls both public visibility and direct claim routes. Owners can request — never directly perform — non-destructive restaurant removal; admins moderate these requests.
+Latest ownership V2: first restaurateur claims create no account or password, require a private document and expiring e-mail confirmation before manual review, then send a password-activation link after approval. A verified restaurateur signs in and submits only certification for each manually reviewed additional restaurant. Claimability remains central and owners can request — never directly perform — non-destructive removal.
 
 Latest claim UX: a guest clicking a claimable restaurant’s claim CTA now sees a focused Contact-card-styled explanation instead of an abrupt login redirect. Login and registration preserve the exact claim URL and resume there after authentication; claimability is rechecked at the screen, hand-off, form and submit boundaries.
 

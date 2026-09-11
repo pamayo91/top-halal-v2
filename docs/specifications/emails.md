@@ -11,7 +11,7 @@
 
 ## Implemented events
 - Email verification, password reset, password-change confirmation, and claim received/accepted/refused now use central templates.
-- Claim submitted, accepted and refused.
+- First-claim e-mail confirmation, restaurateur-space activation, claim submitted, accepted and refused.
 - `mail:test address@example.com` queues a neutral test message without printing configuration.
 - The legacy-account notification template exists for the future campaign and is never dispatched by the migration.
 

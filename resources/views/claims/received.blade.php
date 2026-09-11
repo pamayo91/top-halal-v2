@@ -1,0 +1,1 @@
+<x-layouts.app title="Demande enregistrée"><section class="contact-page"><div class="shell"><div class="contact-form-wrap"><div class="contact-form-card"><h1>Demande enregistrée</h1><p>Votre demande a bien été enregistrée. Vérifiez votre boîte e-mail pour confirmer votre adresse.</p></div></div></div></section></x-layouts.app>

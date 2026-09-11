@@ -1,17 +1,11 @@
-<x-layouts.app title="Revendiquer un restaurant">
-    <h1>Revendiquer {{ $restaurant->name }}</h1>
-    @if($claim)<p role="status">Une demande existe déjà : {{ $claim->status }}.</p>@else
-    <p>Pour éviter les revendications frauduleuses, prenez une photo de votre pièce d’identité avec, à côté, une feuille sur laquelle vous avez écrit à la main :</p>
-    <p><strong>Top Halal - {{ $restaurant->name }} - {{ now()->format('d/m/Y') }}</strong></p>
-    <p>La demande sera vérifiée manuellement par l’équipe Top Halal.</p>
-    <form method="post" enctype="multipart/form-data" action="{{ route('claims.store', $restaurant) }}">@csrf
-        <label>Nom / prénom <input name="full_name" required maxlength="255" value="{{ old('full_name') }}"></label>
-        <label>Société <input name="company" required maxlength="255" value="{{ old('company') }}"></label>
-        <label>SIRET <input name="siret" required inputmode="numeric" maxlength="20" value="{{ old('siret') }}"></label>
-        <label><input type="checkbox" name="certified" value="1" required @checked(old('certified'))> Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement.</label>
-        <label>Photo de la pièce d’identité <input type="file" name="identity_document" accept="image/jpeg,image/png,image/webp" required></label>
-        @foreach(['full_name','company','siret','certified','identity_document','claim'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
-        <label>Message pour la modération (facultatif) <textarea name="message" maxlength="1000">{{ old('message') }}</textarea></label>
-        <button type="submit">Envoyer la demande</button>
-    </form>@endif
+<x-layouts.app :title="'Revendiquer '. $restaurant->name .' - Top Halal'">
+<section class="contact-page claim-page"><div class="shell">
+@if($user?->isVerifiedRestaurateur())
+<div class="contact-form-wrap claim-light-wrap"><div class="contact-form-card claim-card"><h1>Revendiquer ce restaurant</h1><p class="claim-restaurant"><strong>{{ $restaurant->name }}</strong></p><form method="post" action="{{ route('claims.store', $restaurant) }}">@csrf<label><input type="checkbox" name="certified" value="1" required> Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement.</label>@error('certified')<p class="field-error">{{ $message }}</p>@enderror<button class="button contact-submit" type="submit">Envoyer la demande</button></form></div></div>
+@else
+<header class="claim-page-header"><p class="eyebrow">Espace restaurateur</p><h1>Revendiquer {{ $restaurant->name }}</h1></header><div class="claim-grid">
+<section class="contact-form-card claim-card"><h2>Vous avez déjà un compte restaurateur ?</h2><p>Si vous avez déjà été validé par Top Halal, connectez-vous pour revendiquer un nouvel établissement sans refaire la vérification d’identité.</p><form method="post" action="{{ route('login.store') }}">@csrf<input type="hidden" name="claim_intended" value="{{ route('claims.create', $restaurant) }}"><label>E-mail <input name="email" type="email" required autocomplete="email"></label><label>Mot de passe <input name="password" type="password" required autocomplete="current-password"></label><button class="button contact-submit" type="submit">Se connecter et continuer</button></form><p><a href="{{ route('password.request') }}">Mot de passe oublié ?</a></p></section>
+<section class="contact-form-card claim-card"><h2>Première revendication ?</h2><p>Votre identité sera vérifiée une seule fois, avant validation manuelle par Top Halal.</p><form method="post" enctype="multipart/form-data" action="{{ route('claims.store', $restaurant) }}">@csrf<label>Nom et prénom <input name="full_name" required maxlength="255" value="{{ old('full_name', $user?->name) }}"></label><label>E-mail <input name="email" type="email" required maxlength="255" value="{{ old('email', $user?->email) }}"></label><label>Société <input name="company" required maxlength="255" value="{{ old('company') }}"></label><label>SIRET <input name="siret" required inputmode="numeric" maxlength="20" value="{{ old('siret') }}"></label><label class="claim-document">Photo de votre pièce d’identité <input name="identity_document" type="file" accept="image/jpeg,image/png,image/webp" required><small>Prenez une photo de votre pièce d’identité avec, à côté, une feuille sur laquelle vous avez écrit à la main : <strong>Top Halal - {{ $restaurant->name }} - {{ now()->format('d/m/Y') }}</strong></small></label><label><input type="checkbox" name="certified" value="1" required @checked(old('certified'))> Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement.</label>@foreach(['full_name','email','company','siret','identity_document','certified','claim'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach<button class="button contact-submit" type="submit">Envoyer ma demande</button></form></section>
+</div>@endif
+</div></section>
 </x-layouts.app>

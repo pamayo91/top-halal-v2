@@ -129,7 +129,7 @@ class PublicRestaurantSubmissionController extends Controller
                 'owner_certified' => $request->boolean('owner_certified'),
             ]);
 
-            if ($data['submitter_role'] === 'owner') RestaurantClaim::create(['restaurant_id'=>$restaurant->id,'user_id'=>$request->user()->id,'full_name'=>$data['owner_full_name'],'company'=>$data['owner_company'],'siret'=>$data['owner_siret'],'certified'=>true,'source'=>'new_submission','status'=>'pending_publication','submitted_at'=>now()]);
+            if ($data['submitter_role'] === 'owner') RestaurantClaim::create(['restaurant_id'=>$restaurant->id,'user_id'=>$request->user()?->id,'full_name'=>$data['owner_full_name'],'email'=>Str::lower(trim($data['email'])),'company'=>$data['owner_company'],'siret'=>$data['owner_siret'],'certified'=>true,'source'=>'new_submission','status'=>'pending_publication','submitted_at'=>now()]);
 
             return $restaurant;
         });

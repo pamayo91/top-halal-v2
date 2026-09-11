@@ -9,7 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController, RestaurantRemovalRequestController};
+use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController, RestaurantRemovalRequestController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
@@ -41,6 +41,11 @@ Route::post('/contact', [ContactController::class, 'store'])->middleware('thrott
 Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
 Route::get('/restaurants/{restaurant}/claim/login', [RestaurantClaimController::class, 'login'])->name('claims.login');
 Route::get('/restaurants/{restaurant}/claim/register', [RestaurantClaimController::class, 'register'])->name('claims.register');
+Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
+Route::get('/claims/recu', [RestaurantClaimController::class, 'received'])->name('claims.received');
+Route::get('/claims/{claim}/verify/{token}', [RestaurantClaimController::class, 'verify'])->middleware('signed')->name('claims.verify');
+Route::get('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'create'])->middleware('signed')->name('claims.activate');
+Route::post('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'store'])->middleware(['signed', 'throttle:5,1'])->name('claims.activate.store');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));
@@ -95,7 +100,6 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('password.change.required')->group(function (): void {
         Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
-        Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
         Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
         Route::get('/claims/{claim}/identity-document', ClaimIdentityDocumentController::class)->middleware('admin')->name('claims.identity-document');
         Route::get('/account/restaurants/{restaurant}/edit', [OwnerRestaurantController::class, 'edit'])->name('owner.restaurants.edit');

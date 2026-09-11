@@ -60,7 +60,7 @@ class Restaurant extends Model
     /** A single central rule for public claim presentation and write access. */
     public function isClaimable(): bool
     {
-        return ! $this->claims()->whereIn('status', ['pending', 'approved', 'pending_publication'])->exists();
+        return ! $this->claims()->whereIn('status', ['pending_email_verification', 'pending', 'approved', 'pending_publication', 'pending_activation'])->exists();
     }
     public function activateSubmittedOwner(): void
     {
@@ -69,8 +69,8 @@ class Restaurant extends Model
         if (! $submission?->user_id || $submission->submitter_role !== 'owner') return;
         $claim = $this->claims()->where('user_id', $submission->user_id)->where('source', 'new_submission')->first();
         if (! $claim || $claim->status !== 'pending_publication') return;
-        $claim->update(['status'=>'approved','reviewed_at'=>now()]);
-        if ($claim->user->role === 'user') $claim->user->update(['role'=>'restaurant_owner']);
+        $claim->update(['status'=>'pending']);
+        app(\App\Services\ClaimModeration::class)->approve($claim->fresh());
     }
     public function approvedReviewAggregate(): array
     {

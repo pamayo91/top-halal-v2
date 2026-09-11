@@ -83,7 +83,6 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
                     if ($secondOpen <= $firstClose) $validator->errors()->add("hours.$day.second_open", 'La seconde plage doit commencer après la première.');
                 }
             }
-            if ($this->input('submitter_role') === 'owner' && ! $this->user()) $validator->errors()->add('submitter_role', 'Connectez-vous ou créez un compte pour gérer cette fiche après sa publication.');
             $siret = (string) $this->input('owner_siret');
             if ($this->input('submitter_role') === 'owner' && $siret !== '' && ! $this->isValidSiret($siret)) $validator->errors()->add('owner_siret', 'Le SIRET doit comporter 14 chiffres valides.');
         });

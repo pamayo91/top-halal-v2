@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     }
 
     public function claims() { return $this->hasMany(RestaurantClaim::class); }
+    public function isVerifiedRestaurateur(): bool { return $this->role === 'restaurant_owner' && $this->status === 'active' && ! $this->must_change_password; }
     public function ownedRestaurants() { return $this->belongsToMany(Restaurant::class, 'restaurant_claims', 'user_id', 'restaurant_id')->wherePivot('status', 'approved'); }
     public function legacyRestaurantAuthorships() { return $this->hasMany(LegacyRestaurantAuthorship::class); }
     public function legacyAuthoredRestaurants() { return $this->belongsToMany(Restaurant::class, 'legacy_restaurant_authorships', 'user_id', 'restaurant_id'); }

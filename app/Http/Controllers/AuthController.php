@@ -18,6 +18,9 @@ class AuthController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if (preg_match('#^'.preg_quote(url('/'), '#').'/restaurants/\\d+/claim$#', (string) $request->input('claim_intended'))) {
+            $request->session()->put('url.intended', (string) $request->input('claim_intended'));
+        }
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],

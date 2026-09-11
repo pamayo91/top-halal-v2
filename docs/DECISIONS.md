@@ -137,3 +137,7 @@ La recherche publique est un composant Blade à deux champs : localisation et sp
 ### D019 — Ownership V1
 
 Un nouveau restaurant soumis par son gérant utilise une déclaration simple, sans pièce d’identité, et obtient la relation propriétaire seulement à la publication. Une fiche existante exige déclaration et photo d’identité accompagnée de la feuille manuscrite Top Halal + restaurant + date, puis une validation manuelle. Le bouton de claim dépend de la règle métier centrale et disparaît avec un propriétaire ou une demande active. Cette V1 ne comporte ni historique détaillé, ni Google Business/OAuth, ni contrôle automatisé du document.
+
+### D020 — Vérification restaurateur unique
+
+La première revendication est un dossier sans compte : document privé, confirmation e-mail expirante et revue humaine précèdent une invitation à choisir un mot de passe. Un restaurateur déjà vérifié ne soumet ensuite que sa certification, avec validation manuelle pour chaque fiche. Une correspondance d’e-mail ne rattache jamais seule une nouvelle fiche à un compte existant : le rattachement doit être confirmé avec la session concernée ou par le lien envoyé à cette adresse.

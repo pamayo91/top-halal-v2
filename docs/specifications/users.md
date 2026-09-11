@@ -9,8 +9,9 @@
 - Password reset also clears the mandatory-change flag after a successful reset.
 
 ## Restaurant claims
-- A claim starts as `pending`; an administrator can approve or reject it with audit timestamps and reviewer reference.
-- Approval associates the user and restaurant through `restaurant_claims` and promotes only a standard user to `restaurant_owner`.
+- A first claim creates no account and starts as `pending_email_verification`; a private identity document plus a single-use, expiring e-mail link are required before it enters the administrator queue.
+- A verified restaurateur sees only the restaurant and the certification checkbox; subsequent claims never request identity, company, SIRET or a password and remain manually reviewed.
+- Approval associates one verified user with one or more restaurants through `restaurant_claims`. A new first dossier receives an activation link to choose only a password; rejection creates no account.
 - `RestaurantPolicy::manage` is enforced server-side; owners cannot access another owner's restaurant.
 - A guest who opens a claimable restaurant claim first sees the Contact-form-card styled account explanation, with Login and Registration actions. Both preserve the claim form as Laravel's intended destination; after successful authentication (or the required legacy password change), the user returns to that exact claim form. Claimability is checked before the explanation, when entering the authentication hand-off and again when loading/submitting the protected form.
 
