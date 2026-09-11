@@ -284,6 +284,8 @@
 
 ## Unreleased
 
+- Refined the claim page presentation only: balanced desktop cards, mobile stacking, a compact shared container, styled private-document selection and a separate certification control.
+
 - Reworked restaurant claims: a first claim has no password, uses a private identity document and expiring e-mail confirmation, then an activation link after review; a verified restaurateur submits only certification for later restaurants.
 
 - Finalisation V1 propriétaires : déclaration SIRET pour les nouveaux dépôts, claims existantes avec justificatif privé et validation manuelle, et demandes de suppression soumises à modération.

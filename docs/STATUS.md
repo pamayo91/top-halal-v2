@@ -4,6 +4,8 @@ Last updated: 2026-09-11
 
 Latest ownership V2: first restaurateur claims create no account or password, require a private document and expiring e-mail confirmation before manual review, then send a password-activation link after approval. A verified restaurateur signs in and submits only certification for each manually reviewed additional restaurant. Claimability remains central and owners can request — never directly perform — non-destructive removal.
 
+Latest claim presentation: the unauthenticated claim page now uses a compact Contact-aligned two-card desktop grid that stacks only on mobile. The identity upload instruction and the certification checkbox are independent, accessible visual blocks; business logic is unchanged.
+
 Latest claim UX: a guest clicking a claimable restaurant’s claim CTA now sees a focused Contact-card-styled explanation instead of an abrupt login redirect. Login and registration preserve the exact claim URL and resume there after authentication; claimability is rechecked at the screen, hand-off, form and submit boundaries.
 
 Latest navigation: header and footer navigation are now configured from the dedicated Filament « Navigation » group. Blade retains the public structure and styling; `menus` / `menu_items` only manage labels, order, destinations, visibility and two-level submenus. The initial header is Restaurants, Villes, Cuisines, Guides and Blog, with no search icon; the account secondary CTA and green restaurant-submission CTA remain route-backed. Footer columns, legal links and valid social URLs are configurable, and public navigation is SSR with targeted cache invalidation.
