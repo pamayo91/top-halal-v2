@@ -36,7 +36,7 @@
 
                     <section class="contact-form-card claim-card">
                         <h2>Première revendication ?</h2>
-                        <p class="claim-intro">Votre identité sera vérifiée une seule fois. Vos prochaines revendications seront ensuite simplifiées.</p>
+                        <p class="claim-intro">Votre identité doit être vérifiée.</p>
                         <form method="post" enctype="multipart/form-data" action="{{ route('claims.store', $restaurant) }}">
                             @csrf
                             <div class="claim-details-grid">
