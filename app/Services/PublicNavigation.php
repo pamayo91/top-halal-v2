@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\{Article, Category, Feature, Menu, MenuItem, Page, Setting};
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class PublicNavigation
 {
@@ -15,6 +16,7 @@ class PublicNavigation
 
     public function header(): array
     {
+        if (! Schema::hasTable('settings')) return $this->defaultHeader();
         return Cache::rememberForever(self::HEADER_KEY, function (): array {
             $config = (array) (Setting::where('key', 'header_navigation')->value('value') ?? []);
             $menu = $this->menu((int) ($config['menu_id'] ?? 0), 'header_main');
@@ -31,6 +33,7 @@ class PublicNavigation
 
     public function footer(): array
     {
+        if (! Schema::hasTable('settings')) return $this->defaultFooter();
         return Cache::rememberForever(self::FOOTER_KEY, function (): array {
             $config = (array) (Setting::where('key', 'footer_navigation')->value('value') ?? []);
             $columns = collect((array) ($config['column_menu_ids'] ?? []))
@@ -50,6 +53,9 @@ class PublicNavigation
     }
 
     public function forget(): void { Cache::forget(self::HEADER_KEY); Cache::forget(self::FOOTER_KEY); }
+
+    private function defaultHeader(): array { return ['menu'=>['name'=>null,'items'=>[]],'mobile_menu'=>['name'=>null,'items'=>[]],'account_visible'=>true,'account_label'=>'Mon compte','submission_visible'=>true,'submission_label'=>'Ajouter un restaurant']; }
+    private function defaultFooter(): array { return ['introduction'=>'Le guide indépendant pour trouver un restaurant halal.','show_logo'=>true,'columns'=>[],'legal'=>['name'=>null,'items'=>[]],'copyright'=>'© Top-Halal','social_links'=>[]]; }
 
     private function menu(int $id, ?string $fallbackLocation = null): ?Menu
     {
