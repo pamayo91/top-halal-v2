@@ -96,7 +96,9 @@ class EmailContactManagementTest extends TestCase
         $this->assertStringContainsString('Le guide des restaurants halal en France', $html);
         $this->assertStringContainsString(config('design.primary'), $html);
         $this->assertStringContainsString('https://example.test/reset', $html);
-        $this->assertStringContainsString('margin:28px 0 0;text-align:center', $html);
+        $this->assertStringContainsString('bgcolor="' . config('design.primary') . '"', $html);
+        $this->assertStringContainsString('margin:28px auto 0', $html);
+        $this->assertStringContainsString('border-radius:12px;overflow:hidden', $html);
         $this->assertStringContainsString('Une question ?', $text);
         $this->assertStringContainsString('À très bientôt !', $text);
         $this->assertStringContainsString("L'équipe Halal Courrier", $text);
