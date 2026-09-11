@@ -11,7 +11,6 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
