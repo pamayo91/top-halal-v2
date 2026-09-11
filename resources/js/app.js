@@ -121,10 +121,12 @@ if (submission) {
             const link = document.createElement('a');
             link.href = candidate.url;
             text(link, `${candidate.name}${candidate.city ? ` — ${candidate.city}` : ''}`);
-            const claim = document.createElement('a');
-            claim.href = candidate.claim_url;
-            text(claim, 'Revendiquer');
-            item.append(link, document.createTextNode(' · '), claim);
+            if (candidate.claim_url) {
+                const claim = document.createElement('a');
+                claim.href = candidate.claim_url;
+                text(claim, 'Revendiquer');
+                item.append(link, document.createTextNode(' · '), claim);
+            } else item.append(link);
             list.append(item);
         });
         target.append(heading, introduction, list);

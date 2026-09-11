@@ -58,7 +58,7 @@ class PublicRestaurantSubmissionController extends Controller
                 'name' => $restaurant->name,
                 'city' => $restaurant->city_name,
                 'url' => route('restaurants.show', $restaurant->slug),
-                'claim_url' => route('claims.create', $restaurant),
+                'claim_url' => $restaurant->isClaimable() ? route('claims.create', $restaurant) : null,
             ];
         })->all()]);
     }
