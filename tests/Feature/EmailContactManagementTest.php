@@ -41,7 +41,8 @@ class EmailContactManagementTest extends TestCase
     {
         $renderer = app(EmailTemplateRenderer::class);
         $fallback = $renderer->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => '<Alice>', 'contact_subject' => 'Bonjour']);
-        $this->assertStringContainsString('&lt;Alice&gt;', $fallback['body']);
+        $this->assertStringContainsString('<Alice>', $fallback['body']);
+        $this->assertStringContainsString('&lt;Alice&gt;', view('emails.transactional', ['email' => $fallback, 'global' => app(EmailGlobalSettings::class)->forRender()])->render());
         EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Bonjour {{ contact_name }} {{ unknown }}', 'body' => 'Texte {{ site_name }}', 'is_active' => true]);
         $rendered = $renderer->render('contact_confirmation', ['site_name' => 'Top Halal', 'contact_name' => 'Alice']);
         $this->assertSame('Bonjour Alice {{ unknown }}', $rendered['subject']); $this->assertSame('Texte Top Halal', $rendered['body']);
