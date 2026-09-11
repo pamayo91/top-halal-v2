@@ -25,6 +25,7 @@ class Restaurant extends Model
                 app(CitySeoService::class)->forget();
                 app(GeographicPageResolver::class)->forget();
             }
+            if ($restaurant->wasChanged('status')) $restaurant->activateSubmittedOwner();
         });
         static::deleted(function (): void { app(CityPageResolver::class)->forget(); app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
         static::restored(function (): void { app(CityPageResolver::class)->forget(); app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
@@ -55,6 +56,22 @@ class Restaurant extends Model
     public function outboundLinks(): HasMany { return $this->hasMany(RestaurantOutboundLink::class); }
     public function webEnrichment(): HasOne { return $this->hasOne(RestaurantWebEnrichment::class); }
     public function submission(): HasOne { return $this->hasOne(RestaurantSubmission::class); }
+    public function removalRequests(): HasMany { return $this->hasMany(RestaurantRemovalRequest::class); }
+    /** A single central rule for public claim presentation and write access. */
+    public function isClaimable(): bool
+    {
+        return ! $this->claims()->whereIn('status', ['pending', 'approved', 'pending_publication'])->exists();
+    }
+    public function activateSubmittedOwner(): void
+    {
+        if ($this->status !== 'published') return;
+        $submission = $this->submission;
+        if (! $submission?->user_id || $submission->submitter_role !== 'owner') return;
+        $claim = $this->claims()->where('user_id', $submission->user_id)->where('source', 'new_submission')->first();
+        if (! $claim || $claim->status !== 'pending_publication') return;
+        $claim->update(['status'=>'approved','reviewed_at'=>now()]);
+        if ($claim->user->role === 'user') $claim->user->update(['role'=>'restaurant_owner']);
+    }
     public function approvedReviewAggregate(): array
     {
         $aggregate = $this->reviews()->where('status', 'approved')->selectRaw('count(*) as count, avg(rating) as average')->first();

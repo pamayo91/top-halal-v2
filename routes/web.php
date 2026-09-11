@@ -9,7 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController};
+use App\Http\Controllers\{AccountController, AuthController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController, RestaurantRemovalRequestController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
@@ -95,8 +95,11 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
         Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
         Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
+        Route::get('/claims/{claim}/identity-document', ClaimIdentityDocumentController::class)->middleware('admin')->name('claims.identity-document');
         Route::get('/account/restaurants/{restaurant}/edit', [OwnerRestaurantController::class, 'edit'])->name('owner.restaurants.edit');
         Route::put('/account/restaurants/{restaurant}', [OwnerRestaurantController::class, 'update'])->name('owner.restaurants.update');
+        Route::get('/account/restaurants/{restaurant}/demander-suppression', [RestaurantRemovalRequestController::class, 'create'])->name('owner.restaurants.removal.create');
+        Route::post('/account/restaurants/{restaurant}/demander-suppression', [RestaurantRemovalRequestController::class, 'store'])->name('owner.restaurants.removal.store');
     });
 });
 

@@ -3,6 +3,6 @@
     <p>Statut : {{ auth()->user()->status }}. Rôle : {{ auth()->user()->role }}.</p>
     <p><a href="{{ route('password.change') }}">Changer le mot de passe</a></p>
     <h2>Mes restaurants</h2>
-    @forelse($restaurants as $restaurant)<article><h3>{{ $restaurant->name }}</h3><a href="{{ route('owner.restaurants.edit', $restaurant) }}">Modifier</a></article>@empty <p>Aucun restaurant approuvé.</p>@endforelse
+    @forelse($restaurants as $restaurant)<article><h3>{{ $restaurant->name }}</h3><a href="{{ route('owner.restaurants.edit', $restaurant) }}">Modifier</a> @if($restaurant->removalRequests()->where('status','pending')->exists())<span>Demande de suppression en cours</span>@else <a href="{{ route('owner.restaurants.removal.create', $restaurant) }}">Demander la suppression</a>@endif</article>@empty <p>Aucun restaurant approuvé.</p>@endforelse
     @if(auth()->user()->role === 'admin')<p><a href="{{ \App\Filament\Resources\RestaurantClaimResource::getUrl() }}">Administration des revendications</a></p>@endif
 </x-layouts.app>

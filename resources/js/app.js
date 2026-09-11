@@ -47,6 +47,8 @@ if (submission) {
     const galleryInput = form.querySelector('[data-gallery-input]');
     const galleryPreview = form.querySelector('[data-gallery-preview]');
     const summary = form.querySelector('[data-submission-summary]');
+    const ownerFields = form.querySelector('[data-owner-fields]');
+    form.querySelectorAll('[data-owner-choice]').forEach(input => input.addEventListener('change', () => { if (ownerFields) ownerFields.hidden = form.querySelector('[name="submitter_role"]:checked')?.value !== 'owner'; }));
     let currentStep = Number.parseInt(submission.dataset.initialStep || '1', 10) || 1;
     let nameTimer;
     let galleryFiles = [];

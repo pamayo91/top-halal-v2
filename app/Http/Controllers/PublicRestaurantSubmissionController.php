@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePublicRestaurantSubmissionRequest;
-use App\Models\{Category, Feature, Restaurant, RestaurantMedia, RestaurantSubmission};
+use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia, RestaurantSubmission};
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
 use App\Services\MediaIngestor;
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
@@ -118,11 +118,18 @@ class PublicRestaurantSubmissionController extends Controller
 
             RestaurantSubmission::create([
                 'restaurant_id' => $restaurant->id,
+                'user_id' => $request->user()?->id,
                 'submitter_email' => Str::lower(trim($data['email'])),
                 'submitter_role' => $data['submitter_role'],
                 'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
                 'submitted_at' => now(),
+                'owner_full_name' => $data['owner_full_name'] ?? null,
+                'owner_company' => $data['owner_company'] ?? null,
+                'owner_siret' => $data['owner_siret'] ?? null,
+                'owner_certified' => $request->boolean('owner_certified'),
             ]);
+
+            if ($data['submitter_role'] === 'owner') RestaurantClaim::create(['restaurant_id'=>$restaurant->id,'user_id'=>$request->user()->id,'full_name'=>$data['owner_full_name'],'company'=>$data['owner_company'],'siret'=>$data['owner_siret'],'certified'=>true,'source'=>'new_submission','status'=>'pending_publication','submitted_at'=>now()]);
 
             return $restaurant;
         });

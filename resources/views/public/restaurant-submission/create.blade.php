@@ -147,10 +147,17 @@
                         <div class="submission-summary" data-submission-summary aria-live="polite"></div>
 
                         <fieldset class="submission-choice-group">
-                            <legend>Quel est votre lien avec ce restaurant ?</legend>
-                            <label class="choice-card"><input type="radio" name="submitter_role" value="owner" required @checked(old('submitter_role') === 'owner')> <span><b>Je suis propriétaire / gérant</b><small>Nous ne vous demanderons pas d’autre information ici. Le parcours de revendication viendra ensuite.</small></span></label>
-                            <label class="choice-card"><input type="radio" name="submitter_role" value="employee" @checked(old('submitter_role') === 'employee')> <span><b>Je travaille dans ce restaurant</b></span></label>
-                            <label class="choice-card"><input type="radio" name="submitter_role" value="customer" @checked(old('submitter_role') === 'customer')> <span><b>Je suis client</b></span></label>
+                            <legend>Êtes-vous le gérant ou propriétaire de cet établissement ?</legend>
+                            <label class="choice-card"><input type="radio" name="submitter_role" value="owner" required @checked(old('submitter_role') === 'owner') data-owner-choice> <span><b>Oui</b><small>Vous pourrez gérer la fiche après sa publication.</small></span></label>
+                            <label class="choice-card"><input type="radio" name="submitter_role" value="customer" required @checked(old('submitter_role') === 'customer') data-owner-choice> <span><b>Non</b><small>Le restaurant pourra être revendiqué après publication.</small></span></label>
+                            <div data-owner-fields @unless(old('submitter_role') === 'owner') hidden @endunless>
+                                <label>Nom / prénom <input name="owner_full_name" maxlength="255" value="{{ old('owner_full_name') }}"></label>
+                                <label>Société <input name="owner_company" maxlength="255" value="{{ old('owner_company') }}"></label>
+                                <label>SIRET <input name="owner_siret" inputmode="numeric" maxlength="20" value="{{ old('owner_siret') }}"></label>
+                                <label><input type="checkbox" name="owner_certified" value="1" @checked(old('owner_certified'))> Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement.</label>
+                                <p class="form-help">Vous devez être connecté à votre compte Top Halal pour gérer cette fiche après publication.</p>
+                                @foreach(['owner_full_name','owner_company','owner_siret','owner_certified'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
+                            </div>
                             @error('submitter_role')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>
                         <label for="submitter-email">Votre e-mail</label>

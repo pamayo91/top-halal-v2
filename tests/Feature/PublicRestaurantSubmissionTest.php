@@ -157,6 +157,21 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame($before, $existing->fresh()->only(array_keys($before)));
     }
 
+    public function test_owner_submission_requires_declaration_and_activates_only_on_publication(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user)->post(route('restaurant-submissions.store'), $this->payload(['submitter_role'=>'owner','owner_full_name'=>'Amina Martin','owner_company'=>'SARL Test','owner_siret'=>'73282932000074','owner_certified'=>'1']))->assertRedirect();
+        $restaurant=Restaurant::firstOrFail();
+        $this->assertFalse($user->can('manage',$restaurant));
+        $restaurant->update(['status'=>'published']);
+        $this->assertTrue($user->fresh()->can('manage',$restaurant));
+    }
+
+    public function test_owner_submission_rejects_missing_certification_or_invalid_siret(): void
+    {
+        $this->actingAs(\App\Models\User::factory()->create())->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['submitter_role'=>'owner','owner_full_name'=>'Amina Martin','owner_company'=>'SARL Test','owner_siret'=>'123','owner_certified'=>null]))->assertSessionHasErrors(['owner_siret','owner_certified']);
+    }
+
     public function test_address_endpoint_and_duplicate_endpoint_expose_only_the_safe_public_contract(): void
     {
         Restaurant::create(['legacy_wp_id' => 99, 'name' => 'Le Safran', 'slug' => 'le-safran', 'status' => 'published', 'address_line1' => '46 Boulevard du Temple', 'city_name' => 'Paris', 'latitude' => 48.866, 'longitude' => 2.364]);

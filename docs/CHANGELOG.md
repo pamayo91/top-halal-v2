@@ -280,6 +280,8 @@
 
 ## Unreleased
 
+- Finalisation V1 propriétaires : déclaration SIRET pour les nouveaux dépôts, claims existantes avec justificatif privé et validation manuelle, et demandes de suppression soumises à modération.
+
 - Emails : le renderer transactionnel commun convertit désormais le texte simple normalisé en paragraphes HTML sûrs et en retours simples explicites ; l’aperçu Filament et le message envoyé rendent les mêmes sauts de ligne sans dépendre de `white-space`. L’espacement avant le séparateur du footer passe à 40 px supplémentaires, via le `padding` inline de la cellule de contenu.
 - Emails : les CTA transactionnels retrouvent 28 px d’espacement vertical inline au-dessus du bouton, sans modifier le design validé du bouton ni l’espace avant le footer.
 - Emails : les boutons envoyés utilisent désormais le pattern table/cellule avec `bgcolor`, plus fiable dans les clients de messagerie, et les cellules supérieure et inférieure du bloc principal portent un arrondi de 12 px.

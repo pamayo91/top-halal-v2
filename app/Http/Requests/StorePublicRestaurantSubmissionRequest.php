@@ -43,6 +43,10 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'gallery_photos' => ['nullable', 'array', 'max:10'],
             'gallery_photos.*' => ['file', 'image', 'dimensions:min_width=800', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             'submitter_role' => ['required', Rule::in(['owner', 'employee', 'customer'])],
+            'owner_full_name' => ['nullable', 'string', 'max:255', 'required_if:submitter_role,owner'],
+            'owner_company' => ['nullable', 'string', 'max:255', 'required_if:submitter_role,owner'],
+            'owner_siret' => ['nullable', 'digits:14', 'required_if:submitter_role,owner'],
+            'owner_certified' => ['nullable', 'accepted', 'required_if:submitter_role,owner'],
             'email' => ['required', 'email:rfc', 'max:255'],
         ];
     }
@@ -79,8 +83,14 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
                     if ($secondOpen <= $firstClose) $validator->errors()->add("hours.$day.second_open", 'La seconde plage doit commencer après la première.');
                 }
             }
+            if ($this->input('submitter_role') === 'owner' && ! $this->user()) $validator->errors()->add('submitter_role', 'Connectez-vous ou créez un compte pour gérer cette fiche après sa publication.');
+            $siret = (string) $this->input('owner_siret');
+            if ($this->input('submitter_role') === 'owner' && $siret !== '' && ! $this->isValidSiret($siret)) $validator->errors()->add('owner_siret', 'Le SIRET doit comporter 14 chiffres valides.');
         });
     }
+
+    protected function prepareForValidation(): void { if ($this->has('owner_siret')) $this->merge(['owner_siret'=>preg_replace('/\D+/', '', (string) $this->input('owner_siret'))]); }
+    private function isValidSiret(string $siret): bool { if (! preg_match('/^\d{14}$/',$siret)) return false; $sum=0; foreach(str_split($siret) as $i=>$digit){$n=(int)$digit; if($i%2===0){$n*=2;if($n>9)$n-=9;}$sum+=$n;} return $sum%10===0; }
 
     public function messages(): array
     {

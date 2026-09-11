@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class AuthenticationAndClaimsTest extends TestCase
@@ -73,12 +74,12 @@ class AuthenticationAndClaimsTest extends TestCase
         $other = User::factory()->create();
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $this->actingAs($owner)->post('/restaurants/'.$restaurant->id.'/claim', ['message' => 'Je représente ce restaurant.'])->assertRedirect();
+        $this->actingAs($owner)->post('/restaurants/'.$restaurant->id.'/claim', $this->claimPayload())->assertRedirect();
         $claim = RestaurantClaim::firstOrFail();
         $this->assertSame('pending', $claim->status);
         $this->actingAs($owner)->get('/account/restaurants/'.$restaurant->id.'/edit')->assertForbidden();
         $this->actingAs($other)->get('/claims/'.$claim->id)->assertForbidden();
-        $this->actingAs($owner)->post('/restaurants/'.$restaurant->id.'/claim', ['message' => 'duplicate'])->assertSessionHasErrors('claim');
+        $this->actingAs($owner)->post('/restaurants/'.$restaurant->id.'/claim', $this->claimPayload())->assertSessionHasErrors('claim');
 
         $this->actingAs($admin);
         app(ClaimModeration::class)->approve($claim);
@@ -106,4 +107,5 @@ class AuthenticationAndClaimsTest extends TestCase
     {
         return Restaurant::create(['legacy_wp_id' => random_int(1, 999999), 'name' => 'L’Étoile', 'slug' => 'l-etoile-'.str()->random(8), 'status' => 'published']);
     }
+    private function claimPayload(): array { return ['full_name'=>'Amina Martin','company'=>'SARL Test','siret'=>'73282932000074','certified'=>'1','identity_document'=>UploadedFile::fake()->image('identity.jpg', 800, 600),'message'=>'Je représente ce restaurant.']; }
 }
