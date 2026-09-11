@@ -64,7 +64,7 @@ class EmailContactManagementTest extends TestCase
 
     public function test_global_layout_inherits_footer_presentation_and_site_design(): void
     {
-        Setting::create(['key' => 'footer_navigation', 'group' => 'navigation', 'value' => ['introduction' => 'Le guide des restaurants halal en France']]);
+        Setting::updateOrCreate(['key' => 'footer_navigation'], ['group' => 'navigation', 'value' => ['introduction' => 'Le guide des restaurants halal en France']]);
         app(EmailGlobalSettings::class)->update(['display_name' => 'Halal Courrier', 'footer_text' => "Une question ?\nÀ très bientôt !\nL'équipe Halal Courrier", 'primary_color' => '#ffffff', 'show_current_year' => true, 'footer_additional_text' => 'Obsolète']);
         $email = app(EmailTemplateRenderer::class)->render('password_reset', ['site_name' => 'Top Halal', 'user_name' => 'Alice', 'reset_url' => 'https://example.test/reset']);
         $global = app(EmailGlobalSettings::class)->forRender();
@@ -84,7 +84,7 @@ class EmailContactManagementTest extends TestCase
     public function test_footer_presentation_change_and_logo_are_reflected_in_a_rendered_mailable(): void
     {
         $logo = MediaAsset::create(['original_path' => 'email-logo.webp', 'mime' => 'image/webp', 'width' => 320, 'height' => 120, 'bytes' => 1000, 'checksum' => str_repeat('a', 64), 'alt_text' => 'Logo Top Halal']);
-        Setting::create(['key' => 'footer_navigation', 'group' => 'navigation', 'value' => ['introduction' => 'Première présentation']]);
+        Setting::updateOrCreate(['key' => 'footer_navigation'], ['group' => 'navigation', 'value' => ['introduction' => 'Première présentation']]);
         app(EmailGlobalSettings::class)->update(['display_name' => 'Nouvelle identité', 'logo_media_asset_id' => $logo->id]);
         $html = (new TemplateMailable('contact_confirmation', ['contact_name' => 'Alice']))->render();
 
