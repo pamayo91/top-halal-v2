@@ -285,6 +285,7 @@
 ## Unreleased
 
 - Refined the claim page presentation only: balanced desktop cards, mobile stacking, a compact shared container, styled private-document selection and a separate certification control.
+- Rebalanced the claim page desktop presentation only: 42/58 cards, large-screen two-column identity details, shorter explanatory text and preserved single-column tablet/mobile flow.
 
 - Reworked restaurant claims: a first claim has no password, uses a private identity document and expiring e-mail confirmation, then an activation link after review; a verified restaurateur submits only certification for later restaurants.
 
