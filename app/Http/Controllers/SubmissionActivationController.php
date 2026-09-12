@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RestaurantSubmission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\{Auth, Hash};
 use Illuminate\View\View;
 
 class SubmissionActivationController extends Controller
@@ -35,8 +35,10 @@ class SubmissionActivationController extends Controller
             'email_verified_at' => now(),
         ])->save();
         $submission->update(['activation_token' => null, 'activation_expires_at' => null]);
+        Auth::login($submission->user);
+        $request->session()->regenerate();
 
-        return redirect()->route('login')->with('status', 'Votre espace est activé. Vous pouvez vous connecter pour gérer votre fiche.');
+        return redirect()->route('account.dashboard')->with('status', 'Votre espace est activé. Vous pouvez gérer votre fiche.');
     }
 
     private function valid(RestaurantSubmission $submission, string $token): bool

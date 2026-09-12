@@ -183,12 +183,13 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertArrayHasKey('activation_url', $confirmation->values);
         $activationUrl = explode('?', $confirmation->values['activation_url'])[0];
         $this->get($activationUrl)->assertOk()->assertSee('Activer mon espace');
-        $this->post($activationUrl, ['password' => 'MotDePasseSolide!123', 'password_confirmation' => 'MotDePasseSolide!123'])->assertRedirect(route('login'));
+        $this->post($activationUrl, ['password' => 'MotDePasseSolide!123', 'password_confirmation' => 'MotDePasseSolide!123'])->assertRedirect(route('account.dashboard'));
 
         $restaurant = Restaurant::firstOrFail();
         $user = User::where('email', 'contributeur@example.invalid')->firstOrFail();
         $this->assertSame('restaurant_owner', $user->role);
         $this->assertFalse($user->must_change_password);
+        $this->assertAuthenticatedAs($user);
         $this->assertTrue($user->can('manage', $restaurant));
         $this->assertTrue($restaurant->isClaimable());
         $this->actingAs($user)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);

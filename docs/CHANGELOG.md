@@ -6,6 +6,7 @@
 - Comptes : l’accès de déposant est limité à ses fiches soumises et reste distinct d’une revendication, afin qu’un véritable gérant puisse encore réclamer la fiche.
 - E-mails : la migration active le CTA « Activer mon espace » sur l’ancien modèle de confirmation conservé en base, sans écraser son texte personnalisé.
 - E-mails : le lien d’activation de déposant repose désormais seulement sur son jeton one-use expirant, afin que les paramètres de signature d’URL perdus par certains clients e-mail ne provoquent plus de 403.
+- Comptes : après le choix du mot de passe, le déposant est connecté et arrive directement dans « Mon compte » au lieu de revenir vers une page publique.
 
 ## 2026-09-11
 
