@@ -7,6 +7,7 @@
 - A legacy WordPress user whose capabilities contain `administrator` is migrated with the V2 `admin` role; an existing V2 role is never downgraded by a repeat migration.
 - A migrated account is marked `must_change_password` and can only change its password or log out until it completes that action.
 - Password reset also clears the mandatory-change flag after a successful reset.
+- The login and forgotten-password pages use the same responsive public form-card language as restaurant claims and public restaurant proposals: calm tinted background, centred card, editorial hierarchy, icon-assisted fields and full-width action.
 
 ## Restaurant claims
 - A first claim creates no account and starts as `pending_email_verification`; a private identity document plus a single-use, expiring e-mail link are required before it enters the administrator queue.

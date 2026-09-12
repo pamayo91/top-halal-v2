@@ -1,0 +1,11 @@
+.auth-page{min-height:calc(100vh - 68px)}
+.auth-shell{display:flex;justify-content:center}
+.auth-form-wrap{width:min(100%,620px);padding-top:1rem}
+.auth-form-card{min-height:0;padding:clamp(2rem,5vw,3.1rem)}
+.auth-form-card header h1{margin:.2rem 0 0;color:#10202d;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.25rem,4vw,3.15rem);letter-spacing:-.05em;line-height:1.1}
+.auth-form-card header p:last-child{margin:.75rem 0 1.75rem;color:#72808b;line-height:1.55}
+.auth-remember{display:flex!important;align-items:center;gap:.65rem;color:#52616b!important;font-size:.92rem!important;font-weight:600!important}
+.auth-remember input{width:1.1rem;height:1.1rem;margin:0;accent-color:var(--green)}
+.auth-secondary{margin:1.2rem 0 0;text-align:center;font-size:.93rem;font-weight:700}
+.auth-success{margin:0 0 1rem;padding:.8rem .95rem;border-left:3px solid var(--green);border-radius:4px;background:#edf7ef;color:#1d613d;font-size:.92rem;line-height:1.45}
+@media(max-width:760px){.auth-page{min-height:0}.auth-form-wrap{padding-top:.7rem}.auth-form-card{padding:3.1rem 1.1rem 1.5rem}.auth-form-card header h1{font-size:2.2rem}}

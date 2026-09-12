@@ -2,6 +2,10 @@
 
 ## 2026-09-12
 
+- Comptes : les pages Connexion et Mot de passe oublié utilisent désormais les cartes, hiérarchie éditoriale, champs illustrés et CTA du parcours de revendication et d’ajout de restaurant, sans changement du flux d’authentification.
+
+## 2026-09-12
+
 - Restaurants : chaque déposant public dont l’e-mail est confirmé reçoit un lien signé d’activation d’espace, valable sept jours et utilisable une seule fois.
 - Comptes : l’accès de déposant est limité à ses fiches soumises et reste distinct d’une revendication, afin qu’un véritable gérant puisse encore réclamer la fiche.
 - E-mails : la migration active le CTA « Activer mon espace » sur l’ancien modèle de confirmation conservé en base, sans écraser son texte personnalisé.

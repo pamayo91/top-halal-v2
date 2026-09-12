@@ -1,5 +1,6 @@
 import '../css/editorial-sidebar-overrides.css';
 import '../css/contact.css';
+import '../css/auth.css';
 import '../css/claim-auth.css';
 import '../css/claim-flow.css';
 import '../css/contact-responsive.css';
