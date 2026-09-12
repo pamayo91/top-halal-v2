@@ -17,7 +17,7 @@
 
 ## Public proposal contributors
 
-- Every public restaurant depositor who confirms their e-mail receives a one-use, seven-day link in that same confirmation message to choose a password. A new active `restaurant_owner` account is created; an existing ordinary account is attached and upgraded to that role without changing its password.
+- Every public restaurant depositor who confirms their e-mail receives a one-use, seven-day link in that same confirmation message to choose a password. It is protected by a separate 64-character hashed token instead of a secondary signed-URL query string. A new active `restaurant_owner` account is created; an existing ordinary account is attached and upgraded to that role without changing its password.
 - The account may manage only restaurants whose `restaurant_submissions.user_id` is that user. This management grant is deliberately distinct from `restaurant_claims`, so the restaurant remains claimable by its real manager.
 
 ## Historical listing authorship

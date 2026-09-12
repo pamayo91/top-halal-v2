@@ -16,7 +16,7 @@
 - The legacy-account notification template exists for the future campaign and is never dispatched by the migration.
 
 ## Security
-- Verification links use Laravel temporary signed URLs; reset links use Laravel password broker tokens and expire after 60 minutes. A restaurant-submission verification additionally requires a per-submission hashed one-use token and expires after 24 hours; a repeat click is harmless and sends no second confirmation. Its subsequent contributor-space activation URL is also signed, uses a separate hashed one-use token and expires after seven days.
+- Verification links use Laravel temporary signed URLs; reset links use Laravel password broker tokens and expire after 60 minutes. A restaurant-submission verification additionally requires a per-submission hashed one-use token and expires after 24 hours; a repeat click is harmless and sends no second confirmation. Its subsequent contributor-space activation URL uses a separate 64-character hashed one-use token and expires after seven days; it deliberately has no fragile secondary URL signature.
 - Credentials remain server-only. No campaign is sent to legacy users in this phase.
 - Template variables are plain allow-listed placeholders only (`{{ variable }}`); Blade, PHP and unknown placeholders are never evaluated.
 - Template bodies are normalised to LF at render time and the one-off forward migration rewrites historical literal `\\n` sequences. The shared renderer converts safe plain text into explicit HTML paragraphs (blank lines) and `<br>` elements (single line breaks); the preview and delivered HTML therefore share the same robust rendering without interpreting administrator content as HTML. The text alternative retains the same normalised plain-text body.

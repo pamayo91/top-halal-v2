@@ -188,7 +188,7 @@ class PublicRestaurantSubmissionController extends Controller
         });
 
         if ($confirmed) {
-            $activationUrl = URL::temporarySignedRoute('restaurant-submissions.activate', now()->addDays(7), ['submission' => $confirmed['submission'], 'token' => $confirmed['activation_token']]);
+            $activationUrl = route('restaurant-submissions.activate', ['submission' => $confirmed['submission'], 'token' => $confirmed['activation_token']]);
             $mailer->confirmed($confirmed['submission'], $activationUrl);
             $mailer->notifyTeamForReview($confirmed['submission']);
         }

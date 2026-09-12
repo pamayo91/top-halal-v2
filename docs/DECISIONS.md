@@ -150,4 +150,4 @@ La première revendication est un dossier sans compte : document privé, confirm
 
 ### D031 — Espace limité pour chaque déposant vérifié
 
-Chaque déposant d’une proposition publique qui confirme son e-mail reçoit, quel que soit son rôle déclaré, un lien d’activation de mot de passe dans l’e-mail de confirmation. L’accès est porté par `restaurant_submissions.user_id`, avec le droit de gérer exclusivement ses propres propositions. Il ne crée pas de `restaurant_claim`, ce qui laisse la fiche revendicable par son véritable gérant.
+Chaque déposant d’une proposition publique qui confirme son e-mail reçoit, quel que soit son rôle déclaré, un lien d’activation de mot de passe dans l’e-mail de confirmation. Son secret est un jeton aléatoire de 64 caractères, haché, expirant et consommé à l’usage ; aucune signature d’URL redondante et fragile n’est requise. L’accès est porté par `restaurant_submissions.user_id`, avec le droit de gérer exclusivement ses propres propositions. Il ne crée pas de `restaurant_claim`, ce qui laisse la fiche revendicable par son véritable gérant.
