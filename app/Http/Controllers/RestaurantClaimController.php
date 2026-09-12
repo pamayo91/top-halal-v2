@@ -27,8 +27,15 @@ class RestaurantClaimController extends Controller
         return view('claims.create', compact('restaurant', 'user'));
     }
 
-    public function login(Request $request, Restaurant $restaurant): RedirectResponse { return $this->redirectToAuthentication($request, $restaurant, 'login'); }
-    public function register(Request $request, Restaurant $restaurant): RedirectResponse { return $this->redirectToAuthentication($request, $restaurant, 'register'); }
+    public function login(Request $request, Restaurant $restaurant): RedirectResponse { return $this->redirectToAuthentication($request, $restaurant); }
+
+    /** Preserve former claim-registration links without recreating generic self-registration. */
+    public function resume(Restaurant $restaurant): RedirectResponse
+    {
+        abort_unless($restaurant->isClaimable(), 409, 'Ce restaurant est déjà géré ou fait actuellement l’objet d’une demande de revendication.');
+
+        return redirect()->route('claims.create', $restaurant);
+    }
 
     public function store(Request $request, Restaurant $restaurant): RedirectResponse
     {
@@ -78,11 +85,11 @@ class RestaurantClaimController extends Controller
     }
     public function received(): View { return view('claims.received'); }
 
-    private function redirectToAuthentication(Request $request, Restaurant $restaurant, string $route): RedirectResponse
+    private function redirectToAuthentication(Request $request, Restaurant $restaurant): RedirectResponse
     {
         abort_unless($restaurant->isClaimable(), 409, 'Ce restaurant est déjà géré ou fait actuellement l’objet d’une demande de revendication.');
         $request->session()->put('url.intended', route('claims.create', $restaurant));
-        return redirect()->route($route);
+        return redirect()->route('login');
     }
     private function isValidSiret(string $siret): bool { $sum = 0; foreach (str_split($siret) as $i => $digit) { $n = (int) $digit; if ($i % 2 === 0) { $n *= 2; if ($n > 9) $n -= 9; } $sum += $n; } return $sum % 10 === 0; }
 }

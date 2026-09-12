@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Authentification avant revendication', () => {
-  test('explains the account requirement and resumes the selected claim after registration and login', async ({ page, context }, testInfo) => {
+  test('shows the direct first-claim form without generic registration', async ({ page }, testInfo) => {
     const errors: string[] = [];
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('pageerror', error => errors.push(error.message));
@@ -9,39 +9,21 @@ test.describe('Authentification avant revendication', () => {
     await page.goto('/resto/01-kebab');
     const claimLink = page.getByRole('link', { name: 'Revendiquer ce restaurant' });
     await expect(claimLink).toBeVisible();
-    const claimUrl = await claimLink.getAttribute('href');
     await claimLink.click();
 
-    await expect(page.getByRole('heading', { name: 'Revendiquer ce restaurant' })).toBeVisible();
-    await expect(page.locator('.claim-auth-card.contact-form-card')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Se connecter' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Créer un compte' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Revendiquer/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Première revendication ?' })).toBeVisible();
+    await expect(page.locator('input[name="full_name"]')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Créer un compte' })).toHaveCount(0);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     if (testInfo.project.name === 'desktop-chromium') {
-      const card = await page.locator('.claim-auth-card').boundingBox();
+      const card = await page.locator('.claim-card').first().boundingBox();
       expect(card).not.toBeNull();
       expect(Math.abs((card!.x + card!.width / 2) - 720)).toBeLessThan(8);
     }
 
-    const email = `claim-auth-${Date.now()}-${testInfo.project.name}@example.invalid`;
-    const password = 'password-long-123';
-    await page.getByRole('link', { name: 'Créer un compte' }).click();
-    await page.locator('input[name="name"]').fill('Validation Claim');
-    await page.locator('input[name="email"]').fill(email);
-    await page.locator('input[name="password"]').fill(password);
-    await page.locator('input[name="password_confirmation"]').fill(password);
-    await page.getByRole('button', { name: 'Créer mon compte' }).click();
-    await expect(page).toHaveURL(claimUrl!);
-    await expect(page.getByText('Nom / prénom')).toBeVisible();
-
-    await context.clearCookies();
-    await page.goto(claimUrl!);
-    await page.getByRole('link', { name: 'Se connecter' }).click();
-    await page.locator('input[name="email"]').fill(email);
-    await page.locator('input[name="password"]').fill(password);
-    await page.getByRole('button', { name: 'Se connecter' }).click();
-    await expect(page).toHaveURL(claimUrl!);
-    await expect(page.getByText('Nom / prénom')).toBeVisible();
+    await expect(page.locator('form[action$="/login"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Envoyer ma demande' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });

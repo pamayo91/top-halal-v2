@@ -6,6 +6,8 @@ Latest restaurant-submission verification: a public proposal creates a pending r
 
 Latest contributor space: every confirmed public depositor, irrespective of the manager/owner answer, is now linked to a scoped account and receives the seven-day one-use password-activation CTA in the same confirmation e-mail. The account manages only its submitted listings; it creates no ownership claim, so the actual manager can still claim the restaurant normally.
 
+Latest account-entry cleanup: the generic `/register` page and its user-creation endpoint are removed. Accounts now originate only from validated public proposals or approved first claims. The former restaurant-specific registration hand-off remains only as a compatibility redirect to the selected direct claim form.
+
 Latest email CTA fix: the shared transactional renderer now resolves `restaurant_url`, `activation_url` and `admin_url` in addition to the original action, verification and reset URLs. Restaurant-publication confirmations therefore render their configured public-listing button.
 
 Latest ownership V2: first restaurateur claims create no account or password, require a private document and expiring e-mail confirmation before manual review, then send a password-activation link after approval. A verified restaurateur signs in and submits only certification for each manually reviewed additional restaurant. Claimability remains central and owners can request — never directly perform — non-destructive removal.
@@ -16,7 +18,7 @@ Latest submission verification UX: step five now uses accessible full-width mana
 
 Latest submission layout: the five-step form uses the full 1,120 px desktop shell, keeping the 280 px progress sidebar compact and giving the main form column the additional space. Below 840 px it remains a single-column flow.
 
-Latest claim UX: a guest clicking a claimable restaurant’s claim CTA now sees a focused Contact-card-styled explanation instead of an abrupt login redirect. Login and registration preserve the exact claim URL and resume there after authentication; claimability is rechecked at the screen, hand-off, form and submit boundaries.
+Latest claim UX: a guest clicking a claimable restaurant’s claim CTA sees the direct first-claim form, alongside the existing-restaurateur login form. Claimability is rechecked at form and submit boundaries.
 
 Latest navigation: header and footer navigation are now configured from the dedicated Filament « Navigation » group. Blade retains the public structure and styling; `menus` / `menu_items` only manage labels, order, destinations, visibility and two-level submenus. The initial header is Restaurants, Villes, Cuisines, Guides and Blog, with no search icon; the account secondary CTA and green restaurant-submission CTA remain route-backed. Footer columns, legal links and valid social URLs are configurable, and public navigation is SSR with targeted cache invalidation.
 

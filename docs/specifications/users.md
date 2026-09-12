@@ -1,7 +1,7 @@
 # Users and Claims
 
 ## Scope validated
-- Laravel session authentication supports registration, login, logout and password reset.
+- Laravel session authentication supports login, logout and password reset. There is no generic public self-registration page.
 - Authentication writes are protected by CSRF and rate limited per e-mail/IP pair.
 - Legacy users retain `legacy_wp_user_id`. WordPress password hashes are deliberately discarded.
 - A legacy WordPress user whose capabilities contain `administrator` is migrated with the V2 `admin` role; an existing V2 role is never downgraded by a repeat migration.
@@ -14,7 +14,7 @@
 - A verified restaurateur sees only the restaurant and the certification checkbox; subsequent claims never request identity, company, SIRET or a password and remain manually reviewed.
 - Approval associates one verified user with one or more restaurants through `restaurant_claims`. A new first dossier receives an activation link to choose only a password; rejection creates no account.
 - `RestaurantPolicy::manage` is enforced server-side; owners cannot access another owner's restaurant.
-- A guest who opens a claimable restaurant claim first sees the Contact-form-card styled account explanation, with Login and Registration actions. Both preserve the claim form as Laravel's intended destination; after successful authentication (or the required legacy password change), the user returns to that exact claim form. Claimability is checked before the explanation, when entering the authentication hand-off and again when loading/submitting the protected form.
+- A guest who opens a claimable restaurant claim sees the direct first-claim form, while an existing verified restaurateur can log in in the same page and resume that exact form. The former `/restaurants/{restaurant}/claim/register` hand-off remains a compatibility redirect to the claim form; it never opens generic self-registration. Claimability is checked when entering and submitting the claim.
 
 ## Public proposal contributors
 

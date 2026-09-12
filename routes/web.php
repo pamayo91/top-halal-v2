@@ -9,7 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
+use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
@@ -43,7 +43,8 @@ Route::get('/contact', [ContactController::class, 'create'])->name('contact.crea
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
 Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
 Route::get('/restaurants/{restaurant}/claim/login', [RestaurantClaimController::class, 'login'])->name('claims.login');
-Route::get('/restaurants/{restaurant}/claim/register', [RestaurantClaimController::class, 'register'])->name('claims.register');
+// Preserve former claim-registration links without offering generic self-registration.
+Route::get('/restaurants/{restaurant}/claim/register', [RestaurantClaimController::class, 'resume'])->name('claims.register');
 Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
 Route::get('/claims/recu', [RestaurantClaimController::class, 'received'])->name('claims.received');
 Route::get('/claims/{claim}/verify/{token}', [RestaurantClaimController::class, 'verify'])->middleware('signed')->name('claims.verify');
@@ -85,8 +86,6 @@ Route::any('/bo/{path?}', fn () => abort(404))->where('path', '.*');
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
     Route::post('/login', [AuthController::class, 'store'])->middleware('throttle:authentication')->name('login.store');
-    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:authentication')->name('register.store');
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware('throttle:authentication')->name('password.email');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');

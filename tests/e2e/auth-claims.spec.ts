@@ -22,23 +22,8 @@ test('authentication, mandatory password change, claims and permissions', async 
   page.on('requestfailed', request => networkErrors.push(`${request.method()} ${request.url()}`));
 
   await page.goto('/register');
-  await page.locator('input[name="name"]').fill('Inscription E2E');
-  await page.locator('input[name="email"]').fill(`${prefix}-registered@example.invalid`);
-  await page.locator('input[name="password"]').fill(password);
-  await page.locator('input[name="password_confirmation"]').fill(password);
-  await page.getByRole('button', { name: 'Créer mon compte' }).click();
-  await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible();
-  await page.getByRole('button', { name: 'Déconnexion' }).click();
-
-  await page.goto('/login');
-  await page.locator('input[name="email"]').fill(`${prefix}-registered@example.invalid`);
-  await page.locator('input[name="password"]').fill('wrong-password');
-  await page.getByRole('button', { name: 'Se connecter' }).click();
-  await expect(page.getByRole('alert')).toContainText('identifiants');
-  await page.locator('input[name="password"]').fill(password);
-  await page.getByRole('button', { name: 'Se connecter' }).click();
-  await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible();
-  await page.getByRole('button', { name: 'Déconnexion' }).click();
+  await expect(page).toHaveURL(/\/register$/);
+  await expect(page.locator('input[name="name"]')).toHaveCount(0);
 
   await page.goto('/login');
   await page.locator('input[name="email"]').fill(`${prefix}-legacy@example.invalid`);
@@ -60,7 +45,7 @@ test('authentication, mandatory password change, claims and permissions', async 
   await expect(page.getByRole('alert')).toContainText('identifiants');
 
   await page.goto('/forgot-password');
-  await page.locator('input[name="email"]').fill(`${prefix}-registered@example.invalid`);
+  await page.locator('input[name="email"]').fill(`${prefix}-no-account@example.invalid`);
   await page.getByRole('button', { name: 'Envoyer le lien' }).click();
   await expect(page.getByRole('status')).toContainText('Si ce compte existe');
 

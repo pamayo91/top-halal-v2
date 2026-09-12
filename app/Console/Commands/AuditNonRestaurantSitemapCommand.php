@@ -24,7 +24,7 @@ class AuditNonRestaurantSitemapCommand extends Command
         foreach (Page::orderBy('id')->get() as $item) $this->addEditorial($add, $item, 'page');
         foreach (Category::orderBy('id')->get() as $item) $add('/specialites/'.$item->slug, 'category', $item->legacy_term_id, 'active', false, false, 'CONSERVER', 'Taxonomie non indexable tant qu’aucune landing page éditoriale n’est validée.');
         foreach (Feature::orderBy('id')->get() as $item) $add('/service/'.$item->slug, 'feature', $item->legacy_term_id, 'active', false, false, 'CONSERVER', 'Taxonomie non indexable tant qu’aucune landing page éditoriale n’est validée.');
-        foreach (['/health', '/login', '/register', '/forgot-password', '/account', '/verify-email', '/sitemap.xml', '/robots.txt', '/_preview/post/{legacyId}', '/_preview/page/{legacyId}', '/_preview/restaurant/{legacyId}'] as $path) {
+        foreach (['/health', '/login', '/forgot-password', '/account', '/verify-email', '/sitemap.xml', '/robots.txt', '/_preview/post/{legacyId}', '/_preview/page/{legacyId}', '/_preview/restaurant/{legacyId}'] as $path) {
             $add($path, 'system', null, 'system', false, false, 'CONSERVER', 'Route technique/authentification/preview : jamais indexable ni incluse dans le sitemap.');
         }
 
