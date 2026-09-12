@@ -168,8 +168,8 @@
                         </fieldset>
                         <label for="submitter-email">Votre e-mail</label>
                         <input id="submitter-email" name="email" type="email" autocomplete="email" required maxlength="255" value="{{ old('email') }}">
-                        <p class="form-help" data-owner-email-help="customer" @if(old('submitter_role') === 'owner') hidden @endif>Nous utilisons votre e-mail pour le suivi de cette proposition et pour vous recontacter si nécessaire.</p>
-                        <p class="form-help" data-owner-email-help="owner" @unless(old('submitter_role') === 'owner') hidden @endunless>Nous utilisons votre e-mail pour le suivi de cette proposition et pour vous contacter au sujet de la gestion de cette fiche.</p>
+                        <p class="form-help" data-owner-email-help="customer" @if(old('submitter_role') === 'owner') hidden @endif>Nous utilisons votre e-mail pour le suivi. Après sa confirmation, vous recevrez aussi un lien pour activer votre espace et adapter cette fiche.</p>
+                        <p class="form-help" data-owner-email-help="owner" @unless(old('submitter_role') === 'owner') hidden @endunless>Nous utilisons votre e-mail pour le suivi. Après sa confirmation, vous recevrez aussi un lien pour activer votre espace et gérer cette fiche.</p>
                         @error('email')<p class="field-error">{{ $message }}</p>@enderror
 
                         <div class="submission-actions">

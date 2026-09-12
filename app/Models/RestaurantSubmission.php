@@ -11,11 +11,16 @@ class RestaurantSubmission extends Model
 
     protected function casts(): array
     {
-        return ['submitted_at' => 'datetime', 'email_verified_at' => 'datetime', 'email_verification_expires_at' => 'datetime'];
+        return ['submitted_at' => 'datetime', 'email_verified_at' => 'datetime', 'email_verification_expires_at' => 'datetime', 'activation_expires_at' => 'datetime'];
     }
 
     public function restaurant(): BelongsTo
     {
         return $this->belongsTo(Restaurant::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

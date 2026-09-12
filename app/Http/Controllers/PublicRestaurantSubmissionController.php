@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePublicRestaurantSubmissionRequest;
-use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia, RestaurantSubmission};
+use App\Models\{Category, Feature, Restaurant, RestaurantMedia, RestaurantSubmission, User};
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
 use App\Services\{MediaIngestor, RestaurantSubmissionMailer};
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
-use Illuminate\Support\Facades\{DB, URL};
+use Illuminate\Support\Facades\{DB, Hash, URL};
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -133,8 +133,6 @@ class PublicRestaurantSubmissionController extends Controller
                 'email_verification_expires_at' => now()->addHours(24),
             ]);
 
-            if ($data['submitter_role'] === 'owner') RestaurantClaim::create(['restaurant_id'=>$restaurant->id,'user_id'=>$request->user()?->id,'full_name'=>$data['owner_full_name'],'email'=>Str::lower(trim($data['email'])),'company'=>$data['owner_company'],'siret'=>$data['owner_siret'],'certified'=>true,'source'=>'new_submission','status'=>'pending_publication','submitted_at'=>now()]);
-
             return $restaurant;
         });
 
@@ -153,17 +151,46 @@ class PublicRestaurantSubmissionController extends Controller
 
     public function verify(RestaurantSubmission $submission, string $token, RestaurantSubmissionMailer $mailer): View
     {
-        $confirmed = DB::transaction(function () use ($submission, $token): ?RestaurantSubmission {
+        $confirmed = DB::transaction(function () use ($submission, $token): ?array {
             $submission = RestaurantSubmission::query()->with('restaurant')->lockForUpdate()->findOrFail($submission->id);
             if ($submission->status !== 'pending_email_verification') return null;
             abort_unless($submission->email_verification_expires_at?->isFuture() && hash_equals((string) $submission->email_verification_token, hash('sha256', $token)), 404);
-            $submission->update(['status' => 'pending_admin_review', 'email_verified_at' => now(), 'email_verification_token' => null, 'email_verification_expires_at' => null]);
-            return $submission->fresh('restaurant');
+            $email = Str::lower(trim($submission->submitter_email));
+            $user = User::query()->where('email', $email)->lockForUpdate()->first();
+            $needsActivation = $user === null;
+
+            if (! $user) {
+                $user = User::create([
+                    'name' => $submission->owner_full_name ?: $submission->restaurant->name,
+                    'email' => $email,
+                    'password' => Hash::make(Str::random(64)),
+                    'role' => 'restaurant_owner',
+                    'status' => 'active',
+                    'must_change_password' => true,
+                ]);
+                $user->forceFill(['email_verified_at' => now()])->save();
+            } elseif ($user->role === 'user') {
+                $user->update(['role' => 'restaurant_owner']);
+            }
+
+            $activationToken = Str::random(64);
+            $submission->update([
+                'user_id' => $user->id,
+                'status' => 'pending_admin_review',
+                'email_verified_at' => now(),
+                'email_verification_token' => null,
+                'email_verification_expires_at' => null,
+                'activation_token' => hash('sha256', $activationToken),
+                'activation_expires_at' => now()->addDays(7),
+            ]);
+
+            return ['submission' => $submission->fresh('restaurant'), 'activation_token' => $activationToken, 'needs_activation' => $needsActivation];
         });
 
         if ($confirmed) {
-            $mailer->confirmed($confirmed);
-            $mailer->notifyTeamForReview($confirmed);
+            $activationUrl = URL::temporarySignedRoute('restaurant-submissions.activate', now()->addDays(7), ['submission' => $confirmed['submission'], 'token' => $confirmed['activation_token']]);
+            $mailer->confirmed($confirmed['submission'], $activationUrl);
+            $mailer->notifyTeamForReview($confirmed['submission']);
         }
 
         return view('public.restaurant-submission.email-verified', ['alreadyConfirmed' => $confirmed === null]);

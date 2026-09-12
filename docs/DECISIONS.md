@@ -147,3 +147,7 @@ Un nouveau restaurant soumis par son gérant utilise une déclaration simple, sa
 ### D020 — Vérification restaurateur unique
 
 La première revendication est un dossier sans compte : document privé, confirmation e-mail expirante et revue humaine précèdent une invitation à choisir un mot de passe. Un restaurateur déjà vérifié ne soumet ensuite que sa certification, avec validation manuelle pour chaque fiche. Une correspondance d’e-mail ne rattache jamais seule une nouvelle fiche à un compte existant : le rattachement doit être confirmé avec la session concernée ou par le lien envoyé à cette adresse.
+
+### D031 — Espace limité pour chaque déposant vérifié
+
+Chaque déposant d’une proposition publique qui confirme son e-mail reçoit, quel que soit son rôle déclaré, un lien d’activation de mot de passe dans l’e-mail de confirmation. L’accès est porté par `restaurant_submissions.user_id`, avec le droit de gérer exclusivement ses propres propositions. Il ne crée pas de `restaurant_claim`, ce qui laisse la fiche revendicable par son véritable gérant.

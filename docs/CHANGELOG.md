@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-12
+
+- Restaurants : chaque déposant public dont l’e-mail est confirmé reçoit un lien signé d’activation d’espace, valable sept jours et utilisable une seule fois.
+- Comptes : l’accès de déposant est limité à ses fiches soumises et reste distinct d’une revendication, afin qu’un véritable gérant puisse encore réclamer la fiche.
+
 ## 2026-09-11
 
 - E-mails : le renderer transactionnel reconnaît désormais les CTA de fiche restaurant, d’activation et d’accès BO ; le bouton « Voir le restaurant » est rendu dans la confirmation de publication.

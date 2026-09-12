@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
-use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantSubmission, Setting};
+use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantSubmission, Setting, User};
 use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -167,17 +167,30 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame($before, $existing->fresh()->only(array_keys($before)));
     }
 
-    public function test_owner_submission_requires_declaration_and_activates_only_on_publication(): void
+    public function test_every_verified_submitter_receives_an_account_activation_and_can_manage_without_blocking_a_claim(): void
     {
-        $user = \App\Models\User::factory()->create();
-        $this->actingAs($user)->post(route('restaurant-submissions.store'), $this->payload(['submitter_role'=>'owner','owner_full_name'=>'Amina Martin','owner_company'=>'SARL Test','owner_siret'=>'73282932000074','owner_certified'=>'1']))->assertRedirect();
-        $restaurant=Restaurant::firstOrFail();
-        $this->assertFalse($user->can('manage',$restaurant));
-        RestaurantSubmission::firstOrFail()->update(['status' => 'pending_admin_review', 'email_verified_at' => now()]);
-        $restaurant->update(['status'=>'published']);
-        $this->assertTrue($user->fresh()->can('manage',$restaurant));
-        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_published', 'recipient' => 'contributeur@example.invalid']);
-        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_published');
+        $asset = MediaAsset::create(['original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('z', 64), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect();
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        $this->assertNotNull($confirmation);
+        $this->assertArrayHasKey('activation_url', $confirmation->values);
+        $this->get($confirmation->values['activation_url'])->assertOk()->assertSee('Activer mon espace');
+        $this->post($confirmation->values['activation_url'], ['password' => 'MotDePasseSolide!123', 'password_confirmation' => 'MotDePasseSolide!123'])->assertRedirect(route('login'));
+
+        $restaurant = Restaurant::firstOrFail();
+        $user = User::where('email', 'contributeur@example.invalid')->firstOrFail();
+        $this->assertSame('restaurant_owner', $user->role);
+        $this->assertFalse($user->must_change_password);
+        $this->assertTrue($user->can('manage', $restaurant));
+        $this->assertTrue($restaurant->isClaimable());
+        $this->actingAs($user)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
     }
 
     public function test_verified_email_makes_the_submission_available_for_admin_review_once(): void

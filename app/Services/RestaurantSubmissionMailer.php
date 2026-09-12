@@ -17,11 +17,12 @@ class RestaurantSubmissionMailer
         ]);
     }
 
-    public function confirmed(RestaurantSubmission $submission): void
+    public function confirmed(RestaurantSubmission $submission, string $activationUrl): void
     {
         app(TransactionalMailService::class)->queue('restaurant_submission_email_confirmed', $submission->submitter_email, [
             'site_name' => config('app.name', 'Top Halal'),
             'restaurant_name' => $submission->restaurant->name,
+            'activation_url' => $activationUrl,
         ]);
     }
 

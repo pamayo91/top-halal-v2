@@ -15,6 +15,11 @@
 - `RestaurantPolicy::manage` is enforced server-side; owners cannot access another owner's restaurant.
 - A guest who opens a claimable restaurant claim first sees the Contact-form-card styled account explanation, with Login and Registration actions. Both preserve the claim form as Laravel's intended destination; after successful authentication (or the required legacy password change), the user returns to that exact claim form. Claimability is checked before the explanation, when entering the authentication hand-off and again when loading/submitting the protected form.
 
+## Public proposal contributors
+
+- Every public restaurant depositor who confirms their e-mail receives a one-use, seven-day link in that same confirmation message to choose a password. A new active `restaurant_owner` account is created; an existing ordinary account is attached and upgraded to that role without changing its password.
+- The account may manage only restaurants whose `restaurant_submissions.user_id` is that user. This management grant is deliberately distinct from `restaurant_claims`, so the restaurant remains claimable by its real manager.
+
 ## Historical listing authorship
 - `legacy_restaurant_authorships` preserves only the WordPress `post_author` relationship to its exact migrated restaurant (`legacy_wp_id`).
 - It is not a restaurant claim: it never grants a role, ownership, dashboard access, edit permission, or changes `is_claimed`.

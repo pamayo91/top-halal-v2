@@ -9,7 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController, RestaurantRemovalRequestController};
+use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RegisteredUserController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
@@ -37,6 +37,8 @@ Route::get('/ajouter-un-restaurant/doublons', [PublicRestaurantSubmissionControl
 Route::post('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'store'])->middleware('throttle:restaurant-submission')->name('restaurant-submissions.store');
 Route::get('/ajouter-un-restaurant/merci', [PublicRestaurantSubmissionController::class, 'thanks'])->name('restaurant-submissions.thanks');
 Route::get('/ajouter-un-restaurant/verifier/{submission}/{token}', [PublicRestaurantSubmissionController::class, 'verify'])->middleware('signed')->name('restaurant-submissions.verify');
+Route::get('/ajouter-un-restaurant/activer/{submission}/{token}', [SubmissionActivationController::class, 'create'])->middleware('signed')->name('restaurant-submissions.activate');
+Route::post('/ajouter-un-restaurant/activer/{submission}/{token}', [SubmissionActivationController::class, 'store'])->middleware(['signed', 'throttle:5,1'])->name('restaurant-submissions.activate.store');
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
 Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');

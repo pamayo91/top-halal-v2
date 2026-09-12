@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Restaurant;
-use App\Models\RestaurantClaim;
+use App\Models\{RestaurantClaim, RestaurantSubmission};
 use App\Models\User;
 
 class RestaurantPolicy
@@ -14,6 +14,9 @@ class RestaurantPolicy
             ->where('restaurant_id', $restaurant->id)
             ->where('user_id', $user->id)
             ->where('status', 'approved')
-            ->exists();
+            ->exists() || RestaurantSubmission::query()
+                ->where('restaurant_id', $restaurant->id)
+                ->where('user_id', $user->id)
+                ->exists();
     }
 }
