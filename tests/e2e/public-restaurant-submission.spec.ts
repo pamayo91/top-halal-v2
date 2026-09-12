@@ -74,5 +74,6 @@ test('public restaurant contribution submits a pending restaurant successfully',
   await page.getByLabel('Votre e-mail').fill(`contribution-${testInfo.project.name}@example.invalid`);
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
   await expect(page.getByRole('heading', { name: 'Merci pour votre aide !' })).toBeVisible();
+  await expect(page.getByText('attend d’abord la confirmation de votre adresse e-mail')).toBeVisible();
   expect(errors).toEqual([]);
 });
