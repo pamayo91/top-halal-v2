@@ -15,7 +15,7 @@ use App\Notifications\QueuedResetPasswordNotification;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 
-#[Fillable(['name', 'email', 'password', 'role', 'status', 'must_change_password'])]
+#[Fillable(['name', 'email', 'password', 'login_enabled', 'role', 'status', 'must_change_password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
@@ -32,17 +32,21 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'login_enabled' => 'boolean',
             'must_change_password' => 'boolean',
         ];
     }
 
     public function claims() { return $this->hasMany(RestaurantClaim::class); }
+    public function reviews() { return $this->hasMany(RestaurantReview::class); }
+    public function comments() { return $this->hasMany(Comment::class); }
+    public function canLogIn(): bool { return $this->login_enabled; }
     public function isVerifiedRestaurateur(): bool { return $this->role === 'restaurant_owner' && $this->status === 'active' && ! $this->must_change_password; }
     public function ownedRestaurants() { return $this->belongsToMany(Restaurant::class, 'restaurant_claims', 'user_id', 'restaurant_id')->wherePivot('status', 'approved'); }
     public function submittedRestaurants() { return $this->hasMany(RestaurantSubmission::class); }
     public function legacyRestaurantAuthorships() { return $this->hasMany(LegacyRestaurantAuthorship::class); }
     public function legacyAuthoredRestaurants() { return $this->belongsToMany(Restaurant::class, 'legacy_restaurant_authorships', 'user_id', 'restaurant_id'); }
     public function sendEmailVerificationNotification(): void { $this->notify(new VerifyEmailNotification()); }
-    public function sendPasswordResetNotification($token): void { $this->notify(new QueuedResetPasswordNotification($token)); }
+    public function sendPasswordResetNotification($token): void { if ($this->canLogIn()) $this->notify(new QueuedResetPasswordNotification($token)); }
     public function canAccessPanel(Panel $panel): bool { return $panel->getId() === 'admin' && $this->role === 'admin' && $this->status === 'active'; }
 }

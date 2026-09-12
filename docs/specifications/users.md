@@ -22,6 +22,13 @@
 - A later visit to a consumed activation URL never allows a password change. It displays a noindex explanation that the space is already active and offers the login route instead of an opaque 404.
 - The account may manage only restaurants whose `restaurant_submissions.user_id` is that user. This management grant is deliberately distinct from `restaurant_claims`, so the restaurant remains claimable by its real manager.
 
+## Contributor identities (reviews and comments)
+
+- A review or editorial comment is always associated with one `User` once its author has proved control of the submitted e-mail address. A unique e-mail therefore maps to one identity only.
+- A contributor identity created by this flow has `login_enabled=false`, an undisclosed random password, role `user` and no claim or restaurant-management grant. It cannot authenticate or receive a usable password-reset link merely because it contributed.
+- An authenticated account proves its own identity directly. An anonymous browser must either hold a server-side session proof for the exact `User` or complete a fresh verification. The proof stores only a user ID and expiry in the Laravel session, never a freely supplied e-mail, and expires after 30 days (or earlier when its session ends).
+- An e-mail's historical `email_verified_at` alone is never enough to submit a contribution: absent a valid current proof, a new one-use verification is required.
+
 ## Historical listing authorship
 - `legacy_restaurant_authorships` preserves only the WordPress `post_author` relationship to its exact migrated restaurant (`legacy_wp_id`).
 - It is not a restaurant claim: it never grants a role, ownership, dashboard access, edit permission, or changes `is_claimed`.

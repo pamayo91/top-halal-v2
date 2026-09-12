@@ -9,7 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
+use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, ContributionVerificationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
@@ -50,6 +50,7 @@ Route::get('/claims/recu', [RestaurantClaimController::class, 'received'])->name
 Route::get('/claims/{claim}/verify/{token}', [RestaurantClaimController::class, 'verify'])->middleware('signed')->name('claims.verify');
 Route::get('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'create'])->middleware('signed')->name('claims.activate');
 Route::post('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'store'])->middleware(['signed', 'throttle:5,1'])->name('claims.activate.store');
+Route::get('/contributions/verifier/{verification}/{token}', ContributionVerificationController::class)->middleware('signed')->name('contributions.verify');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));

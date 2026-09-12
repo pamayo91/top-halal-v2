@@ -19,5 +19,6 @@ Reviews are separate domain objects from editorial comments.
 - Support owner/admin response as a separate response object or explicit review-response relation.
 - Legacy pilot: `rating` is an integer strictly in 1–5. Only approved V2 reviews contribute to the runtime aggregate (`count`, `avg`); no denormalized rating source of truth is stored.
 - New submissions are pending, URL-free, CSRF/honeypot/rate-limit protected and escaped when rendered. `reviews:moderate` provides temporary approve/reject/spam/delete operations.
-- Before public launch, a first review from an e-mail address must require confirmation through a signed, expiring link. The review remains pending and cannot be approved until that confirmation succeeds.
+- A new or unproven review author first creates a `contribution_verifications` record, not a review. It carries a hashed random token, temporary signed URL, 24-hour expiry and the exact restaurant/payload. Only one successful click atomically creates/reuses the `User`, marks its e-mail verified and creates the review as `pending` with `user_id`.
+- A signed-in user or an anonymous browser holding an unexpired server-side proof for that exact `User` creates a `pending` review directly. Merely knowing an existing or historically verified e-mail never bypasses this proof.
 - JSON-LD AggregateRating/Review is deferred and must be emitted only for publicly visible approved V2 reviews.

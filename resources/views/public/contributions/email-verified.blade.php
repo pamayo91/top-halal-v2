@@ -1,0 +1,3 @@
+<x-layouts.app title="Adresse e-mail confirmée | Top Halal" robots="noindex,nofollow">
+    <section class="contact-page auth-page"><div class="shell auth-shell"><div class="contact-form-wrap auth-form-wrap"><aside class="contact-sticker"><span>Adresse confirmée</span></aside><div class="contact-form-card auth-form-card"><header><p class="eyebrow">Merci</p><h1>Votre identité est confirmée.</h1><p>Votre {{ $contribution_type === 'review' ? 'avis' : 'commentaire' }} a été envoyé à l’équipe Top Halal pour modération.</p></header><a class="button contact-submit" href="{{ $destination_url }}">Retourner au contenu <span aria-hidden="true">→</span></a></div></div></div></section>
+</x-layouts.app>

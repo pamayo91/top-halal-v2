@@ -169,8 +169,10 @@ class UserResource extends AdminResource
                     ->visible(fn (User $user) => $user->trashed() && ! static::isProtectedFromDeletion($user))
                     ->action(fn (User $user) => static::forceDelete($user)),
                 Action::make('reset')->label('Réinitialiser MDP')->requiresConfirmation()->visible(fn (User $user) => ! $user->trashed())->action(function (User $user): void {
-                    Password::sendResetLink(['email' => $user->email]);
-                    app(AdminAudit::class)->record('user.password_reset_sent', $user);
+                    if ($user->canLogIn()) {
+                        Password::sendResetLink(['email' => $user->email]);
+                        app(AdminAudit::class)->record('user.password_reset_sent', $user);
+                    }
                 }),
             ])
             ->toolbarActions([

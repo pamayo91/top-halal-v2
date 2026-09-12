@@ -27,14 +27,14 @@ for (const path of previews) {
   });
 }
 
-test('technical preview comment form is protected and keeps submissions pending', async ({ page }) => {
+test('technical preview comment form requires identity verification and rejects URLs', async ({ page }) => {
   const response = await page.goto('/_preview/post/27');
   expect(response?.status()).toBe(200);
   await page.locator('input[name="name"]').fill('Codex test');
   await page.locator('input[name="email"]').fill('codex-comment-test@example.invalid');
   await page.locator('textarea[name="content"]').fill('Commentaire de validation sans lien.');
   await page.getByRole('button', { name: 'Envoyer' }).click();
-  await expect(page.getByRole('status')).toContainText('en attente de modération');
+  await expect(page.getByRole('status')).toContainText('Vérifiez votre adresse e-mail');
   await page.locator('input[name="name"]').fill('Codex test');
   await page.locator('input[name="email"]').fill('codex-comment-test@example.invalid');
   await page.locator('textarea[name="content"]').fill('https://example.invalid');

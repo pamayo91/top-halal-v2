@@ -2,6 +2,10 @@
 
 ## 2026-09-12
 
+### D031 — Identité contributrice sans compte de connexion
+
+Les avis et commentaires partagent un unique workflow d’identité. Une contribution non prouvée est retenue dans `contribution_verifications`, avec e-mail, cible et payload exacts, token aléatoire haché, URL Laravel temporairement signée, expiration de 24 heures et consommation atomique. La confirmation crée ou réutilise un `User` unique, marque l’adresse vérifiée et crée seulement alors l’avis ou commentaire `pending` avec `user_id`. Les identités créées par ce flux ont `login_enabled=false`, un mot de passe aléatoire inconnu, rôle `user`, aucun claim et aucun droit restaurant. Une session authentifiée ou une preuve de session serveur expirante liée à l’ID utilisateur autorise la contribution suivante; connaître une adresse e-mail, même vérifiée historiquement, ne l’autorise jamais.
+
 ### D030 — Double validation des propositions de restaurants
 
 Une proposition publique et sa fiche `restaurants` restent deux objets distincts. La fiche est créée `pending`, tandis que la soumission suit `pending_email_verification` puis `pending_admin_review` et enfin `published`. La vérification d’adresse combine une URL Laravel signée de 24 heures et un token aléatoire haché, lié à une seule soumission et consommé à la confirmation. La publication est refusée au niveau du modèle tant qu’une soumission associée n’est pas à l’étape de revue : cette règle couvre l’édition, les actions unitaires et les actions groupées Filament. Les propositions historiques antérieures à ce mécanisme sont explicitement conservées dans leur file de revue ou à l’état publié, sans simuler une vérification ni envoyer de campagne rétroactive.

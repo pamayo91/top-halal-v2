@@ -26,7 +26,7 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt([...$credentials, 'status' => 'active'], $request->boolean('remember'))) {
+        if (! Auth::attempt([...$credentials, 'status' => 'active', 'login_enabled' => true], $request->boolean('remember'))) {
             throw ValidationException::withMessages(['email' => 'Les identifiants fournis sont invalides.']);
         }
 

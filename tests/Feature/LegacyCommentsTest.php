@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Mail\TemplateMailable;
 use App\Models\{Article, Comment};
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\{DB, Schema};
+use Illuminate\Support\Facades\{DB, Mail, Schema};
 use Tests\TestCase;
 
 class LegacyCommentsTest extends TestCase
@@ -48,7 +49,11 @@ class LegacyCommentsTest extends TestCase
 
     public function test_new_comments_are_pending_escape_html_and_reject_urls(): void
     {
+        Mail::fake();
         $this->post('/_preview/post/27/comments', ['name' => 'Élodie', 'email' => 'elodie@example.test', 'content' => '<img src=x onerror=alert(1)> Bonjour'])->assertRedirect();
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'contribution_email_verification');
+        $this->assertNotNull($verification);
+        $this->get($verification->values['verification_url'])->assertOk();
         $comment = Comment::firstOrFail();
         $this->assertSame('pending', $comment->status);
         $this->assertSame('Bonjour', $comment->content);

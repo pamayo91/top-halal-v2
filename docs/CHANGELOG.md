@@ -2,6 +2,10 @@
 
 ## 2026-09-12
 
+- Avis et commentaires : ajout d’une identité `User` contributrice commune, vérification e-mail temporaire à usage unique et preuve de session expirante. Les contributeurs créés ne peuvent pas se connecter, n’obtiennent aucun rôle restaurant et chaque contribution validée reste soumise à la modération existante.
+
+## 2026-09-12
+
 - Comptes : suppression de l’inscription publique générique. Les anciens liens de création de compte depuis une revendication reviennent vers la fiche de revendication concernée, sans créer de compte autonome.
 - Comptes : les pages Connexion et Mot de passe oublié utilisent désormais les cartes, hiérarchie éditoriale, champs illustrés et CTA du parcours de revendication et d’ajout de restaurant, sans changement du flux d’authentification.
 - Comptes : le changement de mot de passe adopte la même carte sécurisée, sans modifier ses règles de validation ni sa redirection après mise à jour.

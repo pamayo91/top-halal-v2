@@ -11,6 +11,7 @@ use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
+use App\Services\ContributionIdentityService;
 
 class PublicContentController extends Controller
 {
@@ -98,11 +99,12 @@ class PublicContentController extends Controller
         return response()->view('public.restaurant', compact('restaurant', 'reviews', 'adminEditUrl', 'breadcrumbs'));
     }
 
-    public function storeReview(StoreRestaurantReviewRequest $request, string $slug): RedirectResponse
+    public function storeReview(StoreRestaurantReviewRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
     {
         $restaurant = Restaurant::where('slug', $slug)->where('status', 'published')->firstOrFail();
-        RestaurantReview::create(['restaurant_id' => $restaurant->id, 'author_name' => $request->validated('name'), 'author_email' => $request->validated('email'), 'rating' => $request->validated('rating'), 'title' => $request->validated('title'), 'content' => trim(strip_tags($request->validated('content'))), 'status' => 'pending']);
-        return back()->with('review_submitted', true);
+        $result = $identities->submitReview($request, $restaurant, $request->validated());
+
+        return back()->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
     }
 
     public function location(string $slug): Response
@@ -204,11 +206,12 @@ class PublicContentController extends Controller
         return response()->view('public.editorial', compact('content', 'comments', 'isArticle', 'adminEditUrl', 'sidebar'));
     }
 
-    public function storeComment(StoreCommentRequest $request, string $slug): RedirectResponse
+    public function storeComment(StoreCommentRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
     {
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
-        Comment::create([$content instanceof Page ? 'page_id' : 'article_id' => $content->id, 'author_name' => $request->validated('name'), 'author_email' => $request->validated('email'), 'content' => trim(strip_tags($request->validated('content'))), 'status' => 'pending']);
-        return back()->with('comment_submitted', true);
+        $result = $identities->submitComment($request, $content, $request->validated());
+
+        return back()->with($result['verified'] ? 'comment_submitted' : 'contribution_verification_sent', true);
     }
 
     public function storeEditorialReport(Request $request, string $slug): RedirectResponse
