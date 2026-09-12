@@ -27,17 +27,19 @@ for (const path of previews) {
   });
 }
 
-test('technical preview comment form requires identity verification and rejects URLs', async ({ page }) => {
-  const response = await page.goto('/_preview/post/27');
+test('public comment form requires identity verification and rejects URLs', async ({ page }) => {
+  const response = await page.goto('/voyage-en-asie');
   expect(response?.status()).toBe(200);
+  await page.getByText('Laisser un commentaire', { exact: true }).click();
   await page.locator('input[name="name"]').fill('Codex test');
   await page.locator('input[name="email"]').fill('codex-comment-test@example.invalid');
   await page.locator('textarea[name="content"]').fill('Commentaire de validation sans lien.');
-  await page.getByRole('button', { name: 'Envoyer' }).click();
+  await page.getByRole('button', { name: 'Envoyer pour modération' }).click();
   await expect(page.getByRole('status')).toContainText('Vérifiez votre adresse e-mail');
+  await page.getByText('Laisser un commentaire', { exact: true }).click();
   await page.locator('input[name="name"]').fill('Codex test');
   await page.locator('input[name="email"]').fill('codex-comment-test@example.invalid');
   await page.locator('textarea[name="content"]').fill('https://example.invalid');
-  await page.getByRole('button', { name: 'Envoyer' }).click();
+  await page.getByRole('button', { name: 'Envoyer pour modération' }).click();
   await expect(page.getByRole('alert')).toContainText('liens et URLs');
 });
