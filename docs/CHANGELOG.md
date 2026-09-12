@@ -2,6 +2,8 @@
 
 ## 2026-09-12
 
+- Espace restaurateur : ajout d’une déconnexion visible depuis « Mon compte », réutilisant l’invalidation sécurisée de session existante.
+
 - Ajout de la purge quotidienne des vérifications d’identité d’avis/commentaires : seules les lignes expirées ou consommées depuis plus de sept jours sont supprimées, avec simulation, lots et conservation stricte des utilisateurs, contributions et historiques d’e-mails.
 
 - Avis et commentaires : ajout d’une identité `User` contributrice commune, vérification e-mail temporaire à usage unique et preuve de session expirante. Les contributeurs créés ne peuvent pas se connecter, n’obtiennent aucun rôle restaurant et chaque contribution validée reste soumise à la modération existante.

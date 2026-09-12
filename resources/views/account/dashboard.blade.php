@@ -2,6 +2,10 @@
     <h1>Mon compte</h1>
     <p>Statut : {{ auth()->user()->status }}. Rôle : {{ auth()->user()->role }}.</p>
     <p><a href="{{ route('password.change') }}">Changer le mot de passe</a></p>
+    <form method="post" action="{{ route('logout') }}">
+        @csrf
+        <button class="button button-secondary" type="submit">Déconnexion</button>
+    </form>
     <h2>Mes restaurants</h2>
     @forelse($restaurants as $restaurant)<article><h3>{{ $restaurant->name }}</h3><a href="{{ route('owner.restaurants.edit', $restaurant) }}">Modifier</a> @if($restaurant->removalRequests()->where('status','pending')->exists())<span>Demande de suppression en cours</span>@else <a href="{{ route('owner.restaurants.removal.create', $restaurant) }}">Demander la suppression</a>@endif</article>@empty <p>Aucun restaurant à gérer.</p>@endforelse
     @if(auth()->user()->role === 'admin')<p><a href="{{ \App\Filament\Resources\RestaurantClaimResource::getUrl() }}">Administration des revendications</a></p>@endif

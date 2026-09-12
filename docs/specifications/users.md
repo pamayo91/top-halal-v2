@@ -15,6 +15,7 @@
 - Approval associates one verified user with one or more restaurants through `restaurant_claims`. A new first dossier receives an activation link to choose only a password; rejection creates no account.
 - `RestaurantPolicy::manage` is enforced server-side; owners cannot access another owner's restaurant.
 - A guest who opens a claimable restaurant claim sees the direct first-claim form, while an existing verified restaurateur can log in in the same page and resume that exact form. The former `/restaurants/{restaurant}/claim/register` hand-off remains a compatibility redirect to the claim form; it never opens generic self-registration. Claimability is checked when entering and submitting the claim.
+- The restaurant-owner account dashboard exposes a CSRF-protected logout action that invalidates the current session through the shared authentication endpoint.
 
 ## Public proposal contributors
 
