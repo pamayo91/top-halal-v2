@@ -35,7 +35,7 @@ return new class extends Migration
             $table->string('created_contribution_type', 20)->nullable();
             $table->unsignedBigInteger('created_contribution_id')->nullable();
             $table->timestamps();
-            $table->index(['contribution_type', 'target_type', 'target_id']);
+            $table->index(['contribution_type', 'target_type', 'target_id'], 'contribution_verification_target_idx');
         });
     }
 
