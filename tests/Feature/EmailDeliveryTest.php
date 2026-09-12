@@ -8,7 +8,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
 use App\Models\Setting;
 use App\Models\User;
-use App\Notifications\ClaimStatusNotification;
+use App\Notifications\ClaimLifecycleNotification;
 use App\Notifications\VerifyEmailNotification;
 use App\Services\ClaimModeration;
 use App\Services\SmtpConfigurationTestException;
@@ -34,14 +34,14 @@ class EmailDeliveryTest extends TestCase
     public function test_claim_lifecycle_queues_notifications(): void
     {
         Notification::fake();
-        $user = User::factory()->create(); $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'restaurant_owner', 'must_change_password' => false]); $admin = User::factory()->create(['role' => 'admin']);
         $restaurant = Restaurant::create(['legacy_wp_id' => 999, 'name' => 'Test', 'slug' => 'test', 'status' => 'published']);
-        $this->actingAs($user)->post('/restaurants/'.$restaurant->id.'/claim', ['message' => 'Test']);
+        $this->actingAs($user)->post('/restaurants/'.$restaurant->id.'/claim', ['certified' => '1']);
         $claim = RestaurantClaim::firstOrFail();
-        Notification::assertSentTo($user, ClaimStatusNotification::class);
+        Notification::assertSentTo($user, ClaimLifecycleNotification::class);
         $this->actingAs($admin);
         app(ClaimModeration::class)->approve($claim);
-        Notification::assertSentToTimes($user, ClaimStatusNotification::class, 2);
+        Notification::assertSentToTimes($user, ClaimLifecycleNotification::class, 2);
     }
 
     public function test_test_mail_is_queued_without_transport_credentials(): void
