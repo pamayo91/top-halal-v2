@@ -25,7 +25,13 @@ class Restaurant extends Model
                 app(CitySeoService::class)->forget();
                 app(GeographicPageResolver::class)->forget();
             }
-            if ($restaurant->wasChanged('status')) $restaurant->activateSubmittedOwner();
+            if ($restaurant->wasChanged('status')) {
+                $restaurant->activateSubmittedOwner();
+
+                if ($restaurant->status === 'published') {
+                    app(\App\Services\RestaurantSubmissionMailer::class)->published($restaurant);
+                }
+            }
         });
         static::deleted(function (): void { app(CityPageResolver::class)->forget(); app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });
         static::restored(function (): void { app(CityPageResolver::class)->forget(); app(CitySeoService::class)->forget(); app(GeographicPageResolver::class)->forget(); });

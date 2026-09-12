@@ -10,7 +10,7 @@
 - Controllers only enqueue notifications. A real SMTP failure occurs in the worker and cannot turn a user request into an error page.
 
 ## Implemented events
-- Email verification, password reset, password-change confirmation, and claim received/accepted/refused now use central templates.
+- Email verification, password reset, password-change confirmation, claim received/accepted/refused, restaurant-submission receipt and restaurant-publication notifications use central templates.
 - First-claim e-mail confirmation, restaurateur-space activation, claim submitted, accepted and refused.
 - `mail:test address@example.com` queues a neutral test message without printing configuration.
 - The legacy-account notification template exists for the future campaign and is never dispatched by the migration.

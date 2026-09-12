@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Mail\TemplateMailable;
 use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantSubmission};
 use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Mockery;
 use Tests\TestCase;
 
@@ -17,6 +19,7 @@ class PublicRestaurantSubmissionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Mail::fake();
         $this->app->instance(GeocodingService::class, new class implements GeocodingService {
             public function search(string $query, int $limit = 3): array { return ['ok' => true, 'query' => $query, 'cached' => false, 'error' => null, 'features' => [['label' => '46 Boulevard du Temple 75011 Paris', 'postcode' => '75011', 'city' => 'Paris', 'citycode' => '75111', 'latitude' => 48.866, 'longitude' => 2.364, 'id' => 'BAN-46', 'type' => 'housenumber', 'score' => .92]]]; }
             public function reverse(float $latitude, float $longitude, int $limit = 3): array { return ['ok' => true, 'query' => '', 'cached' => false, 'error' => null, 'features' => []]; }
@@ -119,6 +122,8 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $asset->id, 'sort_order' => 0]);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'destination_url' => 'https://example.test/menu', 'is_active' => 0]);
         $this->assertSame('customer', RestaurantSubmission::firstOrFail()->submitter_role);
+        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_received', 'recipient' => 'contributeur@example.invalid']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_received');
     }
 
     public function test_a_marker_move_changes_only_coordinates_after_the_selected_address_is_persisted(): void
@@ -165,6 +170,8 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertFalse($user->can('manage',$restaurant));
         $restaurant->update(['status'=>'published']);
         $this->assertTrue($user->fresh()->can('manage',$restaurant));
+        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_published', 'recipient' => 'contributeur@example.invalid']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_published');
     }
 
     public function test_owner_submission_rejects_missing_certification_or_invalid_siret(): void

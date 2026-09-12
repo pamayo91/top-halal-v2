@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePublicRestaurantSubmissionRequest;
 use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia, RestaurantSubmission};
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
-use App\Services\MediaIngestor;
+use App\Services\{MediaIngestor, RestaurantSubmissionMailer};
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -63,7 +63,7 @@ class PublicRestaurantSubmissionController extends Controller
         })->all()]);
     }
 
-    public function store(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, RestaurantLocationService $locations, MediaIngestor $media): RedirectResponse
+    public function store(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, RestaurantLocationService $locations, MediaIngestor $media, RestaurantSubmissionMailer $mailer): RedirectResponse
     {
         $data = $request->validated();
         $location = $this->locationData($request, $suggestions, $data);
@@ -133,6 +133,8 @@ class PublicRestaurantSubmissionController extends Controller
 
             return $restaurant;
         });
+
+        $mailer->received($restaurant->submission()->with('restaurant')->firstOrFail());
 
         return redirect()->route('restaurant-submissions.thanks')->with('submitted_restaurant', $restaurant->name);
     }

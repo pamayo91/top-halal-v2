@@ -53,7 +53,7 @@ An existing published restaurant is claimable only when it has neither an approv
 
 Existing-record claims have two paths: a first dossier needs the complete identity information, one private identity photo and expiring e-mail confirmation before manual review; a verified restaurateur submits only a certification and stays manually reviewed. A first approval sends a password-activation link, and one verified account may manage several restaurants. Owners cannot delete or unpublish a restaurant. They can only create one pending removal request with a reason; the restaurant remains public until an admin accepts it, which uses the existing non-destructive `archived` status.
 
-A valid proposal creates a normal `restaurants` record with `status=pending`, never `published`, plus one private `restaurant_submissions` record for the contact/audit context. Filament’s existing pending status is the moderation queue; the e-mail is visible to administrators as the restaurant contact and the linked contributor context.
+A valid proposal creates a normal `restaurants` record with `status=pending`, never `published`, plus one private `restaurant_submissions` record for the contact/audit context. The contributor receives a queued confirmation of receipt, then one queued notification when that submitted record moves to `published`. Filament’s existing pending status is the moderation queue; the e-mail is visible to administrators as the restaurant contact and the linked contributor context.
 
 ## Référentiel de spécialités
 

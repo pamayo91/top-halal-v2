@@ -2,6 +2,7 @@
 
 ## 2026-09-11
 
+- Restaurants : ajout des e-mails transactionnels suivis de confirmation de proposition et de publication. Ils sont mis en file et apparaissent dans l’historique de livraison.
 - Contact : suppression du champ BO inutilisé « Texte d’introduction », de son chargement public et de sa clé résiduelle dans `contact_settings`.
 
 ## 2026-09-10

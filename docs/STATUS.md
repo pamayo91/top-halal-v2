@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-11
+Last updated: 2026-09-12
+
+Latest restaurant submission mail: a public restaurant proposal now creates a tracked queued receipt e-mail for its submitter, and its transition to `published` creates a tracked queued publication e-mail with the public listing CTA. Historic submissions are not backfilled or mailed automatically.
 
 Latest ownership V2: first restaurateur claims create no account or password, require a private document and expiring e-mail confirmation before manual review, then send a password-activation link after approval. A verified restaurateur signs in and submits only certification for each manually reviewed additional restaurant. Claimability remains central and owners can request — never directly perform — non-destructive removal.
 
