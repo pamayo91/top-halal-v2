@@ -4,6 +4,7 @@
 
 - Restaurants : chaque déposant public dont l’e-mail est confirmé reçoit un lien signé d’activation d’espace, valable sept jours et utilisable une seule fois.
 - Comptes : l’accès de déposant est limité à ses fiches soumises et reste distinct d’une revendication, afin qu’un véritable gérant puisse encore réclamer la fiche.
+- E-mails : la migration active le CTA « Activer mon espace » sur l’ancien modèle de confirmation conservé en base, sans écraser son texte personnalisé.
 
 ## 2026-09-11
 
