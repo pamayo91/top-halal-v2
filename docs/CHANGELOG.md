@@ -7,6 +7,7 @@
 - E-mails : la migration active le CTA « Activer mon espace » sur l’ancien modèle de confirmation conservé en base, sans écraser son texte personnalisé.
 - E-mails : le lien d’activation de déposant repose désormais seulement sur son jeton one-use expirant, afin que les paramètres de signature d’URL perdus par certains clients e-mail ne provoquent plus de 403.
 - Comptes : après le choix du mot de passe, le déposant est connecté et arrive directement dans « Mon compte » au lieu de revenir vers une page publique.
+- Comptes : un lien d’activation déjà consommé explique désormais que l’espace est actif et redirige vers la connexion, au lieu d’afficher une 404.
 
 ## 2026-09-11
 

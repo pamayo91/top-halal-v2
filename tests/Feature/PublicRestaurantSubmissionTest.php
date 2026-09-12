@@ -190,6 +190,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame('restaurant_owner', $user->role);
         $this->assertFalse($user->must_change_password);
         $this->assertAuthenticatedAs($user);
+        $this->get($activationUrl)->assertOk()->assertSee('Votre espace est déjà activé.');
         $this->assertTrue($user->can('manage', $restaurant));
         $this->assertTrue($restaurant->isClaimable());
         $this->actingAs($user)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);

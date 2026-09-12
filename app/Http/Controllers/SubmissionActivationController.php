@@ -12,6 +12,10 @@ class SubmissionActivationController extends Controller
 {
     public function create(RestaurantSubmission $submission, string $token): View|RedirectResponse
     {
+        if ($this->wasActivated($submission, $token)) {
+            return view('public.restaurant-submission.already-activated');
+        }
+
         abort_unless($this->valid($submission, $token), 404);
 
         if (! $submission->user?->must_change_password) {
@@ -48,5 +52,13 @@ class SubmissionActivationController extends Controller
             && $submission->activation_token
             && $submission->activation_expires_at?->isFuture()
             && hash_equals($submission->activation_token, hash('sha256', $token));
+    }
+
+    private function wasActivated(RestaurantSubmission $submission, string $token): bool
+    {
+        return $submission->activation_token === null
+            && $submission->user?->status === 'active'
+            && ! $submission->user->must_change_password
+            && preg_match('/^[A-Za-z0-9]{64}$/D', $token) === 1;
     }
 }
