@@ -48,6 +48,18 @@ class EmailContactManagementTest extends TestCase
         $this->assertSame('Bonjour Alice {{ unknown }}', $rendered['subject']); $this->assertSame('Texte Top Halal', $rendered['body']);
     }
 
+    public function test_restaurant_publication_template_renders_its_public_listing_button(): void
+    {
+        $rendered = app(EmailTemplateRenderer::class)->render('restaurant_published', [
+            'site_name' => 'Top Halal',
+            'restaurant_name' => 'Le Test',
+            'restaurant_url' => 'https://dev.top-halal.fr/resto/le-test',
+        ]);
+
+        $this->assertSame('Voir le restaurant', $rendered['cta_label']);
+        $this->assertSame('https://dev.top-halal.fr/resto/le-test', $rendered['cta_url']);
+    }
+
     public function test_template_rendering_normalises_legacy_newline_escapes_and_escapes_html(): void
     {
         EmailTemplate::create(['key' => 'contact_confirmation', 'subject' => 'Sujet', 'body' => 'Premier\\n\\nDeuxième <script>alert(1)</script>']);

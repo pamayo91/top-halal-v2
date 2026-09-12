@@ -2,6 +2,7 @@
 
 ## 2026-09-11
 
+- E-mails : le renderer transactionnel reconnaît désormais les CTA de fiche restaurant, d’activation et d’accès BO ; le bouton « Voir le restaurant » est rendu dans la confirmation de publication.
 - Restaurants : le destinataire opérationnel reçoit désormais une alerte mise en file lorsqu’un déposant confirme l’e-mail de sa proposition, avec accès au BO et Reply-To vers le déposant.
 - Restaurants : la proposition publique suit désormais les étapes distinctes `pending_email_verification` → `pending_admin_review` → `published` ; les e-mails transactionnels suivis vérifient l’adresse, confirment la validation puis annoncent la publication.
 - Contact : suppression du champ BO inutilisé « Texte d’introduction », de son chargement public et de sa clé résiduelle dans `contact_settings`.

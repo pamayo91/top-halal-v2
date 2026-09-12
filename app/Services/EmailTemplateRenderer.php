@@ -13,7 +13,11 @@ class EmailTemplateRenderer
         $replace = fn (?string $text) => preg_replace_callback('/{{\s*([a-z_]+)\s*}}/', fn ($m) => array_key_exists($m[1], $safe) ? $safe[$m[1]] : $m[0], $this->normaliseLineBreaks((string) $text));
         $body = $replace($override?->body ?? $default['body']);
 
-        return ['subject' => $replace($override?->subject ?? $default['subject']), 'body' => $body, 'body_paragraphs' => $this->bodyParagraphs($body), 'cta_label' => $replace($override?->cta_label ?? $default['cta_label']), 'cta_url' => $safe['action_url'] ?? $safe['verification_url'] ?? $safe['reset_url'] ?? null];
+        $ctaUrl = collect(['action_url', 'verification_url', 'reset_url', 'activation_url', 'restaurant_url', 'admin_url'])
+            ->map(fn (string $key): string => $safe[$key] ?? '')
+            ->first(fn (string $url): bool => filled($url));
+
+        return ['subject' => $replace($override?->subject ?? $default['subject']), 'body' => $body, 'body_paragraphs' => $this->bodyParagraphs($body), 'cta_label' => $replace($override?->cta_label ?? $default['cta_label']), 'cta_url' => $ctaUrl];
     }
 
     /** Converts historical literal escape sequences and all newline styles to real line feeds. */
