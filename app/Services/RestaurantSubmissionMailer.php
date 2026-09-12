@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Restaurant;
 use App\Models\RestaurantSubmission;
+use App\Models\Setting;
 
 class RestaurantSubmissionMailer
 {
@@ -22,6 +23,22 @@ class RestaurantSubmissionMailer
             'site_name' => config('app.name', 'Top Halal'),
             'restaurant_name' => $submission->restaurant->name,
         ]);
+    }
+
+    public function notifyTeamForReview(RestaurantSubmission $submission): void
+    {
+        $recipient = Setting::query()->where('key', 'contact_settings')->first()?->value['recipient'] ?? null;
+
+        if (blank($recipient)) {
+            return;
+        }
+
+        app(TransactionalMailService::class)->queue('restaurant_submission_admin_review', $recipient, [
+            'site_name' => config('app.name', 'Top Halal'),
+            'restaurant_name' => $submission->restaurant->name,
+            'submitter_email' => $submission->submitter_email,
+            'admin_url' => url('/admin/restaurants'),
+        ], $submission->submitter_email);
     }
 
     public function published(Restaurant $restaurant): void

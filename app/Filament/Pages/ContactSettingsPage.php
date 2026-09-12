@@ -32,7 +32,7 @@ class ContactSettingsPage extends Page
         return $schema
             ->components([
                 Section::make()->schema([
-                    TextInput::make('recipient')->label('Destinataire unique')->email()->required(),
+                    TextInput::make('recipient')->label('Destinataire opérationnel')->helperText('Reçoit les messages Contact et les propositions de restaurants dont l’e-mail a été confirmé.')->email()->required(),
                     Textarea::make('success_message')->label('Message après envoi')->maxLength(500),
                     Toggle::make('send_confirmation')->label('Envoyer un accusé de réception'),
                 ]),

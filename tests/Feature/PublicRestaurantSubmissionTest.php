@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
-use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantSubmission};
+use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantSubmission, Setting};
 use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -182,6 +182,7 @@ class PublicRestaurantSubmissionTest extends TestCase
 
     public function test_verified_email_makes_the_submission_available_for_admin_review_once(): void
     {
+        Setting::create(['key' => 'contact_settings', 'group' => 'contact', 'value' => ['recipient' => 'team@example.invalid']]);
         $asset = MediaAsset::create(['original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('d', 64), 'status' => 'ready']);
         $ingestor = Mockery::mock(MediaIngestor::class);
         $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
@@ -198,9 +199,12 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertNotNull($submission->email_verified_at);
         $this->assertNull($submission->email_verification_token);
         $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_confirmed', 'recipient' => 'contributeur@example.invalid']);
+        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_admin_review', 'recipient' => 'team@example.invalid']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review' && $mail->replyToAddress === 'contributeur@example.invalid');
 
         $this->get($url)->assertOk()->assertSee('Votre adresse était déjà confirmée.');
         $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed')->count());
+        $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review')->count());
     }
 
     public function test_unverified_submission_cannot_be_published_and_invalid_or_expired_links_do_not_confirm_it(): void

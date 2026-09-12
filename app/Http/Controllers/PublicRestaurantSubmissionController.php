@@ -161,7 +161,10 @@ class PublicRestaurantSubmissionController extends Controller
             return $submission->fresh('restaurant');
         });
 
-        if ($confirmed) $mailer->confirmed($confirmed);
+        if ($confirmed) {
+            $mailer->confirmed($confirmed);
+            $mailer->notifyTeamForReview($confirmed);
+        }
 
         return view('public.restaurant-submission.email-verified', ['alreadyConfirmed' => $confirmed === null]);
     }
