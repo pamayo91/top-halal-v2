@@ -3,6 +3,7 @@
 ## 2026-09-12
 
 - Comptes : les pages Connexion et Mot de passe oublié utilisent désormais les cartes, hiérarchie éditoriale, champs illustrés et CTA du parcours de revendication et d’ajout de restaurant, sans changement du flux d’authentification.
+- Comptes : le changement de mot de passe adopte la même carte sécurisée, sans modifier ses règles de validation ni sa redirection après mise à jour.
 
 ## 2026-09-12
 
