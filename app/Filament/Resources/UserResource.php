@@ -29,6 +29,7 @@ class UserResource extends AdminResource
     {
         return parent::getEloquentQuery()->withCount([
             'ownedRestaurants',
+            'submittedRestaurants',
             'legacyRestaurantAuthorships',
             'claims',
             'claims as pending_claims_count' => fn (Builder $query) => $query->where('status', 'pending'),
@@ -54,7 +55,7 @@ class UserResource extends AdminResource
 
     public static function activityLabel(User $user): string
     {
-        if ($user->owned_restaurants_count > 0) return 'Restaurateur';
+        if ($user->owned_restaurants_count > 0 || $user->submitted_restaurants_count > 0) return 'Restaurateur';
         if ($user->pending_claims_count > 0) return 'Revendication en cours';
         if ($user->claims_count > 0) return 'Revendication traitée';
         if ($user->legacy_restaurant_authorships_count > 0) return 'Auteur legacy';
@@ -64,7 +65,7 @@ class UserResource extends AdminResource
 
     public static function restaurantLinkCount(User $user): int
     {
-        return (int) $user->owned_restaurants_count + (int) $user->legacy_restaurant_authorships_count;
+        return (int) $user->owned_restaurants_count + (int) $user->submitted_restaurants_count + (int) $user->legacy_restaurant_authorships_count;
     }
 
     public static function claimSummary(User $user): string
@@ -149,7 +150,7 @@ class UserResource extends AdminResource
             ->filters([
                 SelectFilter::make('role')->options(['user' => 'Utilisateur', 'restaurant_owner' => 'Restaurateur', 'admin' => 'Administrateur']),
                 SelectFilter::make('status')->options(['active' => 'Actif', 'disabled' => 'Désactivé']),
-                Filter::make('without_business_activity')->label('Sans lien restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')->doesntHave('legacyRestaurantAuthorships')),
+                Filter::make('without_business_activity')->label('Sans lien restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')->doesntHave('submittedRestaurants')->doesntHave('legacyRestaurantAuthorships')),
             ])
             ->recordActions([
                 EditAction::make()->visible(fn (User $user) => ! $user->trashed()),

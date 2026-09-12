@@ -256,17 +256,19 @@ class AdminBackOfficeTest extends TestCase
         $inactive = User::factory()->create(['role' => 'user']);
         $claimant = User::factory()->create(['role' => 'user']);
         $owner = User::factory()->create(['role' => 'restaurant_owner']);
+        $submitter = User::factory()->create(['role' => 'restaurant_owner']);
         $legacyAuthor = User::factory()->create(['legacy_wp_user_id' => 124, 'role' => 'user']);
         $restaurant = $this->restaurant();
         $legacyRestaurant = $this->restaurant();
         RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $claimant->id, 'status' => 'pending', 'submitted_at' => now()]);
         RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $owner->id, 'status' => 'approved', 'submitted_at' => now()]);
+        \App\Models\RestaurantSubmission::create(['restaurant_id' => $this->restaurant()->id, 'user_id' => $submitter->id, 'submitter_email' => $submitter->email, 'submitter_role' => 'owner', 'status' => 'published', 'submitted_at' => now()]);
         \App\Models\LegacyRestaurantAuthorship::create(['restaurant_id' => $legacyRestaurant->id, 'user_id' => $legacyAuthor->id, 'legacy_wp_id' => $legacyRestaurant->legacy_wp_id, 'legacy_wp_user_id' => 124, 'source_post_status' => 'publish']);
         Comment::create(['article_id' => $this->article()->id, 'legacy_user_id' => 124, 'author_name' => 'Auteur legacy', 'author_email' => $legacyAuthor->email, 'content' => 'Commentaire historique', 'status' => 'approved']);
         RestaurantReview::create(['restaurant_id' => $legacyRestaurant->id, 'author_name' => 'Auteur legacy', 'author_email' => $legacyAuthor->email, 'rating' => 5, 'content' => 'Avis historique', 'status' => 'approved']);
 
         $users = \App\Filament\Resources\UserResource::getEloquentQuery()
-            ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id, $legacyAuthor->id])
+            ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id, $submitter->id, $legacyAuthor->id])
             ->get()
             ->keyBy('id');
 
@@ -277,6 +279,8 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame('1 en attente', \App\Filament\Resources\UserResource::claimSummary($users[$claimant->id]));
         $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$owner->id]));
         $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$owner->id]));
+        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$submitter->id]));
+        $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$submitter->id]));
         $this->assertSame('Auteur legacy', \App\Filament\Resources\UserResource::activityLabel($users[$legacyAuthor->id]));
         $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$legacyAuthor->id]));
         $this->assertSame(1, $users[$legacyAuthor->id]->comments_count);

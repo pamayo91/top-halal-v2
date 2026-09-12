@@ -2,6 +2,8 @@
 
 ## 2026-09-12
 
+- Back-office Utilisateurs : le compteur « Restaurants liés » inclut désormais les restaurants issus d’une proposition publique rattachée au `User`.
+
 - Espace restaurateur : ajout d’une déconnexion visible depuis « Mon compte », réutilisant l’invalidation sécurisée de session existante.
 
 - Ajout de la purge quotidienne des vérifications d’identité d’avis/commentaires : seules les lignes expirées ou consommées depuis plus de sept jours sont supprimées, avec simulation, lots et conservation stricte des utilisateurs, contributions et historiques d’e-mails.
