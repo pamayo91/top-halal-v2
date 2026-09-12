@@ -28,6 +28,7 @@
 - A contributor identity created by this flow has `login_enabled=false`, an undisclosed random password, role `user` and no claim or restaurant-management grant. It cannot authenticate or receive a usable password-reset link merely because it contributed.
 - An authenticated account proves its own identity directly. An anonymous browser must either hold a server-side session proof for the exact `User` or complete a fresh verification. The proof stores only a user ID and expiry in the Laravel session, never a freely supplied e-mail, and expires after 30 days (or earlier when its session ends).
 - An e-mail's historical `email_verified_at` alone is never enough to submit a contribution: absent a valid current proof, a new one-use verification is required.
+- `contributions:purge-verifications` removes only verification rows consumed more than seven days ago or unconsumed rows expired more than seven days ago. It is scheduled daily, supports `--dry-run`, processes bounded batches and never removes the related user, contribution or e-mail history.
 
 ## Historical listing authorship
 - `legacy_restaurant_authorships` preserves only the WordPress `post_author` relationship to its exact migrated restaurant (`legacy_wp_id`).

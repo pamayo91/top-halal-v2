@@ -110,7 +110,11 @@ After deploying this release to preproduction, run the forward-only `city_refere
 - `.env`, database dumps, uploads awaiting migration, SSH keys, API keys, passwords and Git metadata must never be web-accessible.
 
 ## Cron
-Laravel scheduler should have one server Cron entry (exact path/user decided after server audit), calling `php artisan schedule:run` every minute.
+Laravel scheduler runs through this server Cron entry every minute:
+
+```cron
+* * * * * cd /home/meyo5199/top-halal-v2 && /opt/alt/php84/usr/bin/php artisan schedule:run --no-interaction >> /home/meyo5199/top-halal-v2/storage/logs/scheduler.log 2>&1
+```
 
 ## Queue worker
 

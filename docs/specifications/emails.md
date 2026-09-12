@@ -39,3 +39,4 @@
 - A pending job can be made available immediately or cancelled; a failed job is retried from Laravel's existing `failed_jobs` payload. Neither operation creates a second delivery-history row or offers a resend for an already sent message.
 - The Cron script calls `emails:reconcile-delivery-logs` before its flock-protected finite worker.
 - A separate daily Cron runs `emails:purge-delivery-logs --days=60`. It deletes only terminal `Annulé` and `Expiré` records older than 60 days; `Envoyé` and `Échec` remain retained. Operators can audit the next run safely with `emails:purge-delivery-logs --days=60 --dry-run`.
+- The Laravel scheduler also runs `contributions:purge-verifications` daily. This separate retention action deletes only expired or consumed contribution-verification payloads older than seven days; it never deletes email-delivery history.
