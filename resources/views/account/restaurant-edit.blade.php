@@ -1,23 +1,3 @@
-<x-layouts.app title="Modifier le restaurant">
-    <main class="shell submission-page">
-    <h1>Modifier {{ $restaurant->name }}</h1>
-    <form class="submission-form" method="post" action="{{ route('owner.restaurants.update', $restaurant) }}">
-        @csrf @method('PUT')
-        <label>Nom <input name="name" required value="{{ old('name', $restaurant->name) }}"></label>
-        <label>Description <textarea name="description">{{ old('description', $restaurant->description) }}</textarea></label>
-        <label>Téléphone <input name="phone" value="{{ old('phone', $restaurant->phone) }}"></label>
-        <input type="hidden" name="location_changed" value="0" data-location-changed>
-        <x-address-selector
-            label="Nouvelle adresse (facultatif)"
-            :address-line1="$restaurant->address_line1"
-            :postal-code="$restaurant->postal_code"
-            :city-name="$restaurant->city_name"
-            :latitude="$restaurant->latitude"
-            :longitude="$restaurant->longitude"
-            :show-existing="true"
-        />
-        <p class="form-help">Pour modifier l’adresse ou sa position, sélectionnez obligatoirement une suggestion, puis ajustez le marqueur si nécessaire.</p>
-        <button type="submit">Enregistrer</button>
-    </form>
-    </main>
+<x-layouts.app :title="'Modifier '. $restaurant->name .' | Top Halal'" :hide-flash="true">
+    <section class="contact-page owner-form-page"><div class="shell owner-form-shell"><div class="contact-form-wrap owner-form-wrap"><aside class="contact-sticker"><span>Votre fiche restaurant</span></aside><div class="contact-form-card owner-form-card"><header><p class="eyebrow">Gérer ma fiche</p><h1>Modifier {{ $restaurant->name }}</h1><p>Vos modifications sont enregistrées sur votre fiche restaurant.</p></header>@if(session('status'))<div class="auth-success" role="status">{{ session('status') }}</div>@endif@if($errors->any())<div class="contact-errors" role="alert"><p>Certains champs demandent votre attention.</p></div>@endif<form class="contact-form" method="post" action="{{ route('owner.restaurants.update', $restaurant) }}">@csrf @method('PUT')<div class="contact-field"><label for="restaurant-name">Nom</label><div class="contact-input"><input id="restaurant-name" name="name" required value="{{ old('name', $restaurant->name) }}"></div>@error('name')<p class="field-error">{{ $message }}</p>@enderror</div><div class="contact-field"><label for="restaurant-description">Description</label><div class="contact-textarea"><textarea id="restaurant-description" name="description" rows="6">{{ old('description', $restaurant->description) }}</textarea></div>@error('description')<p class="field-error">{{ $message }}</p>@enderror</div><div class="contact-field"><label for="restaurant-phone">Téléphone</label><div class="contact-input"><input id="restaurant-phone" name="phone" value="{{ old('phone', $restaurant->phone) }}"></div>@error('phone')<p class="field-error">{{ $message }}</p>@enderror</div><input type="hidden" name="location_changed" value="0" data-location-changed><div class="owner-address"><x-address-selector label="Nouvelle adresse (facultatif)" :address-line1="$restaurant->address_line1" :postal-code="$restaurant->postal_code" :city-name="$restaurant->city_name" :latitude="$restaurant->latitude" :longitude="$restaurant->longitude" :show-existing="true" /></div><p class="form-help">Pour modifier l’adresse ou sa position, sélectionnez obligatoirement une suggestion, puis ajustez le marqueur si nécessaire.</p><button class="button contact-submit" type="submit">Enregistrer les modifications <span aria-hidden="true">→</span></button></form></div></div></div></section>
 </x-layouts.app>

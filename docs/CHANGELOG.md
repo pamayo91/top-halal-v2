@@ -4,6 +4,7 @@
 
 - Comptes : les pages Connexion et Mot de passe oublié utilisent désormais les cartes, hiérarchie éditoriale, champs illustrés et CTA du parcours de revendication et d’ajout de restaurant, sans changement du flux d’authentification.
 - Comptes : le changement de mot de passe adopte la même carte sécurisée, sans modifier ses règles de validation ni sa redirection après mise à jour.
+- Comptes et espace restaurateur : les pages de réinitialisation, vérification d’e-mail, modification de fiche et demande de suppression reprennent la carte de formulaire commune sans modifier leurs contrôles métier.
 
 ## 2026-09-12
 
