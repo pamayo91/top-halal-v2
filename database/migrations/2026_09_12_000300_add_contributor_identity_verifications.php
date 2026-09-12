@@ -8,17 +8,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->boolean('login_enabled')->default(true)->after('password');
-        });
+        if (! Schema::hasColumn('users', 'login_enabled')) {
+            Schema::table('users', function (Blueprint $table): void {
+                $table->boolean('login_enabled')->default(true)->after('password');
+            });
+        }
 
-        Schema::table('restaurant_reviews', function (Blueprint $table): void {
-            $table->foreignId('user_id')->nullable()->after('restaurant_id')->constrained()->nullOnDelete();
-        });
+        if (! Schema::hasColumn('restaurant_reviews', 'user_id')) {
+            Schema::table('restaurant_reviews', function (Blueprint $table): void {
+                $table->foreignId('user_id')->nullable()->after('restaurant_id')->constrained()->nullOnDelete();
+            });
+        }
 
-        Schema::table('comments', function (Blueprint $table): void {
-            $table->foreignId('user_id')->nullable()->after('page_id')->constrained()->nullOnDelete();
-        });
+        if (! Schema::hasColumn('comments', 'user_id')) {
+            Schema::table('comments', function (Blueprint $table): void {
+                $table->foreignId('user_id')->nullable()->after('page_id')->constrained()->nullOnDelete();
+            });
+        }
 
         Schema::create('contribution_verifications', function (Blueprint $table): void {
             $table->id();
