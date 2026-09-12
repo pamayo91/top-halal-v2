@@ -7,7 +7,7 @@ use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia,
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
 use App\Services\{MediaIngestor, RestaurantSubmissionMailer};
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\{DB, URL};
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -69,7 +69,8 @@ class PublicRestaurantSubmissionController extends Controller
         $location = $this->locationData($request, $suggestions, $data);
         $hours = $this->hours($data['hours']);
 
-        $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request): Restaurant {
+        $token = Str::random(64);
+        $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request, $token): Restaurant {
             $restaurant = Restaurant::create([
                 'name' => trim($data['name']),
                 'slug' => $this->submissionSlug($data['name']),
@@ -127,6 +128,9 @@ class PublicRestaurantSubmissionController extends Controller
                 'owner_company' => $data['owner_company'] ?? null,
                 'owner_siret' => $data['owner_siret'] ?? null,
                 'owner_certified' => $request->boolean('owner_certified'),
+                'status' => 'pending_email_verification',
+                'email_verification_token' => hash('sha256', $token),
+                'email_verification_expires_at' => now()->addHours(24),
             ]);
 
             if ($data['submitter_role'] === 'owner') RestaurantClaim::create(['restaurant_id'=>$restaurant->id,'user_id'=>$request->user()?->id,'full_name'=>$data['owner_full_name'],'email'=>Str::lower(trim($data['email'])),'company'=>$data['owner_company'],'siret'=>$data['owner_siret'],'certified'=>true,'source'=>'new_submission','status'=>'pending_publication','submitted_at'=>now()]);
@@ -134,7 +138,8 @@ class PublicRestaurantSubmissionController extends Controller
             return $restaurant;
         });
 
-        $mailer->received($restaurant->submission()->with('restaurant')->firstOrFail());
+        $submission = $restaurant->submission()->with('restaurant')->firstOrFail();
+        $mailer->verification($submission, URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHours(24), ['submission' => $submission, 'token' => $token]));
 
         return redirect()->route('restaurant-submissions.thanks')->with('submitted_restaurant', $restaurant->name);
     }
@@ -144,6 +149,21 @@ class PublicRestaurantSubmissionController extends Controller
         abort_unless(session()->has('submitted_restaurant'), 404);
 
         return view('public.restaurant-submission.thanks', ['restaurantName' => session('submitted_restaurant')]);
+    }
+
+    public function verify(RestaurantSubmission $submission, string $token, RestaurantSubmissionMailer $mailer): View
+    {
+        $confirmed = DB::transaction(function () use ($submission, $token): ?RestaurantSubmission {
+            $submission = RestaurantSubmission::query()->with('restaurant')->lockForUpdate()->findOrFail($submission->id);
+            if ($submission->status !== 'pending_email_verification') return null;
+            abort_unless($submission->email_verification_expires_at?->isFuture() && hash_equals((string) $submission->email_verification_token, hash('sha256', $token)), 404);
+            $submission->update(['status' => 'pending_admin_review', 'email_verified_at' => now(), 'email_verification_token' => null, 'email_verification_expires_at' => null]);
+            return $submission->fresh('restaurant');
+        });
+
+        if ($confirmed) $mailer->confirmed($confirmed);
+
+        return view('public.restaurant-submission.email-verified', ['alreadyConfirmed' => $confirmed === null]);
     }
 
     private function locationData(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, array $data): array

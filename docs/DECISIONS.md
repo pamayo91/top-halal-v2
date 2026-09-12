@@ -1,5 +1,11 @@
 # Architectural & Product Decisions
 
+## 2026-09-12
+
+### D030 — Double validation des propositions de restaurants
+
+Une proposition publique et sa fiche `restaurants` restent deux objets distincts. La fiche est créée `pending`, tandis que la soumission suit `pending_email_verification` puis `pending_admin_review` et enfin `published`. La vérification d’adresse combine une URL Laravel signée de 24 heures et un token aléatoire haché, lié à une seule soumission et consommé à la confirmation. La publication est refusée au niveau du modèle tant qu’une soumission associée n’est pas à l’étape de revue : cette règle couvre l’édition, les actions unitaires et les actions groupées Filament. Les propositions historiques antérieures à ce mécanisme sont explicitement conservées dans leur file de revue ou à l’état publié, sans simuler une vérification ni envoyer de campagne rétroactive.
+
 ## 2026-09-10
 
 ### D029 — Navigation administrable sans page builder

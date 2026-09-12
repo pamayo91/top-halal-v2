@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Validation\ValidationException;
 use App\Services\CityPageResolver;
 use App\Services\CitySeoService;
 use App\Services\GeographicPageResolver;
@@ -19,6 +20,11 @@ class Restaurant extends Model
 
     protected static function booted(): void
     {
+        static::saving(function (self $restaurant): void {
+            if (! $restaurant->exists || ! $restaurant->isDirty('status') || $restaurant->status !== 'published') return;
+            $submission = $restaurant->submission()->first();
+            if ($submission && $submission->status !== 'pending_admin_review') throw ValidationException::withMessages(['status' => 'La proposition doit d’abord être confirmée par e-mail avant sa publication.']);
+        });
         static::saved(function (self $restaurant): void {
             if ($restaurant->wasRecentlyCreated || $restaurant->wasChanged(['city_name', 'city_code', 'status'])) {
                 app(CityPageResolver::class)->forget();

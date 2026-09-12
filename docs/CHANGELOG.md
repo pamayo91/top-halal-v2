@@ -2,7 +2,7 @@
 
 ## 2026-09-11
 
-- Restaurants : ajout des e-mails transactionnels suivis de confirmation de proposition et de publication. Ils sont mis en file et apparaissent dans l’historique de livraison.
+- Restaurants : la proposition publique suit désormais les étapes distinctes `pending_email_verification` → `pending_admin_review` → `published` ; les e-mails transactionnels suivis vérifient l’adresse, confirment la validation puis annoncent la publication.
 - Contact : suppression du champ BO inutilisé « Texte d’introduction », de son chargement public et de sa clé résiduelle dans `contact_settings`.
 
 ## 2026-09-10

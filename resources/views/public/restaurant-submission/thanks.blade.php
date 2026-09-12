@@ -3,8 +3,8 @@
         <div class="shell submission-thanks">
             <p class="eyebrow">Proposition envoyée</p>
             <h1>Merci pour votre aide !</h1>
-            <p><b>{{ $restaurantName }}</b> est maintenant en attente de vérification. Il ne sera jamais publié automatiquement.</p>
-            <p>Nous vous contacterons uniquement si un complément est nécessaire.</p>
+            <p><b>{{ $restaurantName }}</b> attend d’abord la confirmation de votre adresse e-mail. Il ne sera jamais publié automatiquement.</p>
+            <p>Consultez votre boîte e-mail pour confirmer votre adresse, puis notre équipe pourra examiner la proposition.</p>
             <a class="button" href="{{ route('restaurants.index') }}">Voir les restaurants</a>
         </div>
     </section>

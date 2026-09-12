@@ -8,7 +8,8 @@ use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\{Mail, URL};
+use Illuminate\Validation\ValidationException;
 use Mockery;
 use Tests\TestCase;
 
@@ -122,8 +123,12 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $asset->id, 'sort_order' => 0]);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'destination_url' => 'https://example.test/menu', 'is_active' => 0]);
         $this->assertSame('customer', RestaurantSubmission::firstOrFail()->submitter_role);
-        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_received', 'recipient' => 'contributeur@example.invalid']);
-        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_received');
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('pending_email_verification', $submission->status);
+        $this->assertNull($submission->email_verified_at);
+        $this->assertNotNull($submission->email_verification_token);
+        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_verification', 'recipient' => 'contributeur@example.invalid']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
     }
 
     public function test_a_marker_move_changes_only_coordinates_after_the_selected_address_is_persisted(): void
@@ -168,10 +173,53 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->actingAs($user)->post(route('restaurant-submissions.store'), $this->payload(['submitter_role'=>'owner','owner_full_name'=>'Amina Martin','owner_company'=>'SARL Test','owner_siret'=>'73282932000074','owner_certified'=>'1']))->assertRedirect();
         $restaurant=Restaurant::firstOrFail();
         $this->assertFalse($user->can('manage',$restaurant));
+        RestaurantSubmission::firstOrFail()->update(['status' => 'pending_admin_review', 'email_verified_at' => now()]);
         $restaurant->update(['status'=>'published']);
         $this->assertTrue($user->fresh()->can('manage',$restaurant));
         $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_published', 'recipient' => 'contributeur@example.invalid']);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_published');
+    }
+
+    public function test_verified_email_makes_the_submission_available_for_admin_review_once(): void
+    {
+        $asset = MediaAsset::create(['original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('d', 64), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect(route('restaurant-submissions.thanks'));
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->assertNotNull($verification);
+        $url = $verification->values['verification_url'];
+
+        $this->get($url)->assertOk()->assertSee('Votre adresse e-mail est confirmée.');
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('pending_admin_review', $submission->status);
+        $this->assertNotNull($submission->email_verified_at);
+        $this->assertNull($submission->email_verification_token);
+        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_confirmed', 'recipient' => 'contributeur@example.invalid']);
+
+        $this->get($url)->assertOk()->assertSee('Votre adresse était déjà confirmée.');
+        $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed')->count());
+    }
+
+    public function test_unverified_submission_cannot_be_published_and_invalid_or_expired_links_do_not_confirm_it(): void
+    {
+        $restaurant = Restaurant::create(['name' => 'En attente', 'slug' => 'en-attente', 'status' => 'pending']);
+        $submission = RestaurantSubmission::create(['restaurant_id' => $restaurant->id, 'submitter_email' => 'contributeur@example.invalid', 'submitter_role' => 'customer', 'status' => 'pending_email_verification', 'submitted_at' => now(), 'email_verification_token' => hash('sha256', 'secret'), 'email_verification_expires_at' => now()->addHour()]);
+
+        try {
+            $restaurant->update(['status' => 'published']);
+            $this->fail('The restaurant must not be published before e-mail verification.');
+        } catch (ValidationException) {
+            $this->assertSame('pending', $restaurant->fresh()->status);
+        }
+
+        $invalid = URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHour(), ['submission' => $submission, 'token' => 'incorrect']);
+        $this->get($invalid)->assertNotFound();
+        $expired = URL::temporarySignedRoute('restaurant-submissions.verify', now()->subMinute(), ['submission' => $submission, 'token' => 'secret']);
+        $this->get($expired)->assertForbidden();
+        $this->assertSame('pending_email_verification', $submission->fresh()->status);
     }
 
     public function test_owner_submission_rejects_missing_certification_or_invalid_siret(): void

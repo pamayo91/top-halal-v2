@@ -7,9 +7,18 @@ use App\Models\RestaurantSubmission;
 
 class RestaurantSubmissionMailer
 {
-    public function received(RestaurantSubmission $submission): void
+    public function verification(RestaurantSubmission $submission, string $verificationUrl): void
     {
-        app(TransactionalMailService::class)->queue('restaurant_submission_received', $submission->submitter_email, [
+        app(TransactionalMailService::class)->queue('restaurant_submission_email_verification', $submission->submitter_email, [
+            'site_name' => config('app.name', 'Top Halal'),
+            'restaurant_name' => $submission->restaurant->name,
+            'verification_url' => $verificationUrl,
+        ]);
+    }
+
+    public function confirmed(RestaurantSubmission $submission): void
+    {
+        app(TransactionalMailService::class)->queue('restaurant_submission_email_confirmed', $submission->submitter_email, [
             'site_name' => config('app.name', 'Top Halal'),
             'restaurant_name' => $submission->restaurant->name,
         ]);
@@ -19,9 +28,11 @@ class RestaurantSubmissionMailer
     {
         $submission = $restaurant->submission;
 
-        if (! $submission) {
+        if (! $submission || $submission->status !== 'pending_admin_review') {
             return;
         }
+
+        $submission->update(['status' => 'published']);
 
         app(TransactionalMailService::class)->queue('restaurant_published', $submission->submitter_email, [
             'site_name' => config('app.name', 'Top Halal'),

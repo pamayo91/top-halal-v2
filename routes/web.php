@@ -36,6 +36,7 @@ Route::get('/ajouter-un-restaurant/adresses', [PublicRestaurantSubmissionControl
 Route::get('/ajouter-un-restaurant/doublons', [PublicRestaurantSubmissionController::class, 'duplicates'])->middleware('throttle:restaurant-duplicate-check')->name('restaurant-submissions.duplicates');
 Route::post('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'store'])->middleware('throttle:restaurant-submission')->name('restaurant-submissions.store');
 Route::get('/ajouter-un-restaurant/merci', [PublicRestaurantSubmissionController::class, 'thanks'])->name('restaurant-submissions.thanks');
+Route::get('/ajouter-un-restaurant/verifier/{submission}/{token}', [PublicRestaurantSubmissionController::class, 'verify'])->middleware('signed')->name('restaurant-submissions.verify');
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
 Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
