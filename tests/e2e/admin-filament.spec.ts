@@ -66,4 +66,22 @@ test.describe('Filament administration', () => {
       await page.keyboard.press('Escape');
     }
   });
+
+  test('restaurant duplicate signals are visible and filterable without exposing technical details', async ({ page }) => {
+    await page.goto('/admin');
+    await page.locator('input[type="email"]').fill(email!);
+    await page.locator('input[type="password"]').fill(password!);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/admin$/);
+
+    await page.goto('/admin/restaurants');
+    await expect(page.getByRole('columnheader', { name: 'Doublon', exact: true })).toBeVisible();
+    await expect(page.getByText('À vérifier', { exact: true }).first()).toBeVisible();
+
+    await page.getByRole('button', { name: 'Filtre' }).click();
+    await expect(page.getByText('Doublon potentiel', { exact: true })).toBeVisible();
+    await page.getByText('Doublon potentiel', { exact: true }).click();
+    await expect(page.getByText('À vérifier', { exact: true }).first()).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('candidate_id');
+  });
 });
