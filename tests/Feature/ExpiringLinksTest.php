@@ -63,7 +63,7 @@ class ExpiringLinksTest extends TestCase
         $this->post(route('claims.activate.resend', [$connectableClaim, 'connectable-old']))->assertNotFound();
         $consumedUser = User::factory()->create(['status' => 'active', 'login_enabled' => false, 'must_change_password' => true]);
         $consumed = RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $consumedUser->id, 'email' => $consumedUser->email, 'full_name' => 'Amina', 'status' => 'approved', 'activation_token' => hash('sha256', 'used-activation'), 'activation_expires_at' => now(), 'submitted_at' => now()]);
-        $consumedUser->update(['must_change_password' => false]);
+        $consumedUser->update(['login_enabled' => true, 'must_change_password' => false]);
         $this->get(route('claims.activate', [$consumed, 'used-activation']))->assertOk()->assertSee('Votre espace est déjà activé.')->assertDontSee('Renvoyer un nouveau lien');
     }
 
