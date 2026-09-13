@@ -62,7 +62,17 @@ class RestaurantDepositorManagementTest extends TestCase
         $this->assertTrue($manager->can('manage', $restaurant));
         $this->assertTrue($admin->can('manage', $restaurant));
         $this->actingAs($depositor)->get(route('account.dashboard'))->assertOk()->assertDontSee($restaurant->name);
-        $this->actingAs($depositor)->get(route('owner.restaurants.edit', $restaurant))->assertForbidden();
+        $this->actingAs($depositor)->get(route('owner.restaurants.edit', $restaurant))
+            ->assertRedirect(route('owner.restaurants.management-unavailable', $restaurant));
+        $this->actingAs($depositor)->get(route('owner.restaurants.management-unavailable', $restaurant))
+            ->assertOk()
+            ->assertSee('Cette fiche n’est plus gérée depuis votre espace.')
+            ->assertSee('La gestion de')
+            ->assertSee('Contester ou nous contacter')
+            ->assertSee(route('contact.create'), false);
+        $this->actingAs($depositor)->put(route('owner.restaurants.update', $restaurant), ['name' => 'Modification refusée'])
+            ->assertRedirect(route('owner.restaurants.management-unavailable', $restaurant));
+        $this->assertSame('Restaurant du déposant', $restaurant->fresh()->name);
         $this->actingAs($manager)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
         $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk();
         $this->actingAs($admin)->get(route('owner.restaurants.edit', $restaurant))->assertOk();

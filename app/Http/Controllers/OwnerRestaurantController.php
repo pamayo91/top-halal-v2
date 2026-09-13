@@ -11,16 +11,29 @@ use Illuminate\View\View;
 
 class OwnerRestaurantController extends Controller
 {
-    public function edit(Restaurant $restaurant): View
+    public function edit(Restaurant $restaurant): View|RedirectResponse
     {
-        $this->authorize('manage', $restaurant);
+        if (! request()->user()->can('manage', $restaurant)) {
+            return redirect()->route('owner.restaurants.management-unavailable', $restaurant);
+        }
 
         return view('account.restaurant-edit', compact('restaurant'));
     }
 
+    public function managementUnavailable(Restaurant $restaurant): View|RedirectResponse
+    {
+        if (request()->user()->can('manage', $restaurant)) {
+            return redirect()->route('owner.restaurants.edit', $restaurant);
+        }
+
+        return view('account.restaurant-management-unavailable', compact('restaurant'));
+    }
+
     public function update(Request $request, Restaurant $restaurant, AddressSuggestionService $suggestions, RestaurantLocationService $locations): RedirectResponse
     {
-        $this->authorize('manage', $restaurant);
+        if (! $request->user()->can('manage', $restaurant)) {
+            return redirect()->route('owner.restaurants.management-unavailable', $restaurant);
+        }
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:10000'],

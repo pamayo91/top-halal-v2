@@ -106,6 +106,7 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
         Route::get('/claims/{claim}/identity-document', ClaimIdentityDocumentController::class)->middleware('admin')->name('claims.identity-document');
         Route::get('/account/restaurants/{restaurant}/edit', [OwnerRestaurantController::class, 'edit'])->name('owner.restaurants.edit');
+        Route::get('/account/restaurants/{restaurant}/gestion-indisponible', [OwnerRestaurantController::class, 'managementUnavailable'])->name('owner.restaurants.management-unavailable');
         Route::put('/account/restaurants/{restaurant}', [OwnerRestaurantController::class, 'update'])->name('owner.restaurants.update');
         Route::get('/account/restaurants/{restaurant}/demander-suppression', [RestaurantRemovalRequestController::class, 'create'])->name('owner.restaurants.removal.create');
         Route::post('/account/restaurants/{restaurant}/demander-suppression', [RestaurantRemovalRequestController::class, 'store'])->name('owner.restaurants.removal.store');
