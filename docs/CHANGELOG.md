@@ -331,6 +331,8 @@
 
 ## Unreleased
 
+- Refonte visuelle SSR de `Mon compte` : en-tête et profil métier lisibles, cartes de restaurants responsive, statuts français, actions existantes et état vide. La requête d’accès, les Policies, claims, rôles et workflows existants sont inchangés.
+
 - Refined the claim page presentation only: balanced desktop cards, mobile stacking, a compact shared container, styled private-document selection and a separate certification control.
 - Rebalanced the claim page desktop presentation only: 42/58 cards, large-screen two-column identity details, shorter explanatory text and preserved single-column tablet/mobile flow.
 - Widened the claim page presentation only: 1,120 px maximum, 44/56 desktop cards with a 28 px gap, and an earlier 840 px stacked breakpoint for comfortable tablet sizing.

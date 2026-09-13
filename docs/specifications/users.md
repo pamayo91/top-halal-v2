@@ -16,6 +16,7 @@
 - `RestaurantPolicy::manage` is enforced server-side; owners cannot access another owner's restaurant.
 - A guest who opens a claimable restaurant claim sees the direct first-claim form, while an existing verified restaurateur can log in in the same page and resume that exact form. The former `/restaurants/{restaurant}/claim/register` hand-off remains a compatibility redirect to the claim form; it never opens generic self-registration. Claimability is checked when entering and submitting the claim.
 - The restaurant-owner account dashboard exposes a CSRF-protected logout action that invalidates the current session through the shared authentication endpoint.
+- `Mon compte` is a public SSR account space, not an administrative dashboard. It presents only the restaurants returned by the existing authorized account query and labels their already-established relationship in plain French (`Déposant` or `Restaurateur`). It never determines management rights in Blade. The profile badge is the existing calculated business profile (`Utilisateur`, `Déposant`, `Restaurateur`, `Administrateur`), not a technical role.
 
 ## Public proposal contributors
 
