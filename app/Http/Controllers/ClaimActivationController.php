@@ -56,5 +56,5 @@ class ClaimActivationController extends Controller
     }
     private function matches(RestaurantClaim $claim, string $token): bool { return filled($claim->activation_token) && hash_equals($claim->activation_token, hash('sha256', $token)); }
     private function eligible(RestaurantClaim $claim): bool { return $claim->status === 'approved' && $claim->user?->status === 'active' && (! $claim->user?->login_enabled || $claim->user?->must_change_password); }
-    private function wasActivated(RestaurantClaim $claim, string $token): bool { return $claim->status === 'approved' && $this->matches($claim, $token) && $claim->user?->status === 'active' && ! $claim->user?->must_change_password; }
+    private function wasActivated(RestaurantClaim $claim, string $token): bool { return $claim->status === 'approved' && $this->matches($claim, $token) && $claim->user?->status === 'active' && $claim->user?->login_enabled && ! $claim->user?->must_change_password; }
 }

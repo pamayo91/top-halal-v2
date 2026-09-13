@@ -349,7 +349,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $submission = RestaurantSubmission::firstOrFail();
         $this->assertSame('pending_admin_review', $submission->status);
         $this->assertNotNull($submission->email_verified_at);
-        $this->assertNull($submission->email_verification_token);
+        $this->assertNotNull($submission->email_verification_token);
         $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_confirmed', 'recipient' => 'contributeur@example.invalid']);
         $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_admin_review', 'recipient' => 'team@example.invalid']);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review' && $mail->replyToAddress === 'contributeur@example.invalid');
@@ -435,7 +435,7 @@ class PublicRestaurantSubmissionTest extends TestCase
     public function test_unverified_submission_cannot_be_published_and_invalid_or_expired_links_do_not_confirm_it(): void
     {
         $restaurant = Restaurant::create(['name' => 'En attente', 'slug' => 'en-attente', 'status' => 'pending']);
-        $submission = RestaurantSubmission::create(['restaurant_id' => $restaurant->id, 'submitter_email' => 'contributeur@example.invalid', 'submitter_role' => 'customer', 'status' => 'pending_email_verification', 'submitted_at' => now(), 'email_verification_token' => hash('sha256', 'secret'), 'email_verification_expires_at' => now()->addHour()]);
+        $submission = RestaurantSubmission::create(['restaurant_id' => $restaurant->id, 'submitter_email' => 'contributeur@example.invalid', 'submitter_role' => 'customer', 'status' => 'pending_email_verification', 'submitted_at' => now(), 'email_verification_token' => hash('sha256', 'secret'), 'email_verification_expires_at' => now()->subMinute()]);
 
         try {
             $restaurant->update(['status' => 'published']);

@@ -80,6 +80,7 @@ class SubmissionActivationController extends Controller
         return $submission->status !== 'rejected'
             && $this->matches($submission, $token)
             && $submission->user?->status === 'active'
+            && $submission->user?->login_enabled
             && ! $submission->user->must_change_password
             && preg_match('/^[A-Za-z0-9]{64}$/D', $token) === 1;
     }
