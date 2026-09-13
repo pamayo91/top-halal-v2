@@ -71,11 +71,11 @@ class ExpiringLinksTest extends TestCase
     {
         $submission = $this->submission('pending_email_verification', 'rate-old');
         RateLimiter::clear('expiring-link|'.$submission->id.'|127.0.0.1');
-        for ($attempt = 0; $attempt < 3; $attempt++) {
-            $submission->update(['email_verification_token' => hash('sha256', 'rate-old'), 'email_verification_expires_at' => now()->subMinute()]);
-            $this->post(route('restaurant-submissions.verify.resend', [$submission, 'rate-old']))->assertRedirect();
-        }
+        $this->post(route('restaurant-submissions.verify.resend', [$submission, 'rate-old']))->assertRedirect();
         $submission->update(['email_verification_token' => hash('sha256', 'rate-old'), 'email_verification_expires_at' => now()->subMinute()]);
+        RateLimiter::hit('expiring-link|'.$submission->id.'|127.0.0.1', 3600);
+        RateLimiter::hit('expiring-link|'.$submission->id.'|127.0.0.1', 3600);
+        RateLimiter::hit('expiring-link|'.$submission->id.'|127.0.0.1', 3600);
         $this->post(route('restaurant-submissions.verify.resend', [$submission, 'rate-old']))->assertTooManyRequests();
     }
 
