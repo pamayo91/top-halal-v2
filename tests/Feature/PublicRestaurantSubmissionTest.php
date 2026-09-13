@@ -205,7 +205,7 @@ class PublicRestaurantSubmissionTest extends TestCase
             'status' => 'active',
             'must_change_password' => false,
         ]);
-        $before = $this->storedUserState($user, ['password', 'email_verified_at', 'login_enabled', 'role', 'status', 'must_change_password']);
+        $before = $this->storedUserState($user->fresh(), ['password', 'email_verified_at', 'login_enabled', 'role', 'status', 'must_change_password']);
         $this->fakeSubmissionIngestor('active-existing-account');
 
         $this->post(route('restaurant-submissions.store'), $this->payload(['email' => 'contributeur@example.invalid']))->assertRedirect();
