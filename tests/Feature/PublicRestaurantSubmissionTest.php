@@ -366,6 +366,26 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertDatabaseCount('email_delivery_logs', 0);
     }
 
+    public function test_a_certain_duplicate_only_offers_claim_when_the_published_record_is_claimable(): void
+    {
+        $existing = $this->existingRestaurant(['name' => 'Restaurant de test', 'status' => 'published']);
+        $owner = User::factory()->create();
+        RestaurantClaim::create([
+            'restaurant_id' => $existing->id, 'user_id' => $owner->id, 'email' => $owner->email,
+            'status' => 'approved', 'submitted_at' => now(),
+        ]);
+
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload())
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('name')
+            ->assertSessionHas('duplicate_restaurant.url', route('restaurants.show', $existing->slug))
+            ->assertSessionMissing('duplicate_restaurant.claim_url');
+
+        $this->assertDatabaseCount('restaurants', 1);
+        $this->assertDatabaseCount('restaurant_submissions', 0);
+        Mail::assertNothingQueued();
+    }
+
     public function test_case_accent_hyphen_and_small_name_variants_at_the_same_address_are_certain_duplicates(): void
     {
         $this->existingRestaurant(['name' => 'Café du Monde', 'status' => 'published']);

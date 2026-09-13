@@ -150,6 +150,21 @@ class RestaurantResource extends AdminResource
                         return $count.' établissement(s) similaire(s) trouvé(s) à proximité — vérifiez les fiches avant toute action.';
                     }),
                 ]),
+                Section::make('Signal de doublon de la proposition')->visible(fn (?Restaurant $record): bool => $record?->submission?->duplicate_signal === 'potential')->schema([
+                    Textarea::make('submission_duplicate_details')->label('Rapprochements à examiner')->readOnly()->dehydrated(false)->rows(4)->formatStateUsing(function (?Restaurant $record): string {
+                        if (! $record) return '';
+                        return collect($record->submission?->duplicate_details ?? [])->map(function (array $detail): string {
+                            $reason = match ($detail['reason'] ?? '') {
+                                'same_address_different_name' => 'même adresse, nom distinct',
+                                'nearby_similar_name' => 'nom proche à moins de 250 m, adresse distincte',
+                                'same_phone_same_locality' => 'même téléphone dans la même commune, adresse distincte',
+                                'archived_exact_match' => 'ancienne fiche archivée ou en corbeille',
+                                default => 'rapprochement à vérifier',
+                            };
+                            return ($detail['name'] ?? 'Fiche existante').' — '.$reason;
+                        })->implode("\n");
+                    }),
+                ]),
             ]),
             Tabs\Tab::make('Catégories & caractéristiques')->schema([Section::make()->columns(2)->schema([
                 Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),

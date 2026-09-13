@@ -83,5 +83,9 @@ test.describe('Filament administration', () => {
     await page.getByText('Doublon potentiel', { exact: true }).click();
     await expect(page.getByText('À vérifier', { exact: true }).first()).toBeVisible();
     await expect(page.locator('body')).not.toContainText('candidate_id');
+
+    await page.getByRole('button', { name: 'Modifier' }).first().click();
+    await expect(page.getByText('Rapprochements à examiner', { exact: true })).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('candidate_id');
   });
 });
