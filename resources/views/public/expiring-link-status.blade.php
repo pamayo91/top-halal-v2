@@ -1,0 +1,3 @@
+<x-layouts.app :title="$title.' | Top Halal'" robots="noindex,nofollow">
+    <section class="contact-page auth-page"><div class="shell auth-shell"><div class="contact-form-wrap auth-form-wrap"><aside class="contact-sticker"><span>{{ $eyebrow }}</span></aside><div class="contact-form-card auth-form-card"><header><p class="eyebrow">{{ $eyebrow }}</p><h1>{{ $title }}</h1><p>{{ $message }}</p></header>@if($resendUrl)<form method="post" action="{{ $resendUrl }}">@csrf<button class="button contact-submit" type="submit">Renvoyer un nouveau lien</button></form>@endif<a class="button button-secondary contact-submit" href="{{ $exitUrl ?? route('home') }}">{{ $exitLabel ?? 'Retour à l’accueil' }}</a></div></div></div></section>
+</x-layouts.app>

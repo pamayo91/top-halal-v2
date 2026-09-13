@@ -36,9 +36,11 @@ Route::get('/ajouter-un-restaurant/adresses', [PublicRestaurantSubmissionControl
 Route::get('/ajouter-un-restaurant/doublons', [PublicRestaurantSubmissionController::class, 'duplicates'])->middleware('throttle:restaurant-duplicate-check')->name('restaurant-submissions.duplicates');
 Route::post('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'store'])->middleware('throttle:restaurant-submission')->name('restaurant-submissions.store');
 Route::get('/ajouter-un-restaurant/merci', [PublicRestaurantSubmissionController::class, 'thanks'])->name('restaurant-submissions.thanks');
-Route::get('/ajouter-un-restaurant/verifier/{submission}/{token}', [PublicRestaurantSubmissionController::class, 'verify'])->middleware('signed')->name('restaurant-submissions.verify');
+Route::get('/ajouter-un-restaurant/verifier/{submission}/{token}', [PublicRestaurantSubmissionController::class, 'verify'])->name('restaurant-submissions.verify');
+Route::post('/ajouter-un-restaurant/verifier/{submission}/{token}/renvoyer', [PublicRestaurantSubmissionController::class, 'resendVerification'])->middleware('throttle:expiring-link-resend')->name('restaurant-submissions.verify.resend');
 Route::get('/ajouter-un-restaurant/activer/{submission}/{token}', [SubmissionActivationController::class, 'create'])->name('restaurant-submissions.activate');
 Route::post('/ajouter-un-restaurant/activer/{submission}/{token}', [SubmissionActivationController::class, 'store'])->middleware('throttle:5,1')->name('restaurant-submissions.activate.store');
+Route::post('/ajouter-un-restaurant/activer/{submission}/{token}/renvoyer', [SubmissionActivationController::class, 'resend'])->middleware('throttle:expiring-link-resend')->name('restaurant-submissions.activate.resend');
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.store');
 Route::get('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'create'])->name('claims.create');
@@ -47,10 +49,13 @@ Route::get('/restaurants/{restaurant}/claim/login', [RestaurantClaimController::
 Route::get('/restaurants/{restaurant}/claim/register', [RestaurantClaimController::class, 'resume'])->name('claims.register');
 Route::post('/restaurants/{restaurant}/claim', [RestaurantClaimController::class, 'store'])->middleware('throttle:5,1')->name('claims.store');
 Route::get('/claims/recu', [RestaurantClaimController::class, 'received'])->name('claims.received');
-Route::get('/claims/{claim}/verify/{token}', [RestaurantClaimController::class, 'verify'])->middleware('signed')->name('claims.verify');
-Route::get('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'create'])->middleware('signed')->name('claims.activate');
-Route::post('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'store'])->middleware(['signed', 'throttle:5,1'])->name('claims.activate.store');
-Route::get('/contributions/verifier/{verification}/{token}', ContributionVerificationController::class)->middleware('signed')->name('contributions.verify');
+Route::get('/claims/{claim}/verify/{token}', [RestaurantClaimController::class, 'verify'])->name('claims.verify');
+Route::post('/claims/{claim}/verify/{token}/renvoyer', [RestaurantClaimController::class, 'resendVerification'])->middleware('throttle:expiring-link-resend')->name('claims.verify.resend');
+Route::get('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'create'])->name('claims.activate');
+Route::post('/claims/{claim}/activate/{token}', [ClaimActivationController::class, 'store'])->middleware('throttle:5,1')->name('claims.activate.store');
+Route::post('/claims/{claim}/activate/{token}/renvoyer', [ClaimActivationController::class, 'resend'])->middleware('throttle:expiring-link-resend')->name('claims.activate.resend');
+Route::get('/contributions/verifier/{verification}/{token}', ContributionVerificationController::class)->name('contributions.verify');
+Route::post('/contributions/verifier/{verification}/{token}/renvoyer', [ContributionVerificationController::class, 'resend'])->middleware('throttle:expiring-link-resend')->name('contributions.verify.resend');
 
 Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId) {
     $model = $type === 'post' ? Article::class : ($type === 'page' ? Page::class : abort(404));

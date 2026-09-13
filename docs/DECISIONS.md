@@ -2,6 +2,10 @@
 
 ## 2026-09-13
 
+### D036 — Les liens expirés restent vérifiables par leur jeton hashé
+
+Les liens publics de vérification et d’activation conservent leur URL temporairement signée lors de l’envoi, mais la page de destination s’appuie aussi sur le jeton aléatoire 64 caractères hashé par objet afin de pouvoir distinguer, après l’expiration de la signature, un lien réellement expiré d’un lien inconnu. Un hash de jeton consommé est conservé avec un état final non utilisable uniquement pour rendre le clic idempotent. Un renvoi remplace ce hash sous contrôle de débit; il invalide donc immédiatement le lien précédent. Aucun état final ou compte désactivé ne redevient éligible par cette voie.
+
 ### D035 — L’activation de déposant dépend de la connectabilité réelle
 
 La confirmation d’une proposition retrouve l’unique `User` par e-mail sans tenir compte de la casse. Un lien d’activation n’est créé que pour un compte à l’état `active` qui n’est pas encore normalement connectable : `login_enabled=false` ou `must_change_password=true`. La connectabilité normale exige `login_enabled=true`, `status=active` et `must_change_password=false`; le hachage de mot de passe ne constitue donc jamais un indicateur d’activation. Un compte déjà connectable conserve strictement son mot de passe, ses flags, rôle et droits, et ne reçoit aucun nouveau token. Une identité avis/commentaire reste non connectable après confirmation de la proposition et son e-mail d’activation ; seule la validation du lien et le choix du mot de passe activent ce même `User`, ce qui préserve ses contributions. Un compte administrativement `disabled` n’est jamais réactivé par une proposition publique.

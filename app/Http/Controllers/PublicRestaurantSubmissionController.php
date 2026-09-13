@@ -183,6 +183,13 @@ class PublicRestaurantSubmissionController extends Controller
 
     public function verify(RestaurantSubmission $submission, string $token, RestaurantSubmissionMailer $mailer): View
     {
+        if (! hash_equals((string) $submission->email_verification_token, hash('sha256', $token))) abort(404);
+        if ($submission->status !== 'pending_email_verification') {
+            return $this->linkStatus('Cette demande a déjà été traitée.', 'Votre adresse e-mail était déjà confirmée.', null, route('restaurants.index'), 'Voir les restaurants');
+        }
+        if (! $submission->email_verification_expires_at?->isFuture()) {
+            return $this->linkStatus('Ce lien a expiré.', 'Vous pouvez recevoir un nouveau lien pour continuer.', route('restaurant-submissions.verify.resend', [$submission, $token]));
+        }
         $confirmed = DB::transaction(function () use ($submission, $token): ?array {
             $submission = RestaurantSubmission::query()->with('restaurant')->lockForUpdate()->findOrFail($submission->id);
             if ($submission->status !== 'pending_email_verification') return null;
@@ -214,8 +221,6 @@ class PublicRestaurantSubmissionController extends Controller
                 'user_id' => $user->id,
                 'status' => 'pending_admin_review',
                 'email_verified_at' => now(),
-                'email_verification_token' => null,
-                'email_verification_expires_at' => null,
                 'activation_token' => $activationToken ? hash('sha256', $activationToken) : null,
                 'activation_expires_at' => $activationToken ? now()->addDays(7) : null,
             ]);
@@ -249,6 +254,24 @@ class PublicRestaurantSubmissionController extends Controller
         }
 
         return view('public.restaurant-submission.email-verified', ['alreadyConfirmed' => $confirmed === null]);
+    }
+
+    public function resendVerification(RestaurantSubmission $submission, string $token, RestaurantSubmissionMailer $mailer): RedirectResponse
+    {
+        [$submission, $newToken] = DB::transaction(function () use ($submission, $token): array {
+            $submission = RestaurantSubmission::query()->lockForUpdate()->findOrFail($submission->id);
+            abort_unless($submission->status === 'pending_email_verification' && ! $submission->email_verification_expires_at?->isFuture() && hash_equals((string) $submission->email_verification_token, hash('sha256', $token)), 404);
+            $newToken = Str::random(64);
+            $submission->update(['email_verification_token' => hash('sha256', $newToken), 'email_verification_expires_at' => now()->addHours(24)]);
+            return [$submission->fresh('restaurant'), $newToken];
+        });
+        $mailer->verification($submission, URL::temporarySignedRoute('restaurant-submissions.verify', $submission->email_verification_expires_at, ['submission' => $submission, 'token' => $newToken]));
+        return back()->with('status', 'Un nouveau lien vient d’être envoyé.');
+    }
+
+    private function linkStatus(string $title, string $message, ?string $resendUrl = null, ?string $exitUrl = null, ?string $exitLabel = null): View
+    {
+        return view('public.expiring-link-status', compact('title', 'message', 'resendUrl', 'exitUrl', 'exitLabel') + ['eyebrow' => 'Vérification e-mail']);
     }
 
     private function locationData(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, array $data): array

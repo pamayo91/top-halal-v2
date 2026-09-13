@@ -447,7 +447,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $invalid = URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHour(), ['submission' => $submission, 'token' => 'incorrect']);
         $this->get($invalid)->assertNotFound();
         $expired = URL::temporarySignedRoute('restaurant-submissions.verify', now()->subMinute(), ['submission' => $submission, 'token' => 'secret']);
-        $this->get($expired)->assertForbidden();
+        $this->get($expired)->assertOk()->assertSee('Ce lien a expiré.');
         $this->assertSame('pending_email_verification', $submission->fresh()->status);
     }
 

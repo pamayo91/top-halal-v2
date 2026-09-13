@@ -116,7 +116,7 @@ class RestaurantSubmissionRejectionTest extends TestCase
         $token = str()->random(64);
         $submission->update(['activation_token' => hash('sha256', $token), 'activation_expires_at' => now()->addDay()]);
 
-        $this->get(route('restaurant-submissions.activate', ['submission' => $submission, 'token' => $token]))->assertNotFound();
+        $this->get(route('restaurant-submissions.activate', ['submission' => $submission, 'token' => $token]))->assertOk()->assertSee('Cette demande a déjà été traitée.')->assertDontSee('Renvoyer un nouveau lien');
         $this->assertFalse($depositor->can('manage', $restaurant));
         $this->actingAs($depositor)->get(route('account.dashboard'))->assertOk()->assertDontSee($restaurant->name);
         $this->actingAs($depositor)->get(route('owner.restaurants.edit', $restaurant))
@@ -139,7 +139,7 @@ class RestaurantSubmissionRejectionTest extends TestCase
 
         $this->assertSame($before, $user->fresh()->only(array_keys($before)));
         $this->assertSame('rejected', $rejected->fresh()->status);
-        $this->assertNull($rejected->fresh()->activation_token);
+        $this->assertNotNull($rejected->fresh()->activation_token);
         $this->assertSame('pending_admin_review', $valid->fresh()->status);
         $this->assertSame($user->id, $valid->fresh()->user_id);
         $this->assertSame('approved', $claim->fresh()->status);
@@ -169,7 +169,7 @@ class RestaurantSubmissionRejectionTest extends TestCase
 
         app(RestaurantSubmissionModeration::class)->reject($rejectedRestaurant);
 
-        $this->get(route('restaurant-submissions.activate', ['submission' => $rejected, 'token' => $rejectedToken]))->assertNotFound();
+        $this->get(route('restaurant-submissions.activate', ['submission' => $rejected, 'token' => $rejectedToken]))->assertOk()->assertDontSee('Renvoyer un nouveau lien');
         $this->get(route('restaurant-submissions.activate', ['submission' => $valid, 'token' => $validToken]))->assertOk();
         $this->post(route('restaurant-submissions.activate.store', ['submission' => $valid, 'token' => $validToken]), [
             'password' => 'MotDePasseSolide!123', 'password_confirmation' => 'MotDePasseSolide!123',

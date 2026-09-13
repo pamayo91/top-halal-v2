@@ -73,9 +73,24 @@ class RestaurantClaimController extends Controller
 
     public function verify(RestaurantClaim $claim, string $token): View
     {
-        abort_unless($claim->status === 'pending_email_verification' && $claim->email_verification_expires_at?->isFuture() && hash_equals($claim->email_verification_token ?? '', hash('sha256', $token)), 404);
-        $claim->update(['status' => 'pending', 'email_verified_at' => now(), 'email_verification_token' => null, 'email_verification_expires_at' => null]);
+        abort_unless(hash_equals($claim->email_verification_token ?? '', hash('sha256', $token)), 404);
+        if ($claim->status !== 'pending_email_verification') return view('public.expiring-link-status', ['eyebrow' => 'Vérification e-mail', 'title' => 'Cette demande a déjà été traitée.', 'message' => 'Votre adresse e-mail était déjà confirmée.', 'resendUrl' => null]);
+        if (! $claim->email_verification_expires_at?->isFuture()) return view('public.expiring-link-status', ['eyebrow' => 'Vérification e-mail', 'title' => 'Ce lien a expiré.', 'message' => 'Vous pouvez recevoir un nouveau lien pour continuer.', 'resendUrl' => route('claims.verify.resend', [$claim, $token])]);
+        $claim->update(['status' => 'pending', 'email_verified_at' => now()]);
         return view('claims.email-verified', compact('claim'));
+    }
+
+    public function resendVerification(RestaurantClaim $claim, string $token): RedirectResponse
+    {
+        [$claim, $newToken] = \Illuminate\Support\Facades\DB::transaction(function () use ($claim, $token): array {
+            $claim = RestaurantClaim::query()->lockForUpdate()->findOrFail($claim->id);
+            abort_unless($claim->status === 'pending_email_verification' && ! $claim->email_verification_expires_at?->isFuture() && hash_equals($claim->email_verification_token ?? '', hash('sha256', $token)), 404);
+            $newToken = Str::random(64);
+            $claim->update(['email_verification_token' => hash('sha256', $newToken), 'email_verification_expires_at' => now()->addHours(24)]);
+            return [$claim->fresh('restaurant'), $newToken];
+        });
+        Notification::route('mail', $claim->email)->notify(new ClaimLifecycleNotification($claim, 'verify', URL::temporarySignedRoute('claims.verify', $claim->email_verification_expires_at, ['claim' => $claim, 'token' => $newToken])));
+        return back()->with('status', 'Un nouveau lien vient d’être envoyé.');
     }
 
     public function show(RestaurantClaim $claim): View

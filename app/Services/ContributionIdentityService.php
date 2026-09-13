@@ -81,6 +81,27 @@ class ContributionIdentityService
         });
     }
 
+    public function linkState(ContributionVerification $verification, string $token): string
+    {
+        if (! hash_equals($verification->token_hash, hash('sha256', $token))) return 'invalid';
+        if ($verification->used_at) return 'used';
+        if (! $verification->expires_at->isFuture()) return $this->canContinue($verification) ? 'expired' : 'closed';
+        return 'valid';
+    }
+
+    public function resend(ContributionVerification $verification, string $token): void
+    {
+        [$verification, $newToken] = DB::transaction(function () use ($verification, $token): array {
+            $verification = ContributionVerification::query()->lockForUpdate()->findOrFail($verification->id);
+            abort_unless($this->linkState($verification, $token) === 'expired', 404);
+            $newToken = Str::random(64);
+            $verification->update(['token_hash' => hash('sha256', $newToken), 'expires_at' => now()->addHours((int) config('contributions.verification_expire_hours'))]);
+            return [$verification->fresh(), $newToken];
+        });
+        $url = URL::temporarySignedRoute('contributions.verify', $verification->expires_at, ['verification' => $verification, 'token' => $newToken]);
+        app(TransactionalMailService::class)->queue('contribution_email_verification', $verification->email, ['site_name' => config('app.name', 'Top Halal'), 'user_name' => $verification->author_name, 'verification_url' => $url, 'contribution_label' => match ($verification->contribution_type) { 'review' => 'avis', 'report' => 'signalement', default => 'commentaire' }]);
+    }
+
     /** @return array{verified: bool, verification: ?ContributionVerification} */
     private function submit(Request $request, string $contributionType, string $targetType, int $targetId, array $data): array
     {
@@ -252,6 +273,14 @@ class ContributionIdentityService
     private function targetType(Restaurant|Article|Page $content): string
     {
         return match (true) { $content instanceof Restaurant => 'restaurant', $content instanceof Article => 'article', default => 'page' };
+    }
+
+    private function canContinue(ContributionVerification $verification): bool
+    {
+        $user = User::query()->where('email', Str::lower(trim($verification->email)))->first();
+        if ($user?->status === 'disabled') return false;
+        $model = match ($verification->target_type) { 'restaurant' => Restaurant::class, 'article' => Article::class, 'page' => Page::class, default => null };
+        return $model !== null && $model::query()->whereKey($verification->target_id)->where('status', 'published')->exists();
     }
 
     private function reportTarget(string $targetType, int $targetId): Restaurant|Article|Page

@@ -16,6 +16,7 @@ Fields: author name, email, content; optional authenticated user relationship.
 - Moderated workflow: pending -> approved/rejected/spam.
 - A new or unproven comment author first creates a `contribution_verifications` record, not a comment. It carries a hashed random token, temporary signed URL, 24-hour expiry and the exact article/page/payload. Only one successful click atomically creates/reuses the `User`, marks its e-mail verified and creates the comment as `pending` with `user_id`.
 - A signed-in user or an anonymous browser holding an unexpired server-side proof for that exact `User` creates a `pending` comment directly. A syntactically valid, existing or historically verified e-mail alone is insufficient.
+- An expired verification page offers one rate-limited resend only while the article/page remains published and the identity is not disabled; it replaces the hashed token and does not create a comment.
 - URLs are forbidden. Reject `http://`, `https://`, `www.`, link markup and robust URL/domain-like patterns server-side.
 - Comments render as escaped/sanitized safe text; user HTML is not executed.
 - Email is private.

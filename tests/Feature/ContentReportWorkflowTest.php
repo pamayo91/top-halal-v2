@@ -101,7 +101,7 @@ class ContentReportWorkflowTest extends TestCase
     {
         $expired = ContributionVerification::create(['email' => 'expired@example.test', 'author_name' => 'Expiré', 'contribution_type' => 'report', 'target_type' => 'restaurant', 'target_id' => $this->restaurant->id, 'payload' => ['message' => 'Trop tard'], 'token_hash' => hash('sha256', 'expired'), 'expires_at' => now()->subMinute()]);
         $url = URL::temporarySignedRoute('contributions.verify', now()->subMinute(), ['verification' => $expired, 'token' => 'expired']);
-        $this->get($url)->assertForbidden();
+        $this->get($url)->assertOk()->assertSee('Ce lien a expiré.');
         $this->post($this->restaurantUrl(), $this->payload(['website' => 'bot']))->assertSessionHasErrors('website');
         $this->post($this->restaurantUrl(), $this->payload(['message' => str_repeat('a', 2001)]))->assertSessionHasErrors('message');
         $this->assertDatabaseCount('editorial_content_reports', 0);

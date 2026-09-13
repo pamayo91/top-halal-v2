@@ -31,10 +31,9 @@ class RestaurantSubmissionModeration
                 'rejection_reference' => 'TH-PROP-'.Str::upper(Str::random(12)),
                 'rejected_at' => now(),
                 'rejected_by' => auth()->id(),
-                // A refusal must not leave an activation link able to suggest that
-                // the rejected listing can still be managed.
-                'activation_token' => null,
-                'activation_expires_at' => null,
+                // Keep only the hash so the holder of this exact old link receives
+                // a clear final state; the rejected status makes it unusable.
+                'activation_expires_at' => now(),
             ]);
 
             app(AdminAudit::class)->record('restaurant_submission.rejected', $submission, [

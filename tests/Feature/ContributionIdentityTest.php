@@ -134,13 +134,13 @@ class ContributionIdentityTest extends TestCase
             'payload' => ['rating' => 5, 'title' => null, 'content' => 'Très bon'], 'token_hash' => hash('sha256', 'expired-token'), 'expires_at' => now()->subMinute(),
         ]);
         $expiredUrl = URL::temporarySignedRoute('contributions.verify', now()->subMinute(), ['verification' => $expired, 'token' => 'expired-token']);
-        $this->get($expiredUrl)->assertForbidden();
+        $this->get($expiredUrl)->assertOk()->assertSee('Ce lien a expiré.');
         $this->assertDatabaseCount('restaurant_reviews', 0);
 
         $this->post('/resto/identite-avis/avis', $this->reviewPayload())->assertRedirect();
         $url = $this->verificationUrl();
         $this->get($url)->assertOk();
-        $this->get($url)->assertNotFound();
+        $this->get($url)->assertOk()->assertSee('Cette contribution a déjà été confirmée.');
         $this->assertDatabaseCount('restaurant_reviews', 1);
     }
 
