@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-13
+
+- Restaurants : un déposant public conserve la gestion de sa fiche pendant une revendication `pending` ou `rejected`, mais la perd dès qu'une revendication est `approved` pour un autre utilisateur. La fiche quitte alors « Mon compte » du déposant, son accès direct d'édition est refusé et l'historique `restaurant_submissions` est conservé.
+
 ## 2026-09-12
 
 - Back-office Utilisateurs : le compteur « Restaurants liés » inclut désormais les restaurants issus d’une proposition publique rattachée au `User`.

@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-12
+Last updated: 2026-09-13
+
+Latest depositor-management transfer: a public restaurant depositor may manage the listing only while it has no approved claim. Pending and rejected claims preserve that temporary right; approving a claim grants management to the claimant and removes the listing from the former non-owner depositor's account and edit routes. The historical `restaurant_submissions` row and both users remain intact. The Policy, account query and preproduction regression gate are validated.
 
 Latest contribution identity: public restaurant reviews and editorial comments now share a one-use, 24-hour signed e-mail verification workflow. An unproven submission persists only a private verification payload; successful confirmation atomically creates or reuses one `User`, marks the address verified, records a server-side session proof for that exact user and creates the actual contribution as `pending` with `user_id`. New contributor identities have `login_enabled=false`, a random unusable password, role `user`, no claim and no restaurant-management grant. An authenticated user or a valid proof bypasses only the new verification, never moderation. A known e-mail without a current proof must verify again. The daily scheduler purges only verification rows expired or consumed for more than seven days; it never removes related users, contributions or e-mail history.
 
@@ -8,7 +10,7 @@ Latest restaurant-owner account: « Mon compte » exposes the existing CSRF-prot
 
 Latest restaurant-submission verification: a public proposal creates a pending restaurant plus a `pending_email_verification` submission and a tracked queued e-mail with a 24-hour signed, one-use verification link. Confirmation moves only the submission to `pending_admin_review`, queues its acknowledgement and alerts the configured operational recipient; the central publication guard rejects any earlier restaurant publication. An administrator can then publish the restaurant from the clearly labelled Filament queue, which sets the submission to `published` and queues the public-listing e-mail. Historic proposals remain in their existing moderation/published state and receive no retrospective e-mail.
 
-Latest contributor space: every confirmed public depositor, irrespective of the manager/owner answer, is now linked to a scoped account and receives the seven-day one-use password-activation CTA in the same confirmation e-mail. The account manages only its submitted listings; it creates no ownership claim, so the actual manager can still claim the restaurant normally.
+Latest contributor space: every confirmed public depositor, irrespective of the manager/owner answer, is now linked to a scoped account and receives the seven-day one-use password-activation CTA in the same confirmation e-mail. The account manages submitted listings only until a real manager's claim is approved; it creates no ownership claim, so the actual manager can still claim the restaurant normally.
 
 Latest account-entry cleanup: the generic `/register` page and its user-creation endpoint are removed. Accounts now originate only from validated public proposals or approved first claims. The former restaurant-specific registration hand-off remains only as a compatibility redirect to the selected direct claim form.
 
