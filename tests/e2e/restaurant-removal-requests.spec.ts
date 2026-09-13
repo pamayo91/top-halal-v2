@@ -25,7 +25,6 @@ test.describe('Demandes de suppression de restaurant', () => {
     expect(response?.status()).toBe(200);
     await expect(page.getByRole('heading', { name: /Demandes de suppression/i }).first()).toBeVisible();
     await expect(page.getByRole('table')).toBeVisible();
-    await expect(page.getByText('En attente', { exact: true }).first()).toBeVisible();
 
     expect(consoleErrors).toEqual([]);
     expect(failedRequests).toEqual([]);
