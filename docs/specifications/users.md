@@ -19,11 +19,11 @@
 
 ## Public proposal contributors
 
-- Every public restaurant depositor who confirms their e-mail receives a one-use, seven-day link in that same confirmation message to choose a password. It is protected by a separate 64-character hashed token instead of a secondary signed-URL query string. A new active `restaurant_owner` account is created; an existing ordinary account is attached and upgraded to that role without changing its password. Choosing the password authenticates the depositor immediately and opens `Mon compte`.
+- Every public restaurant depositor who confirms their e-mail receives a one-use, seven-day link in that same confirmation message to choose a password. It is protected by a separate 64-character hashed token instead of a secondary signed-URL query string. A new active baseline `user` account is created, or an existing account is attached without changing its password. Choosing the password authenticates the depositor immediately and opens `Mon compte`; the temporary management grant is carried only by the linked submission.
 - A later visit to a consumed activation URL never allows a password change. It displays a noindex explanation that the space is already active and offers the login route instead of an opaque 404.
 - A depositor may manage a restaurant linked by `restaurant_submissions.user_id` only while it has no approved claim. This temporary management grant is distinct from ownership, so the restaurant remains claimable by its real manager. A pending or rejected claim changes nothing; an approved claim transfers current management to its owner, removes the listing from the former non-owner depositor's account and preserves the submission for audit. A former depositor reaching an edit or removal URL is redirected to an explanatory page, never a raw 403; it includes a Contact CTA to contest the transfer.
 - When a confirmed public depositor explicitly declared themselves the manager/owner, confirmation prepares exactly one `new_submission` claim in `pending_publication`. It grants no ownership before Top Halal publishes the restaurant. Publication atomically advances that existing claim through the normal approval mechanism, making it the unique approved ownership relation; a non-manager depositor never receives this claim.
-- The back-office User list counts a restaurant linked through a public submission in the same « Restaurants liés » indicator as approved claims and legacy authorship.
+- The back-office computes a business profile rather than exposing a restaurant authority role: `Administrateur` comes from the technical role; `Restaurateur` comes from an approved claim or an exact V2 legacy-authorship relation; `Déposant` comes from a linked public submission and is labelled separately when the manager/owner was declared; all others, including non-connectable contribution identities, are `Utilisateur`. The primary profile never grants a permission itself. The list separately exposes connection availability, current management, and the breakdown of ownership, submissions and legacy relations.
 
 ## Contributor identities (reviews and comments)
 
@@ -36,6 +36,7 @@
 ## Historical listing authorship
 - `legacy_restaurant_authorships` preserves only the WordPress `post_author` relationship to its exact migrated restaurant (`legacy_wp_id`).
 - It is not a restaurant claim: it never grants a role, ownership, dashboard access, edit permission, or changes `is_claimed`.
+- It does make the historical account visibly `Restaurateur` in the back-office profile, while its current management remains explicitly `Aucun droit` unless an approved claim separately exists.
 - The import accepts an existing source listing only when it has an active V2 user with the exact `legacy_wp_user_id` and an active V2 restaurant with the exact `legacy_wp_id`. The legacy post status is preserved in the audit but does not invalidate an already active exact V2 restaurant. Missing or deleted V2 records are reported and excluded; names and slugs are never fallback matches.
 
 ## Deferred

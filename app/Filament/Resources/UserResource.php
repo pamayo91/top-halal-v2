@@ -30,7 +30,9 @@ class UserResource extends AdminResource
         return parent::getEloquentQuery()->withCount([
             'ownedRestaurants',
             'submittedRestaurants',
+            'ownerSubmissions',
             'legacyRestaurantAuthorships',
+            'manageableSubmittedRestaurants',
             'claims',
             'claims as pending_claims_count' => fn (Builder $query) => $query->where('status', 'pending'),
             'claims as approved_claims_count' => fn (Builder $query) => $query->where('status', 'approved'),
@@ -53,19 +55,57 @@ class UserResource extends AdminResource
         return $user->legacy_wp_user_id === null ? 'Inscription V2' : 'Migré WordPress';
     }
 
-    public static function activityLabel(User $user): string
+    /** Primary business profile. Rights remain relationship- and policy-based. */
+    public static function profileLabel(User $user): string
     {
-        if ($user->owned_restaurants_count > 0 || $user->submitted_restaurants_count > 0) return 'Restaurateur';
-        if ($user->pending_claims_count > 0) return 'Revendication en cours';
-        if ($user->claims_count > 0) return 'Revendication traitée';
-        if ($user->legacy_restaurant_authorships_count > 0) return 'Auteur legacy';
+        if ($user->role === 'admin') return 'Administrateur';
+        if (static::count($user, 'owned_restaurants') > 0 || static::count($user, 'legacy_restaurant_authorships') > 0) return 'Restaurateur';
+        if (static::count($user, 'submitted_restaurants') > 0) {
+            return static::count($user, 'owner_submissions') > 0 ? 'Déposant — gérant déclaré' : 'Déposant';
+        }
 
-        return 'Aucune activité';
+        return 'Utilisateur';
+    }
+
+    public static function profileColor(User $user): string
+    {
+        return match (static::profileLabel($user)) {
+            'Administrateur' => 'danger',
+            'Restaurateur' => 'success',
+            default => static::count($user, 'submitted_restaurants') > 0 ? 'warning' : 'gray',
+        };
+    }
+
+    public static function connectionLabel(User $user): string
+    {
+        return $user->canLogIn() ? 'Possible' : 'Désactivée';
+    }
+
+    public static function managementLabel(User $user): string
+    {
+        if ($user->role === 'admin') return 'Accès global';
+        if (static::count($user, 'owned_restaurants') > 0) return 'Propriétaire · '.static::count($user, 'owned_restaurants');
+        if (static::count($user, 'manageable_submitted_restaurants') > 0) return 'Déposant · '.static::count($user, 'manageable_submitted_restaurants');
+
+        return 'Aucun droit';
     }
 
     public static function restaurantLinkCount(User $user): int
     {
-        return (int) $user->owned_restaurants_count + (int) $user->submitted_restaurants_count + (int) $user->legacy_restaurant_authorships_count;
+        return static::count($user, 'owned_restaurants')
+            + static::count($user, 'submitted_restaurants')
+            + static::count($user, 'legacy_restaurant_authorships');
+    }
+
+    public static function restaurantLinkSummary(User $user): string
+    {
+        return collect([
+            ['count' => static::count($user, 'owned_restaurants'), 'label' => 'propriété'],
+            ['count' => static::count($user, 'submitted_restaurants'), 'label' => 'dépôt'],
+            ['count' => static::count($user, 'legacy_restaurant_authorships'), 'label' => 'historique'],
+        ])->filter(fn (array $link): bool => $link['count'] > 0)
+            ->map(fn (array $link): string => $link['count'].' '.$link['label'])
+            ->implode(' · ') ?: 'Aucune relation';
     }
 
     public static function claimSummary(User $user): string
@@ -116,6 +156,15 @@ class UserResource extends AdminResource
         return $user->role === 'admin' || $user->is(auth()->user());
     }
 
+    private static function count(User $user, string $relation): int
+    {
+        $attribute = $relation.'_count';
+
+        return $user->getAttribute($attribute) !== null
+            ? (int) $user->getAttribute($attribute)
+            : $user->{$relation}()->count();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -123,7 +172,7 @@ class UserResource extends AdminResource
             TextInput::make('email')->label('E-mail')->email()->required()->maxLength(255)->unique(ignoreRecord: true),
             TextInput::make('password')->label('Mot de passe initial')->password()->revealable()->required()->confirmed()->minLength(12)->visibleOn('create'),
             TextInput::make('password_confirmation')->label('Confirmation du mot de passe')->password()->revealable()->required()->dehydrated(false)->visibleOn('create'),
-            Select::make('role')->label('Rôle')->options(['user' => 'Utilisateur', 'restaurant_owner' => 'Restaurateur', 'admin' => 'Administrateur'])->default('user')->required(),
+            Select::make('role')->label('Accès technique')->options(['user' => 'Utilisateur', 'admin' => 'Administrateur'])->default('user')->required(),
             Select::make('status')->label('Statut')->options(['active' => 'Actif', 'disabled' => 'Désactivé'])->default('active')->required(),
             Toggle::make('must_change_password')->label('Forcer le changement de mot de passe')->default(true),
         ]);
@@ -135,22 +184,46 @@ class UserResource extends AdminResource
             ->columns([
                 TextColumn::make('name')->searchable(['name', 'email'])->description(fn (User $user) => $user->email),
                 TextColumn::make('origin')->label('Origine')->state(fn (User $user) => static::originLabel($user))->badge(),
-                TextColumn::make('role')->badge(),
-                TextColumn::make('status')->badge(),
-                TextColumn::make('email_verified_at')->label('E-mail vérifié')->dateTime('d/m/Y')->placeholder('Non'),
-                TextColumn::make('restaurants_linked_count')->label('Restaurants liés')->state(fn (User $user) => static::restaurantLinkCount($user))->numeric(),
+                TextColumn::make('profile')->label('Profil')->state(fn (User $user) => static::profileLabel($user))->badge()->color(fn (User $user) => static::profileColor($user)),
+                TextColumn::make('login_enabled')->label('Connexion')->state(fn (User $user) => static::connectionLabel($user))->badge()->color(fn (User $user) => $user->canLogIn() ? 'success' : 'gray'),
+                TextColumn::make('management')->label('Gestion de fiches')->state(fn (User $user) => static::managementLabel($user))->badge(),
+                TextColumn::make('restaurants_linked_count')->label('Relations restaurants')->state(fn (User $user) => static::restaurantLinkCount($user))->numeric()->description(fn (User $user) => static::restaurantLinkSummary($user)),
                 TextColumn::make('reviews_count')->label('Avis')->numeric()->sortable(),
                 TextColumn::make('comments_count')->label('Commentaires')->numeric()->sortable(),
                 TextColumn::make('claims_count')->label('Revendications')->numeric()->description(fn (User $user) => static::claimSummary($user)),
-                TextColumn::make('activity')->label('Activité')->state(fn (User $user) => static::activityLabel($user))->badge(),
+                TextColumn::make('status')->badge(),
                 TextColumn::make('must_change_password')->label('MDP à changer')->badge()->formatStateUsing(fn ($state) => $state ? 'Oui' : 'Non'),
                 TextColumn::make('created_at')->label('Inscription')->dateTime('d/m/Y H:i')->sortable(),
                 TextColumn::make('updated_at')->label('Modifié')->dateTime('d/m/Y H:i')->sortable()->toggleable(),
             ])
             ->filters([
-                SelectFilter::make('role')->options(['user' => 'Utilisateur', 'restaurant_owner' => 'Restaurateur', 'admin' => 'Administrateur']),
+                Filter::make('profile')->label('Profil')->form([
+                    Select::make('value')->label('Profil')->options([
+                        'user' => 'Utilisateur',
+                        'depositor' => 'Déposant',
+                        'restaurateur' => 'Restaurateur',
+                        'admin' => 'Administrateur',
+                    ]),
+                ])->query(function (Builder $query, array $data): Builder {
+                    return match ($data['value'] ?? null) {
+                        'admin' => $query->where('role', 'admin'),
+                        'restaurateur' => $query->where('role', '!=', 'admin')->where(fn (Builder $profiles) => $profiles
+                            ->whereHas('ownedRestaurants')
+                            ->orWhereHas('legacyRestaurantAuthorships')),
+                        'depositor' => $query->where('role', '!=', 'admin')
+                            ->whereDoesntHave('ownedRestaurants')
+                            ->whereDoesntHave('legacyRestaurantAuthorships')
+                            ->whereHas('submittedRestaurants'),
+                        'user' => $query->where('role', '!=', 'admin')
+                            ->whereDoesntHave('ownedRestaurants')
+                            ->whereDoesntHave('legacyRestaurantAuthorships')
+                            ->whereDoesntHave('submittedRestaurants'),
+                        default => $query,
+                    };
+                }),
                 SelectFilter::make('status')->options(['active' => 'Actif', 'disabled' => 'Désactivé']),
-                Filter::make('without_business_activity')->label('Sans lien restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')->doesntHave('submittedRestaurants')->doesntHave('legacyRestaurantAuthorships')),
+                SelectFilter::make('login_enabled')->label('Connexion')->options(['1' => 'Possible', '0' => 'Désactivée']),
+                Filter::make('without_business_activity')->label('Sans relation restaurant ni revendication')->query(fn (Builder $query) => $query->doesntHave('claims')->doesntHave('submittedRestaurants')->doesntHave('legacyRestaurantAuthorships')),
             ])
             ->recordActions([
                 EditAction::make()->visible(fn (User $user) => ! $user->trashed()),
@@ -199,7 +272,7 @@ class UserResource extends AdminResource
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading('Supprimer définitivement les comptes sélectionnés ?')
+                        ->modalHeading('Supprimer définitivement les comptes ?')
                         ->modalDescription('Cette action est irréversible. Les comptes et leurs demandes de revendication associées seront définitivement effacés. Les administrateurs restent protégés.')
                         ->modalSubmitActionLabel('Supprimer définitivement')
                         ->visible(fn ($livewire): bool => $livewire->activeTab === 'trash')

@@ -77,7 +77,7 @@ class ContributionIdentityTest extends TestCase
         $this->assertSame($user->id, RestaurantReview::sole()->user_id);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
 
-        $restaurantUser = User::factory()->create(['role' => 'restaurant_owner', 'email' => 'owner@example.test']);
+        $restaurantUser = User::factory()->create(['role' => 'user', 'email' => 'owner@example.test']);
         Mail::fake();
         $this->actingAs($restaurantUser)->post('/resto/identite-avis/avis', [
             'name' => 'Nom affiché', 'rating' => 4, 'title' => 'Très bien', 'content' => 'Service impeccable.',

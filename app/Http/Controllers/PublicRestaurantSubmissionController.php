@@ -164,13 +164,11 @@ class PublicRestaurantSubmissionController extends Controller
                     'name' => $submission->owner_full_name ?: $submission->restaurant->name,
                     'email' => $email,
                     'password' => Hash::make(Str::random(64)),
-                    'role' => 'restaurant_owner',
+                    'role' => 'user',
                     'status' => 'active',
                     'must_change_password' => true,
                 ]);
                 $user->forceFill(['email_verified_at' => now()])->save();
-            } elseif ($user->role === 'user') {
-                $user->update(['role' => 'restaurant_owner']);
             }
 
             $activationToken = Str::random(64);

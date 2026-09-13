@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-13
 
+Latest user profiles: the BO derives `Administrateur`, `Restaurateur`, `Déposant` (including the manager-declared detail) and `Utilisateur` from V2 relations, rather than from the obsolete `restaurant_owner` role. Exact `legacy_restaurant_authorships` makes an old account visibly Restaurateur but grants no ownership or management; approved claims and submissions remain the only entitlement sources. Preproduction audit: 90 active technical `user` accounts have exact active historical restaurant links (7,604 rows), while the single technical `restaurant_owner` is a non-manager depositor and is normalised idempotently to `user` without relation or claim changes.
+
 Latest depositor-management transfer: a public restaurant depositor may manage the listing only while it has no approved claim. Pending and rejected claims preserve that temporary right; approving a claim grants management to the claimant and removes the listing from the former non-owner depositor's account and edit routes. The historical `restaurant_submissions` row and both users remain intact. A direct edit, update or removal URL now redirects a former depositor to an explanation and Contact CTA rather than returning a raw 403. The Policy, account query and preproduction regression gate are validated.
 
 Latest submitted-owner ownership: a confirmed public depositor who declared themselves manager/owner receives one deferred `new_submission` claim, not ownership. When Top Halal publishes the restaurant, the existing normal claim-approval path approves that claim and makes the depositor the official owner. Non-manager depositors never receive an automatic claim.

@@ -23,8 +23,8 @@ class RestaurantDepositorManagementTest extends TestCase
             'slug' => 'restaurant-deposant-'.str()->random(8),
             'status' => 'published',
         ]);
-        $depositor = User::factory()->create(['role' => 'restaurant_owner']);
-        $manager = User::factory()->create(['role' => 'restaurant_owner']);
+        $depositor = User::factory()->create(['role' => 'user']);
+        $manager = User::factory()->create(['role' => 'user']);
         $admin = User::factory()->create(['role' => 'admin']);
         $submission = RestaurantSubmission::create([
             'restaurant_id' => $restaurant->id,

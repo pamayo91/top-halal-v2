@@ -187,7 +187,7 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $restaurant = Restaurant::firstOrFail();
         $user = User::where('email', 'contributeur@example.invalid')->firstOrFail();
-        $this->assertSame('restaurant_owner', $user->role);
+        $this->assertSame('user', $user->role);
         $this->assertFalse($user->must_change_password);
         $this->assertAuthenticatedAs($user);
         $this->get($activationUrl)->assertOk()->assertSee('Votre espace est déjà activé.');
@@ -277,7 +277,7 @@ class PublicRestaurantSubmissionTest extends TestCase
     public function test_published_non_owner_submission_never_creates_an_ownership_claim(): void
     {
         $restaurant = Restaurant::create(['name' => 'Déposant non gérant', 'slug' => 'deposant-non-gerant', 'status' => 'pending']);
-        $depositor = User::factory()->create(['role' => 'restaurant_owner']);
+        $depositor = User::factory()->create(['role' => 'user']);
         $submission = RestaurantSubmission::create([
             'restaurant_id' => $restaurant->id,
             'user_id' => $depositor->id,
