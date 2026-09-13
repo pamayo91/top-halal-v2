@@ -263,7 +263,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         Password::spy();
         $this->from(route('login'))->post(route('login.store'), ['email' => $identity->email, 'password' => 'password'])->assertSessionHasErrors('email');
         $this->post(route('password.email'), ['email' => $identity->email])->assertSessionHas('status');
-        Password::shouldHaveReceived('sendResetLink')->never();
+        Password::shouldNotHaveReceived('sendResetLink');
 
         $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
         $activationUrl = $confirmation->values['activation_url'];
