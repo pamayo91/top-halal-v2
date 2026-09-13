@@ -41,9 +41,28 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function reviews() { return $this->hasMany(RestaurantReview::class); }
     public function comments() { return $this->hasMany(Comment::class); }
     public function canLogIn(): bool { return $this->login_enabled; }
-    public function isVerifiedRestaurateur(): bool { return $this->role === 'restaurant_owner' && $this->status === 'active' && ! $this->must_change_password; }
+    /**
+     * A verified restaurateur has an actual approved ownership claim.
+     *
+     * An exact legacy authorship relation can qualify a back-office profile as
+     * "Restaurateur", but intentionally never grants ownership or the
+     * abbreviated subsequent-claim workflow.
+     */
+    public function isVerifiedRestaurateur(): bool
+    {
+        return $this->status === 'active'
+            && ! $this->must_change_password
+            && $this->ownedRestaurants()->exists();
+    }
     public function ownedRestaurants() { return $this->belongsToMany(Restaurant::class, 'restaurant_claims', 'user_id', 'restaurant_id')->wherePivot('status', 'approved'); }
     public function submittedRestaurants() { return $this->hasMany(RestaurantSubmission::class); }
+    public function ownerSubmissions() { return $this->hasMany(RestaurantSubmission::class)->where('submitter_role', 'owner'); }
+    /** Submissions still manageable because no real owner has an approved claim. */
+    public function manageableSubmittedRestaurants()
+    {
+        return $this->hasMany(RestaurantSubmission::class)
+            ->whereDoesntHave('restaurant.claims', fn ($query) => $query->where('status', 'approved'));
+    }
     public function legacyRestaurantAuthorships() { return $this->hasMany(LegacyRestaurantAuthorship::class); }
     public function legacyAuthoredRestaurants() { return $this->belongsToMany(Restaurant::class, 'legacy_restaurant_authorships', 'user_id', 'restaurant_id'); }
     public function sendEmailVerificationNotification(): void { $this->notify(new VerifyEmailNotification()); }

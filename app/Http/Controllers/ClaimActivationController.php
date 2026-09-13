@@ -15,7 +15,6 @@ class ClaimActivationController extends Controller
         abort_unless($this->valid($claim, $token), 404);
         if (! $claim->user_id && ($existing = \App\Models\User::query()->where('email', $claim->email)->first())) {
             $claim->update(['user_id' => $existing->id, 'activation_token' => null, 'activation_expires_at' => null]);
-            if ($existing->role === 'user') $existing->update(['role' => 'restaurant_owner']);
             return redirect()->route('login')->with('status', 'Votre restaurant est rattaché à votre espace. Connectez-vous pour le gérer.');
         }
         return view('claims.activate', compact('claim', 'token'));

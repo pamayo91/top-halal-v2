@@ -250,41 +250,54 @@ class AdminBackOfficeTest extends TestCase
             ->assertCanNotSeeTableRecords([$otherUser]);
     }
 
-    public function test_user_list_qualifies_origin_restaurant_links_and_claim_activity(): void
+    public function test_user_list_derives_business_profiles_without_using_a_technical_owner_role(): void
     {
-        $legacy = User::factory()->create(['legacy_wp_user_id' => 123, 'role' => 'user']);
-        $inactive = User::factory()->create(['role' => 'user']);
-        $claimant = User::factory()->create(['role' => 'user']);
-        $owner = User::factory()->create(['role' => 'restaurant_owner']);
-        $submitter = User::factory()->create(['role' => 'restaurant_owner']);
+        $standard = User::factory()->create(['role' => 'user']);
+        $contributor = User::factory()->create(['role' => 'user', 'login_enabled' => false]);
+        $depositor = User::factory()->create(['role' => 'user']);
+        $declaredManager = User::factory()->create(['role' => 'user']);
+        $submittedOwner = User::factory()->create(['role' => 'user']);
+        $claimOwner = User::factory()->create(['role' => 'user']);
+        $legacyWithoutRestaurant = User::factory()->create(['legacy_wp_user_id' => 123, 'role' => 'user']);
         $legacyAuthor = User::factory()->create(['legacy_wp_user_id' => 124, 'role' => 'user']);
-        $restaurant = $this->restaurant();
+        $formerDepositor = User::factory()->create(['role' => 'user']);
+        $actualOwner = User::factory()->create(['role' => 'user']);
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        \App\Models\RestaurantSubmission::create(['restaurant_id' => $this->restaurant()->id, 'user_id' => $depositor->id, 'submitter_email' => $depositor->email, 'submitter_role' => 'customer', 'status' => 'published', 'submitted_at' => now()]);
+        \App\Models\RestaurantSubmission::create(['restaurant_id' => $this->restaurant(['status' => 'pending'])->id, 'user_id' => $declaredManager->id, 'submitter_email' => $declaredManager->email, 'submitter_role' => 'owner', 'status' => 'pending_admin_review', 'submitted_at' => now()]);
+        $submittedOwnerRestaurant = $this->restaurant();
+        RestaurantClaim::create(['restaurant_id' => $submittedOwnerRestaurant->id, 'user_id' => $submittedOwner->id, 'source' => 'new_submission', 'status' => 'approved', 'submitted_at' => now()]);
+        RestaurantClaim::create(['restaurant_id' => $this->restaurant()->id, 'user_id' => $claimOwner->id, 'source' => 'first_claim', 'status' => 'approved', 'submitted_at' => now()]);
         $legacyRestaurant = $this->restaurant();
-        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $claimant->id, 'status' => 'pending', 'submitted_at' => now()]);
-        RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $owner->id, 'status' => 'approved', 'submitted_at' => now()]);
-        \App\Models\RestaurantSubmission::create(['restaurant_id' => $this->restaurant()->id, 'user_id' => $submitter->id, 'submitter_email' => $submitter->email, 'submitter_role' => 'owner', 'status' => 'published', 'submitted_at' => now()]);
         \App\Models\LegacyRestaurantAuthorship::create(['restaurant_id' => $legacyRestaurant->id, 'user_id' => $legacyAuthor->id, 'legacy_wp_id' => $legacyRestaurant->legacy_wp_id, 'legacy_wp_user_id' => 124, 'source_post_status' => 'publish']);
         Comment::create(['article_id' => $this->article()->id, 'legacy_user_id' => 124, 'author_name' => 'Auteur legacy', 'author_email' => $legacyAuthor->email, 'content' => 'Commentaire historique', 'status' => 'approved']);
         RestaurantReview::create(['restaurant_id' => $legacyRestaurant->id, 'author_name' => 'Auteur legacy', 'author_email' => $legacyAuthor->email, 'rating' => 5, 'content' => 'Avis historique', 'status' => 'approved']);
+        $transferredRestaurant = $this->restaurant();
+        \App\Models\RestaurantSubmission::create(['restaurant_id' => $transferredRestaurant->id, 'user_id' => $formerDepositor->id, 'submitter_email' => $formerDepositor->email, 'submitter_role' => 'customer', 'status' => 'published', 'submitted_at' => now()]);
+        RestaurantClaim::create(['restaurant_id' => $transferredRestaurant->id, 'user_id' => $actualOwner->id, 'status' => 'approved', 'submitted_at' => now()]);
 
-        $users = \App\Filament\Resources\UserResource::getEloquentQuery()
-            ->whereKey([$legacy->id, $inactive->id, $claimant->id, $owner->id, $submitter->id, $legacyAuthor->id])
-            ->get()
-            ->keyBy('id');
+        $ids = [$standard, $contributor, $depositor, $declaredManager, $submittedOwner, $claimOwner, $legacyWithoutRestaurant, $legacyAuthor, $formerDepositor, $admin];
+        $users = \App\Filament\Resources\UserResource::getEloquentQuery()->whereKey(collect($ids)->pluck('id'))->get()->keyBy('id');
 
-        $this->assertSame('Migré WordPress', \App\Filament\Resources\UserResource::originLabel($users[$legacy->id]));
-        $this->assertSame('Inscription V2', \App\Filament\Resources\UserResource::originLabel($users[$inactive->id]));
-        $this->assertSame('Aucune activité', \App\Filament\Resources\UserResource::activityLabel($users[$inactive->id]));
-        $this->assertSame('Revendication en cours', \App\Filament\Resources\UserResource::activityLabel($users[$claimant->id]));
-        $this->assertSame('1 en attente', \App\Filament\Resources\UserResource::claimSummary($users[$claimant->id]));
-        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$owner->id]));
-        $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$owner->id]));
-        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::activityLabel($users[$submitter->id]));
-        $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$submitter->id]));
-        $this->assertSame('Auteur legacy', \App\Filament\Resources\UserResource::activityLabel($users[$legacyAuthor->id]));
-        $this->assertSame(1, \App\Filament\Resources\UserResource::restaurantLinkCount($users[$legacyAuthor->id]));
+        $this->assertSame('Utilisateur', \App\Filament\Resources\UserResource::profileLabel($users[$standard->id]));
+        $this->assertSame('Utilisateur', \App\Filament\Resources\UserResource::profileLabel($users[$contributor->id]));
+        $this->assertSame('Désactivée', \App\Filament\Resources\UserResource::connectionLabel($users[$contributor->id]));
+        $this->assertSame('Déposant', \App\Filament\Resources\UserResource::profileLabel($users[$depositor->id]));
+        $this->assertSame('Déposant · 1', \App\Filament\Resources\UserResource::managementLabel($users[$depositor->id]));
+        $this->assertSame('Déposant — gérant déclaré', \App\Filament\Resources\UserResource::profileLabel($users[$declaredManager->id]));
+        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::profileLabel($users[$submittedOwner->id]));
+        $this->assertSame('Propriétaire · 1', \App\Filament\Resources\UserResource::managementLabel($users[$submittedOwner->id]));
+        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::profileLabel($users[$claimOwner->id]));
+        $this->assertSame('Utilisateur', \App\Filament\Resources\UserResource::profileLabel($users[$legacyWithoutRestaurant->id]));
+        $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::profileLabel($users[$legacyAuthor->id]));
+        $this->assertSame('Aucun droit', \App\Filament\Resources\UserResource::managementLabel($users[$legacyAuthor->id]));
+        $this->assertSame('1 historique', \App\Filament\Resources\UserResource::restaurantLinkSummary($users[$legacyAuthor->id]));
         $this->assertSame(1, $users[$legacyAuthor->id]->comments_count);
         $this->assertSame(1, $users[$legacyAuthor->id]->reviews_count);
+        $this->assertSame('Déposant', \App\Filament\Resources\UserResource::profileLabel($users[$formerDepositor->id]));
+        $this->assertSame('Aucun droit', \App\Filament\Resources\UserResource::managementLabel($users[$formerDepositor->id]));
+        $this->assertSame('Administrateur', \App\Filament\Resources\UserResource::profileLabel($users[$admin->id]));
     }
 
     public function test_admin_can_bulk_trash_and_restore_non_administrator_users_without_losing_claims(): void

@@ -30,10 +30,10 @@ test.describe('Gestion des utilisateurs', () => {
     await expect(page.getByLabel('Nom')).toBeVisible();
     await expect(page.getByLabel('E-mail')).toBeVisible();
     await expect(page.getByLabel('Mot de passe initial')).toBeVisible();
-    const role = page.getByLabel('Rôle');
-    await expect(role).toBeVisible();
-    await role.selectOption('admin');
-    await expect(role).toHaveValue('admin');
+    const technicalAccess = page.getByLabel('Accès technique');
+    await expect(technicalAccess).toBeVisible();
+    await technicalAccess.selectOption('admin');
+    await expect(technicalAccess).toHaveValue('admin');
     await expect(page.getByText('Forcer le changement de mot de passe', { exact: true })).toBeVisible();
     expect(consoleErrors).toEqual([]);
     expect(networkErrors).toEqual([]);
@@ -58,7 +58,7 @@ test.describe('Gestion des utilisateurs', () => {
     await expect(page).toHaveURL(/\/admin$/);
 
     await page.goto('/admin/users');
-    for (const label of ['Origine', 'Restaurants liés', 'Avis', 'Commentaires', 'Revendications', 'Activité']) {
+    for (const label of ['Origine', 'Profil', 'Connexion', 'Gestion de fiches', 'Relations restaurants', 'Avis', 'Commentaires', 'Revendications']) {
       await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
     }
     const search = page.getByRole('searchbox', { name: 'Rechercher', exact: true });

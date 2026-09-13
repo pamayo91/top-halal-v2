@@ -27,7 +27,9 @@ class EmailDeliveryTest extends TestCase
     public function test_claim_lifecycle_queues_notifications(): void
     {
         Notification::fake();
-        $user = User::factory()->create(['role' => 'restaurant_owner', 'must_change_password' => false]); $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'user', 'must_change_password' => false]); $admin = User::factory()->create(['role' => 'admin']);
+        $ownedRestaurant = Restaurant::create(['legacy_wp_id' => 998, 'name' => 'Déjà géré', 'slug' => 'deja-gere', 'status' => 'published']);
+        RestaurantClaim::create(['restaurant_id' => $ownedRestaurant->id, 'user_id' => $user->id, 'status' => 'approved', 'submitted_at' => now()]);
         $restaurant = Restaurant::create(['legacy_wp_id' => 999, 'name' => 'Test', 'slug' => 'test', 'status' => 'published']);
         $this->actingAs($user)->post('/restaurants/'.$restaurant->id.'/claim', ['certified' => '1']);
         $claim = RestaurantClaim::firstOrFail();
