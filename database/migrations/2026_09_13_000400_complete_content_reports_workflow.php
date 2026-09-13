@@ -24,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('editorial_content_reports', function (Blueprint $table): void {
             $table->dropIndex('content_reports_context_status_idx');
+            $table->dropIndex(['status']);
             $table->dropConstrainedForeignId('user_id');
             $table->dropColumn(['reporter_name', 'reporter_email', 'is_authenticated', 'content_title', 'status', 'status_changed_at']);
         });
