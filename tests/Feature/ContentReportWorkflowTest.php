@@ -78,6 +78,7 @@ class ContentReportWorkflowTest extends TestCase
         $this->assertTrue($report->is_authenticated);
         $this->assertDatabaseCount('contribution_verifications', 0);
         $this->assertDatabaseCount('users', 1);
+        $this->app['session']->flush();
         $this->actingAs($user)->get(route('restaurants.show', $this->restaurant->slug))->assertOk()->assertSee('Modifier les informations de cette fiche');
     }
 
