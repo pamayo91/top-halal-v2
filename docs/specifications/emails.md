@@ -10,7 +10,7 @@
 - Controllers only enqueue notifications. A real SMTP failure occurs in the worker and cannot turn a user request into an error page.
 
 ## Implemented events
-- Email verification, password reset, password-change confirmation, claim received/accepted/refused, restaurant-submission e-mail verification, confirmation, operational-review alert and publication notifications use central templates. The submission-confirmation template includes the seven-day, one-use contributor-space activation CTA for every verified depositor. The single operational recipient in `Contact > Réglages` receives both Contact messages and verified restaurant-proposal alerts.
+- Email verification, password reset, password-change confirmation, claim received/accepted/refused, restaurant-submission e-mail verification, confirmation, operational-review alert and publication notifications use central templates. The submission-confirmation template includes the seven-day, one-use contributor-space activation CTA only when the attached account needs activation; the verification, confirmation, operational-review and publication events remain queued for every valid submission. The single operational recipient in `Contact > Réglages` receives both Contact messages and verified restaurant-proposal alerts.
 - First-claim e-mail confirmation, restaurateur-space activation, claim submitted, accepted and refused.
 - Contributor e-mail verification for reviews and comments: a shared queued template sends one temporary signed URL containing a separate hashed random token. It is dispatched only when the browser has no authenticated or valid session proof for the exact identity.
 - `mail:test address@example.com` queues a neutral test message without printing configuration.

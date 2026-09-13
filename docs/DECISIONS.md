@@ -2,6 +2,10 @@
 
 ## 2026-09-13
 
+### D035 — L’activation de déposant dépend de la connectabilité réelle
+
+La confirmation d’une proposition retrouve l’unique `User` par e-mail sans tenir compte de la casse. Un lien d’activation n’est créé que pour un compte à l’état `active` qui n’est pas encore normalement connectable : `login_enabled=false` ou `must_change_password=true`. La connectabilité normale exige `login_enabled=true`, `status=active` et `must_change_password=false`; le hachage de mot de passe ne constitue donc jamais un indicateur d’activation. Un compte déjà connectable conserve strictement son mot de passe, ses flags, rôle et droits, et ne reçoit aucun nouveau token. Une identité avis/commentaire devient connectable en activant ce même `User`, ce qui préserve ses contributions. Un compte administrativement `disabled` n’est jamais réactivé par une proposition publique.
+
 ### D034 — Les identités contributrices historiques ne sont pas des comptes connectables
 
 L’ajout de `login_enabled` avait appliqué sa valeur par défaut aux comptes déjà migrés, y compris aux 77 identités n’ayant comme activité V2 fiable qu’un avis ou commentaire. Une migration idempotente désactive seulement ces comptes `user` migrés, non vérifiés et jamais activés, après exclusion stricte des claims, dépôts et relations `legacy_restaurant_authorships`. Le rapprochement contribution/utilisateur utilise exactement l’identifiant WordPress ou l’e-mail déjà employé par le BO. Elle ne modifie ni rôle, ni mot de passe, ni contenu, ni relation restaurant.

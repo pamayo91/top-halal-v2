@@ -41,6 +41,42 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function reviews() { return $this->hasMany(RestaurantReview::class); }
     public function comments() { return $this->hasMany(Comment::class); }
     public function canLogIn(): bool { return $this->login_enabled; }
+
+    /**
+     * A restaurant submission can complete an account only when it is an
+     * active account that has not yet been made usable for a normal login.
+     *
+     * A disabled account is an administrative state, not an invitation to
+     * reactivate it from a public submission.
+     */
+    public function needsRestaurantSubmissionActivation(): bool
+    {
+        return $this->status === 'active'
+            && (! $this->login_enabled || $this->must_change_password);
+    }
+
+    /** Make a verified contribution identity eligible to choose its password. */
+    public function prepareForRestaurantSubmissionActivation(): void
+    {
+        if (! $this->needsRestaurantSubmissionActivation()) {
+            return;
+        }
+
+        $changes = [];
+
+        if (! $this->login_enabled) {
+            $changes['login_enabled'] = true;
+            $changes['must_change_password'] = true;
+        }
+
+        if (! $this->hasVerifiedEmail()) {
+            $changes['email_verified_at'] = now();
+        }
+
+        if ($changes !== []) {
+            $this->forceFill($changes)->save();
+        }
+    }
     /**
      * A verified restaurateur has an actual approved ownership claim.
      *

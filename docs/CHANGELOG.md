@@ -1,5 +1,6 @@
 # Changelog
 
+- Comptes / propositions restaurant : après confirmation d’e-mail, la soumission retrouve le `User` existant sans tenir compte de la casse. Un token et lien d’activation ne sont créés que si ce compte actif n’est pas encore connectable (`login_enabled=false` ou `must_change_password=true`). Un compte déjà actif conserve intégralement mot de passe, état, droits et rôle. Une identité avis/commentaire est réutilisée et devient connectable sans perdre ses contributions.
 - Restaurants : la détection de doublon du formulaire public est désormais exécutée par le même moteur lors du POST final, avant toute écriture. Les doublons certains (adresse structurée identique et nom normalisé/très proche, ou téléphone confirmant cette adresse) sont refusés avec lien de fiche/claim lorsqu’ils sont publics ; les cas ambigus restent `pending` et sont signalés, détaillés et filtrables dans le BO. Les fiches archivées ou en corbeille ne bloquent pas une nouvelle proposition.
 - Blocked validated restaurant managers from publishing reviews on their own restaurant. The shared manager rule includes approved regular and `new_submission` claims plus exact historical authorships, excludes non-manager depositors, hides the review form for signed-in managers and remains enforced at server-side creation.
 

@@ -3,12 +3,12 @@
 namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
-use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantClaim, RestaurantSubmission, Setting, User};
+use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantClaim, RestaurantReview, RestaurantSubmission, Setting, User};
 use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\{Mail, URL};
+use Illuminate\Support\Facades\{Hash, Mail, URL};
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Tests\TestCase;
@@ -194,6 +194,134 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertTrue($user->can('manage', $restaurant));
         $this->assertTrue($restaurant->isClaimable());
         $this->actingAs($user)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
+    }
+
+    public function test_an_existing_active_account_is_reused_without_an_activation_token_or_account_mutation(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'Contributeur@Example.Invalid',
+            'password' => Hash::make('MotDePasseActif!123'),
+            'login_enabled' => true,
+            'status' => 'active',
+            'must_change_password' => false,
+        ]);
+        $before = $user->only(['password', 'email_verified_at', 'login_enabled', 'role', 'status', 'must_change_password']);
+        $this->fakeSubmissionIngestor('active-existing-account');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['email' => 'contributeur@example.invalid']))->assertRedirect();
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame($user->id, $submission->user_id);
+        $this->assertNull($submission->activation_token);
+        $this->assertNull($submission->activation_expires_at);
+        $this->assertSame($before, $user->fresh()->only(array_keys($before)));
+        $this->assertDatabaseCount('users', 1);
+
+        $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        $this->assertNotNull($confirmation);
+        $this->assertArrayNotHasKey('activation_url', $confirmation->values);
+
+        $submission->restaurant->update(['status' => 'published']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_published');
+    }
+
+    public function test_a_contribution_identity_is_reused_activated_and_keeps_its_review(): void
+    {
+        $identity = User::factory()->create([
+            'email' => 'avis@example.invalid',
+            'login_enabled' => false,
+            'status' => 'active',
+            'must_change_password' => false,
+        ]);
+        $reviewedRestaurant = Restaurant::create(['legacy_wp_id' => 887766, 'name' => 'Restaurant des avis', 'slug' => 'restaurant-des-avis', 'status' => 'published']);
+        $review = RestaurantReview::create([
+            'restaurant_id' => $reviewedRestaurant->id,
+            'user_id' => $identity->id,
+            'author_name' => 'Amina Martin',
+            'author_email' => $identity->email,
+            'rating' => 5,
+            'content' => 'Très bon restaurant.',
+            'status' => 'approved',
+        ]);
+        $this->fakeSubmissionIngestor('contribution-identity');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['email' => 'AVIS@example.invalid']))->assertRedirect();
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame($identity->id, $submission->user_id);
+        $this->assertTrue($identity->fresh()->login_enabled);
+        $this->assertTrue($identity->fresh()->must_change_password);
+        $this->assertSame($identity->id, $review->fresh()->user_id);
+        $this->assertDatabaseCount('users', 1);
+
+        $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        $activationUrl = $confirmation->values['activation_url'];
+        $this->get($activationUrl)->assertOk()->assertSee('Activer mon espace');
+        $this->post($activationUrl, ['password' => 'MotDePasseSolide!123', 'password_confirmation' => 'MotDePasseSolide!123'])
+            ->assertRedirect(route('account.dashboard'));
+
+        $this->assertTrue($identity->fresh()->canLogIn());
+        $this->assertFalse($identity->fresh()->must_change_password);
+        $this->assertSame($identity->id, $review->fresh()->user_id);
+        $this->post(route('logout'));
+        $this->post(route('login.store'), ['email' => 'avis@example.invalid', 'password' => 'MotDePasseSolide!123'])
+            ->assertRedirect(route('account.dashboard'));
+    }
+
+    public function test_an_existing_pending_activation_account_is_reused_without_a_duplicate(): void
+    {
+        $user = User::factory()->unverified()->create([
+            'email' => 'pending@example.invalid',
+            'password' => Hash::make('MotDePasseInconnu!123'),
+            'login_enabled' => true,
+            'status' => 'active',
+            'must_change_password' => true,
+        ]);
+        $password = $user->password;
+        $this->fakeSubmissionIngestor('pending-activation-account');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['email' => 'PENDING@example.invalid']))->assertRedirect();
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame($user->id, $submission->user_id);
+        $this->assertNotNull($submission->activation_token);
+        $this->assertTrue($submission->activation_expires_at->isFuture());
+        $this->assertSame($password, $user->fresh()->password);
+        $this->assertTrue($user->fresh()->must_change_password);
+        $this->assertDatabaseCount('users', 1);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed' && isset($mail->values['activation_url']));
+    }
+
+    public function test_a_legacy_must_change_password_account_keeps_its_existing_activation_state(): void
+    {
+        $legacy = User::factory()->unverified()->create([
+            'email' => 'legacy@example.invalid',
+            'legacy_wp_user_id' => 81234,
+            'password' => Hash::make('LegacyTempPassword!123'),
+            'login_enabled' => true,
+            'status' => 'active',
+            'must_change_password' => true,
+        ]);
+        $before = $legacy->only(['password', 'login_enabled', 'role', 'status', 'must_change_password', 'legacy_wp_user_id']);
+        $this->fakeSubmissionIngestor('legacy-pending-password-change');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['email' => 'LEGACY@example.invalid']))->assertRedirect();
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame($legacy->id, $submission->user_id);
+        $this->assertNotNull($submission->activation_token);
+        $this->assertSame($before, $legacy->fresh()->only(array_keys($before)));
+        $this->assertDatabaseCount('users', 1);
     }
 
     public function test_verified_email_makes_the_submission_available_for_admin_review_once(): void

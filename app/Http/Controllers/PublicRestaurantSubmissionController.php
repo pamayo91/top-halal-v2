@@ -188,14 +188,14 @@ class PublicRestaurantSubmissionController extends Controller
             if ($submission->status !== 'pending_email_verification') return null;
             abort_unless($submission->email_verification_expires_at?->isFuture() && hash_equals((string) $submission->email_verification_token, hash('sha256', $token)), 404);
             $email = Str::lower(trim($submission->submitter_email));
-            $user = User::query()->where('email', $email)->lockForUpdate()->first();
-            $needsActivation = $user === null;
+            $user = User::query()->whereRaw('LOWER(email) = ?', [$email])->lockForUpdate()->first();
 
             if (! $user) {
                 $user = User::create([
                     'name' => $submission->owner_full_name ?: $submission->restaurant->name,
                     'email' => $email,
                     'password' => Hash::make(Str::random(64)),
+                    'login_enabled' => true,
                     'role' => 'user',
                     'status' => 'active',
                     'must_change_password' => true,
@@ -203,15 +203,21 @@ class PublicRestaurantSubmissionController extends Controller
                 $user->forceFill(['email_verified_at' => now()])->save();
             }
 
-            $activationToken = Str::random(64);
+            $needsActivation = $user->needsRestaurantSubmissionActivation();
+
+            if ($needsActivation) {
+                $user->prepareForRestaurantSubmissionActivation();
+            }
+
+            $activationToken = $needsActivation ? Str::random(64) : null;
             $submission->update([
                 'user_id' => $user->id,
                 'status' => 'pending_admin_review',
                 'email_verified_at' => now(),
                 'email_verification_token' => null,
                 'email_verification_expires_at' => null,
-                'activation_token' => hash('sha256', $activationToken),
-                'activation_expires_at' => now()->addDays(7),
+                'activation_token' => $activationToken ? hash('sha256', $activationToken) : null,
+                'activation_expires_at' => $activationToken ? now()->addDays(7) : null,
             ]);
 
             if ($submission->submitter_role === 'owner') {
@@ -235,7 +241,9 @@ class PublicRestaurantSubmissionController extends Controller
         });
 
         if ($confirmed) {
-            $activationUrl = route('restaurant-submissions.activate', ['submission' => $confirmed['submission'], 'token' => $confirmed['activation_token']]);
+            $activationUrl = $confirmed['activation_token']
+                ? route('restaurant-submissions.activate', ['submission' => $confirmed['submission'], 'token' => $confirmed['activation_token']])
+                : null;
             $mailer->confirmed($confirmed['submission'], $activationUrl);
             $mailer->notifyTeamForReview($confirmed['submission']);
         }
