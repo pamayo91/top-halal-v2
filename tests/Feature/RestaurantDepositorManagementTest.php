@@ -6,7 +6,9 @@ use App\Models\Restaurant;
 use App\Models\RestaurantClaim;
 use App\Models\RestaurantSubmission;
 use App\Models\User;
+use App\Services\ClaimModeration;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RestaurantDepositorManagementTest extends TestCase
@@ -51,7 +53,9 @@ class RestaurantDepositorManagementTest extends TestCase
         $this->assertTrue($depositor->can('manage', $restaurant));
         $this->actingAs($depositor)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
 
-        $claim->update(['status' => 'approved']);
+        Notification::fake();
+        $this->actingAs($admin);
+        app(ClaimModeration::class)->approve($claim->fresh());
 
         $this->assertFalse($depositor->can('manage', $restaurant));
         $this->assertTrue($manager->can('manage', $restaurant));
