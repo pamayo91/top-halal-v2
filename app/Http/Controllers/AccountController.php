@@ -13,7 +13,10 @@ class AccountController extends Controller
         return view('account.dashboard', ['restaurants' => Restaurant::query()
             ->where(function ($query) use ($user): void {
                 $query->whereHas('claims', fn ($claims) => $claims->where('user_id', $user->id)->where('status', 'approved'))
-                    ->orWhereHas('submission', fn ($submission) => $submission->where('user_id', $user->id));
+                    ->orWhere(function ($submissions) use ($user): void {
+                        $submissions->whereHas('submission', fn ($submission) => $submission->where('user_id', $user->id))
+                            ->whereDoesntHave('claims', fn ($claims) => $claims->where('status', 'approved'));
+                    });
             })->orderBy('name')->get()]);
     }
 }

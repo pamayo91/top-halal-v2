@@ -10,11 +10,23 @@ class RestaurantPolicy
 {
     public function manage(User $user, Restaurant $restaurant): bool
     {
-        return $user->role === 'admin' || RestaurantClaim::query()
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        if (RestaurantClaim::query()
             ->where('restaurant_id', $restaurant->id)
             ->where('user_id', $user->id)
             ->where('status', 'approved')
-            ->exists() || RestaurantSubmission::query()
+            ->exists()) {
+            return true;
+        }
+
+        return ! RestaurantClaim::query()
+            ->where('restaurant_id', $restaurant->id)
+            ->where('status', 'approved')
+            ->exists()
+            && RestaurantSubmission::query()
                 ->where('restaurant_id', $restaurant->id)
                 ->where('user_id', $user->id)
                 ->exists();
