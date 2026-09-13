@@ -66,7 +66,11 @@ test('public restaurant contribution requires a cover photo and validates the em
 test('public restaurant contribution submits a pending restaurant successfully', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  await fillRestaurantAndAddress(page, `complete-${testInfo.project.name}-${Date.now()}`);
+  // A timestamp differs by only a few characters between regression runs and
+  // is intentionally treated as a near-name at the same address by the server.
+  // Use a genuinely distinct test identity so historic preproduction fixtures
+  // do not turn this non-duplicate flow into a certain duplicate.
+  await fillRestaurantAndAddress(page, `complete-${testInfo.project.name}-${crypto.randomUUID()}`);
   await page.locator('[data-cover-input]').setInputFiles(cover);
   await expect(page.locator('[data-cover-preview] img')).toBeVisible();
   await page.getByRole('button', { name: 'Continuer' }).click();
