@@ -92,6 +92,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function manageableSubmittedRestaurants()
     {
         return $this->hasMany(RestaurantSubmission::class)
+            ->where('status', '!=', 'rejected')
             ->whereDoesntHave('restaurant.claims', fn ($query) => $query->where('status', 'approved'));
     }
     public function legacyRestaurantAuthorships() { return $this->hasMany(LegacyRestaurantAuthorship::class); }

@@ -13,7 +13,7 @@ class EmailTemplateRenderer
         $replace = fn (?string $text) => preg_replace_callback('/{{\s*([a-z_]+)\s*}}/', fn ($m) => array_key_exists($m[1], $safe) ? $safe[$m[1]] : $m[0], $this->normaliseLineBreaks((string) $text));
         $body = $replace($override?->body ?? $default['body']);
 
-        $ctaUrl = collect(['action_url', 'verification_url', 'reset_url', 'activation_url', 'restaurant_url', 'admin_url'])
+        $ctaUrl = collect(['action_url', 'verification_url', 'reset_url', 'activation_url', 'restaurant_url', 'admin_url', 'contact_url'])
             ->map(fn (string $key): string => $safe[$key] ?? '')
             ->first(fn (string $url): bool => filled($url));
 

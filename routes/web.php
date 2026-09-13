@@ -73,7 +73,7 @@ Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => route('restaurants.preview', $legacyId)]);
 })->name('restaurants.preview');
 Route::get('/_preview/restaurant/v2/{restaurant}', function (Restaurant $restaurant) {
-    abort_unless($restaurant->status === 'pending', 404);
+    abort_unless($restaurant->status === 'pending' && $restaurant->submission?->status !== 'rejected', 404);
     $restaurant->load(['categories', 'features', 'openingHours', 'media.asset.variants']);
     $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => request()->fullUrl()]);

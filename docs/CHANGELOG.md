@@ -364,3 +364,8 @@
 - Ajout du moteur Blade SSR commun aux Articles et Pages, avec configurations globales distinctes, overrides sparse et administration Filament.
 - Sidebar activée par défaut sur les Articles et désactivée par défaut sur les Pages.
 - Ajout du sommaire à ancres déterministes, des blocs éditoriaux réutilisables et du signalement contextualisé limité.
+# 2026-09-13 — Refus des propositions de restaurant
+
+- Ajout de la décision atomique de refus depuis la file Filament, avec motif facultatif, acteur/date et référence de contestation auditables.
+- Les restaurants refusés restent conservés, non publics, et les notifications utilisent le renderer transactionnel, la queue et l’historique existants sans `Reply-To`.
+- Le CTA de contestation réutilise Contact avec une référence opaque, sans donnée personnelle dans l’URL.

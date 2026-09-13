@@ -39,6 +39,7 @@ class RestaurantPolicy
             && RestaurantSubmission::query()
                 ->where('restaurant_id', $restaurant->id)
                 ->where('user_id', $user->id)
+                ->where('status', '!=', 'rejected')
                 ->exists();
     }
 }

@@ -11,7 +11,7 @@ class RestaurantSubmission extends Model
 
     protected function casts(): array
     {
-        return ['submitted_at' => 'datetime', 'email_verified_at' => 'datetime', 'email_verification_expires_at' => 'datetime', 'activation_expires_at' => 'datetime', 'duplicate_details' => 'array'];
+        return ['submitted_at' => 'datetime', 'email_verified_at' => 'datetime', 'email_verification_expires_at' => 'datetime', 'activation_expires_at' => 'datetime', 'rejected_at' => 'datetime', 'duplicate_details' => 'array'];
     }
 
     public function restaurant(): BelongsTo

@@ -63,4 +63,21 @@ class RestaurantSubmissionMailer
             'restaurant_url' => route('restaurants.show', $restaurant->slug),
         ]);
     }
+
+    public function rejected(RestaurantSubmission $submission): void
+    {
+        $submission->loadMissing('restaurant');
+
+        app(TransactionalMailService::class)->queue('restaurant_submission_rejected', $submission->submitter_email, [
+            'site_name' => config('app.name', 'Top Halal'),
+            'restaurant_name' => $submission->restaurant->name,
+            'rejection_reason' => $submission->admin_rejection_reason
+                ? 'Motif communiqué : '.$submission->admin_rejection_reason
+                : '',
+            'contact_url' => route('contact.create', [
+                'subject' => 'Contestation d’un refus de proposition',
+                'reference' => $submission->rejection_reference,
+            ]),
+        ]);
+    }
 }

@@ -48,7 +48,7 @@ class SubmissionActivationController extends Controller
 
     private function valid(RestaurantSubmission $submission, string $token): bool
     {
-        return $submission->status !== 'pending_email_verification'
+        return ! in_array($submission->status, ['pending_email_verification', 'rejected'], true)
             && $submission->user_id
             && $submission->activation_token
             && $submission->activation_expires_at?->isFuture()
@@ -57,7 +57,8 @@ class SubmissionActivationController extends Controller
 
     private function wasActivated(RestaurantSubmission $submission, string $token): bool
     {
-        return $submission->activation_token === null
+        return $submission->status !== 'rejected'
+            && $submission->activation_token === null
             && $submission->user?->status === 'active'
             && ! $submission->user->must_change_password
             && preg_match('/^[A-Za-z0-9]{64}$/D', $token) === 1;
