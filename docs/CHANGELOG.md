@@ -2,6 +2,7 @@
 
 ## 2026-09-13
 
+- Back-office Utilisateurs : le champ « Accès technique » est retiré des créations et éditions. Une création BO force `user` et une édition conserve le rôle stocké ; aucun compte ne peut donc être promu ou rétrogradé `admin` depuis cette interface.
 - Comptes : les profils du BO sont désormais calculés depuis les relations V2. Les 90 comptes migrés ayant une relation historique exacte restaurant/utilisateur apparaissent `Restaurateur` sans recevoir aucun droit supplémentaire. `Déposant`, `Restaurateur`, `Utilisateur` et `Administrateur` sont filtrables et les colonnes distinguent connexion, gestion actuelle et provenance des relations.
 - Comptes : le rôle technique obsolète `restaurant_owner` est retiré et normalisé de façon idempotente vers `user`. Les claims approuvés, les soumissions temporaires et les relations historiques exactes déterminent désormais les droits sans dépendre de ce rôle ; aucun claim ni relation n’est créé par cette correction.
 - Comptes : une relation `legacy_restaurant_authorships` exacte donne désormais au restaurateur historique la gestion effective de cette fiche, son affichage dans « Mon compte » et le blocage de toute première revendication concurrente, sans créer de claim ni modifier la relation historique.

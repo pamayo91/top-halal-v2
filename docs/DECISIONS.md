@@ -2,6 +2,10 @@
 
 ## 2026-09-13
 
+### D033 — L’accès technique n’est pas attribuable depuis le BO Utilisateurs
+
+Le formulaire « Utilisateurs » ne rend ni n’accepte le choix du rôle technique. Toute création effectuée depuis ce BO force `user` et toute édition préserve le rôle déjà stocké ; l’interface ne permet donc ni promotion ni rétrogradation `admin`. Les administrateurs existants conservent leurs droits, mais la désignation d’un administrateur relève d’un chemin opérationnel distinct et délibéré. Cette contrainte ne modifie aucun profil métier, claim, soumission ou relation restaurant.
+
 ### D032 — Profils utilisateurs calculés, droits restaurant relationnels
 
 Le rôle stocké ne représente que l’accès technique : `admin` ou `user`. Le rôle historique `restaurant_owner` est retiré car il était attribué aux déposants non-gérants sans créer ni ownership ni permission. Le BO calcule son profil primaire à partir des seules relations V2 : `Administrateur` pour `admin`, `Restaurateur` pour un claim approuvé ou une relation exacte `legacy_restaurant_authorships`, `Déposant` pour une soumission liée (avec le détail gérant déclaré), et `Utilisateur` sinon. L’antériorité de dépôt reste visible même quand le droit temporaire est perdu.

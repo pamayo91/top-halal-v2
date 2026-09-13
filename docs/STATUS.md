@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-13
 
+Latest BO technical-access hardening: the « Accès technique » field is no longer rendered in either user create or edit forms. A BO-created account is always persisted as technical `user`, and an edit never writes the stored technical role; existing administrators retain their access but cannot promote or demote an account through this interface. PHP and browser coverage enforce the absence of the control.
+
 Latest historical restaurateur management: every exact `legacy_restaurant_authorships` relation is now a first-class management entitlement for that linked restaurant. The historical manager sees and edits the listing from `Mon compte`; `RestaurantPolicy` grants access, and the existing relationship blocks competing first claims. No `restaurant_claim` is created and no historic relation is rewritten. The BO profile remains calculated independently of the technical `user`/`admin` access role. Preproduction scope: 90 active technical `user` accounts and 7,604 exact active links.
 
 Latest depositor-management transfer: a public restaurant depositor may manage the listing only while it has no approved claim. Pending and rejected claims preserve that temporary right; approving a claim grants management to the claimant and removes the listing from the former non-owner depositor's account and edit routes. The historical `restaurant_submissions` row and both users remain intact. A direct edit, update or removal URL now redirects a former depositor to an explanation and Contact CTA rather than returning a raw 403. The Policy, account query and preproduction regression gate are validated.

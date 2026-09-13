@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
 use App\Services\MediaIngestor;
@@ -205,36 +206,53 @@ class AdminBackOfficeTest extends TestCase
         $this->actingAs($admin)->get('/admin/users')->assertOk();
     }
 
-    public function test_admin_can_create_an_administrator_from_the_users_section_without_a_password_in_the_audit_log(): void
+    public function test_admin_can_create_only_a_standard_user_from_the_users_section_without_a_password_in_the_audit_log(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin)->get('/admin/users')->assertOk()->assertSee('Ajouter un utilisateur');
         $this->actingAs($admin)->get('/admin/users/create')->assertOk()
             ->assertSee('Mot de passe initial')
-            ->assertSee('Administrateur');
+            ->assertDontSee('Accès technique');
 
         Livewire::actingAs($admin)
             ->test(CreateUser::class)
             ->fillForm([
-                'name' => 'Administrateur de test',
-                'email' => 'admin-test@example.test',
+                'name' => 'Utilisateur de test',
+                'email' => 'user-test@example.test',
                 'password' => 'a-secure-test-password',
                 'password_confirmation' => 'a-secure-test-password',
-                'role' => 'admin',
                 'status' => 'active',
                 'must_change_password' => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $created = User::where('email', 'admin-test@example.test')->firstOrFail();
+        $created = User::where('email', 'user-test@example.test')->firstOrFail();
 
-        $this->assertSame('admin', $created->role);
+        $this->assertSame('user', $created->role);
         $this->assertTrue($created->must_change_password);
         $this->assertTrue(Hash::check('a-secure-test-password', $created->password));
         $audit = AdminAuditLog::where('action', 'user.created')->where('subject_id', $created->id)->firstOrFail();
         $this->assertArrayNotHasKey('password', $audit->changes ?? []);
+    }
+
+    public function test_users_back_office_cannot_promote_an_existing_standard_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'user']);
+
+        $this->actingAs($admin)->get("/admin/users/{$user->id}/edit")
+            ->assertOk()
+            ->assertDontSee('Accès technique');
+
+        Livewire::actingAs($admin)
+            ->test(EditUser::class, ['record' => $user->getRouteKey()])
+            ->set('data.role', 'admin')
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('user', $user->fresh()->role);
     }
 
     public function test_user_list_searches_email_fragments(): void

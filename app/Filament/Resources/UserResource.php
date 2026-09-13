@@ -173,7 +173,6 @@ class UserResource extends AdminResource
             TextInput::make('email')->label('E-mail')->email()->required()->maxLength(255)->unique(ignoreRecord: true),
             TextInput::make('password')->label('Mot de passe initial')->password()->revealable()->required()->confirmed()->minLength(12)->visibleOn('create'),
             TextInput::make('password_confirmation')->label('Confirmation du mot de passe')->password()->revealable()->required()->dehydrated(false)->visibleOn('create'),
-            Select::make('role')->label('Accès technique')->options(['user' => 'Utilisateur', 'admin' => 'Administrateur'])->default('user')->required(),
             Select::make('status')->label('Statut')->options(['active' => 'Actif', 'disabled' => 'Désactivé'])->default('active')->required(),
             Toggle::make('must_change_password')->label('Forcer le changement de mot de passe')->default(true),
         ]);

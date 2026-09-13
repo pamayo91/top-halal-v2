@@ -6,7 +6,7 @@ const password = process.env.PREPROD_ADMIN_PASSWORD;
 test.describe('Gestion des utilisateurs', () => {
   test.skip(!email || !password, 'PREPROD_ADMIN_EMAIL and PREPROD_ADMIN_PASSWORD are required.');
 
-  test('an administrator can open the user creation form and select the administrator role', async ({ page }) => {
+  test('an administrator cannot set technical access from the user creation form', async ({ page }) => {
     const consoleErrors: string[] = [];
     const networkErrors: string[] = [];
 
@@ -30,10 +30,7 @@ test.describe('Gestion des utilisateurs', () => {
     await expect(page.getByLabel('Nom')).toBeVisible();
     await expect(page.getByLabel('E-mail')).toBeVisible();
     await expect(page.getByLabel('Mot de passe initial')).toBeVisible();
-    const technicalAccess = page.getByLabel('Accès technique');
-    await expect(technicalAccess).toBeVisible();
-    await technicalAccess.selectOption('admin');
-    await expect(technicalAccess).toHaveValue('admin');
+    await expect(page.getByLabel('Accès technique')).toHaveCount(0);
     await expect(page.getByText('Forcer le changement de mot de passe', { exact: true })).toBeVisible();
     expect(consoleErrors).toEqual([]);
     expect(networkErrors).toEqual([]);
