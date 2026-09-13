@@ -13,6 +13,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Services\RestaurantRemovalModeration;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
@@ -105,6 +106,7 @@ class RestaurantRemovalRequestTest extends TestCase
         $this->actingAs($standardUser)
             ->post(route('owner.restaurants.removal.store', $restaurant), ['reason' => 'closed'])
             ->assertRedirect(route('owner.restaurants.management-unavailable', $restaurant));
+        Auth::logout();
         $this->post(route('owner.restaurants.removal.store', $restaurant), ['reason' => 'closed'])
             ->assertRedirect(route('login'));
 
