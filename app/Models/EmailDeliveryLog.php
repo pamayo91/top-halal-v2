@@ -51,6 +51,10 @@ class EmailDeliveryLog extends Model
             'claim_approved' => 'Revendication - acceptée',
             'claim_rejected' => 'Revendication - refusée',
             'legacy_account_migration' => 'Compte - migration historique',
+            'restaurant_removal_request_received' => 'Suppression restaurant - demande reçue',
+            'restaurant_removal_request_approved' => 'Suppression restaurant - acceptée',
+            'restaurant_removal_request_rejected' => 'Suppression restaurant - refusée',
+            'restaurant_removal_request_admin_review' => 'Suppression restaurant - revue opérationnelle',
         ];
     }
 
