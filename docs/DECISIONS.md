@@ -2,6 +2,10 @@
 
 ## 2026-09-13
 
+### D034 — Les identités contributrices historiques ne sont pas des comptes connectables
+
+L’ajout de `login_enabled` avait appliqué sa valeur par défaut aux comptes déjà migrés, y compris aux 77 identités n’ayant comme activité V2 fiable qu’un avis ou commentaire. Une migration idempotente désactive seulement ces comptes `user` migrés, non vérifiés et jamais activés, après exclusion stricte des claims, dépôts et relations `legacy_restaurant_authorships`. Le rapprochement contribution/utilisateur utilise exactement l’identifiant WordPress ou l’e-mail déjà employé par le BO. Elle ne modifie ni rôle, ni mot de passe, ni contenu, ni relation restaurant.
+
 ### D033 — L’accès technique n’est pas attribuable depuis le BO Utilisateurs
 
 Le formulaire « Utilisateurs » ne rend ni n’accepte le choix du rôle technique. Toute création effectuée depuis ce BO force `user` et toute édition préserve le rôle déjà stocké ; l’interface ne permet donc ni promotion ni rétrogradation `admin`. Les administrateurs existants conservent leurs droits, mais la désignation d’un administrateur relève d’un chemin opérationnel distinct et délibéré. Cette contrainte ne modifie aucun profil métier, claim, soumission ou relation restaurant.

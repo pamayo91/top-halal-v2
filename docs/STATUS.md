@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-13
 
+Latest historical contributor access correction: the 77 migrated, unactivated `user` identities whose only reliable V2 activity is a review or comment now have `login_enabled=false`. The idempotent scope excludes every claim, public submission and exact historic restaurant authorship, and changes neither roles nor restaurant/contribution data; the BO now reports their connection as disabled.
+
 Latest BO technical-access hardening: the « Accès technique » field is no longer rendered in either user create or edit forms. A BO-created account is always persisted as technical `user`, and an edit never writes the stored technical role; existing administrators retain their access but cannot promote or demote an account through this interface. PHP and browser coverage enforce the absence of the control.
 
 Latest historical restaurateur management: every exact `legacy_restaurant_authorships` relation is now a first-class management entitlement for that linked restaurant. The historical manager sees and edits the listing from `Mon compte`; `RestaurantPolicy` grants access, and the existing relationship blocks competing first claims. No `restaurant_claim` is created and no historic relation is rewritten. The BO profile remains calculated independently of the technical `user`/`admin` access role. Preproduction scope: 90 active technical `user` accounts and 7,604 exact active links.
