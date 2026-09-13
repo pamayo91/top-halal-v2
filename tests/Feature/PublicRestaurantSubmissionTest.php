@@ -356,7 +356,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->existingRestaurant(['name' => 'Restaurant de test', 'status' => 'pending']);
 
         // No call to the informational GET endpoint precedes this manually built POST.
-        $this->post(route('restaurant-submissions.store'), $this->payload())
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload())
             ->assertRedirect(route('restaurant-submissions.create'))
             ->assertSessionHasErrors('name')
             ->assertSessionMissing('duplicate_restaurant.url');
@@ -370,14 +370,14 @@ class PublicRestaurantSubmissionTest extends TestCase
     {
         $this->existingRestaurant(['name' => 'Café du Monde', 'status' => 'published']);
 
-        $this->post(route('restaurant-submissions.store'), $this->payload(['name' => 'CAFE-DU monde']))
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['name' => 'CAFE-DU monde']))
             ->assertRedirect(route('restaurant-submissions.create'))
             ->assertSessionHasErrors('name');
 
         $this->assertDatabaseCount('restaurants', 1);
         $this->assertDatabaseCount('restaurant_submissions', 0);
 
-        $this->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Cafe du Mnde']))
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Cafe du Mnde']))
             ->assertRedirect(route('restaurant-submissions.create'))
             ->assertSessionHasErrors('name');
 
