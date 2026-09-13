@@ -354,7 +354,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_admin_review', 'recipient' => 'team@example.invalid']);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review' && $mail->replyToAddress === 'contributeur@example.invalid');
 
-        $this->get($url)->assertOk()->assertSee('Votre adresse était déjà confirmée.');
+        $this->get($url)->assertOk()->assertSee('Votre adresse e-mail était déjà confirmée.');
         $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed')->count());
         $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review')->count());
     }
