@@ -109,6 +109,7 @@ class RestaurantSubmissionRejectionTest extends TestCase
 
     public function test_rejected_submission_cannot_be_activated_or_managed_by_its_depositor(): void
     {
+        Mail::fake();
         $depositor = User::factory()->create(['role' => 'user']);
         [$restaurant, $submission] = $this->reviewableSubmission($depositor);
         app(RestaurantSubmissionModeration::class)->reject($restaurant);
