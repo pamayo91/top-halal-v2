@@ -8,21 +8,27 @@ use App\Models\User;
 
 class RestaurantPolicy
 {
+    /**
+     * The exact restaurant-manager rule shared by owner features and review
+     * eligibility. A depositor is deliberately not a manager here.
+     */
+    public function isRestaurantManager(User $user, Restaurant $restaurant): bool
+    {
+        return $restaurant->legacyAuthorships()->where('user_id', $user->id)->exists()
+            || RestaurantClaim::query()
+                ->where('restaurant_id', $restaurant->id)
+                ->where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->exists();
+    }
+
     public function manage(User $user, Restaurant $restaurant): bool
     {
         if ($user->role === 'admin') {
             return true;
         }
 
-        if ($restaurant->legacyAuthorships()->where('user_id', $user->id)->exists()) {
-            return true;
-        }
-
-        if (RestaurantClaim::query()
-            ->where('restaurant_id', $restaurant->id)
-            ->where('user_id', $user->id)
-            ->where('status', 'approved')
-            ->exists()) {
+        if ($this->isRestaurantManager($user, $restaurant)) {
             return true;
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\RestaurantReviewOwnershipException;
 use App\Models\{Article, Comment, ContributionVerification, Page, Restaurant, RestaurantReview, User};
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class ContributionIdentityService
         return $this->submit($request, 'comment', $content instanceof Article ? 'article' : 'page', $content->id, $data);
     }
 
-    /** @return array{contribution_type: string, contribution_id: int, destination_url: string} */
+    /** @return array{contribution_type: string, contribution_id: ?int, destination_url: string, review_ownership_forbidden?: bool} */
     public function verify(Request $request, ContributionVerification $verification, string $token): array
     {
         return DB::transaction(function () use ($request, $verification, $token): array {
@@ -38,7 +39,23 @@ class ContributionIdentityService
             );
 
             $user = $this->identityFor($verification);
-            $contribution = $this->createContribution($verification, $user);
+            try {
+                $contribution = $this->createContribution($verification, $user);
+            } catch (RestaurantReviewOwnershipException) {
+                $verification->update([
+                    'user_id' => $user->id,
+                    'used_at' => now(),
+                ]);
+
+                $this->rememberProof($request, $user);
+
+                return [
+                    'contribution_type' => 'review',
+                    'contribution_id' => null,
+                    'destination_url' => $this->destinationUrl($verification),
+                    'review_ownership_forbidden' => true,
+                ];
+            }
 
             $verification->update([
                 'user_id' => $user->id,
@@ -138,6 +155,9 @@ class ContributionIdentityService
         if ($contributionType === 'review') {
             abort_unless($targetType === 'restaurant', 404);
             $restaurant = Restaurant::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
+            if ($user->can('isRestaurantManager', $restaurant)) {
+                throw new RestaurantReviewOwnershipException();
+            }
 
             return RestaurantReview::create([
                 'restaurant_id' => $restaurant->id,

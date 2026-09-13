@@ -1,5 +1,7 @@
 # Changelog
 
+- Blocked validated restaurant managers from publishing reviews on their own restaurant. The shared manager rule includes approved regular and `new_submission` claims plus exact historical authorships, excludes non-manager depositors, hides the review form for signed-in managers and remains enforced at server-side creation.
+
 ## 2026-09-13
 
 - Comptes : les 77 identités migrées uniquement contributrices (avis/commentaire) ne sont plus connectables. La correction idempotente exclut strictement claims, dépôts et relations historiques, sans modifier rôle, contenu ni relation restaurant.

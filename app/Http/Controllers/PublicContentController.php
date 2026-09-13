@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Filament\Resources\{ArticleResource, PageResource, RestaurantResource};
+use App\Exceptions\RestaurantReviewOwnershipException;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\StoreRestaurantReviewRequest;
 use App\Models\{Article, Category, Comment, EditorialContentReport, Feature, Page, Restaurant, RestaurantReview};
@@ -102,7 +103,11 @@ class PublicContentController extends Controller
     public function storeReview(StoreRestaurantReviewRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
     {
         $restaurant = Restaurant::where('slug', $slug)->where('status', 'published')->firstOrFail();
-        $result = $identities->submitReview($request, $restaurant, $request->validated());
+        try {
+            $result = $identities->submitReview($request, $restaurant, $request->validated());
+        } catch (RestaurantReviewOwnershipException) {
+            return back()->with('review_ownership_forbidden', true);
+        }
 
         return back()->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
     }
