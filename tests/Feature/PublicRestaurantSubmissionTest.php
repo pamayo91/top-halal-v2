@@ -205,7 +205,7 @@ class PublicRestaurantSubmissionTest extends TestCase
             'status' => 'active',
             'must_change_password' => false,
         ]);
-        $before = $user->only(['password', 'email_verified_at', 'login_enabled', 'role', 'status', 'must_change_password']);
+        $before = $this->storedUserState($user, ['password', 'email_verified_at', 'login_enabled', 'role', 'status', 'must_change_password']);
         $this->fakeSubmissionIngestor('active-existing-account');
 
         $this->post(route('restaurant-submissions.store'), $this->payload(['email' => 'contributeur@example.invalid']))->assertRedirect();
@@ -216,7 +216,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame($user->id, $submission->user_id);
         $this->assertNull($submission->activation_token);
         $this->assertNull($submission->activation_expires_at);
-        $this->assertSame($before, $user->fresh()->only(array_keys($before)));
+        $this->assertSame($before, $this->storedUserState($user->fresh(), array_keys($before)));
         $this->assertDatabaseCount('users', 1);
 
         $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
@@ -621,6 +621,11 @@ class PublicRestaurantSubmissionTest extends TestCase
         $ingestor = Mockery::mock(MediaIngestor::class);
         $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
         $this->app->instance(MediaIngestor::class, $ingestor);
+    }
+
+    private function storedUserState(User $user, array $attributes): array
+    {
+        return collect($attributes)->mapWithKeys(fn (string $attribute): array => [$attribute => $user->getRawOriginal($attribute)])->all();
     }
 
     private function payload(array $overrides = []): array
