@@ -36,7 +36,7 @@
 @elseif(session('content_report_verification_sent'))
 <p class="flash" role="status">Vérifiez votre adresse e-mail pour transmettre votre signalement.</p>
 @else
-@if(auth()->user()?->can('manage', $restaurant))
+@if(auth()->user() && app(\App\Policies\RestaurantPolicy::class)->manage(auth()->user(), $restaurant))
 <p>Vous pouvez modifier cette fiche directement.</p><a class="button" href="{{ route('owner.restaurants.edit', $restaurant) }}">Modifier les informations de cette fiche</a><p class="muted">Pour tout autre problème, vous pouvez aussi nous le signaler ci-dessous.</p>
 @endif
 <details><summary>Signaler une erreur</summary><form class="stack-form" method="post" action="{{ route('restaurants.reports.store', $restaurant->slug) }}">@csrf
