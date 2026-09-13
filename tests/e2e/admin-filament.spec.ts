@@ -77,6 +77,8 @@ test.describe('Filament administration', () => {
     await page.goto('/admin/restaurants');
     await expect(page.getByRole('columnheader', { name: 'Doublon', exact: true })).toBeVisible();
     await expect(page.getByText('À vérifier', { exact: true }).first()).toBeVisible();
+    const detailUrl = await page.getByRole('row').filter({ hasText: 'À vérifier' }).first().locator('a[href*="/admin/restaurants/"][href$="/edit"]').first().getAttribute('href');
+    expect(detailUrl).not.toBeNull();
 
     await page.getByRole('button', { name: 'Filtre' }).click();
     await expect(page.getByText('Doublon potentiel', { exact: true })).toBeVisible();
@@ -84,7 +86,8 @@ test.describe('Filament administration', () => {
     await expect(page.getByText('À vérifier', { exact: true }).first()).toBeVisible();
     await expect(page.locator('body')).not.toContainText('candidate_id');
 
-    await page.getByRole('button', { name: 'Modifier' }).first().click();
+    await page.goto(detailUrl!);
+    await page.getByRole('tab', { name: 'Localisation' }).click();
     await expect(page.getByText('Rapprochements à examiner', { exact: true })).toBeVisible();
     await expect(page.locator('body')).not.toContainText('candidate_id');
   });
