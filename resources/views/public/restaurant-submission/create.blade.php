@@ -33,6 +33,13 @@
                         <label for="submission-name">Nom du restaurant</label>
                         <input id="submission-name" name="name" required maxlength="255" autocomplete="organization" value="{{ old('name') }}" data-restaurant-name>
                         @error('name')<p class="field-error">{{ $message }}</p>@enderror
+                        @if($duplicate = session('duplicate_restaurant'))
+                            <div class="submission-duplicates" role="alert">
+                                <p><b>{{ $duplicate['name'] }}</b> semble déjà être référencé.</p>
+                                @if($duplicate['url'])<a href="{{ $duplicate['url'] }}">Voir la fiche existante</a>@endif
+                                @if($duplicate['claim_url']) <a href="{{ $duplicate['claim_url'] }}">Revendiquer cette fiche</a>@endif
+                            </div>
+                        @endif
 
                         <fieldset class="submission-choice-group" data-halal-group>
                             <legend>Que propose le restaurant ?</legend>

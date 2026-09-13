@@ -63,14 +63,32 @@ class PublicRestaurantSubmissionController extends Controller
         })->all()]);
     }
 
-    public function store(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, RestaurantLocationService $locations, MediaIngestor $media, RestaurantSubmissionMailer $mailer): RedirectResponse
+    public function store(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, RestaurantLocationService $locations, MediaIngestor $media, RestaurantSubmissionMailer $mailer, DuplicateRestaurantDetector $duplicates): RedirectResponse
     {
         $data = $request->validated();
         $location = $this->locationData($request, $suggestions, $data);
         $hours = $this->hours($data['hours']);
+        $duplicateAssessment = $duplicates->assess([
+            ...$location,
+            'name' => $data['name'],
+            'phone' => $data['phone'] ?? null,
+            'latitude' => $request->boolean('map_moved') ? $data['latitude'] : $location['latitude'],
+            'longitude' => $request->boolean('map_moved') ? $data['longitude'] : $location['longitude'],
+        ]);
+
+        if ($duplicateAssessment->certain->isNotEmpty()) {
+            $candidate = $duplicateAssessment->certain->first()['restaurant'];
+            return $this->duplicateRejected($request, $candidate);
+        }
+        $duplicateDetails = $duplicateAssessment->potential->take(10)->map(fn (array $match): array => [
+            'candidate_id' => $match['restaurant']->id,
+            'name' => $match['restaurant']->name,
+            'status' => $match['restaurant']->trashed() ? 'trashed' : $match['restaurant']->status,
+            'reason' => $match['reason'],
+        ])->values()->all();
 
         $token = Str::random(64);
-        $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request, $token): Restaurant {
+        $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request, $token, $duplicateDetails): Restaurant {
             $restaurant = Restaurant::create([
                 'name' => trim($data['name']),
                 'slug' => $this->submissionSlug($data['name']),
@@ -129,6 +147,8 @@ class PublicRestaurantSubmissionController extends Controller
                 'owner_siret' => $data['owner_siret'] ?? null,
                 'owner_certified' => $request->boolean('owner_certified'),
                 'status' => 'pending_email_verification',
+                'duplicate_signal' => $duplicateDetails === [] ? null : 'potential',
+                'duplicate_details' => $duplicateDetails === [] ? null : $duplicateDetails,
                 'email_verification_token' => hash('sha256', $token),
                 'email_verification_expires_at' => now()->addHours(24),
             ]);
@@ -140,6 +160,18 @@ class PublicRestaurantSubmissionController extends Controller
         $mailer->verification($submission, URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHours(24), ['submission' => $submission, 'token' => $token]));
 
         return redirect()->route('restaurant-submissions.thanks')->with('submitted_restaurant', $restaurant->name);
+    }
+
+    private function duplicateRejected(Request $request, Restaurant $candidate): RedirectResponse
+    {
+        $public = ! $candidate->trashed() && $candidate->status === 'published';
+        return redirect()->back()->withInput()->withErrors([
+            'name' => 'Ce restaurant semble déjà présent dans l’annuaire. Vérifiez la fiche existante avant de proposer une nouvelle adresse.',
+        ])->with('duplicate_restaurant', [
+            'name' => $candidate->name,
+            'url' => $public ? route('restaurants.show', $candidate->slug) : null,
+            'claim_url' => $public && $candidate->isClaimable() ? route('claims.create', $candidate) : null,
+        ]);
     }
 
     public function thanks(): View

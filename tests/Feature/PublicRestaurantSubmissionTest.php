@@ -334,6 +334,108 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertJsonPath('data.0.url', route('restaurants.show', 'le-safran'));
     }
 
+    public function test_a_published_exact_duplicate_is_rejected_before_any_submission_side_effect(): void
+    {
+        $existing = $this->existingRestaurant(['name' => 'Restaurant de test', 'status' => 'published']);
+
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload())
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('name')
+            ->assertSessionHas('duplicate_restaurant.url', route('restaurants.show', $existing->slug))
+            ->assertSessionHas('duplicate_restaurant.claim_url', route('claims.create', $existing));
+
+        $this->assertDatabaseCount('restaurants', 1);
+        $this->assertDatabaseCount('restaurant_submissions', 0);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('email_delivery_logs', 0);
+        Mail::assertNothingQueued();
+    }
+
+    public function test_a_direct_post_cannot_bypass_the_server_side_exact_duplicate_check(): void
+    {
+        $this->existingRestaurant(['name' => 'Restaurant de test', 'status' => 'pending']);
+
+        // No call to the informational GET endpoint precedes this manually built POST.
+        $this->post(route('restaurant-submissions.store'), $this->payload())
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('name')
+            ->assertSessionMissing('duplicate_restaurant.url');
+
+        $this->assertDatabaseCount('restaurants', 1);
+        $this->assertDatabaseCount('restaurant_submissions', 0);
+        $this->assertDatabaseCount('email_delivery_logs', 0);
+    }
+
+    public function test_case_accent_and_hyphen_variants_at_the_same_address_are_certain_duplicates(): void
+    {
+        $this->existingRestaurant(['name' => 'Café du Monde', 'status' => 'published']);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['name' => 'CAFE-DU monde']))
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('name');
+
+        $this->assertDatabaseCount('restaurants', 1);
+        $this->assertDatabaseCount('restaurant_submissions', 0);
+    }
+
+    public function test_same_name_at_a_different_address_is_allowed_without_a_duplicate_signal(): void
+    {
+        $this->existingRestaurant([
+            'name' => 'Restaurant de test', 'address_line1' => '1 Rue des Lilas', 'postal_code' => '75011',
+            'latitude' => 48.890, 'longitude' => 2.364,
+        ]);
+        $this->fakeSubmissionIngestor('same-name-different-address');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $this->assertDatabaseHas('restaurant_submissions', ['duplicate_signal' => null]);
+    }
+
+    public function test_same_address_with_a_clearly_different_establishment_stays_pending_and_is_signalled(): void
+    {
+        $this->existingRestaurant(['name' => 'Bowl du Centre', 'status' => 'published']);
+        $this->fakeSubmissionIngestor('same-address-different-name');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('potential', $submission->duplicate_signal);
+        $this->assertSame('same_address_different_name', $submission->duplicate_details[0]['reason']);
+        $this->assertSame('pending_email_verification', $submission->status);
+    }
+
+    public function test_archived_and_trashed_matches_are_not_blocking_but_are_visible_to_moderation(): void
+    {
+        $this->existingRestaurant(['name' => 'Restaurant de test', 'status' => 'archived', 'slug' => 'restaurant-archive']);
+        $trashed = $this->existingRestaurant(['name' => 'Restaurant de test', 'status' => 'published', 'slug' => 'restaurant-corbeille']);
+        $trashed->delete();
+        $this->fakeSubmissionIngestor('archived-and-trashed');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('potential', $submission->duplicate_signal);
+        $this->assertCount(2, $submission->duplicate_details);
+        $this->assertSame(['archived_exact_match', 'archived_exact_match'], array_column($submission->duplicate_details, 'reason'));
+    }
+
+    private function existingRestaurant(array $attributes = []): Restaurant
+    {
+        return Restaurant::create($attributes + [
+            'legacy_wp_id' => random_int(1, 999999999), 'name' => 'Restaurant existant', 'slug' => 'restaurant-existant-'.str()->random(8), 'status' => 'published',
+            'address_line1' => '46 Boulevard du Temple', 'postal_code' => '75011', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR',
+            'latitude' => 48.866, 'longitude' => 2.364,
+        ]);
+    }
+
+    private function fakeSubmissionIngestor(string $checksumSeed): void
+    {
+        $asset = MediaAsset::create(['original_path' => 'media/originals/'.$checksumSeed.'.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => hash('sha256', $checksumSeed), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+    }
+
     private function payload(array $overrides = []): array
     {
         $hours = [];

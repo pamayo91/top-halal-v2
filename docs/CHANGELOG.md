@@ -1,5 +1,6 @@
 # Changelog
 
+- Restaurants : la détection de doublon du formulaire public est désormais exécutée par le même moteur lors du POST final, avant toute écriture. Les doublons certains (adresse structurée identique et nom normalisé/très proche, ou téléphone confirmant cette adresse) sont refusés avec lien de fiche/claim lorsqu’ils sont publics ; les cas ambigus restent `pending` et sont signalés, détaillés et filtrables dans le BO. Les fiches archivées ou en corbeille ne bloquent pas une nouvelle proposition.
 - Blocked validated restaurant managers from publishing reviews on their own restaurant. The shared manager rule includes approved regular and `new_submission` claims plus exact historical authorships, excludes non-manager depositors, hides the review form for signed-in managers and remains enforced at server-side creation.
 
 ## 2026-09-13

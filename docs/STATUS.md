@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-13
 
+Latest public restaurant duplicate guard: the existing shared detector now powers the final POST as well as the informational browser lookup and BO checks. A live exact structured-address + normalized-name (or phone-confirmed) match rejects before any restaurant, submission, media, user or e-mail write, returning the public listing and claim path where available. Same-address different names, nearby similar names and historic archived/trash matches remain allowed `pending` submissions with persisted, filterable BO duplicate signals; distinct branches of a chain do not block one another.
+
 Latest historical contributor access correction: the 77 migrated, unactivated `user` identities whose only reliable V2 activity is a review or comment now have `login_enabled=false`. The idempotent scope excludes every claim, public submission and exact historic restaurant authorship, and changes neither roles nor restaurant/contribution data; the BO now reports their connection as disabled.
 
 Latest restaurant-review ownership guard: the shared `RestaurantPolicy` now exposes the strict validated-manager rule used by restaurant management — approved claims (including `new_submission`) and exact historic authorships, never a simple depositor. A signed-in manager sees an explanatory message instead of the restaurant-review form; the server rejects direct POST attempts and rechecks before a verified e-mail flow can create a review. Editorial comments are unchanged. Preproduction validation passed: 22 targeted PHP tests / 182 assertions and the full 80-check browser, sentinel and Laravel-log regression gate.
