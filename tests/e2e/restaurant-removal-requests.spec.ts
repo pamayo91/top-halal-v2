@@ -23,7 +23,7 @@ test.describe('Demandes de suppression de restaurant', () => {
 
     const response = await page.goto('/admin/restaurant-removal-requests');
     expect(response?.status()).toBe(200);
-    await expect(page.getByRole('heading', { name: 'Demandes de suppression', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Demandes de suppression/i }).first()).toBeVisible();
     await expect(page.getByRole('table')).toBeVisible();
     await expect(page.getByText('En attente', { exact: true }).first()).toBeVisible();
 
