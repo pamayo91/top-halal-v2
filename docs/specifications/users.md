@@ -35,8 +35,8 @@
 
 ## Historical listing authorship
 - `legacy_restaurant_authorships` preserves only the WordPress `post_author` relationship to its exact migrated restaurant (`legacy_wp_id`).
-- It is not a restaurant claim: it never grants a role, ownership, dashboard access, edit permission, or changes `is_claimed`.
-- It does make the historical account visibly `Restaurateur` in the back-office profile, while its current management remains explicitly `Aucun droit` unless an approved claim separately exists.
+- It is not a restaurant claim and never changes `is_claimed` or creates ownership data. It is nevertheless a first-class source of effective management for that exact linked restaurant: the historical manager sees it in `Mon compte`, may edit it through `RestaurantPolicy`, and blocks a competing first claim.
+- It makes the historical account visibly `Restaurateur` in the back-office profile, with an explicit historical management indicator.
 - The import accepts an existing source listing only when it has an active V2 user with the exact `legacy_wp_user_id` and an active V2 restaurant with the exact `legacy_wp_id`. The legacy post status is preserved in the audit but does not invalidate an already active exact V2 restaurant. Missing or deleted V2 records are reported and excluded; names and slugs are never fallback matches.
 
 ## Deferred

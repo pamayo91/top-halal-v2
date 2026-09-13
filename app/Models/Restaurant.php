@@ -72,7 +72,8 @@ class Restaurant extends Model
     /** A single central rule for public claim presentation and write access. */
     public function isClaimable(): bool
     {
-        return ! $this->claims()->whereIn('status', ['pending_email_verification', 'pending', 'approved', 'pending_publication', 'pending_activation'])->exists();
+        return ! $this->legacyAuthorships()->exists()
+            && ! $this->claims()->whereIn('status', ['pending_email_verification', 'pending', 'approved', 'pending_publication', 'pending_activation'])->exists();
     }
     public function activateSubmittedOwner(): void
     {

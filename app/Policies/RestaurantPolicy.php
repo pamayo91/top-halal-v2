@@ -14,6 +14,10 @@ class RestaurantPolicy
             return true;
         }
 
+        if ($restaurant->legacyAuthorships()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
         if (RestaurantClaim::query()
             ->where('restaurant_id', $restaurant->id)
             ->where('user_id', $user->id)

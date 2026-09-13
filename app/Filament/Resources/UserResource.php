@@ -85,6 +85,7 @@ class UserResource extends AdminResource
     {
         if ($user->role === 'admin') return 'Accès global';
         if (static::count($user, 'owned_restaurants') > 0) return 'Propriétaire · '.static::count($user, 'owned_restaurants');
+        if (static::count($user, 'legacy_restaurant_authorships') > 0) return 'Historique · '.static::count($user, 'legacy_restaurant_authorships');
         if (static::count($user, 'manageable_submitted_restaurants') > 0) return 'Déposant · '.static::count($user, 'manageable_submitted_restaurants');
 
         return 'Aucun droit';

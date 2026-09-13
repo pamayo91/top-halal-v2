@@ -6,7 +6,7 @@
 
 Le rôle stocké ne représente que l’accès technique : `admin` ou `user`. Le rôle historique `restaurant_owner` est retiré car il était attribué aux déposants non-gérants sans créer ni ownership ni permission. Le BO calcule son profil primaire à partir des seules relations V2 : `Administrateur` pour `admin`, `Restaurateur` pour un claim approuvé ou une relation exacte `legacy_restaurant_authorships`, `Déposant` pour une soumission liée (avec le détail gérant déclaré), et `Utilisateur` sinon. L’antériorité de dépôt reste visible même quand le droit temporaire est perdu.
 
-Les droits ne dérivent jamais de ce profil : `RestaurantPolicy` reste l’unique décision de gestion, fondée sur un claim approuvé ou une soumission liée sans claim approuvé concurrent. Une relation historique rend donc le compte visiblement Restaurateur mais ne lui donne ni ownership, ni édition, ni parcours de claim allégé. La normalisation est idempotente : elle remplace uniquement les valeurs techniques `restaurant_owner` existantes par `user`, sans toucher aux claims, submissions, restaurants ou relations historiques.
+Les droits ne dérivent jamais du libellé de profil : `RestaurantPolicy` reste l’unique décision de gestion, fondée sur un claim approuvé, une relation historique exacte, ou une soumission liée sans restaurateur effectif concurrent. Une relation historique donne l’édition et l’accès compte de son exact restaurant, sans créer de claim ni modifier ownership ; elle rend aussi cette fiche non-claimable. La normalisation est idempotente : elle remplace uniquement les valeurs techniques `restaurant_owner` existantes par `user`, sans toucher aux claims, submissions, restaurants ou relations historiques.
 
 ## 2026-09-12
 

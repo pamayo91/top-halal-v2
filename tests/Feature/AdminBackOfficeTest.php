@@ -291,7 +291,7 @@ class AdminBackOfficeTest extends TestCase
         $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::profileLabel($users[$claimOwner->id]));
         $this->assertSame('Utilisateur', \App\Filament\Resources\UserResource::profileLabel($users[$legacyWithoutRestaurant->id]));
         $this->assertSame('Restaurateur', \App\Filament\Resources\UserResource::profileLabel($users[$legacyAuthor->id]));
-        $this->assertSame('Aucun droit', \App\Filament\Resources\UserResource::managementLabel($users[$legacyAuthor->id]));
+        $this->assertSame('Historique · 1', \App\Filament\Resources\UserResource::managementLabel($users[$legacyAuthor->id]));
         $this->assertSame('1 historique', \App\Filament\Resources\UserResource::restaurantLinkSummary($users[$legacyAuthor->id]));
         $this->assertSame(1, $users[$legacyAuthor->id]->comments_count);
         $this->assertSame(1, $users[$legacyAuthor->id]->reviews_count);
