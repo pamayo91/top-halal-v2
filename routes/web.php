@@ -123,6 +123,7 @@ Route::get('/restaurants/recherche/suggestions', [RestaurantSearchSuggestionCont
 Route::post('/restaurants/autour-de-moi', [PublicContentController::class, 'nearMe'])->middleware('throttle:20,1')->name('restaurants.near-me');
 Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
 Route::post('/resto/{slug}/avis', [PublicContentController::class, 'storeReview'])->middleware('throttle:10,1')->name('restaurants.reviews.store');
+Route::post('/resto/{slug}/signaler-une-erreur', [PublicContentController::class, 'storeRestaurantReport'])->middleware('throttle:5,1')->name('restaurants.reports.store');
 Route::get('/restos/{city}/{facet}', [PublicContentController::class, 'cityFacet'])->name('city-specialties.show');
 Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name('cities.show');
 Route::get('/specialites/{slug}', [PublicContentController::class, 'category'])->name('categories.show');

@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use App\Exceptions\RestaurantReviewOwnershipException;
-use App\Models\{Article, Comment, ContributionVerification, Page, Restaurant, RestaurantReview, User};
+use App\Models\{Article, Comment, ContributionVerification, EditorialContentReport, Page, Restaurant, RestaurantReview, User};
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Hash, URL};
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class ContributionIdentityService
 {
@@ -23,6 +24,12 @@ class ContributionIdentityService
     public function submitComment(Request $request, Article|Page $content, array $data): array
     {
         return $this->submit($request, 'comment', $content instanceof Article ? 'article' : 'page', $content->id, $data);
+    }
+
+    /** @return array{verified: bool, verification: ?ContributionVerification} */
+    public function submitReport(Request $request, Restaurant|Article|Page $content, array $data): array
+    {
+        return $this->submit($request, 'report', $this->targetType($content), $content->id, $data + ['name' => $request->user()?->name ?? 'Visiteur']);
     }
 
     /** @return array{contribution_type: string, contribution_id: ?int, destination_url: string, review_ownership_forbidden?: bool} */
@@ -81,7 +88,7 @@ class ContributionIdentityService
         $user = $request->user() ?: User::query()->where('email', $email)->first();
 
         if ($user && ($request->user()?->is($user) || $this->hasProof($request, $user))) {
-            $this->createDirectContribution($contributionType, $targetType, $targetId, $user, $data, $email);
+            $this->createDirectContribution($contributionType, $targetType, $targetId, $user, $data, $email, $request->user()?->is($user) ?? false);
 
             return ['verified' => true, 'verification' => null];
         }
@@ -103,7 +110,7 @@ class ContributionIdentityService
             'site_name' => config('app.name', 'Top Halal'),
             'user_name' => $verification->author_name,
             'verification_url' => $url,
-            'contribution_label' => $contributionType === 'review' ? 'avis' : 'commentaire',
+            'contribution_label' => match ($contributionType) { 'review' => 'avis', 'report' => 'signalement', default => 'commentaire' },
         ]);
 
         return ['verified' => false, 'verification' => $verification];
@@ -138,7 +145,7 @@ class ContributionIdentityService
         return $user;
     }
 
-    private function createContribution(ContributionVerification $verification, User $user): RestaurantReview|Comment
+    private function createContribution(ContributionVerification $verification, User $user): RestaurantReview|Comment|EditorialContentReport
     {
         return $this->createDirectContribution(
             $verification->contribution_type,
@@ -150,8 +157,30 @@ class ContributionIdentityService
         );
     }
 
-    private function createDirectContribution(string $contributionType, string $targetType, int $targetId, User $user, array $data, string $email): RestaurantReview|Comment
+    private function createDirectContribution(string $contributionType, string $targetType, int $targetId, User $user, array $data, string $email, bool $isAuthenticated = false): RestaurantReview|Comment|EditorialContentReport
     {
+        if ($contributionType === 'report') {
+            $content = $this->reportTarget($targetType, $targetId);
+            $payload = Validator::make($data, [
+                'name' => ['required', 'string', 'max:100'],
+                'message' => ['required', 'string', 'min:2', 'max:2000'],
+            ])->validate();
+            $report = EditorialContentReport::create([
+                'user_id' => $user->id,
+                'reporter_name' => trim($payload['name']),
+                'reporter_email' => Str::lower(trim($email)),
+                'is_authenticated' => $isAuthenticated,
+                'content_type' => $targetType,
+                'content_id' => $content->id,
+                'content_title' => $content->name ?? $content->title,
+                'content_url' => $this->publicUrl($content),
+                'message' => trim(strip_tags($payload['message'])),
+                'status' => 'new',
+                'ip_hash' => hash('sha256', (string) request()->ip()),
+            ]);
+            app(ContentReportMailer::class)->notifyTeam($report);
+            return $report;
+        }
         if ($contributionType === 'review') {
             abort_unless($targetType === 'restaurant', 404);
             $restaurant = Restaurant::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
@@ -190,6 +219,7 @@ class ContributionIdentityService
 
     private function payload(string $type, array $data): array
     {
+        if ($type === 'report') return ['message' => trim(strip_tags($data['message']))];
         return $type === 'review'
             ? ['rating' => $data['rating'], 'title' => $data['title'] ?? null, 'content' => trim(strip_tags($data['content']))]
             : ['content' => trim(strip_tags($data['content']))];
@@ -217,5 +247,21 @@ class ContributionIdentityService
             'restaurant' => route('restaurants.show', Restaurant::query()->findOrFail($verification->target_id)->slug),
             'article', 'page' => route('editorial.show', ($verification->target_type === 'article' ? Article::query() : Page::query())->findOrFail($verification->target_id)->slug),
         };
+    }
+
+    private function targetType(Restaurant|Article|Page $content): string
+    {
+        return match (true) { $content instanceof Restaurant => 'restaurant', $content instanceof Article => 'article', default => 'page' };
+    }
+
+    private function reportTarget(string $targetType, int $targetId): Restaurant|Article|Page
+    {
+        $model = match ($targetType) { 'restaurant' => Restaurant::class, 'article' => Article::class, 'page' => Page::class, default => abort(404) };
+        return $model::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
+    }
+
+    private function publicUrl(Restaurant|Article|Page $content): string
+    {
+        return $content instanceof Restaurant ? route('restaurants.show', $content->slug) : route('editorial.show', $content->slug);
     }
 }

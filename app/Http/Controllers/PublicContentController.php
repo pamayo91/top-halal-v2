@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Filament\Resources\{ArticleResource, PageResource, RestaurantResource};
 use App\Exceptions\RestaurantReviewOwnershipException;
 use App\Http\Requests\StoreCommentRequest;
-use App\Http\Requests\StoreRestaurantReviewRequest;
-use App\Models\{Article, Category, Comment, EditorialContentReport, Feature, Page, Restaurant, RestaurantReview};
+use App\Http\Requests\{StoreContentReportRequest, StoreRestaurantReviewRequest};
+use App\Models\{Article, Category, Comment, Feature, Page, Restaurant, RestaurantReview};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
@@ -110,6 +110,13 @@ class PublicContentController extends Controller
         }
 
         return back()->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
+    }
+
+    public function storeRestaurantReport(StoreContentReportRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
+    {
+        $restaurant = Restaurant::where('slug', $slug)->where('status', 'published')->firstOrFail();
+        $result = $identities->submitReport($request, $restaurant, $request->validated());
+        return back()->with($result['verified'] ? 'content_report_submitted' : 'content_report_verification_sent', true);
     }
 
     public function location(string $slug): Response
@@ -219,12 +226,11 @@ class PublicContentController extends Controller
         return back()->with($result['verified'] ? 'comment_submitted' : 'contribution_verification_sent', true);
     }
 
-    public function storeEditorialReport(Request $request, string $slug): RedirectResponse
+    public function storeEditorialReport(StoreContentReportRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
     {
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
-        $data = $request->validate(['message' => ['required', 'string', 'max:2000'], 'website' => ['nullable', 'max:0']]);
-        EditorialContentReport::create(['content_type' => $content instanceof Article ? 'article' : 'page', 'content_id' => $content->id, 'content_url' => route('editorial.show', $content->slug), 'message' => trim(strip_tags($data['message'])), 'ip_hash' => hash('sha256', (string) $request->ip())]);
-        return back()->with('editorial_report_submitted', true);
+        $result = $identities->submitReport($request, $content, $request->validated());
+        return back()->with($result['verified'] ? 'content_report_submitted' : 'content_report_verification_sent', true);
     }
 
     private function taxonomy(object $term, string $kind): Response
