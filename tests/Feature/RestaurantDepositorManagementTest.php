@@ -53,6 +53,7 @@ class RestaurantDepositorManagementTest extends TestCase
         $this->assertTrue($depositor->can('manage', $restaurant));
         $this->actingAs($depositor)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
 
+        $claim->update(['status' => 'pending']);
         Notification::fake();
         $this->actingAs($admin);
         app(ClaimModeration::class)->approve($claim->fresh());
