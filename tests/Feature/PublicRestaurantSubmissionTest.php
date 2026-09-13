@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
-use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantSubmission, Setting, User};
+use App\Models\{Category, Feature, MediaAsset, Restaurant, RestaurantClaim, RestaurantSubmission, Setting, User};
 use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -221,6 +221,75 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->get($url)->assertOk()->assertSee('Votre adresse était déjà confirmée.');
         $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed')->count());
         $this->assertSame(1, Mail::queued(TemplateMailable::class)->filter(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review')->count());
+    }
+
+    public function test_verified_owner_submission_becomes_an_owner_only_when_published_and_only_once(): void
+    {
+        $asset = MediaAsset::create(['original_path' => 'media/originals/owner.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('e', 64), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload([
+            'submitter_role' => 'owner',
+            'owner_full_name' => 'Amina Martin',
+            'owner_company' => 'SARL Restaurant de test',
+            'owner_siret' => '73282932000074',
+            'owner_certified' => '1',
+        ]))->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $restaurant = Restaurant::firstOrFail();
+        $submission = RestaurantSubmission::firstOrFail();
+        $owner = User::where('email', 'contributeur@example.invalid')->firstOrFail();
+        $claim = RestaurantClaim::firstOrFail();
+
+        $this->assertSame('pending', $restaurant->status);
+        $this->assertSame('pending_admin_review', $submission->status);
+        $this->assertSame('pending_publication', $claim->status);
+        $this->assertSame('new_submission', $claim->source);
+        $this->assertSame($owner->id, $claim->user_id);
+        $this->assertSame($owner->id, $submission->user_id);
+        $this->assertFalse($owner->ownedRestaurants()->whereKey($restaurant->id)->exists());
+        $this->assertTrue($owner->can('manage', $restaurant));
+
+        $restaurant->update(['status' => 'published']);
+
+        $this->assertSame('approved', $claim->fresh()->status);
+        $this->assertTrue($owner->ownedRestaurants()->whereKey($restaurant->id)->exists());
+        $this->assertTrue($owner->can('manage', $restaurant));
+        $this->assertFalse($restaurant->fresh()->isClaimable());
+        $this->actingAs($owner)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
+        $this->actingAs($owner)->get(route('owner.restaurants.edit', $restaurant))->assertOk();
+        $this->assertDatabaseHas('restaurant_submissions', ['id' => $submission->id, 'restaurant_id' => $restaurant->id, 'user_id' => $owner->id, 'status' => 'published']);
+
+        $restaurant->update(['status' => 'published']);
+        $this->assertSame(1, RestaurantClaim::where('restaurant_id', $restaurant->id)->count());
+        $this->assertSame(1, RestaurantClaim::where('restaurant_id', $restaurant->id)->where('user_id', $owner->id)->count());
+    }
+
+    public function test_published_non_owner_submission_never_creates_an_ownership_claim(): void
+    {
+        $restaurant = Restaurant::create(['name' => 'Déposant non gérant', 'slug' => 'deposant-non-gerant', 'status' => 'pending']);
+        $depositor = User::factory()->create(['role' => 'restaurant_owner']);
+        $submission = RestaurantSubmission::create([
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $depositor->id,
+            'submitter_email' => $depositor->email,
+            'submitter_role' => 'customer',
+            'status' => 'pending_admin_review',
+            'email_verified_at' => now(),
+            'submitted_at' => now(),
+        ]);
+
+        $restaurant->update(['status' => 'published']);
+
+        $this->assertDatabaseCount('restaurant_claims', 0);
+        $this->assertTrue($depositor->can('manage', $restaurant));
+        $this->assertTrue($restaurant->fresh()->isClaimable());
+        $this->assertDatabaseHas('restaurant_submissions', ['id' => $submission->id, 'user_id' => $depositor->id, 'status' => 'published']);
     }
 
     public function test_unverified_submission_cannot_be_published_and_invalid_or_expired_links_do_not_confirm_it(): void

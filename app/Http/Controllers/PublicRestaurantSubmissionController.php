@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePublicRestaurantSubmissionRequest;
-use App\Models\{Category, Feature, Restaurant, RestaurantMedia, RestaurantSubmission, User};
+use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia, RestaurantSubmission, User};
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
 use App\Services\{MediaIngestor, RestaurantSubmissionMailer};
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
@@ -183,6 +183,23 @@ class PublicRestaurantSubmissionController extends Controller
                 'activation_token' => hash('sha256', $activationToken),
                 'activation_expires_at' => now()->addDays(7),
             ]);
+
+            if ($submission->submitter_role === 'owner') {
+                RestaurantClaim::query()->firstOrCreate(
+                    ['restaurant_id' => $submission->restaurant_id, 'user_id' => $user->id],
+                    [
+                        'email' => $email,
+                        'full_name' => $submission->owner_full_name ?: $user->name,
+                        'company' => $submission->owner_company,
+                        'siret' => $submission->owner_siret,
+                        'certified' => $submission->owner_certified,
+                        'source' => 'new_submission',
+                        'status' => 'pending_publication',
+                        'email_verified_at' => now(),
+                        'submitted_at' => now(),
+                    ],
+                );
+            }
 
             return ['submission' => $submission->fresh('restaurant'), 'activation_token' => $activationToken, 'needs_activation' => $needsActivation];
         });
