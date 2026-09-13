@@ -366,11 +366,18 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertDatabaseCount('email_delivery_logs', 0);
     }
 
-    public function test_case_accent_and_hyphen_variants_at_the_same_address_are_certain_duplicates(): void
+    public function test_case_accent_hyphen_and_small_name_variants_at_the_same_address_are_certain_duplicates(): void
     {
         $this->existingRestaurant(['name' => 'Café du Monde', 'status' => 'published']);
 
         $this->post(route('restaurant-submissions.store'), $this->payload(['name' => 'CAFE-DU monde']))
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('name');
+
+        $this->assertDatabaseCount('restaurants', 1);
+        $this->assertDatabaseCount('restaurant_submissions', 0);
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Cafe du Mnde']))
             ->assertRedirect(route('restaurant-submissions.create'))
             ->assertSessionHasErrors('name');
 
@@ -402,6 +409,38 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertSame('potential', $submission->duplicate_signal);
         $this->assertSame('same_address_different_name', $submission->duplicate_details[0]['reason']);
         $this->assertSame('pending_email_verification', $submission->status);
+    }
+
+    public function test_nearby_similar_name_with_a_different_address_stays_pending_and_is_signalled(): void
+    {
+        $this->existingRestaurant([
+            'name' => 'Restaurant de test', 'address_line1' => '47 Boulevard du Temple',
+            'latitude' => 48.8661, 'longitude' => 2.3641,
+        ]);
+        $this->fakeSubmissionIngestor('nearby-similar-name');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload())->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('pending_email_verification', $submission->status);
+        $this->assertSame('potential', $submission->duplicate_signal);
+        $this->assertSame('nearby_similar_name', $submission->duplicate_details[0]['reason']);
+    }
+
+    public function test_a_matching_phone_without_a_matching_address_never_blocks_a_submission(): void
+    {
+        $this->existingRestaurant([
+            'name' => 'Autre restaurant', 'address_line1' => '1 Rue des Lilas', 'phone' => '+33 1 23 45 67 89',
+            'latitude' => 48.890, 'longitude' => 2.364,
+        ]);
+        $this->fakeSubmissionIngestor('phone-without-address');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['phone' => '01 23 45 67 89']))->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('pending_email_verification', $submission->status);
+        $this->assertSame('potential', $submission->duplicate_signal);
+        $this->assertSame('same_phone_same_locality', $submission->duplicate_details[0]['reason']);
     }
 
     public function test_archived_and_trashed_matches_are_not_blocking_but_are_visible_to_moderation(): void
