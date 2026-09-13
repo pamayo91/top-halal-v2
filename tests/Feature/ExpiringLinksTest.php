@@ -6,6 +6,7 @@ use App\Mail\TemplateMailable;
 use App\Models\{Article, ContributionVerification, Restaurant, RestaurantClaim, RestaurantSubmission, User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\{Mail, Notification};
+use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
 class ExpiringLinksTest extends TestCase
@@ -60,14 +61,16 @@ class ExpiringLinksTest extends TestCase
         $connectableClaim = RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $connectable->id, 'email' => $connectable->email, 'full_name' => 'Amina', 'status' => 'approved', 'activation_token' => hash('sha256', 'connectable-old'), 'activation_expires_at' => now()->subMinute(), 'submitted_at' => now()]);
         $this->get(route('claims.activate', [$connectableClaim, 'connectable-old']))->assertOk()->assertDontSee('Renvoyer un nouveau lien');
         $this->post(route('claims.activate.resend', [$connectableClaim, 'connectable-old']))->assertNotFound();
-        $consumed = RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'email' => $user->email, 'full_name' => 'Amina', 'status' => 'approved', 'activation_token' => hash('sha256', 'used-activation'), 'activation_expires_at' => now(), 'submitted_at' => now()]);
-        $user->update(['must_change_password' => false]);
+        $consumedUser = User::factory()->create(['status' => 'active', 'login_enabled' => false, 'must_change_password' => true]);
+        $consumed = RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $consumedUser->id, 'email' => $consumedUser->email, 'full_name' => 'Amina', 'status' => 'approved', 'activation_token' => hash('sha256', 'used-activation'), 'activation_expires_at' => now(), 'submitted_at' => now()]);
+        $consumedUser->update(['must_change_password' => false]);
         $this->get(route('claims.activate', [$consumed, 'used-activation']))->assertOk()->assertSee('Votre espace est déjà activé.')->assertDontSee('Renvoyer un nouveau lien');
     }
 
     public function test_resend_is_rate_limited_per_object_and_ip(): void
     {
         $submission = $this->submission('pending_email_verification', 'rate-old');
+        RateLimiter::clear('expiring-link|'.$submission->id.'|127.0.0.1');
         for ($attempt = 0; $attempt < 3; $attempt++) {
             $submission->update(['email_verification_token' => hash('sha256', 'rate-old'), 'email_verification_expires_at' => now()->subMinute()]);
             $this->post(route('restaurant-submissions.verify.resend', [$submission, 'rate-old']))->assertRedirect();
