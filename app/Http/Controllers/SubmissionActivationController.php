@@ -18,7 +18,7 @@ class SubmissionActivationController extends Controller
 
         abort_unless($this->valid($submission, $token), 404);
 
-        if (! $submission->user?->must_change_password) {
+        if ($submission->user?->login_enabled && ! $submission->user->must_change_password) {
             $submission->update(['activation_token' => null, 'activation_expires_at' => null]);
 
             return redirect()->route('login')->with('status', 'Cette fiche est rattachée à votre espace. Connectez-vous pour la gérer.');
@@ -34,6 +34,7 @@ class SubmissionActivationController extends Controller
 
         $submission->user->forceFill([
             'password' => Hash::make($data['password']),
+            'login_enabled' => true,
             'must_change_password' => false,
             'status' => 'active',
             'email_verified_at' => now(),

@@ -55,7 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             && (! $this->login_enabled || $this->must_change_password);
     }
 
-    /** Make a verified contribution identity eligible to choose its password. */
+    /** Confirm the e-mail without making a contribution identity connectable early. */
     public function prepareForRestaurantSubmissionActivation(): void
     {
         if (! $this->needsRestaurantSubmissionActivation()) {
@@ -63,11 +63,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         }
 
         $changes = [];
-
-        if (! $this->login_enabled) {
-            $changes['login_enabled'] = true;
-            $changes['must_change_password'] = true;
-        }
 
         if (! $this->hasVerifiedEmail()) {
             $changes['email_verified_at'] = now();

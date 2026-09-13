@@ -8,7 +8,7 @@ use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\{Hash, Mail, URL};
+use Illuminate\Support\Facades\{Hash, Mail, Password, URL};
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Tests\TestCase;
@@ -255,10 +255,15 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $submission = RestaurantSubmission::firstOrFail();
         $this->assertSame($identity->id, $submission->user_id);
-        $this->assertTrue($identity->fresh()->login_enabled);
-        $this->assertTrue($identity->fresh()->must_change_password);
+        $this->assertFalse($identity->fresh()->login_enabled);
+        $this->assertFalse($identity->fresh()->must_change_password);
         $this->assertSame($identity->id, $review->fresh()->user_id);
         $this->assertDatabaseCount('users', 1);
+
+        Password::spy();
+        $this->from(route('login'))->post(route('login.store'), ['email' => $identity->email, 'password' => 'password'])->assertSessionHasErrors('email');
+        $this->post(route('password.email'), ['email' => $identity->email])->assertSessionHas('status');
+        Password::shouldHaveReceived('sendResetLink')->never();
 
         $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
         $activationUrl = $confirmation->values['activation_url'];
@@ -272,6 +277,9 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->post(route('logout'));
         $this->post(route('login.store'), ['email' => 'avis@example.invalid', 'password' => 'MotDePasseSolide!123'])
             ->assertRedirect(route('account.dashboard'));
+        $this->post(route('logout'));
+        $this->post(route('password.email'), ['email' => $identity->email])->assertSessionHas('status');
+        Password::shouldHaveReceived('sendResetLink')->once()->with(['email' => $identity->email]);
     }
 
     public function test_an_existing_pending_activation_account_is_reused_without_a_duplicate(): void
