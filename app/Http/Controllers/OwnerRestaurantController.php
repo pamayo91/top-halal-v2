@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
+use App\Models\RestaurantClaim;
+use App\Models\RestaurantSubmission;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\RestaurantLocationService;
 use Illuminate\Http\RedirectResponse;
@@ -26,7 +28,17 @@ class OwnerRestaurantController extends Controller
             return redirect()->route('owner.restaurants.edit', $restaurant);
         }
 
-        return view('account.restaurant-management-unavailable', compact('restaurant'));
+        $managementTransferred = RestaurantSubmission::query()
+            ->where('restaurant_id', $restaurant->id)
+            ->where('user_id', request()->user()->id)
+            ->exists()
+            && RestaurantClaim::query()
+                ->where('restaurant_id', $restaurant->id)
+                ->where('status', 'approved')
+                ->where('user_id', '!=', request()->user()->id)
+                ->exists();
+
+        return view('account.restaurant-management-unavailable', compact('restaurant', 'managementTransferred'));
     }
 
     public function update(Request $request, Restaurant $restaurant, AddressSuggestionService $suggestions, RestaurantLocationService $locations): RedirectResponse

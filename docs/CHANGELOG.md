@@ -3,6 +3,7 @@
 ## 2026-09-13
 
 - Restaurants : un déposant public conserve la gestion de sa fiche pendant une revendication `pending` ou `rejected`, mais la perd dès qu'une revendication est `approved` pour un autre utilisateur. La fiche quitte alors « Mon compte » du déposant, son accès direct d'édition est refusé et l'historique `restaurant_submissions` est conservé.
+- Restaurants : après transfert de gestion, les URL directes d’édition, de mise à jour ou de demande de suppression redirigent vers une explication et un bouton Contact, au lieu d’une réponse 403 brute.
 
 ## 2026-09-12
 
