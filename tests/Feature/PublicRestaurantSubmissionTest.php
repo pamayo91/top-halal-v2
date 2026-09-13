@@ -240,6 +240,10 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
         $this->get($verification->values['verification_url'])->assertOk();
+        $confirmation = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        $activationUrl = explode('?', $confirmation->values['activation_url'])[0];
+        $this->post($activationUrl, ['password' => 'MotDePasseSolide!123', 'password_confirmation' => 'MotDePasseSolide!123'])
+            ->assertRedirect(route('account.dashboard'));
 
         $restaurant = Restaurant::firstOrFail();
         $submission = RestaurantSubmission::firstOrFail();
