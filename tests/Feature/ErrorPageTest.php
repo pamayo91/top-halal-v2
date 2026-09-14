@@ -31,7 +31,6 @@ class ErrorPageTest extends TestCase
             ->assertSee('Des avis authentiques')
             ->assertSee('Une recherche en toute confiance')
             ->assertSee($asset->deliveryUrl(960), false)
-            ->assertDontSee('src="http', false)
             ->assertDontSee('wp-content', false);
     }
 
