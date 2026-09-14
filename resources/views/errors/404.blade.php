@@ -1,6 +1,5 @@
-@php($errors = isset($errors) ? $errors : new \Illuminate\Support\ViewErrorBag)
 @php($page404 = app(\App\Services\ErrorPageSettings::class)->values())
-<x-layouts.app title="Page introuvable | Top Halal" robots="noindex,follow">
+<x-layouts.app title="Page introuvable | Top Halal" robots="noindex,follow" :hide-flash="true">
     <section class="error-404-page">
     <div class="error-404 shell" aria-labelledby="error-404-title">
         <div class="error-404-main">
