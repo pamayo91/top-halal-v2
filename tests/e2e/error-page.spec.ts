@@ -10,8 +10,10 @@ test('the public 404 is a responsive, clean HTTP 404 page', async ({ page }) => 
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { name: "Cette page n'est plus au menu" })).toBeVisible();
   await expect(page.locator('.error-404-visual img')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Retour à l’accueil' })).toHaveAttribute('href', /\/$/);
-  await expect(page.getByRole('link', { name: 'Trouver un restaurant halal' })).toHaveAttribute('href', /\/restaurants$/);
+  const homeHref = await page.getByRole('link', { name: 'Retour à l’accueil' }).getAttribute('href');
+  const restaurantsHref = await page.getByRole('link', { name: 'Trouver un restaurant halal' }).getAttribute('href');
+  expect(new URL(homeHref ?? '', page.url()).pathname).toBe('/');
+  expect(new URL(restaurantsHref ?? '', page.url()).pathname).toBe('/restaurants');
   await expect(page.getByText('Des milliers de restaurants')).toBeVisible();
   await expect(page.getByText('Toutes vos cuisines préférées')).toBeVisible();
   await expect(page.getByText('Des avis authentiques')).toBeVisible();
