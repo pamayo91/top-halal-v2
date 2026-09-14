@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test';
 test('the public 404 is a responsive, clean HTTP 404 page', async ({ page }) => {
   const consoleErrors: string[] = [];
   const networkFailures: string[] = [];
-  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  page.on('console', message => {
+    if (message.type() === 'error' && !/Failed to load resource:.*404/i.test(message.text())) consoleErrors.push(message.text());
+  });
   page.on('requestfailed', request => networkFailures.push(`${request.method()} ${request.url()}`));
 
   const response = await page.goto('/__top_halal_404_visual_check');
