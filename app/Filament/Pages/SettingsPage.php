@@ -2,11 +2,11 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Setting;
+use App\Models\{MediaAsset, Setting};
 use App\Filament\Support\EditorialSidebarFields;
 use App\Services\EditorialSidebar;
-use App\Services\{AdminAudit, NearbyCityService};
-use Filament\Forms\Components\{TextInput, Toggle};
+use App\Services\{AdminAudit, ErrorPageSettings, NearbyCityService};
+use Filament\Forms\Components\{Select, Textarea, TextInput, Toggle};
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
@@ -36,6 +36,7 @@ class SettingsPage extends Page
             'city_nearby_maximum' => $settings['city_nearby_maximum']['value'] ?? NearbyCityService::DEFAULT_LIMIT,
             'editorial_sidebar_articles' => $settings['editorial_sidebar_articles'] ?? ['blocks' => app(EditorialSidebar::class)->global('articles')],
             'editorial_sidebar_pages' => $settings['editorial_sidebar_pages'] ?? ['blocks' => app(EditorialSidebar::class)->global('pages')],
+            'error_404' => $settings[ErrorPageSettings::SETTINGS_KEY] ?? [],
         ]);
     }
 
@@ -61,6 +62,17 @@ class SettingsPage extends Page
                 ]),
             EditorialSidebarFields::section('editorial_sidebar_articles', 'Sidebar éditoriale — Articles')->description('Configuration par défaut des Articles. Les Articles affichent la sidebar sauf override explicite.'),
             EditorialSidebarFields::section('editorial_sidebar_pages', 'Sidebar éditoriale — Pages')->description('Configuration utilisée seulement lorsqu’une Page active explicitement sa sidebar.'),
+            Section::make('Page 404')
+                ->description('Le code HTTP, les liens et les repères de confiance restent fixes. Laissez l’illustration vide pour utiliser l’illustration validée par défaut.')
+                ->schema([
+                    Select::make('error_404.illustration_media_asset_id')
+                        ->label('Illustration')
+                        ->options(fn () => MediaAsset::query()->whereIn('mime', MediaAsset::RESTAURANT_IMAGE_MIMES)->orderByDesc('created_at')->limit(500)->get()->mapWithKeys(fn (MediaAsset $asset) => [$asset->id => trim(($asset->alt_text ?: 'Sans texte alternatif').' — '.$asset->width.' × '.$asset->height.' px')]))
+                        ->searchable()
+                        ->nullable(),
+                    TextInput::make('error_404.title')->label('Titre')->maxLength(160)->placeholder(ErrorPageSettings::DEFAULT_TITLE),
+                    Textarea::make('error_404.text')->label('Texte')->maxLength(300)->rows(3)->placeholder(ErrorPageSettings::DEFAULT_TEXT),
+                ]),
         ])->statePath('data');
     }
 
@@ -71,13 +83,22 @@ class SettingsPage extends Page
         foreach ($data as $key => $value) {
             $nearbySetting = in_array($key, ['city_nearby_radius_km', 'city_nearby_maximum'], true);
             $sidebarSetting = in_array($key, ['editorial_sidebar_articles', 'editorial_sidebar_pages'], true);
+            $errorPageSetting = $key === ErrorPageSettings::SETTINGS_KEY;
             Setting::updateOrCreate(
                 ['key' => $key],
                 [
-                    'value' => $sidebarSetting ? ['blocks' => app(EditorialSidebar::class)->normalize((array) ($value['blocks'] ?? []))] : ($nearbySetting ? ['value' => (int) $value] : (is_bool($value) ? ['enabled' => $value] : ['text' => $value])),
-                    'group' => $sidebarSetting ? 'editorial' : ($nearbySetting ? 'seo' : 'general'),
+                    'value' => $sidebarSetting ? ['blocks' => app(EditorialSidebar::class)->normalize((array) ($value['blocks'] ?? []))] : ($errorPageSetting ? array_filter((array) $value, fn ($item) => $item !== null && $item !== '') : ($nearbySetting ? ['value' => (int) $value] : (is_bool($value) ? ['enabled' => $value] : ['text' => $value]))),
+                    'group' => $sidebarSetting ? 'editorial' : ($errorPageSetting ? 'error_pages' : ($nearbySetting ? 'seo' : 'general')),
                 ],
             );
+
+            if ($errorPageSetting && ! empty($value['illustration_media_asset_id']) && ! Setting::query()->where('key', ErrorPageSettings::DEFAULT_ILLUSTRATION_KEY)->exists()) {
+                Setting::create([
+                    'key' => ErrorPageSettings::DEFAULT_ILLUSTRATION_KEY,
+                    'group' => 'error_pages',
+                    'value' => ['media_asset_id' => (int) $value['illustration_media_asset_id']],
+                ]);
+            }
         }
 
         app(AdminAudit::class)->record('settings.updated', 'settings', array_keys($data));

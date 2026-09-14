@@ -377,3 +377,7 @@
 
 - Signalements restaurant/article/page reliés à la preuve d’identité des contributions, au renderer transactionnel et à l’historique d’envoi existants.
 - Ajout de la file BO minimale et des quatre statuts de traitement, sans assignation ni modification automatique de contenu.
+# 2026-09-14
+
+- La page 404 publique adopte le shell Top Halal, un layout responsive à deux colonnes, les CTA Accueil/Annuaire et quatre repères de confiance fixes, tout en conservant HTTP 404 et `noindex,follow`.
+- Les réglages ajoutent les seules personnalisations autorisées de la page 404 : illustration V2, titre et texte, avec repli vers les valeurs par défaut.

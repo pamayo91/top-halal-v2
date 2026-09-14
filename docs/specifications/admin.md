@@ -18,6 +18,8 @@ Chaque opération sensible est enregistrée dans `admin_audit_logs`, avec l’ad
 
 La page « Réglages » comprend une section « SEO local — pages villes » avec le rayon global des villes aux alentours (30 km par défaut, 250 km maximum) et leur nombre maximum (15 par défaut, 30 maximum). Ces valeurs sont globales, ne créent aucun override par commune et invalident le cache de maillage géographique lorsqu'elles sont enregistrées.
 
+La page « Réglages » comprend aussi une section « Page 404 ». Elle permet uniquement de sélectionner une illustration raster depuis la médiathèque V2, de personnaliser le titre et le texte. Une valeur vide revient aux valeurs par défaut du code et à l’illustration V2 validée par défaut ; ni le statut HTTP, ni les destinations, ni le layout ou les repères de confiance ne sont administrables.
+
 Dans une fiche restaurant existante, l’action « Ajouter des photos » charge directement des JPEG, PNG ou WebP (10 Mo maximum par fichier) dans le pipeline V2, puis les associe à la fin de sa galerie. L’administrateur peut remonter la nouvelle photo pour en faire la couverture, ou la retirer de la fiche. Une miniature de spécialité peut aussi être retirée individuellement lorsqu’elle est inutile. Ces retraits ne suppriment jamais l’asset partagé de la médiathèque. Les ajouts et retraits sont audités.
 
 ## Localisation des restaurants
