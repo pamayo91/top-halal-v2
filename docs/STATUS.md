@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-14
 
-Latest 404 page: the public 404 now uses the shared shell, fixed noindex HTTP-404 behavior, responsive illustration/message/CTA layout and four fixed reassurance blocks. Settings exposes only V2 media, title and text overrides; empty values fall back to code defaults and the designated V2 fallback illustration. The provided mascot must be ingested through the existing V2 media-library uploader and selected once in Réglages > Page 404; that first selection becomes the durable fallback illustration.
+Latest 404 page: the public 404 now uses the shared shell, fixed noindex HTTP-404 behavior, responsive illustration/message/CTA layout and four fixed reassurance blocks. On desktop, the illustration column is exactly stretched to the content block’s height and contains the raster without cropping or distortion; mobile returns to natural single-column image flow. Settings exposes only V2 media, title and text overrides; empty values fall back to code defaults and the designated V2 fallback illustration.
 
 Latest restaurant-submission refusal: an administrator can now refuse exactly one `pending_admin_review` proposal from the Filament queue, with an optional retained reason. The proposal is atomically marked `rejected`; its restaurant stays stored as non-public `pending` data, is neither published nor deleted, and the depositor loses proposal-derived management/activation access. The existing queued transactional renderer and delivery history send one no-reply notification with the reason when supplied, an explicit “merci de ne pas y répondre” notice, and a “Contester ce refus” CTA to the existing Contact form with an opaque proposal reference.
 
