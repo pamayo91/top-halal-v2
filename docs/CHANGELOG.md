@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-15
+
+- 404 : enlarged the desktop illustration and restored the airy reassurance-card treatment with pastel 56 px icons, subtle short dividers and responsive tablet/mobile grids.
+
 - Liens expirés : les vérifications de proposition, première revendication, avis, commentaire et signalement, ainsi que les activations déposant/claim, affichent désormais un état SSR explicite au lieu d’une 404 générique. Quand l’objet reste éligible, un renvoi CSRF-protégé, limité à 3/h/objet/IP, génère un nouveau jeton aléatoire hashé et invalide immédiatement l’ancien; états traités, refusés, publiés et comptes désactivés n’offrent aucun renvoi. Les expirations existantes sont inchangées; le reset mot de passe reste inchangé.
 
 - Comptes / propositions restaurant : après confirmation d’e-mail, la soumission retrouve le `User` existant sans tenir compte de la casse. Un token et lien d’activation ne sont créés que si ce compte actif n’est pas encore connectable (`login_enabled=false` ou `must_change_password=true`). Un compte déjà actif conserve intégralement mot de passe, état, droits et rôle. Une identité avis/commentaire est réutilisée mais reste non connectable jusqu’à l’utilisation valide du lien et au choix du mot de passe, sans perdre ses contributions.

@@ -35,6 +35,11 @@ test('the desktop 404 illustration is taller than the visible content block', as
   const actions = await page.locator('.error-404-actions').boundingBox();
   const contentHeight = (actions?.y ?? 0) + (actions?.height ?? 0) - (code?.y ?? 0);
   expect(illustration?.height ?? 0).toBeGreaterThan(contentHeight);
+
+  const reassurance = page.locator('.error-404-reassurance');
+  await expect(reassurance).toBeVisible();
+  expect(await reassurance.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(4);
+  expect(await page.locator('.error-404-icon').first().evaluate(element => Math.round(element.getBoundingClientRect().width))).toBeGreaterThanOrEqual(52);
 });
 
 test('the 404 stacks illustration, content and actions on mobile', async ({ page }) => {
@@ -46,5 +51,6 @@ test('the 404 stacks illustration, content and actions on mobile', async ({ page
   const copy = await page.locator('.error-404-copy').boundingBox();
   expect(visual?.y).toBeLessThan(copy?.y ?? 0);
   await expect(page.locator('.error-404-actions .button')).toHaveCount(2);
+  expect(await page.locator('.error-404-reassurance').evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(1);
   expect(await page.locator('html').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
 });
