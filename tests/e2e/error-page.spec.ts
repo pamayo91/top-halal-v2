@@ -26,13 +26,15 @@ test('the public 404 is a responsive, clean HTTP 404 page', async ({ page }) => 
   expect(networkFailures).toEqual([]);
 });
 
-test('the desktop 404 visual column matches the content block height', async ({ page }) => {
+test('the desktop 404 illustration is taller than the visible content block', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/__top_halal_404_desktop_balance_check');
 
-  const visual = await page.locator('.error-404-visual').boundingBox();
-  const copy = await page.locator('.error-404-copy').boundingBox();
-  expect(Math.abs((visual?.height ?? 0) - (copy?.height ?? 0))).toBeLessThanOrEqual(1);
+  const illustration = await page.locator('.error-404-visual img').boundingBox();
+  const code = await page.locator('.error-404-code').boundingBox();
+  const actions = await page.locator('.error-404-actions').boundingBox();
+  const contentHeight = (actions?.y ?? 0) + (actions?.height ?? 0) - (code?.y ?? 0);
+  expect(illustration?.height ?? 0).toBeGreaterThan(contentHeight);
 });
 
 test('the 404 stacks illustration, content and actions on mobile', async ({ page }) => {
