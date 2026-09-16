@@ -4,9 +4,9 @@
     .restaurant-hours-slots.fi-fo-repeater { --restaurant-hours-fields-width: 34.5rem; position: relative; display: block; width: fit-content; max-width: 100%; }
     .restaurant-hours-slots .fi-fo-repeater-items { display: grid; grid-template-columns: max-content; gap: .25rem; width: max-content; }
     .restaurant-hours-slots .fi-fo-repeater-item { display: grid; grid-template-columns: var(--restaurant-hours-fields-width) 9rem; align-items: center; column-gap: .5rem; border-radius: 0; background: transparent; box-shadow: none; }
-    .restaurant-hours-slots .fi-fo-repeater-item-content { grid-column: 1; padding: 0; width: var(--restaurant-hours-fields-width); }
+    .restaurant-hours-slots .fi-fo-repeater-item-content { grid-column: 1; grid-row: 1; padding: 0; width: var(--restaurant-hours-fields-width); }
     .restaurant-hours-slots .fi-fo-repeater-item-has-header > .fi-fo-repeater-item-content { border-top: 0; padding: 0; }
-    .restaurant-hours-slots .fi-fo-repeater-item-header { position: static; grid-column: 2; align-self: center; justify-content: flex-start; padding: 0; width: 9rem; }
+    .restaurant-hours-slots .fi-fo-repeater-item-header { position: static; grid-column: 2; grid-row: 1; align-self: center; justify-content: flex-start; padding: 0; width: 9rem; }
     .restaurant-hours-slots .fi-fo-repeater-item-header-end-actions { gap: 0; margin-left: .375rem; }
     .restaurant-hours-slots .fi-fo-field, .restaurant-hours-slots .fi-fo-field-wrp { gap: 0; }
     .restaurant-hours-slots .fi-sc { display: grid; grid-template-columns: max-content max-content; gap: .5rem; width: max-content; }
