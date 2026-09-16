@@ -30,7 +30,13 @@ test.describe('Horaires restaurant Filament', () => {
     const statuses = page.locator('select[id*=".hours."][id$=".status"]');
     await expect(statuses).toHaveCount(7);
     await expect(statuses.first()).toHaveValue(/closed|slots|all_day/);
+    await statuses.first().selectOption('slots');
     await expect(hoursSection.locator('.restaurant-hours-slots table')).toHaveCount(0);
+    const slots = hoursSection.locator('.restaurant-hours-slots').first();
+    await expect(slots).toBeVisible();
+    await expect(slots).toHaveCSS('display', 'flex');
+    await expect(slots.locator('.fi-fo-repeater-items')).toHaveCSS('row-gap', '4px');
+    await expect(slots.locator('.fi-input-wrp').first()).toHaveCSS('min-height', '32px');
     expect((await hoursSection.boundingBox())?.height).toBeLessThan(700);
     expect(errors).toEqual([]);
   });
