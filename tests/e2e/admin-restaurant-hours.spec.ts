@@ -34,9 +34,21 @@ test.describe('Horaires restaurant Filament', () => {
     await expect(hoursSection.locator('.restaurant-hours-slots table')).toHaveCount(0);
     const slots = hoursSection.locator('.restaurant-hours-slots').first();
     await expect(slots).toBeVisible();
-    await expect(slots).toHaveCSS('display', 'flex');
-    await expect(slots.locator('.fi-fo-repeater-items')).toHaveCSS('row-gap', '4px');
+    await expect(slots).toHaveCSS('display', 'grid');
+    await expect(slots).toHaveCSS('width', /px/);
     await expect(slots.locator('.fi-input-wrp').first()).toHaveCSS('min-height', '32px');
+    await slots.getByRole('button', { name: '+ Ajouter une plage' }).click();
+    const slotItems = slots.locator('.fi-fo-repeater-item');
+    await expect(slotItems).toHaveCount(2);
+    const [firstInput, secondInput, addButton, deleteButton] = await Promise.all([
+      slotItems.nth(0).locator('.fi-input-wrp').first().boundingBox(),
+      slotItems.nth(1).locator('.fi-input-wrp').first().boundingBox(),
+      slots.getByRole('button', { name: '+ Ajouter une plage' }).boundingBox(),
+      slotItems.nth(1).locator('.fi-fo-repeater-item-header button').boundingBox(),
+    ]);
+    expect(firstInput?.x).toBe(secondInput?.x);
+    expect(addButton?.x).toBe(deleteButton?.x);
+    expect((secondInput?.y ?? 0) - (firstInput?.y ?? 0)).toBeLessThanOrEqual(36);
     expect((await hoursSection.boundingBox())?.height).toBeLessThan(700);
     expect(errors).toEqual([]);
   });
