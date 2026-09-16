@@ -34,7 +34,9 @@ test.describe('Horaires restaurant Filament', () => {
     await expect(hoursSection.locator('.restaurant-hours-slots table')).toHaveCount(0);
     const slots = hoursSection.locator('.restaurant-hours-slots').first();
     await expect(slots).toBeVisible();
-    await expect(slots).toHaveCSS('display', 'grid');
+    await expect(slots).toHaveCSS('display', 'block');
+    await expect(slots.locator('.fi-fo-repeater-items')).toHaveCSS('display', 'grid');
+    await expect(slots.locator('.fi-fo-repeater-items')).toHaveCSS('row-gap', '4px');
     await expect(slots).toHaveCSS('width', /px/);
     await expect(slots.locator('.fi-input-wrp').first()).toHaveCSS('min-height', '32px');
     await slots.getByRole('button', { name: '+ Ajouter une plage' }).click();
