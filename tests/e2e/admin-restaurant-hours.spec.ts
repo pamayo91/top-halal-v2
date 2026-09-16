@@ -50,6 +50,7 @@ test.describe('Horaires restaurant Filament', () => {
     ]);
     expect(firstInput?.x).toBe(secondInput?.x);
     expect(addButton?.x).toBe(deleteButton?.x);
+    expect(addButton?.height).toBeLessThanOrEqual(32);
     expect((secondInput?.y ?? 0) - (firstInput?.y ?? 0)).toBeLessThanOrEqual(36);
     expect((await hoursSection.boundingBox())?.height).toBeLessThan(700);
     expect(errors).toEqual([]);
