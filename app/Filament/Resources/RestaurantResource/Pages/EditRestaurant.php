@@ -7,13 +7,47 @@ use App\Services\AdminAudit;
 use App\Services\Location\RestaurantLocationService;
 use App\Services\RestaurantMediaOrderer;
 use App\Services\RestaurantMediaManager;
+use App\Services\RestaurantHours;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 class EditRestaurant extends EditAuditedRecord {
     protected static string $resource = RestaurantResource::class;
+    protected array $hours = [];
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        /** @var Restaurant $restaurant */
+        $restaurant = $this->getRecord();
+        $data['hours'] = app(RestaurantHours::class)->editorState($restaurant->openingHours()->get());
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $this->hours = $data['hours'] ?? [];
+        app(RestaurantHours::class)->validatedEditorRows($this->hours);
+        unset($data['hours']);
+
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        /** @var Restaurant $restaurant */
+        $restaurant = $this->getRecord();
+        app(AdminAudit::class)->record('restaurant.opening_hours_updated', $restaurant, ['days' => array_column($this->hours, 'day')]);
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model {
-        if ($record instanceof Restaurant) return app(RestaurantLocationService::class)->update($record, $data);
+        if ($record instanceof Restaurant) return DB::transaction(function () use ($record, $data): Restaurant {
+            $restaurant = app(RestaurantLocationService::class)->update($record, $data);
+            app(RestaurantHours::class)->sync($restaurant, $this->hours);
+
+            return $restaurant;
+        });
         return parent::handleRecordUpdate($record, $data);
     }
     protected function getHeaderActions(): array { return [

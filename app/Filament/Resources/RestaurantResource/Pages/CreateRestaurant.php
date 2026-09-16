@@ -7,15 +7,21 @@ use App\Filament\Resources\RestaurantResource;
 use App\Models\Restaurant;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\RestaurantLocationService;
+use App\Services\RestaurantHours;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CreateRestaurant extends CreateAuditedRecord
 {
     protected static string $resource = RestaurantResource::class;
+    protected array $hours = [];
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $this->hours = $data['hours'] ?? [];
+        app(RestaurantHours::class)->validatedEditorRows($this->hours);
+        unset($data['hours']);
         unset($data['location_update_source']);
         $data['legacy_wp_id'] = random_int(1000000000, 2000000000);
 
@@ -29,10 +35,13 @@ class CreateRestaurant extends CreateAuditedRecord
         $selection = app(AddressSuggestionService::class)->structuredFromToken($token);
         if ($selection === null) throw ValidationException::withMessages(['data.address_suggestion' => 'Cette suggestion a expiré. Recherchez l’adresse à nouveau.']);
 
-        /** @var Restaurant $restaurant */
-        $restaurant = parent::handleRecordCreation($data);
-        app(RestaurantLocationService::class)->applySelectedSuggestion($restaurant, $selection);
+        return DB::transaction(function () use ($data, $selection): Model {
+            /** @var Restaurant $restaurant */
+            $restaurant = parent::handleRecordCreation($data);
+            app(RestaurantLocationService::class)->applySelectedSuggestion($restaurant, $selection);
+            app(RestaurantHours::class)->sync($restaurant, $this->hours);
 
-        return $restaurant;
+            return $restaurant;
+        });
     }
 }

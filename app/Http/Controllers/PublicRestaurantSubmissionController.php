@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePublicRestaurantSubmissionRequest;
 use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia, RestaurantSubmission, User};
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
-use App\Services\{MediaIngestor, RestaurantSubmissionMailer};
+use App\Services\{MediaIngestor, RestaurantHours, RestaurantSubmissionMailer};
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
 use Illuminate\Support\Facades\{DB, Hash, URL};
 use Illuminate\Support\Str;
@@ -14,8 +14,6 @@ use Illuminate\View\View;
 
 class PublicRestaurantSubmissionController extends Controller
 {
-    private const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
     public function create(): View
     {
         return view('public.restaurant-submission.create', [
@@ -67,7 +65,7 @@ class PublicRestaurantSubmissionController extends Controller
     {
         $data = $request->validated();
         $location = $this->locationData($request, $suggestions, $data);
-        $hours = $this->hours($data['hours']);
+        $hours = app(RestaurantHours::class)->publicSubmissionRows($data['hours']);
         $duplicateAssessment = $duplicates->assess([
             ...$location,
             'name' => $data['name'],
@@ -303,24 +301,4 @@ class PublicRestaurantSubmissionController extends Controller
         return (Str::slug($name) ?: 'restaurant').'-'.Str::lower(Str::random(8));
     }
 
-    /** @return array<int, array<string, mixed>> */
-    private function hours(array $input): array
-    {
-        $hours = [];
-        foreach (self::DAYS as $day) {
-            $entry = $input[$day];
-            if ($entry['status'] === 'closed') {
-                $hours[] = ['day' => $day, 'slot' => 1, 'is_closed' => true, 'is_open_24_hours' => false, 'legacy_key' => 'public:'.$day.':1'];
-                continue;
-            }
-            if ($entry['status'] === 'all_day') {
-                $hours[] = ['day' => $day, 'slot' => 1, 'opens_at' => '00:00', 'closes_at' => '23:59', 'is_closed' => false, 'is_open_24_hours' => true, 'legacy_key' => 'public:'.$day.':1'];
-                continue;
-            }
-            $hours[] = ['day' => $day, 'slot' => 1, 'opens_at' => $entry['first_open'], 'closes_at' => $entry['first_close'], 'is_closed' => false, 'is_open_24_hours' => false, 'legacy_key' => 'public:'.$day.':1'];
-            if (filled($entry['second_open'] ?? null)) $hours[] = ['day' => $day, 'slot' => 2, 'opens_at' => $entry['second_open'], 'closes_at' => $entry['second_close'], 'is_closed' => false, 'is_open_24_hours' => false, 'legacy_key' => 'public:'.$day.':2'];
-        }
-
-        return $hours;
-    }
 }

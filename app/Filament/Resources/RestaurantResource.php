@@ -8,9 +8,10 @@ use App\Services\AdminAudit;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\DuplicateRestaurantDetector;
 use App\Services\RestaurantSubmissionModeration;
+use App\Services\RestaurantHours;
 use App\Support\RobotsMeta;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
-use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Select, Textarea, TextInput};
+use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Repeater, Select, Textarea, TextInput, TimePicker};
 use Filament\Schemas\Components\{Section, Tabs, View};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\{ImageColumn, TextColumn};
@@ -172,6 +173,36 @@ class RestaurantResource extends AdminResource
                 Select::make('features')->relationship('features', 'name')->multiple()->searchable()->preload(),
             ])]),
             Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255)])]),
+            Tabs\Tab::make('Horaires')->schema([
+                Section::make('Horaires d’ouverture')
+                    ->description('Renseignez chaque jour comme fermé, ouvert 24h/24 ou avec une ou plusieurs plages. Les créneaux sont affichés tels quels sur la fiche publique.')
+                    ->schema([
+                        Repeater::make('hours')
+                            ->label('Jours')
+                            ->default(fn (): array => app(RestaurantHours::class)->editorState(collect()))
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false)
+                            ->schema([
+                                Hidden::make('hour_ids')->default([]),
+                                Select::make('day')->label('Jour')->options(RestaurantHours::DAYS)->required()->disabled()->dehydrated(),
+                                Select::make('status')->label('Statut')->options(['closed' => 'Fermé', 'all_day' => 'Ouvert 24h/24', 'slots' => 'Plages horaires'])->required()->live(),
+                                Repeater::make('slots')
+                                    ->label('Plages horaires')
+                                    ->visible(fn ($get): bool => $get('../status') === 'slots')
+                                    ->defaultItems(1)
+                                    ->addActionLabel('Ajouter une plage')
+                                    ->reorderable(false)
+                                    ->schema([
+                                        Hidden::make('id'),
+                                        TimePicker::make('opens_at')->label('Ouvre à')->seconds(false)->required(),
+                                        TimePicker::make('closes_at')->label('Ferme à')->seconds(false)->required(),
+                                    ])
+                                    ->columns(2),
+                            ])
+                            ->columns(2),
+                    ]),
+            ]),
             Tabs\Tab::make('Proposition')->visible(fn (?Restaurant $record): bool => $record?->submission !== null)->schema([
                 Section::make('Décision de modération')->schema([
                     Textarea::make('submission_admin_rejection_reason')->label('Motif de refus administrateur')->readOnly()->dehydrated(false)->rows(4)->visible(fn (?Restaurant $record): bool => $record?->submission?->status === 'rejected')->formatStateUsing(fn (?Restaurant $record): string => $record?->submission?->admin_rejection_reason ?: 'Aucun motif renseigné.'),
