@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use App\Services\CityPageResolver;
 use App\Services\CitySeoService;
 use App\Services\GeographicPageResolver;
+use App\Services\RestaurantSlugRedirects;
 
 class Restaurant extends Model
 {
@@ -21,11 +22,13 @@ class Restaurant extends Model
     protected static function booted(): void
     {
         static::saving(function (self $restaurant): void {
+            app(RestaurantSlugRedirects::class)->assertCanChange($restaurant);
             if (! $restaurant->exists || ! $restaurant->isDirty('status') || $restaurant->status !== 'published') return;
             $submission = $restaurant->submission()->first();
             if ($submission && $submission->status !== 'pending_admin_review') throw ValidationException::withMessages(['status' => 'La proposition doit d’abord être confirmée par e-mail avant sa publication.']);
         });
         static::saved(function (self $restaurant): void {
+            app(RestaurantSlugRedirects::class)->createForChangedSlug($restaurant);
             if ($restaurant->wasRecentlyCreated || $restaurant->wasChanged(['city_name', 'city_code', 'status'])) {
                 app(CityPageResolver::class)->forget();
                 app(CitySeoService::class)->forget();

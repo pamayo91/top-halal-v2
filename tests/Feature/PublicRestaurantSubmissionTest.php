@@ -107,6 +107,7 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $restaurant = Restaurant::firstOrFail();
         $this->assertNull($restaurant->legacy_wp_id);
+        $this->assertSame('restaurant-de-test', $restaurant->slug);
         $this->assertSame('pending', $restaurant->status);
         $this->assertTrue($restaurant->has_halal_meat);
         $this->assertFalse($restaurant->has_halal_chicken);

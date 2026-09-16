@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-16
+
+- Secured restaurant slug creation and changes: deterministic name/city/postcode candidates, global reservation including the trash, no random public-submission suffix, and automatic guarded 301 redirects for intentional slug changes.
+
 ## 2026-09-15
 
 - 404 : enlarged the desktop illustration and restored the airy reassurance-card treatment with pastel 56 px icons, subtle short dividers and responsive tablet/mobile grids.

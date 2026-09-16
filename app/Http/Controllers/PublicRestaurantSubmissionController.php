@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePublicRestaurantSubmissionRequest;
 use App\Models\{Category, Feature, Restaurant, RestaurantClaim, RestaurantMedia, RestaurantSubmission, User};
 use App\Services\Location\{AddressSuggestionService, DuplicateRestaurantDetector, RestaurantLocationService};
-use App\Services\{MediaIngestor, RestaurantHours, RestaurantSubmissionMailer};
+use App\Services\{MediaIngestor, RestaurantHours, RestaurantSlugService, RestaurantSubmissionMailer};
 use Illuminate\Http\{JsonResponse, RedirectResponse, Request};
 use Illuminate\Support\Facades\{DB, Hash, URL};
 use Illuminate\Support\Str;
@@ -89,7 +89,7 @@ class PublicRestaurantSubmissionController extends Controller
         $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request, $token, $duplicateDetails): Restaurant {
             $restaurant = Restaurant::create([
                 'name' => trim($data['name']),
-                'slug' => $this->submissionSlug($data['name']),
+                'slug' => app(RestaurantSlugService::class)->generate($data['name'], $location['city_name'] ?? null, $location['postal_code'] ?? null),
                 'status' => 'pending',
                 'has_halal_meat' => (bool) ($data['halal_meat'] ?? false),
                 'has_halal_chicken' => (bool) ($data['halal_chicken'] ?? false),
@@ -294,11 +294,6 @@ class PublicRestaurantSubmissionController extends Controller
             trim(($location['postal_code'] ?? '').' '.($location['city_name'] ?? '')) ?: null,
             ($location['country_code'] ?? null) === 'FR' ? 'France' : null,
         ]));
-    }
-
-    private function submissionSlug(string $name): string
-    {
-        return (Str::slug($name) ?: 'restaurant').'-'.Str::lower(Str::random(8));
     }
 
 }

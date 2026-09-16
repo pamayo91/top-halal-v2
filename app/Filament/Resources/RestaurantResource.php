@@ -8,6 +8,7 @@ use App\Services\AdminAudit;
 use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\DuplicateRestaurantDetector;
 use App\Services\RestaurantSubmissionModeration;
+use App\Services\RestaurantSlugService;
 use App\Services\RestaurantHours;
 use App\Support\RobotsMeta;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
@@ -123,8 +124,15 @@ class RestaurantResource extends AdminResource
         return $schema->components([Tabs::make('Restaurant')->tabs([
             Tabs\Tab::make('Général')->schema([
                 Section::make()->columns(2)->schema([
-                    TextInput::make('name')->required()->maxLength(255)->live(onBlur: true)->afterStateUpdated(fn ($state, $set) => $set('slug', Str::slug((string) $state))),
-                    TextInput::make('slug')->required()->alphaDash()->unique(ignoreRecord: true),
+                    TextInput::make('name')->required()->maxLength(255)->live(onBlur: true)->afterStateUpdated(function ($state, $set, $get, string $operation): void {
+                        if ($operation !== 'create') return;
+                        $set('slug', app(RestaurantSlugService::class)->generate((string) $state, $get('city_name'), $get('postal_code')));
+                        $set('slug_automated', true);
+                    }),
+                    Hidden::make('slug_automated')->default(true)->visibleOn('create'),
+                    TextInput::make('slug')->required()->alphaDash()->unique(ignoreRecord: true)->afterStateUpdated(function ($set, string $operation): void {
+                        if ($operation === 'create') $set('slug_automated', false);
+                    }),
                     Select::make('status')->options(['draft'=>'Brouillon','pending'=>'En attente','published'=>'Publié','reported'=>'Signalé'])->required()->default('draft'),
                     Textarea::make('description')->columnSpanFull()->rows(6)->maxLength(20000),
                 ]),
@@ -134,10 +142,14 @@ class RestaurantResource extends AdminResource
                 Section::make('Adresse')->columns(2)->schema([
                     Select::make('address_suggestion')->label('Rechercher une adresse')->helperText('Sélection obligatoire pour créer ou remplacer une adresse.')->placeholder('Commencez à saisir au moins 3 caractères')->required(fn (string $operation): bool => $operation === 'create')->searchable()->searchDebounce(350)->getSearchResultsUsing(function (string $search): array {
                         return collect(app(AddressSuggestionService::class)->suggest($search))->mapWithKeys(fn (array $item) => [$item['token'] => $item['label']])->all();
-                    })->getOptionLabelUsing(fn (?string $value): ?string => ($feature = app(AddressSuggestionService::class)->resolve((string) $value)) ? app(AddressSuggestionService::class)->label($feature) : null)->live()->afterStateUpdated(function ($state, $set): void {
+                    })->getOptionLabelUsing(fn (?string $value): ?string => ($feature = app(AddressSuggestionService::class)->resolve((string) $value)) ? app(AddressSuggestionService::class)->label($feature) : null)->live()->afterStateUpdated(function ($state, $set, $get, string $operation): void {
                         $service = app(AddressSuggestionService::class); $feature = $service->resolve((string) $state); if (!$feature) return;
                         foreach ($service->structured($feature) as $field => $value) $set($field, $value);
                         $set('location_update_source', 'autocomplete');
+                        if ($operation === 'create' && $get('slug_automated')) {
+                            $set('slug', app(RestaurantSlugService::class)->generate((string) $get('name'), $get('city_name'), $get('postal_code')));
+                            $set('slug_automated', true);
+                        }
                     })->columnSpanFull(),
                     TextInput::make('address_line1')->label('Adresse')->maxLength(255)->readOnly(), TextInput::make('address_line2')->label('Complément')->maxLength(255)->readOnly(), TextInput::make('postal_code')->label('Code postal')->maxLength(20)->readOnly(),
                     TextInput::make('city_name')->label('Ville officielle')->maxLength(255)->readOnly(), TextInput::make('city_code')->label('Code INSEE')->maxLength(10)->readOnly(), TextInput::make('country_code')->label('Pays')->maxLength(2)->rules(['nullable', 'size:2'])->readOnly(),
