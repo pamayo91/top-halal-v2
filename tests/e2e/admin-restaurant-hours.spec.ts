@@ -30,6 +30,7 @@ test.describe('Horaires restaurant Filament', () => {
     const statuses = page.locator('select[id*=".hours."][id$=".status"]');
     await expect(statuses).toHaveCount(7);
     await expect(statuses.first()).toHaveValue(/closed|slots|all_day/);
+    await expect(hoursSection.locator('.restaurant-hours-slots table')).toHaveCount(0);
     expect((await hoursSection.boundingBox())?.height).toBeLessThan(700);
     expect(errors).toEqual([]);
   });

@@ -202,17 +202,17 @@ class RestaurantResource extends AdminResource
                                     ->dehydrated()
                                     ->defaultItems(1)
                                     ->addActionLabel('+ Ajouter une plage')
+                                    ->addActionAlignment('end')
                                     ->reorderable(false)
-                                    ->table([
-                                        TableColumn::make('De')->hiddenHeaderLabel(),
-                                        TableColumn::make('À')->hiddenHeaderLabel(),
-                                    ])
-                                    ->compact()
+                                    ->deleteAction(fn (Action $action): Action => $action->visible(function (array $arguments, Repeater $component): bool {
+                                        return array_key_first($component->getRawState()) !== ($arguments['item'] ?? null);
+                                    }))
                                     ->schema([
                                         Hidden::make('id'),
-                                        TextInput::make('opens_at')->hiddenLabel()->type('time')->required()->rules(['date_format:H:i']),
-                                        TextInput::make('closes_at')->hiddenLabel()->type('time')->required()->rules(['date_format:H:i']),
+                                        TextInput::make('opens_at')->hiddenLabel()->prefix('Ouverture')->type('time')->required()->rules(['date_format:H:i']),
+                                        TextInput::make('closes_at')->hiddenLabel()->prefix('→ Fermeture')->type('time')->required()->rules(['date_format:H:i']),
                                     ])
+                                    ->columns(['default' => 1, 'sm' => 2])
                                     ->extraAttributes(['class' => 'restaurant-hours-slots']),
                             ]),
                     ]),
