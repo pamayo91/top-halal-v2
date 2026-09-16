@@ -1,6 +1,8 @@
 # Front public
 
-Le front public est rendu côté serveur avec Blade. Il n’utilise ni SPA, ni police distante, ni bibliothèque UI. La feuille CSS locale constitue le design system : couleurs, typographie système, boutons, formulaires, cartes, étiquettes, états vides et grilles responsive.
+Le front public est rendu côté serveur avec Blade. Il n’utilise ni SPA, ni police distante, ni bibliothèque UI. La feuille CSS locale constitue le design system : couleurs, typographie General Sans auto-hébergée, boutons, formulaires, cartes, étiquettes, états vides et grilles responsive.
+
+- General Sans est la police unique du front public, servie localement via une unique WOFF2 variable (200–700) avec `font-display: swap`. Les usages sont limités à 400 (texte), 500 (métadonnées), 600 (navigation, formulaires, boutons et petits titres) et 700 (H1/grands titres). Le fichier officiel et la licence ITF Free Font License 2.0 sont dans `resources/fonts/general-sans/`; aucun CSS, préconnexion ou fichier de police tiers ne doit être ajouté.
 
 - L’en-tête conserve les parcours Restaurant, Guide et Compte ; le menu mobile est une amélioration progressive très légère.
 - Lorsqu’un administrateur actif consulte une fiche restaurant, un article ou une page, l’en-tête rend un raccourci SSR « Éditer » vers son formulaire Filament ; les visiteurs et autres comptes ne reçoivent pas ce markup.

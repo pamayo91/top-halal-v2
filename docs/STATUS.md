@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-14
+Last updated: 2026-09-16
+
+Latest public typography: General Sans is now the local public frontend typeface. One official 38 KB WOFF2 variable file (200–700) is bundled through Vite with `font-display: swap`, licensed under the retained ITF Free Font License 2.0. Public hierarchy uses 400 text, 500 metadata, 600 navigation/forms/buttons/small headings and 700 H1/major headings; legacy Georgia overrides were removed from public form/editorial headings. Filament remains unchanged and no external font CSS, preconnect or font request is allowed.
 
 Latest 404 page: the public 404 now uses the shared shell, fixed noindex HTTP-404 behavior, responsive illustration/message/CTA layout and four fixed reassurance blocks. On desktop, the left illustration intentionally exceeds the content block’s visible height while remaining centered, uncropped and undistorted; mobile returns to natural single-column image flow. The reassurance area is a light, spacious 1,120 px card with 56 px pastel icons, short subtle dividers and balanced text columns; it becomes 2 × 2 on tablet and a single column on mobile. Settings exposes only V2 media, title and text overrides; empty values fall back to code defaults and the designated V2 fallback illustration.
 

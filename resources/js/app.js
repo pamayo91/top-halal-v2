@@ -7,6 +7,7 @@ import '../css/contact-responsive.css';
 import '../css/contact-proportions.css';
 import '../css/contact-asset.css';
 import '../css/account.css';
+import '../css/typography.css';
 import { initializeAddressSelectors } from './address-selector';
 
 const menu = document.querySelector('.menu-toggle');

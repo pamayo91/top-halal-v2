@@ -1,0 +1,74 @@
+/*
+ * General Sans is self-hosted from the official Fontshare download.
+ * License: ITF Free Font License 2.0, kept beside this file's source asset.
+ */
+@font-face {
+    font-family: 'General Sans';
+    src: url('../fonts/general-sans/GeneralSans-Variable.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 200 700;
+    font-display: swap;
+}
+
+/* Public type hierarchy: the variable file provides only the weights we use. */
+h1 {
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+}
+
+h2,
+h3 {
+    font-weight: 600;
+}
+
+.brand,
+.eyebrow,
+.submission-kicker,
+.submission-choice-group legend,
+.taxonomy-fieldset legend,
+.hours-fieldset legend,
+.submission-summary dt,
+.contact-sticker {
+    font-weight: 700;
+}
+
+.nav-menu-list a,
+.nav-parent,
+.submenu-toggle,
+.button,
+.link-button,
+.menu-toggle,
+.mobile-menu-list a,
+.mobile-menu-list button,
+.filters legend,
+.contact-field > label,
+.form-grid label,
+.submission-step > label,
+.submission-owner-fields > label,
+.address-fields label,
+.claim-card label,
+.owner-address > .address-selector > label,
+.owner-address .address-fields label {
+    font-weight: 600;
+}
+
+/* These public form/editorial styles previously selected Georgia directly. */
+.auth-form-card header h1,
+.owner-form-card header h1,
+.claim-auth-card header h1,
+.claim-page-header h1,
+.claim-card h1,
+.claim-card h2,
+.contact-editorial h1,
+.contact-form-card header h2,
+.contact-success h2,
+.contact-art > p,
+.account-header h1 {
+    font-family: var(--site-font);
+}
+
+.contact-editorial h1 {
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+}

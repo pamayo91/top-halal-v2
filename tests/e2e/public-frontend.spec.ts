@@ -2,10 +2,10 @@ import { expect, test } from '@playwright/test';
 
 for (const device of ['desktop', 'mobile']) {
   test(`public directory journey is clean on ${device}`, async ({ page }) => {
-    const errors: string[] = []; const failed: string[] = []; const legacy: string[] = [];
+    const errors: string[] = []; const failed: string[] = []; const legacy: string[] = []; const externalFonts: string[] = [];
     page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
     page.on('requestfailed', r => failed.push(r.url()));
-    page.on('request', r => { if (/wp-conten(?:t|u)|wordpress/i.test(r.url())) legacy.push(r.url()); });
+    page.on('request', r => { if (/wp-conten(?:t|u)|wordpress/i.test(r.url())) legacy.push(r.url()); if (/fonts\.googleapis\.com|fonts\.gstatic\.com|fontshare\.com|cdn\.fontshare\.com/i.test(r.url())) externalFonts.push(r.url()); });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Trouvez votre restaurant halal, simplement.' })).toBeVisible();
     await page.getByRole('link', { name: 'Restaurants' }).first().click();
@@ -21,6 +21,6 @@ for (const device of ['desktop', 'mobile']) {
     await expect(page.locator('nav[aria-label="Fil d’Ariane"]')).toBeVisible();
     await page.goto('/blog');
     await expect(page.getByRole('heading', { name: 'Le guide Top Halal' })).toBeVisible();
-    expect(errors).toEqual([]); expect(failed).toEqual([]); expect(legacy).toEqual([]);
+    expect(errors).toEqual([]); expect(failed).toEqual([]); expect(legacy).toEqual([]); expect(externalFonts).toEqual([]);
   });
 }

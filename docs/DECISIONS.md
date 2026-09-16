@@ -1,5 +1,11 @@
 # Architectural & Product Decisions
 
+## 2026-09-16
+
+### D037 — General Sans auto-hébergée pour le front public
+
+Le front public utilise General Sans comme police principale. Une seule WOFF2 variable officielle (axe 200–700) est conservée sous `resources/fonts/general-sans/`, avec sa licence ITF Free Font License 2.0. Elle est servie par les assets Vite du domaine Top-Halal avec `font-display: swap`; ni API Fontshare, ni Google Fonts, ni autre domaine tiers ne participent au rendu. Le back-office Filament reste indépendant.
+
 ## 2026-09-13
 
 ### D036 — Les liens expirés restent vérifiables par leur jeton hashé

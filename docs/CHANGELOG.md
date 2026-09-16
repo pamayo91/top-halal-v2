@@ -335,6 +335,8 @@
 
 ## Unreleased
 
+- Le front public adopte General Sans en WOFF2 variable locale (400/500/600/700), téléchargée depuis Fontshare/Indian Type Foundry avec la licence FFL 2.0 conservée dans le dépôt. Les titres, navigation, contrôles et formulaires suivent une hiérarchie de graisses cohérente sans appel de police tiers; Filament n’est pas modifié.
+
 - Refonte visuelle SSR de `Mon compte` : en-tête et profil métier lisibles, cartes de restaurants responsive, statuts français, actions existantes et état vide. La requête d’accès, les Policies, claims, rôles et workflows existants sont inchangés.
 
 - Refined the claim page presentation only: balanced desktop cards, mobile stacking, a compact shared container, styled private-document selection and a separate certification control.

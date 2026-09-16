@@ -8,7 +8,7 @@ Internal CWV budgets: LCP < 1.8s, INP < 150ms, CLS < 0.05.
 - Server-rendered HTML via Blade.
 - Minimal JS; progressive enhancement.
 - No heavy SPA framework for public site.
-- Local/system fonts preferred; avoid remote font render blocking.
+- General Sans local variable WOFF2 only for the public frontend; avoid remote font render blocking and do not preload additional weights.
 - AVIF/WebP responsive images with correct dimensions.
 - Lazy-load below-the-fold media, never the LCP image.
 - Preload/priority only when measured and justified.
