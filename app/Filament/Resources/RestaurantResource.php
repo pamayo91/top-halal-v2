@@ -190,6 +190,7 @@ class RestaurantResource extends AdminResource
                                 Repeater::make('slots')
                                     ->label('Plages horaires')
                                     ->visible(fn ($get): bool => $get('../status') === 'slots')
+                                    ->dehydrated()
                                     ->defaultItems(1)
                                     ->addActionLabel('Ajouter une plage')
                                     ->reorderable(false)
