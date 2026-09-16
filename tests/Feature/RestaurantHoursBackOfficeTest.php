@@ -45,6 +45,7 @@ class RestaurantHoursBackOfficeTest extends TestCase
             ->assertSet('data.hours.0.slots.0.opens_at', '11:00')
             ->assertSet('data.hours.0.slots.1.opens_at', '18:00')
             ->fillForm(['hours' => $hours])
+            ->assertSet('data.hours.0.slots', $hours[0]['slots'])
             ->call('save')
             ->assertHasNoFormErrors();
         $undoRepeaterFake();
