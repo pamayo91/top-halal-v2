@@ -1,7 +1,7 @@
 <style id="fi-admin-responsive">
     .fi-main { max-width: 100%; min-width: 0; }
     .fi-main-ctn, .fi-page, .fi-section, .fi-ta { min-width: 0; }
-    .restaurant-hours-slots.fi-fo-repeater { --restaurant-hours-fields-width: 34.5rem; --restaurant-hours-action-width: 11.5rem; position: relative; display: block; width: fit-content; max-width: 100%; }
+    .restaurant-hours-slots.fi-fo-repeater { --restaurant-hours-fields-width: 26rem; --restaurant-hours-action-width: 10.5rem; position: relative; display: block; width: fit-content; max-width: 100%; }
     .restaurant-hours-slots .fi-fo-repeater-items { display: grid; grid-template-columns: max-content; gap: .25rem; width: max-content; }
     .restaurant-hours-slots .fi-fo-repeater-item { display: grid; grid-template-columns: var(--restaurant-hours-fields-width) var(--restaurant-hours-action-width); align-items: center; column-gap: .5rem; border-radius: 0; background: transparent; box-shadow: none; }
     .restaurant-hours-slots .fi-fo-repeater-item-content { grid-column: 1; grid-row: 1; padding: 0; width: var(--restaurant-hours-fields-width); }
@@ -10,7 +10,7 @@
     .restaurant-hours-slots .fi-fo-repeater-item-header-end-actions { gap: 0; margin-left: .375rem; }
     .restaurant-hours-slots .fi-fo-field, .restaurant-hours-slots .fi-fo-field-wrp { gap: 0; }
     .restaurant-hours-slots .fi-sc { display: grid; grid-template-columns: max-content max-content; gap: .5rem; width: max-content; }
-    .restaurant-hours-slots .fi-input-wrp { min-height: 2rem; width: 17rem; }
+    .restaurant-hours-slots .fi-input-wrp { min-height: 2rem; width: max-content; }
     .restaurant-hours-slots .fi-input { min-height: 2rem; width: 7.25rem; padding: .25rem .5rem; font-size: .8125rem; }
     .restaurant-hours-slots .fi-input-wrp-prefix { gap: .25rem; padding-inline: .5rem; font-size: .75rem; }
     .restaurant-hours-slots .fi-fo-repeater-add { position: absolute; top: 0; left: calc(var(--restaurant-hours-fields-width) + .5rem); width: var(--restaurant-hours-action-width); justify-content: flex-start; margin: 0; }
