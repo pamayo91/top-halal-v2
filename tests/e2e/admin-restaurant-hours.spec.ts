@@ -42,15 +42,17 @@ test.describe('Horaires restaurant Filament', () => {
     await slots.getByRole('button', { name: '+ Ajouter une plage' }).click();
     const slotItems = slots.locator('.fi-fo-repeater-item');
     await expect(slotItems).toHaveCount(2);
-    const [firstInput, secondInput, addButton, deleteButton] = await Promise.all([
+    const [firstInput, secondInput, addButton, deleteButton, slotsCell] = await Promise.all([
       slotItems.nth(0).locator('.fi-input-wrp').first().boundingBox(),
       slotItems.nth(1).locator('.fi-input-wrp').first().boundingBox(),
       slots.getByRole('button', { name: '+ Ajouter une plage' }).boundingBox(),
       slotItems.nth(1).locator('.fi-fo-repeater-item-header button').boundingBox(),
+      slots.locator('xpath=ancestor::td').first().boundingBox(),
     ]);
     expect(firstInput?.x).toBe(secondInput?.x);
     expect(addButton?.x).toBe(deleteButton?.x);
     expect(addButton?.height).toBeLessThanOrEqual(32);
+    expect((addButton?.x ?? 0) + (addButton?.width ?? 0)).toBeLessThanOrEqual((slotsCell?.x ?? 0) + (slotsCell?.width ?? 0));
     expect((secondInput?.y ?? 0) - (firstInput?.y ?? 0)).toBeLessThanOrEqual(36);
     expect((await hoursSection.boundingBox())?.height).toBeLessThan(700);
     expect(errors).toEqual([]);
