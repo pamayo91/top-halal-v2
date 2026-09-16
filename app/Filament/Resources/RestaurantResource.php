@@ -189,7 +189,7 @@ class RestaurantResource extends AdminResource
                                 Select::make('status')->label('Statut')->options(['closed' => 'Fermé', 'all_day' => 'Ouvert 24h/24', 'slots' => 'Plages horaires'])->required()->live(),
                                 Repeater::make('slots')
                                     ->label('Plages horaires')
-                                    ->visible(fn ($get): bool => $get('../status') === 'slots')
+                                    ->visible(fn ($get): bool => $get('status') === 'slots')
                                     ->dehydrated()
                                     ->defaultItems(1)
                                     ->addActionLabel('Ajouter une plage')
