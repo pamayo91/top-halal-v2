@@ -5,8 +5,8 @@
     .restaurant-hours-slots .fi-fo-repeater-items, .restaurant-hours-slots .fi-fo-repeater-item { display: contents; }
     .restaurant-hours-slots .fi-fo-repeater-item-content { grid-column: 1; padding: 0; width: max-content; }
     .restaurant-hours-slots .fi-fo-repeater-item-has-header > .fi-fo-repeater-item-content { border-top: 0; padding-right: 0; }
-    .restaurant-hours-slots .fi-fo-repeater-item-header { position: static; grid-column: 2; align-self: center; padding: 0; width: 9rem; }
-    .restaurant-hours-slots .fi-fo-repeater-item-header-end-actions { gap: 0; }
+    .restaurant-hours-slots .fi-fo-repeater-item-header { position: static; grid-column: 2; align-self: center; justify-content: flex-start; padding: 0; width: 9rem; }
+    .restaurant-hours-slots .fi-fo-repeater-item-header-end-actions { gap: 0; margin-left: 0; }
     .restaurant-hours-slots .fi-fo-field, .restaurant-hours-slots .fi-fo-field-wrp { gap: 0; }
     .restaurant-hours-slots .fi-sc { display: grid; grid-template-columns: max-content max-content; gap: .5rem; width: max-content; }
     .restaurant-hours-slots .fi-input-wrp { min-height: 2rem; width: 17rem; }
