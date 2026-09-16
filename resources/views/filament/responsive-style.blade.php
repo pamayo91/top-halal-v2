@@ -1,6 +1,8 @@
 <style id="fi-admin-responsive">
     .fi-main { max-width: 100%; min-width: 0; }
     .fi-main-ctn, .fi-page, .fi-section, .fi-ta { min-width: 0; }
+    .restaurant-hours-slots .fi-fo-repeater-item { padding-block: .25rem; }
+    .restaurant-hours-slots .fi-fo-repeater-add-action-ctn { margin-top: .25rem; }
 
     @media (max-width: 767px) {
         .fi-main { padding-inline: .75rem; }

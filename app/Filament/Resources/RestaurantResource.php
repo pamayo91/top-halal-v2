@@ -11,7 +11,8 @@ use App\Services\RestaurantSubmissionModeration;
 use App\Services\RestaurantHours;
 use App\Support\RobotsMeta;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
-use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Repeater, Select, Textarea, TextInput};
+use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Placeholder, Repeater, Select, Textarea, TextInput};
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Schemas\Components\{Section, Tabs, View};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\{ImageColumn, TextColumn};
@@ -175,33 +176,43 @@ class RestaurantResource extends AdminResource
             Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255)])]),
             Tabs\Tab::make('Horaires')->schema([
                 Section::make('Horaires d’ouverture')
-                    ->description('Renseignez chaque jour comme fermé, ouvert 24h/24 ou avec une ou plusieurs plages. Les créneaux sont affichés tels quels sur la fiche publique.')
                     ->schema([
                         Repeater::make('hours')
-                            ->label('Jours')
+                            ->hiddenLabel()
                             ->default(fn (): array => app(RestaurantHours::class)->editorState(collect()))
                             ->addable(false)
                             ->deletable(false)
                             ->reorderable(false)
+                            ->table([
+                                TableColumn::make('Jour')->width('8rem'),
+                                TableColumn::make('Statut')->width('10rem'),
+                                TableColumn::make('Plages horaires'),
+                            ])
+                            ->compact()
                             ->schema([
                                 Hidden::make('hour_ids')->default([]),
-                                Select::make('day')->label('Jour')->options(RestaurantHours::DAYS)->required()->disabled()->dehydrated(),
-                                Select::make('status')->label('Statut')->options(['closed' => 'Fermé', 'all_day' => 'Ouvert 24h/24', 'slots' => 'Plages horaires'])->required()->live(),
+                                Hidden::make('day')->required(),
+                                Placeholder::make('day_label')->hiddenLabel()->content(fn ($get): string => RestaurantHours::DAYS[$get('day')] ?? '—'),
+                                Select::make('status')->hiddenLabel()->options(['closed' => 'Fermé', 'slots' => 'Ouvert', 'all_day' => '24h/24'])->required()->live(),
                                 Repeater::make('slots')
-                                    ->label('Plages horaires')
+                                    ->hiddenLabel()
                                     ->visible(fn ($get): bool => $get('status') === 'slots')
                                     ->dehydrated()
                                     ->defaultItems(1)
-                                    ->addActionLabel('Ajouter une plage')
+                                    ->addActionLabel('+ Ajouter une plage')
                                     ->reorderable(false)
+                                    ->table([
+                                        TableColumn::make('De')->hiddenHeaderLabel(),
+                                        TableColumn::make('À')->hiddenHeaderLabel(),
+                                    ])
+                                    ->compact()
                                     ->schema([
                                         Hidden::make('id'),
-                                        TextInput::make('opens_at')->label('Ouvre à')->type('time')->required()->rules(['date_format:H:i']),
-                                        TextInput::make('closes_at')->label('Ferme à')->type('time')->required()->rules(['date_format:H:i']),
+                                        TextInput::make('opens_at')->hiddenLabel()->type('time')->required()->rules(['date_format:H:i']),
+                                        TextInput::make('closes_at')->hiddenLabel()->type('time')->required()->rules(['date_format:H:i']),
                                     ])
-                                    ->columns(2),
-                            ])
-                            ->columns(2),
+                                    ->extraAttributes(['class' => 'restaurant-hours-slots']),
+                            ]),
                     ]),
             ]),
             Tabs\Tab::make('Proposition')->visible(fn (?Restaurant $record): bool => $record?->submission !== null)->schema([

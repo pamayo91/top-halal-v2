@@ -23,10 +23,12 @@ test.describe('Horaires restaurant Filament', () => {
     await page.getByRole('tab', { name: 'Horaires' }).click();
 
     await expect(page.getByText('Horaires d’ouverture')).toBeVisible();
-    const days = page.locator('select[id$=".day"]');
-    await expect(days).toHaveCount(7);
-    await expect(days.first()).toHaveValue('monday');
-    await expect(days.nth(6)).toHaveValue('sunday');
+    await expect(page.locator('select[id$=".day"]')).toHaveCount(0);
+    await expect(page.getByText('Lundi', { exact: true })).toBeVisible();
+    await expect(page.getByText('Dimanche', { exact: true })).toBeVisible();
+    const statuses = page.locator('select[id$=".status"]');
+    await expect(statuses).toHaveCount(7);
+    await expect(statuses.first()).toHaveValue(/closed|slots|all_day/);
     expect(errors).toEqual([]);
   });
 });
