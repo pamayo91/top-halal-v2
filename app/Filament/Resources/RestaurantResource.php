@@ -11,7 +11,7 @@ use App\Services\RestaurantSubmissionModeration;
 use App\Services\RestaurantHours;
 use App\Support\RobotsMeta;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
-use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Repeater, Select, Textarea, TextInput, TimePicker};
+use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Repeater, Select, Textarea, TextInput};
 use Filament\Schemas\Components\{Section, Tabs, View};
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\{ImageColumn, TextColumn};
@@ -195,8 +195,8 @@ class RestaurantResource extends AdminResource
                                     ->reorderable(false)
                                     ->schema([
                                         Hidden::make('id'),
-                                        TimePicker::make('opens_at')->label('Ouvre à')->seconds(false)->required(),
-                                        TimePicker::make('closes_at')->label('Ferme à')->seconds(false)->required(),
+                                        TextInput::make('opens_at')->label('Ouvre à')->type('time')->required()->rules(['date_format:H:i']),
+                                        TextInput::make('closes_at')->label('Ferme à')->type('time')->required()->rules(['date_format:H:i']),
                                     ])
                                     ->columns(2),
                             ])
