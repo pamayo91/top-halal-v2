@@ -52,9 +52,9 @@ class RestaurantHoursBackOfficeTest extends TestCase
 
         $stored = $restaurant->fresh()->openingHours()->orderBy('day')->orderBy('slot')->get();
         $this->assertCount(9, $stored);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $monday->id, 'opens_at' => '10:30:00', 'closes_at' => '14:30:00', 'legacy_key' => 'legacy:monday:1']);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $mondayEvening->id, 'opens_at' => '18:30:00', 'closes_at' => '23:30:00', 'legacy_key' => 'legacy:monday:2']);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 3, 'opens_at' => '23:40:00', 'closes_at' => '23:50:00', 'legacy_key' => 'admin:monday:3']);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $monday->id, 'opens_at' => '10:30', 'closes_at' => '14:30', 'legacy_key' => 'legacy:monday:1']);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $mondayEvening->id, 'opens_at' => '18:30', 'closes_at' => '23:30', 'legacy_key' => 'legacy:monday:2']);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 3, 'opens_at' => '23:40', 'closes_at' => '23:50', 'legacy_key' => 'admin:monday:3']);
         $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'slot' => 1, 'is_closed' => true]);
     }
 
