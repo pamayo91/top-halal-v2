@@ -22,13 +22,15 @@ test.describe('Horaires restaurant Filament', () => {
     await page.goto('/admin/restaurants/7699/edit');
     await page.getByRole('tab', { name: 'Horaires' }).click();
 
-    await expect(page.getByText('Horaires d’ouverture')).toBeVisible();
+    const hoursSection = page.locator('.fi-section').filter({ hasText: 'Horaires d’ouverture' });
+    await expect(hoursSection).toBeVisible();
     await expect(page.locator('select[id$=".day"]')).toHaveCount(0);
     await expect(page.getByText('Lundi', { exact: true })).toBeVisible();
     await expect(page.getByText('Dimanche', { exact: true })).toBeVisible();
-    const statuses = page.locator('select[id$=".status"]');
+    const statuses = page.locator('select[id*=".hours."][id$=".status"]');
     await expect(statuses).toHaveCount(7);
     await expect(statuses.first()).toHaveValue(/closed|slots|all_day/);
+    expect((await hoursSection.boundingBox())?.height).toBeLessThan(700);
     expect(errors).toEqual([]);
   });
 });
