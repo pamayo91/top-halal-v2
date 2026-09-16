@@ -35,7 +35,7 @@ Suggested core data includes name/slug/description/status/owner, address/postcod
 - external outbound actions obfuscated server-side.
 
 ## Admin/owner
-Create/edit/moderate records, media, hours, categories/features and ownership/claims with clear auditability. The Filament restaurant editor has an `Horaires` tab backed only by the existing `restaurant_opening_hours` relation: its compact seven-row table fixes the day labels, preserves legacy row identifiers on modification, and lets an administrator mark each day closed, open or 24h/24, with one or more ordered, non-overlapping time slots.
+Create/edit/moderate records, media, hours, categories/features and ownership/claims with clear auditability. The Filament restaurant editor has an `Horaires` tab backed only by the existing `restaurant_opening_hours` relation: its compact seven-row table fixes the day labels, preserves legacy row identifiers on modification, and lets an administrator mark each day closed, open or 24h/24, with one or more ordered, non-overlapping time slots. Selecting `Ouvert` on a closed day immediately creates its first empty time slot; the add action is for further slots only.
 
 ## Public restaurant proposal
 

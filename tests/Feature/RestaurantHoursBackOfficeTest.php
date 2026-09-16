@@ -70,4 +70,25 @@ class RestaurantHoursBackOfficeTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         app(RestaurantHours::class)->sync(Restaurant::create(['legacy_wp_id' => 950002, 'name' => 'Validation BO', 'slug' => 'validation-bo', 'status' => 'draft']), $input);
     }
+
+    public function test_filament_adds_a_first_slot_when_a_closed_day_becomes_open_then_saves_it(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 950003, 'name' => 'Ouverture BO', 'slug' => 'ouverture-bo', 'status' => 'draft']);
+
+        $undoRepeaterFake = Repeater::fake();
+        Livewire::actingAs($admin)
+            ->test(EditRestaurant::class, ['record' => $restaurant->getRouteKey()])
+            ->assertSet('data.hours.0.status', 'closed')
+            ->set('data.hours.0.status', 'slots')
+            ->assertSet('data.hours.0.slots.0.opens_at', null)
+            ->assertSet('data.hours.0.slots.0.closes_at', null)
+            ->set('data.hours.0.slots.0.opens_at', '11:00')
+            ->set('data.hours.0.slots.0.closes_at', '14:00')
+            ->call('save')
+            ->assertHasNoFormErrors();
+        $undoRepeaterFake();
+
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '11:00', 'closes_at' => '14:00', 'is_closed' => false]);
+    }
 }

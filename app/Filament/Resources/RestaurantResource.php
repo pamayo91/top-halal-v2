@@ -193,7 +193,9 @@ class RestaurantResource extends AdminResource
                                 Hidden::make('hour_ids')->default([]),
                                 Hidden::make('day')->required(),
                                 Placeholder::make('day_label')->hiddenLabel()->content(fn ($get): string => RestaurantHours::DAYS[$get('day')] ?? '—'),
-                                Select::make('status')->hiddenLabel()->options(['closed' => 'Fermé', 'slots' => 'Ouvert', 'all_day' => '24h/24'])->required()->live(),
+                                Select::make('status')->hiddenLabel()->options(['closed' => 'Fermé', 'slots' => 'Ouvert', 'all_day' => '24h/24'])->required()->live()->afterStateUpdated(function ($state, $get, $set): void {
+                                    if ($state === 'slots' && empty($get('slots'))) $set('slots', [['opens_at' => null, 'closes_at' => null]]);
+                                }),
                                 Repeater::make('slots')
                                     ->hiddenLabel()
                                     ->visible(fn ($get): bool => $get('status') === 'slots')
