@@ -262,7 +262,6 @@ test('public restaurant contribution requires a cover photo and validates the em
   await page.locator('[name="owner_full_name"]').fill('Amina Martin');
   await page.locator('[name="owner_company"]').fill('SARL Test');
   await page.locator('[name="owner_siret"]').fill('654654654654654');
-  await page.getByLabel(/Je certifie être le propriétaire/).check();
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
   await expect(page.locator('[data-owner-siret-error]')).toHaveText('Le SIRET doit comporter 14 chiffres valides.');
   await expect(page.locator('[data-owner-siret-error]')).toBeVisible();
