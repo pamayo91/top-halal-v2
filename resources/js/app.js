@@ -258,6 +258,7 @@ if (submission) {
         button.hidden = false;
         button.addEventListener('click', async () => {
             if (button.hasAttribute('data-previous')) { setStep(currentStep - 1); return; }
+            if (button.closest('[data-submission-step]')?.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return;
             if (!validateStep(currentStep)) return;
             if (currentStep === 1) await refreshDuplicates(nameDuplicates, false);
             if (currentStep === 2) await refreshDuplicates(addressDuplicates, true);
