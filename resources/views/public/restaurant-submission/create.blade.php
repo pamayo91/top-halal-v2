@@ -104,7 +104,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                            <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
+                            <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target="{{ $dayKey }}"> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
                         </fieldset>
 
                         <div class="form-grid">
