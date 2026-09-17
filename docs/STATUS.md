@@ -1,6 +1,6 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-16
+Last updated: 2026-09-17
 
 Latest public restaurant-submission presentation: the five-step Blade form now gives its explanatory header readable secondary contrast, spans the complete usable header width with the progress track, and renders informative close-name candidates immediately after the restaurant-name field. Step 2 uses plain French with no public provider/administrative-geocoding terminology. Returning from step 3 dispatches a visibility refresh to the already-created Leaflet map; it retains the selected marker and coordinates while correctly recalculating map size. Desktop/mobile Playwright coverage includes this return cycle and the mobile close-name placement.
 
