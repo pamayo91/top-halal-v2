@@ -22,6 +22,17 @@ async function fillRestaurantAndAddress(page: import('@playwright/test').Page, s
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
 }
 
+async function expectCopyControlWithoutOverlap(page: import('@playwright/test').Page) {
+  await expect.poll(() => page.locator('[data-copy-hours]').evaluate(button => {
+    const buttonRect = button.getBoundingClientRect();
+    return [...document.querySelectorAll<HTMLElement>('.hours-copy fieldset label')].every(label => {
+      const labelRect = label.getBoundingClientRect();
+      return buttonRect.right <= labelRect.left || buttonRect.left >= labelRect.right
+        || buttonRect.bottom <= labelRect.top || buttonRect.top >= labelRect.bottom;
+    });
+  })).toBe(true);
+}
+
 test('public restaurant contribution blocks an empty halal choice and identifies a duplicate', async ({ page }) => {
   await page.goto('/ajouter-un-restaurant');
   expect(await page.locator('[data-restaurant-name]').evaluate(input => input.nextElementSibling?.matches('[data-name-duplicates]'))).toBe(true);
@@ -129,6 +140,7 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_open]"]').fill('10:10');
   await page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_close]"]').fill('12:00');
   await expect(page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_close]"]')).toHaveValue('12:00');
+  await expectCopyControlWithoutOverlap(page);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
@@ -160,6 +172,8 @@ test('public restaurant contribution keeps the hours editor within standard desk
   await monday.getByRole('button', { name: '+ 2ème plage' }).click();
   await monday.locator('[name="hours[monday][second_open]"]').fill('18:30');
   await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
+
+  await expectCopyControlWithoutOverlap(page);
 
   await expect.poll(async () => monday.evaluate(day => {
     const secondRange = day.querySelector('[data-hours-second-slot]')?.getBoundingClientRect();

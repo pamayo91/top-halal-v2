@@ -4,6 +4,7 @@
 
 - Compacté et clarifié la saisie publique des horaires : contrôles natifs d’heure lisibles, actions de seconde plage raccourcies, deux créneaux alignés puis responsivement repliés, et recopie de jours mieux groupée, sans modifier le contrat enregistré ni sa validation.
 - Affiné l’alignement des plages et de leur action de suppression, la hiérarchie des libellés `De` / `à`, les lignes fermées et la répartition du bloc de recopie.
+- Stabilisé la grille de recopie publique afin que son bouton occupe toujours une ligne distincte des jours sélectionnables.
 
 ## 2026-09-17
 
