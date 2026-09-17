@@ -93,17 +93,18 @@
                             <p class="form-help">Pour chaque jour, indiquez fermé, ouvert 24h/24, ou une à deux plages horaires.</p>
                             @foreach($days as $dayKey => $dayLabel)
                                 @php($status = old("hours.$dayKey.status", 'closed'))
-                                <div class="hours-day" data-hours-day="{{ $dayKey }}">
-                                    <div><b>{{ $dayLabel }}</b><label class="sr-only" for="hours-{{ $dayKey }}-status">Statut {{ $dayLabel }}</label><select id="hours-{{ $dayKey }}-status" name="hours[{{ $dayKey }}][status]" data-hours-status><option value="closed" @selected($status === 'closed')>Fermé</option><option value="all_day" @selected($status === 'all_day')>Ouvert 24h/24</option><option value="slots" @selected($status === 'slots')>Horaires</option></select></div>
+                                @php($hasSecondSlot = filled(old("hours.$dayKey.second_open")) || filled(old("hours.$dayKey.second_close")))
+                                <div class="hours-day" data-hours-day="{{ $dayKey }}" data-hours-second-active="{{ $hasSecondSlot ? '1' : '0' }}">
+                                    <div class="hours-day-heading"><b>{{ $dayLabel }}</b><label class="sr-only" for="hours-{{ $dayKey }}-status">État {{ $dayLabel }}</label><select id="hours-{{ $dayKey }}-status" name="hours[{{ $dayKey }}][status]" data-hours-status><option value="closed" @selected($status === 'closed')>Fermé</option><option value="all_day" @selected($status === 'all_day')>Ouvert 24h/24</option><option value="slots" @selected($status === 'slots')>Horaires</option></select></div>
                                     <div class="hours-slots" data-hours-slots @if($status !== 'slots') hidden @endif>
-                                        <label>De <input type="time" name="hours[{{ $dayKey }}][first_open]" value="{{ old("hours.$dayKey.first_open") }}"></label>
-                                        <label>À <input type="time" name="hours[{{ $dayKey }}][first_close]" value="{{ old("hours.$dayKey.first_close") }}"></label>
-                                        <label>De <input type="time" name="hours[{{ $dayKey }}][second_open]" value="{{ old("hours.$dayKey.second_open") }}"></label>
-                                        <label>À <input type="time" name="hours[{{ $dayKey }}][second_close]" value="{{ old("hours.$dayKey.second_close") }}"></label>
+                                        <div class="hours-slot-row"><label>De <input type="time" name="hours[{{ $dayKey }}][first_open]" value="{{ old("hours.$dayKey.first_open") }}"></label><label>à <input type="time" name="hours[{{ $dayKey }}][first_close]" value="{{ old("hours.$dayKey.first_close") }}"></label></div>
+                                        <div class="hours-slot-row" data-hours-second-slot @if(!$hasSecondSlot) hidden @endif><label>De <input type="time" name="hours[{{ $dayKey }}][second_open]" value="{{ old("hours.$dayKey.second_open") }}"></label><label>à <input type="time" name="hours[{{ $dayKey }}][second_close]" value="{{ old("hours.$dayKey.second_close") }}"></label></div>
+                                        <button class="hours-slot-action" type="button" data-add-hours-slot @if($hasSecondSlot) hidden @endif>+ Ajouter une deuxième plage</button>
+                                        <button class="hours-slot-action" type="button" data-remove-hours-slot @if(!$hasSecondSlot) hidden @endif>Supprimer la deuxième plage</button>
                                     </div>
                                 </div>
                             @endforeach
-                            <div class="hours-copy"><label for="hours-copy-source">Recopier les horaires de</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
+                            <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
                         </fieldset>
 
                         <div class="form-grid">
@@ -113,8 +114,7 @@
                             <label for="restaurant-facebook">Facebook <input id="restaurant-facebook" name="facebook_url" type="url" inputmode="url" placeholder="https://…" value="{{ old('facebook_url') }}"></label>
                             <label for="restaurant-tiktok">TikTok <input id="restaurant-tiktok" name="tiktok_url" type="url" inputmode="url" placeholder="https://…" value="{{ old('tiktok_url') }}"></label>
                         </div>
-                        <p class="form-help">Les liens sont stockés pour vérification et ne sont jamais affichés directement sur une fiche publique.</p>
-                        <label for="restaurant-description">Description (facultative)</label>
+                        <label for="restaurant-description">Description</label>
                         <textarea id="restaurant-description" name="description" maxlength="3000" data-description>{{ old('description') }}</textarea>
                         @foreach(['phone', 'website_url', 'instagram_url', 'facebook_url', 'tiktok_url', 'description'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
 

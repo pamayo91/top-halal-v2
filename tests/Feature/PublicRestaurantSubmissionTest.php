@@ -132,6 +132,28 @@ class PublicRestaurantSubmissionTest extends TestCase
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
     }
 
+    public function test_it_persists_mixed_opening_states_and_two_ordered_slots(): void
+    {
+        $asset = MediaAsset::create(['original_path' => 'media/originals/hours.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
+        $ingestor = Mockery::mock(MediaIngestor::class);
+        $ingestor->shouldReceive('ingest')->once()->andReturn($asset);
+        $this->app->instance(MediaIngestor::class, $ingestor);
+
+        $hours = [];
+        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) $hours[$day] = ['status' => 'closed'];
+        $hours['monday'] = ['status' => 'slots', 'first_open' => '10:00', 'first_close' => '14:00', 'second_open' => '18:00', 'second_close' => '22:00'];
+        $hours['tuesday'] = ['status' => 'all_day'];
+
+        $this->post(route('restaurant-submissions.store'), $this->payload(['hours' => $hours]))->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $restaurant = Restaurant::firstOrFail();
+        $this->assertCount(8, $restaurant->openingHours);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '10:00:00', 'closes_at' => '14:00:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '18:00:00', 'closes_at' => '22:00:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'tuesday', 'slot' => 1, 'is_closed' => 0, 'is_open_24_hours' => 1]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'slot' => 1, 'is_closed' => 1, 'is_open_24_hours' => 0]);
+    }
+
     public function test_a_marker_move_changes_only_coordinates_after_the_selected_address_is_persisted(): void
     {
         $asset = MediaAsset::create(['original_path' => 'media/originals/test.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('b', 64), 'status' => 'ready']);

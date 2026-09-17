@@ -76,6 +76,46 @@ test('public restaurant contribution restores one correctly sized map after retu
   expect(await Promise.all([page.locator('[data-latitude]').inputValue(), page.locator('[data-longitude]').inputValue()])).toEqual(position);
 });
 
+test('public restaurant contribution keeps compact mixed hours and copied slots across steps', async ({ page }) => {
+  await page.goto('/ajouter-un-restaurant');
+  await page.locator('[data-restaurant-name]').fill('Horaires compacts');
+  await page.getByLabel('Viande halal').check();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByLabel('Adresse du restaurant').fill('46 Boulevard du Temple Paris');
+  await expect(page.locator('[data-address-results] button').first()).toBeVisible();
+  await page.locator('[data-address-results] button').first().click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+
+  const monday = page.locator('[data-hours-day="monday"]');
+  const tuesday = page.locator('[data-hours-day="tuesday"]');
+  const sunday = page.locator('[data-hours-day="sunday"]');
+  await page.getByLabel('État Lundi').selectOption('slots');
+  await expect(monday.locator('[data-hours-second-slot]')).toBeHidden();
+  await monday.locator('[name="hours[monday][first_open]"]').fill('10:00');
+  await monday.locator('[name="hours[monday][first_close]"]').fill('14:00');
+  await monday.getByRole('button', { name: '+ Ajouter une deuxième plage' }).click();
+  await monday.locator('[name="hours[monday][second_open]"]').fill('18:00');
+  await monday.locator('[name="hours[monday][second_close]"]').fill('22:00');
+  await page.getByLabel('État Mardi').selectOption('all_day');
+  await expect(tuesday.locator('[data-hours-slots]')).toBeHidden();
+  await expect(sunday.locator('[data-hours-slots]')).toBeHidden();
+
+  await page.locator('[data-copy-source]').selectOption('monday');
+  await page.locator('[data-copy-target="tuesday"]').check();
+  await page.locator('[data-copy-target="wednesday"]').check();
+  await page.getByRole('button', { name: 'Recopier', exact: true }).click();
+  await expect(page.getByLabel('État Mardi')).toHaveValue('slots');
+  await expect(tuesday.locator('[name="hours[tuesday][second_close]"]')).toHaveValue('22:00');
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
+  await page.getByRole('button', { name: 'Retour' }).click();
+  await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
+  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('10:00');
+  await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('22:00');
+  await expect(tuesday.locator('[name="hours[tuesday][second_open]"]')).toHaveValue('18:00');
+});
+
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {
   await fillRestaurantAndAddress(page, `photos-${testInfo.project.name}-${Date.now()}`);
   await page.getByRole('button', { name: 'Continuer' }).click();

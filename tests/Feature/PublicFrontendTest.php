@@ -88,10 +88,20 @@ class PublicFrontendTest extends TestCase
     public function test_outbound_route_redirects_without_exposing_destination_in_restaurant_html(): void
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 412, 'name' => 'Le Cèdre', 'slug' => 'le-cedre', 'status' => 'published']);
-        $link = RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'aBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Réserver', 'destination_url' => 'https://example.test/reservation']);
-        $this->get('/resto/le-cedre')->assertOk()->assertDontSee('example.test');
-        $this->get('/sortie/'.$link->token)->assertRedirect('https://example.test/reservation');
-        $this->assertSame(1, $link->fresh()->click_count);
+        $links = collect([
+            ['token' => 'aBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Site web', 'destination_url' => 'https://example.test/reservation'],
+            ['token' => 'bBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Facebook', 'destination_url' => 'https://facebook.example.test/cedre'],
+            ['token' => 'cBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Instagram', 'destination_url' => 'https://instagram.example.test/cedre'],
+            ['token' => 'dBcDeFgHiJkLmNoPqRsT1234', 'label' => 'TikTok', 'destination_url' => 'https://tiktok.example.test/@cedre'],
+        ])->map(fn (array $attributes) => RestaurantOutboundLink::create([...$attributes, 'restaurant_id' => $restaurant->id, 'is_active' => true]));
+        $response = $this->get('/resto/le-cedre')->assertOk();
+        foreach ($links as $link) {
+            $response->assertSee(route('restaurants.outbound', $link->token), false)
+                ->assertSee($link->label)
+                ->assertDontSee($link->destination_url);
+        }
+        $this->get('/sortie/'.$links->first()->token)->assertRedirect($links->first()->destination_url);
+        $this->assertSame(1, $links->first()->fresh()->click_count);
     }
 
     public function test_restaurant_title_is_not_double_encoded(): void
