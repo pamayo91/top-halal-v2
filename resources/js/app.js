@@ -56,9 +56,13 @@ if (submission) {
     const ownerEmailHelp = [...form.querySelectorAll('[data-owner-email-help]')];
     const syncOwnerChoice = () => {
         const selectedRole = form.querySelector('[name="submitter_role"]:checked')?.value;
-        if (ownerFields) ownerFields.hidden = selectedRole !== 'owner';
+        const isOwner = selectedRole === 'owner';
+        if (ownerFields) {
+            ownerFields.hidden = !isOwner;
+            ownerFields.querySelectorAll('input').forEach(field => { field.required = isOwner; });
+        }
         ownerChoices.forEach(input => input.closest('.choice-card')?.classList.toggle('is-selected', input.checked));
-        ownerEmailHelp.forEach(help => { help.hidden = help.dataset.ownerEmailHelp !== (selectedRole === 'owner' ? 'owner' : 'customer'); });
+        ownerEmailHelp.forEach(help => { help.hidden = help.dataset.ownerEmailHelp !== (isOwner ? 'owner' : 'customer'); });
     };
     ownerChoices.forEach(input => input.addEventListener('change', syncOwnerChoice));
     let currentStep = Number.parseInt(submission.dataset.initialStep || '1', 10) || 1;

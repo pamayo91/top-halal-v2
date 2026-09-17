@@ -243,9 +243,16 @@ test('public restaurant contribution requires a cover photo and validates the em
   await page.getByLabel('Non').check();
   await expect(page.locator('[data-owner-fields]')).toBeHidden();
   await expect(page.locator('[data-owner-email-help="customer"]')).toBeVisible();
+  await expect(page.locator('[name="owner_full_name"]')).not.toHaveAttribute('required', '');
   await page.getByLabel('Oui').check();
   await expect(page.locator('[data-owner-fields]')).toBeVisible();
   await expect(page.locator('[data-owner-email-help="owner"]')).toBeVisible();
+  await expect(page.locator('[name="owner_full_name"]')).toHaveAttribute('required', '');
+  await expect(page.locator('[name="owner_company"]')).toHaveAttribute('required', '');
+  await expect(page.locator('[name="owner_siret"]')).toHaveAttribute('required', '');
+  await expect(page.locator('[name="owner_certified"]')).toHaveAttribute('required', '');
+  await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
+  await expect.poll(() => page.locator('[name="owner_full_name"]').evaluate((input: HTMLInputElement) => input.validationMessage)).not.toBe('');
   await page.getByLabel('Non').check();
   await expect(page.locator('[data-owner-fields]')).toBeHidden();
   await expect(page.locator('[data-owner-email-help="customer"]')).toBeVisible();
