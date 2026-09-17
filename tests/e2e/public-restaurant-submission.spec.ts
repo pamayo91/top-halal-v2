@@ -101,7 +101,7 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
   await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
   await expect(monday.locator('[name="hours[monday][first_close]"]')).toHaveValue('09:30');
-  await expect(monday.locator('[name="hours[monday][second_open]"]')).toHaveValue('18:30');
+  await expect(monday.locator('[name="hours[monday][second_open]"]')).toHaveValue('18:45');
   await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
   await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveJSProperty('offsetWidth', 104);
   if (testInfo.project.name === 'desktop-chromium') {
@@ -137,12 +137,13 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
   await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
   await expect(tuesday.locator('[name="hours[tuesday][second_open]"]')).toHaveValue('18:45');
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(errors).toEqual([]);
 });
 
-test('public restaurant contribution keeps the hours editor within a tablet viewport', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop-chromium', 'The desktop project supplies the tablet viewport check.');
-  await page.setViewportSize({ width: 768, height: 900 });
+test('public restaurant contribution keeps the hours editor within standard desktop and tablet viewports', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium', 'The desktop project supplies the standard desktop and tablet viewport checks.');
+  await page.setViewportSize({ width: 1024, height: 900 });
   await page.goto('/ajouter-un-restaurant');
   await page.locator('[data-restaurant-name]').fill('Horaires tablette');
   await page.getByLabel('Viande halal').check();
@@ -160,6 +161,13 @@ test('public restaurant contribution keeps the hours editor within a tablet view
   await monday.locator('[name="hours[monday][second_open]"]').fill('18:30');
   await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
 
+  await expect.poll(async () => monday.evaluate(day => {
+    const secondRange = day.querySelector('[data-hours-second-slot]')?.getBoundingClientRect();
+    const remove = day.querySelector('[data-remove-hours-slot]')?.getBoundingClientRect();
+    return Boolean(secondRange && remove && remove.top >= secondRange.bottom && remove.left >= secondRange.left);
+  })).toBe(true);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.setViewportSize({ width: 768, height: 900 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
