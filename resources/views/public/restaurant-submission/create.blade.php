@@ -78,7 +78,7 @@
                             <legend>Catégories / type de cuisine</legend>
                             <p class="form-help">Choisissez au moins une catégorie pour continuer.</p>
                             <div class="checkbox-grid">
-                                @foreach($categories as $category)<label><input type="checkbox" name="categories[]" value="{{ $category->id }}" @checked(in_array((string) $category->id, $selectedCategories, true))> {{ $category->name }}</label>@endforeach
+                                @foreach($categories as $category)<label><input type="checkbox" name="categories[]" value="{{ $category->id }}" @if($loop->first) required @endif @checked(in_array((string) $category->id, $selectedCategories, true))> {{ $category->name }}</label>@endforeach
                             </div>
                             <p class="field-error" hidden data-taxonomy-error="categories">Choisissez au moins une catégorie ou un type de cuisine pour continuer.</p>
                             @error('categories')<p class="field-error">{{ $message }}</p>@enderror
@@ -87,7 +87,7 @@
                             <legend>Services et caractéristiques</legend>
                             <p class="form-help">Choisissez au moins un service. Une certification halal éventuelle reste facultative.</p>
                             <div class="checkbox-grid">
-                                @foreach($features as $feature)<label><input type="checkbox" name="features[]" value="{{ $feature->id }}" @checked(in_array((string) $feature->id, $selectedFeatures, true))> {{ $feature->name }}</label>@endforeach
+                                @foreach($features as $feature)<label><input type="checkbox" name="features[]" value="{{ $feature->id }}" @if($loop->first) required @endif @checked(in_array((string) $feature->id, $selectedFeatures, true))> {{ $feature->name }}</label>@endforeach
                             </div>
                             <p class="field-error" hidden data-taxonomy-error="features">Choisissez au moins un service ou une caractéristique pour continuer.</p>
                             @error('features')<p class="field-error">{{ $message }}</p>@enderror

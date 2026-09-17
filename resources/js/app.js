@@ -98,13 +98,20 @@ if (submission) {
         return valid;
     };
 
+    const syncTaxonomyRequirement = group => {
+        const selected = group.querySelector('input[type="checkbox"]:checked');
+        const firstOption = group.querySelector('input[type="checkbox"]');
+        if (firstOption) firstOption.required = !selected;
+        return Boolean(selected);
+    };
+
     const validateTaxonomy = () => {
         let valid = true;
         form.querySelectorAll('[data-taxonomy-group]').forEach(group => {
-            const selected = group.querySelector('input[type="checkbox"]:checked');
+            const selected = syncTaxonomyRequirement(group);
             const error = group.querySelector('[data-taxonomy-error]');
-            error.hidden = Boolean(selected);
-            valid = Boolean(selected) && valid;
+            error.hidden = selected;
+            valid = selected && valid;
         });
         return valid;
     };
@@ -117,12 +124,12 @@ if (submission) {
             coverInput.setCustomValidity('');
             return false;
         }
+        if (section.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return false;
         for (const field of section.querySelectorAll('input, select, textarea')) {
             if (field.type === 'hidden' || field.disabled || !field.willValidate) continue;
             if (!field.reportValidity()) return false;
         }
         if (step === 1 && !validateHalal()) return false;
-        if (section.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return false;
         if (step === 2) {
             if (!addressToken.value) {
                 addressQuery.setCustomValidity('Sélectionnez une adresse dans la liste proposée.');
@@ -258,7 +265,15 @@ if (submission) {
         });
     });
     halalOptions.forEach(option => option.addEventListener('change', validateHalal));
-    form.querySelectorAll('[data-taxonomy-group] input[type="checkbox"]').forEach(option => option.addEventListener('change', validateTaxonomy));
+    form.querySelectorAll('[data-taxonomy-group]').forEach(group => {
+        syncTaxonomyRequirement(group);
+        group.querySelectorAll('input[type="checkbox"]').forEach(option => {
+            option.addEventListener('change', () => {
+                if (syncTaxonomyRequirement(group)) group.querySelector('[data-taxonomy-error]').hidden = true;
+            });
+            option.addEventListener('invalid', () => { group.querySelector('[data-taxonomy-error]').hidden = false; });
+        });
+    });
     nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(() => refreshDuplicates(nameDuplicates, false), 350); });
     addressSelector.addEventListener('address-selected', () => refreshDuplicates(addressDuplicates, true));
     addressSelector.addEventListener('address-marker-moved', () => refreshDuplicates(addressDuplicates, true));

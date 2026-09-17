@@ -107,6 +107,7 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   const sunday = page.locator('[data-hours-day="sunday"]');
   await expect(page.locator('[data-taxonomy-group] input:checked')).toHaveCount(0);
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
   await expect(page.getByText('Choisissez au moins une catégorie ou un type de cuisine pour continuer.')).toBeVisible();
   await expect(page.getByText('Choisissez au moins un service ou une caractéristique pour continuer.')).toBeVisible();
   await page.locator('[name="categories[]"]').first().check();
