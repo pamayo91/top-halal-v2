@@ -259,6 +259,14 @@ test('public restaurant contribution requires a cover photo and validates the em
   }))).toBe(true);
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
   await expect.poll(() => page.locator('[name="owner_full_name"]').evaluate((input: HTMLInputElement) => input.validationMessage)).not.toBe('');
+  await page.locator('[name="owner_full_name"]').fill('Amina Martin');
+  await page.locator('[name="owner_company"]').fill('SARL Test');
+  await page.locator('[name="owner_siret"]').fill('654654654654654');
+  await page.getByLabel(/Je certifie être le propriétaire/).check();
+  await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
+  await expect(page.locator('[data-owner-siret-error]')).toHaveText('Le SIRET doit comporter 14 chiffres valides.');
+  await expect(page.locator('[data-owner-siret-error]')).toBeVisible();
+  await expect(page.getByText('validation.digits')).toHaveCount(0);
   await page.getByLabel('Non').check();
   await expect(page.locator('[data-owner-fields]')).toBeHidden();
   await expect(page.locator('[data-owner-email-help="customer"]')).toBeVisible();

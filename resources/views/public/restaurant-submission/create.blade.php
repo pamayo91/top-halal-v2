@@ -170,10 +170,12 @@
                             <div class="submission-owner-fields" data-owner-fields @unless(old('submitter_role') === 'owner') hidden @endunless>
                                 <label><span class="submission-required-label">Nom / prénom <span aria-hidden="true">*</span></span><input name="owner_full_name" maxlength="255" value="{{ old('owner_full_name') }}" @required(old('submitter_role') === 'owner')></label>
                                 <label><span class="submission-required-label">Société <span aria-hidden="true">*</span></span><input name="owner_company" maxlength="255" value="{{ old('owner_company') }}" @required(old('submitter_role') === 'owner')></label>
-                                <label><span class="submission-required-label">SIRET <span aria-hidden="true">*</span></span><input name="owner_siret" inputmode="numeric" maxlength="20" value="{{ old('owner_siret') }}" @required(old('submitter_role') === 'owner')></label>
+                                <label><span class="submission-required-label">SIRET <span aria-hidden="true">*</span></span><input name="owner_siret" inputmode="numeric" maxlength="20" value="{{ old('owner_siret') }}" @required(old('submitter_role') === 'owner') data-owner-siret></label>
+                                <p class="field-error" data-owner-siret-error role="alert" hidden></p>
+                                @error('owner_siret')<p class="field-error">{{ $message }}</p>@enderror
                                 <label class="submission-owner-certification"><input type="checkbox" name="owner_certified" value="1" @checked(old('owner_certified')) @required(old('submitter_role') === 'owner')><span>Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement. <span aria-hidden="true">*</span></span></label>
                                 <p class="form-help">Après validation de votre proposition, nous vous recontacterons pour la gestion de cette fiche.</p>
-                                @foreach(['owner_full_name','owner_company','owner_siret','owner_certified'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
+                                @foreach(['owner_full_name','owner_company','owner_certified'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
                             </div>
                             @error('submitter_role')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>

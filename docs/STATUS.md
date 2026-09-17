@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-17
 
+Latest public restaurant-submission SIRET validation: an invalid owner SIRET is now caught in the browser before any POST/reload and displays only « Le SIRET doit comporter 14 chiffres valides. » immediately under that input. The server fallback now has the same explicit French rule and field-local rendering, so no `validation.digits` key can reach the public page.
+
 Latest public restaurant-submission owner-field presentation: every required marker now stays on the same line as its Name, Company or SIRET label, rather than becoming a separate grid row. Desktop/mobile browser coverage checks this layout as well as the existing required validation.
 
 Latest public restaurant-submission owner validation: selecting `Oui` at step 5 visibly marks Nom / prénom, Société, SIRET and the certification mandatory and applies native required validation before the request is sent; returning to `Non` removes these client constraints. The existing conditional server validation remains the authoritative fallback.

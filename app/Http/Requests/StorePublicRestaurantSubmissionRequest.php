@@ -100,6 +100,8 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'features.min' => 'Choisissez au moins un service ou une caractéristique.',
             'cover_photo.dimensions' => 'La photo de couverture doit mesurer au moins 800 pixels de large.',
             'gallery_photos.*.dimensions' => 'Chaque photo de galerie doit mesurer au moins 800 pixels de large.',
+            'owner_siret.required' => 'Indiquez le SIRET.',
+            'owner_siret.digits' => 'Le SIRET doit comporter 14 chiffres valides.',
         ];
     }
 }

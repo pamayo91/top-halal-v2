@@ -52,6 +52,8 @@ if (submission) {
     const galleryInput = form.querySelector('[data-gallery-input]');
     const galleryPreview = form.querySelector('[data-gallery-preview]');
     const ownerFields = form.querySelector('[data-owner-fields]');
+    const ownerSiret = form.querySelector('[data-owner-siret]');
+    const ownerSiretError = form.querySelector('[data-owner-siret-error]');
     const ownerChoices = [...form.querySelectorAll('[data-owner-choice]')];
     const ownerEmailHelp = [...form.querySelectorAll('[data-owner-email-help]')];
     const syncOwnerChoice = () => {
@@ -61,6 +63,8 @@ if (submission) {
             ownerFields.hidden = !isOwner;
             ownerFields.querySelectorAll('input').forEach(field => { field.required = isOwner; });
         }
+        if (!isOwner && ownerSiret) ownerSiret.setCustomValidity('');
+        if (!isOwner && ownerSiretError) ownerSiretError.hidden = true;
         ownerChoices.forEach(input => input.closest('.choice-card')?.classList.toggle('is-selected', input.checked));
         ownerEmailHelp.forEach(help => { help.hidden = help.dataset.ownerEmailHelp !== (isOwner ? 'owner' : 'customer'); });
     };
@@ -73,6 +77,27 @@ if (submission) {
 
     const text = (element, value) => { element.textContent = value || 'Non renseigné'; return element; };
     const addressValue = name => addressSelector.querySelector(`[data-address-display="${name}"]`)?.value?.trim() || '';
+    const validSiret = value => {
+        const digits = value.replace(/\D/g, '');
+        if (! /^\d{14}$/.test(digits)) return false;
+        return [...digits].reduce((sum, digit, index) => {
+            let number = Number(digit);
+            if (index % 2 === 0) { number *= 2; if (number > 9) number -= 9; }
+            return sum + number;
+        }, 0) % 10 === 0;
+    };
+    const syncSiretValidation = (showError = false) => {
+        if (! ownerSiret) return true;
+        const isOwner = form.querySelector('[name="submitter_role"]:checked')?.value === 'owner';
+        const invalid = isOwner && ownerSiret.value !== '' && !validSiret(ownerSiret.value);
+        const message = 'Le SIRET doit comporter 14 chiffres valides.';
+        ownerSiret.setCustomValidity(invalid ? message : '');
+        if (ownerSiretError) {
+            ownerSiretError.textContent = invalid ? message : '';
+            ownerSiretError.hidden = !invalid || !showError;
+        }
+        return !invalid;
+    };
 
     const setStep = (step, focus = true) => {
         currentStep = Math.max(1, Math.min(5, step));
@@ -118,6 +143,7 @@ if (submission) {
 
     const validateStep = step => {
         const section = steps[step - 1];
+        if (step === 5) syncSiretValidation(true);
         if (step === 4 && !coverInput.files.length) {
             coverInput.setCustomValidity('Ajoutez une photo de couverture.');
             coverInput.reportValidity();
@@ -291,6 +317,8 @@ if (submission) {
     form.querySelectorAll('[data-hours-day]').forEach(row => updateHoursVisibility(row.dataset.hoursDay));
     coverInput.addEventListener('change', renderCover);
     galleryInput.addEventListener('change', () => { galleryFiles = [...galleryFiles, ...galleryInput.files].slice(0, 10); syncGalleryInput(); renderGallery(); });
+    ownerSiret?.addEventListener('blur', () => syncSiretValidation(true));
+    ownerSiret?.addEventListener('input', () => syncSiretValidation(!ownerSiretError?.hidden));
     form.addEventListener('submit', event => { if (!validateStep(5)) event.preventDefault(); });
     syncOwnerChoice();
     setStep(currentStep, false);
