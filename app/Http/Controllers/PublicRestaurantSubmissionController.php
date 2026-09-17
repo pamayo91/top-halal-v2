@@ -283,7 +283,7 @@ class PublicRestaurantSubmissionController extends Controller
             return $location;
         }
 
-        throw ValidationException::withMessages(['address_suggestion_token' => 'Sélectionnez une adresse proposée par la Géoplateforme.']);
+        throw ValidationException::withMessages(['address_suggestion_token' => 'Sélectionnez une adresse dans la liste proposée.']);
     }
 
     private function displayAddress(array $location): string

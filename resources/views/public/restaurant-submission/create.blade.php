@@ -33,6 +33,7 @@
                         <label for="submission-name">Nom du restaurant</label>
                         <input id="submission-name" name="name" required maxlength="255" autocomplete="organization" value="{{ old('name') }}" data-restaurant-name>
                         @error('name')<p class="field-error">{{ $message }}</p>@enderror
+                        <div class="submission-duplicates" data-name-duplicates aria-live="polite"></div>
                         @if($duplicate = session('duplicate_restaurant'))
                             <div class="submission-duplicates" role="alert">
                                 <p><b>{{ $duplicate['name'] }}</b> semble déjà être référencé.</p>
@@ -50,7 +51,6 @@
                             @error('halal_meat')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>
 
-                        <div class="submission-duplicates" data-name-duplicates aria-live="polite"></div>
                         <div class="submission-actions">
                             <button class="button" type="button" data-next hidden>Continuer</button>
                         </div>
@@ -59,7 +59,7 @@
                     <section class="submission-step" data-submission-step="2" aria-labelledby="submission-step-2-title">
                         <p class="submission-kicker">Étape 2 sur 5</p>
                         <h2 id="submission-step-2-title">L’adresse</h2>
-                        <p class="muted">Sélectionnez une suggestion Géoplateforme : l’adresse, les données administratives et la position sont complétées automatiquement.</p>
+                        <p class="muted">Commencez à saisir l'adresse du restaurant, puis sélectionnez la bonne adresse dans la liste proposée.</p>
                         <x-address-selector />
 
                         <div class="submission-duplicates" data-address-duplicates aria-live="polite"></div>

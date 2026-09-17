@@ -79,6 +79,7 @@ if (submission) {
         currentStepLabel.textContent = String(currentStep);
         progressBar.style.width = `${currentStep * 20}%`;
         steps.forEach(section => { section.hidden = Number(section.dataset.submissionStep) !== currentStep; });
+        if (currentStep === 2) addressSelector.dispatchEvent(new CustomEvent('address-selector-visible'));
         submission.querySelectorAll('[data-step-indicator]').forEach(indicator => {
             const active = Number(indicator.dataset.stepIndicator) === currentStep;
             indicator.classList.toggle('is-current', active);
@@ -112,7 +113,7 @@ if (submission) {
         if (step === 1 && !validateHalal()) return false;
         if (step === 2) {
             if (!addressToken.value) {
-                addressQuery.setCustomValidity('Sélectionnez une adresse proposée par la Géoplateforme.');
+                addressQuery.setCustomValidity('Sélectionnez une adresse dans la liste proposée.');
                 addressQuery.reportValidity();
                 addressQuery.setCustomValidity('');
                 return false;

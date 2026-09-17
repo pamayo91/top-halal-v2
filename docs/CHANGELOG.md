@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-17
+
+- Improved the first two steps of the public restaurant-submission form without changing its submission, address-resolution or duplicate-detection rules: the explanatory header now has stronger secondary contrast, the progress track uses the full available width, and name-similarity results render immediately below the restaurant name.
+- Replaced the public technical address introduction and validation wording with plain-language guidance. The address provider and administrative/geocoding details remain internal.
+- Fixed Leaflet resizing after returning from step 3 by invalidating the existing map after step 2 becomes visible. The selected marker and coordinates are preserved, and Playwright now covers the forward/back map cycle on desktop and mobile.
+
 ## 2026-09-16
 
 - Secured restaurant slug creation and changes: deterministic name/city/postcode candidates, global reservation including the trash, no random public-submission suffix, and automatic guarded 301 redirects for intentional slug changes.

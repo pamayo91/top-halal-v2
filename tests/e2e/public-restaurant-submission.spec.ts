@@ -24,6 +24,7 @@ async function fillRestaurantAndAddress(page: import('@playwright/test').Page, s
 
 test('public restaurant contribution blocks an empty halal choice and identifies a duplicate', async ({ page }) => {
   await page.goto('/ajouter-un-restaurant');
+  expect(await page.locator('[data-restaurant-name]').evaluate(input => input.nextElementSibling?.matches('[data-name-duplicates]'))).toBe(true);
   await page.locator('[data-restaurant-name]').fill('O Sha');
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.locator('[data-halal-error]')).toBeVisible();
@@ -33,15 +34,46 @@ test('public restaurant contribution blocks an empty halal choice and identifies
   await expect(page.locator('[data-name-duplicates]').getByRole('link', { name: /O Sha/ })).toBeVisible();
 });
 
-test('public restaurant contribution requires a Géoplateforme selection and never exposes the INSEE field', async ({ page }) => {
+test('public restaurant contribution requires a suggested address and never exposes technical details', async ({ page }) => {
   await page.goto('/ajouter-un-restaurant');
   await page.locator('[data-restaurant-name]').fill('Adresse obligatoire');
   await page.getByLabel('Viande halal').check();
   await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText("Commencez à saisir l'adresse du restaurant, puis sélectionnez la bonne adresse dans la liste proposée.")).toBeVisible();
   await expect(page.getByText('Votre adresse exacte n’apparaît pas ? Sélectionnez l’adresse la plus proche proposée, puis ajustez précisément la position du restaurant sur la carte.')).toBeVisible();
   await expect(page.getByLabel('Code INSEE')).toHaveCount(0);
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'L’adresse' })).toBeVisible();
+});
+
+test('public restaurant contribution restores one correctly sized map after returning from step 3', async ({ page }, testInfo) => {
+  await page.goto('/ajouter-un-restaurant');
+  await page.locator('[data-restaurant-name]').fill(`Carte retour ${testInfo.project.name}-${crypto.randomUUID()}`);
+  await page.getByLabel('Viande halal').check();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByLabel('Adresse du restaurant').fill('46 Boulevard du Temple Paris');
+  await expect(page.locator('[data-address-results] button').first()).toBeVisible();
+  await page.locator('[data-address-results] button').first().click();
+
+  const map = page.locator('[data-address-map]');
+  await expect(map.locator('.leaflet-marker-icon')).toHaveCount(1);
+  const position = await Promise.all([page.locator('[data-latitude]').inputValue(), page.locator('[data-longitude]').inputValue()]);
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
+  await page.getByRole('button', { name: 'Retour' }).click();
+  await expect(page.getByRole('heading', { name: 'L’adresse' })).toBeVisible();
+  await expect(map.locator('.leaflet-marker-icon')).toHaveCount(1);
+  await expect.poll(async () => map.evaluate(element => {
+    const mapBox = element.getBoundingClientRect();
+    const markerBox = element.querySelector('.leaflet-marker-icon')?.getBoundingClientRect();
+    if (!markerBox) return false;
+    const markerX = markerBox.left + markerBox.width / 2;
+    const markerY = markerBox.top + markerBox.height / 2;
+    return element.clientWidth > 0 && element.clientHeight > 0
+      && markerX > mapBox.left && markerX < mapBox.right
+      && markerY > mapBox.top && markerY < mapBox.bottom;
+  })).toBe(true);
+  expect(await Promise.all([page.locator('[data-latitude]').inputValue(), page.locator('[data-longitude]').inputValue()])).toEqual(position);
 });
 
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {

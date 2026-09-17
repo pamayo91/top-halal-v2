@@ -27,6 +27,11 @@ export const initializeAddressSelectors = () => document.querySelectorAll('[data
     let map;
     let marker;
 
+    const refreshMapSize = () => {
+        if (!map) return;
+        requestAnimationFrame(() => requestAnimationFrame(() => map.invalidateSize({ pan: false })));
+    };
+
     const clearSelection = () => {
         token.value = '';
         selected.hidden = true;
@@ -53,7 +58,7 @@ export const initializeAddressSelectors = () => document.querySelectorAll('[data
                 marker.setLatLng([lat, lng]);
                 map.setView([lat, lng], 16);
             }
-            requestAnimationFrame(() => map.invalidateSize());
+            refreshMapSize();
             if (mapMoved.value !== '1') mapHelp.textContent = 'Déplacez le marqueur si la position doit être affinée. L’adresse sélectionnée ne sera pas modifiée.';
         } catch (_) {
             mapHelp.textContent = 'La carte est indisponible pour le moment. L’adresse sélectionnée reste utilisable.';
@@ -112,6 +117,8 @@ export const initializeAddressSelectors = () => document.querySelectorAll('[data
             } catch (_) { renderResults([]); }
         }, 250);
     });
+
+    container.addEventListener('address-selector-visible', refreshMapSize);
 
     if (latitude.value && longitude.value) void showMap(Number(latitude.value), Number(longitude.value));
 });
