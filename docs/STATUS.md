@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-17
 
+Latest public restaurant-submission owner-field presentation: every required marker now stays on the same line as its Name, Company or SIRET label, rather than becoming a separate grid row. Desktop/mobile browser coverage checks this layout as well as the existing required validation.
+
 Latest public restaurant-submission owner validation: selecting `Oui` at step 5 visibly marks Nom / prénom, Société, SIRET and the certification mandatory and applies native required validation before the request is sent; returning to `Non` removes these client constraints. The existing conditional server validation remains the authoritative fallback.
 
 Latest public restaurant-submission final step: Step 5 is now `Vos informations` while preserving `Étape 5 sur 5`; its proposal recap is no longer rendered by Blade or JavaScript. The accessible role cards are ordered identically in the DOM and visually as `Non`, then `Oui`; the existing conditional owner fields and e-mail help remain unchanged. The post-submit noindex page now clearly separates required e-mail confirmation from later Top Halal review, explicitly says that the e-mail address is never published, and asks visitors to check spam. The existing pending-email-verification → pending-admin-review → human publication workflow and transactional e-mails are unchanged. Desktop/mobile Playwright coverage verifies the final step, both role states, absent recap, successful submission and exact final wording.

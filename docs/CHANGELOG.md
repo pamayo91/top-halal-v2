@@ -2,6 +2,7 @@
 
 ## 2026-09-17
 
+- Formulaire public de proposition : les astérisques de Nom / prénom, Société et SIRET sont maintenant solidaires de leur libellé sur une même ligne, y compris sur mobile.
 - Formulaire public de proposition : choisir « Oui » à l’étape finale rend désormais visiblement obligatoires Nom / prénom, Société, SIRET et la certification, avec blocage natif avant envoi; le retour à « Non » retire ces contraintes côté navigateur. La validation serveur conditionnelle existante reste inchangée.
 - Formulaire public de proposition : l’étape finale devient « Vos informations », sans récapitulatif rendu; les cartes accessibles sont ordonnées `Non`, puis `Oui`, sans modifier les champs conditionnels ni le workflow. L’écran après envoi clarifie que l’adresse e-mail doit être confirmée, qu’elle n’est jamais publiée, puis que l’équipe pourra examiner la proposition.
 - Clarified public restaurant-submission step 4 only: the cover-photo introduction is shorter and neutral, complementary-photo wording no longer calls them optional, and the gallery guidance now correctly says removal/reordering is available before submission. Cover, format, dimensions, gallery limit and ordering behavior are unchanged.
