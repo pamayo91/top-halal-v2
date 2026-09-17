@@ -100,6 +100,7 @@ test('public restaurant contribution keeps step-three contact fields in the requ
   await page.locator('[data-address-results] button').first().click();
   await page.getByRole('button', { name: 'Continuer' }).click();
 
+  await page.locator('.submission-contact-grid').scrollIntoViewIfNeeded();
   const positions = await page.locator('.submission-contact-grid').evaluate(grid => {
     const box = (selector: string) => (grid.querySelector(selector) as HTMLElement).getBoundingClientRect();
     const phone = box('.submission-phone-field');
