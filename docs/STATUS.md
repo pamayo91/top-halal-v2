@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-17
 
+Latest public restaurant-submission server-validation routing: when the final POST discovers an error from steps 1–4, the server now returns the contributor to the first affected step instead of retaining step 5 and hiding the error. Owner-field errors remain on step 5 directly beneath their relevant field.
+
 Latest public restaurant-submission server-error presentation: the page no longer shows Laravel’s global error list. Owner full name, company, SIRET and certification fallback messages render only below their individual control and now all have explicit French text; technical `validation.*` keys cannot be exposed publicly. Browser coverage also submits a complete owner proposal, proving that the valid owner path reaches the confirmation screen without a server validation error.
 
 Latest public restaurant-submission SIRET validation: an invalid owner SIRET is now caught in the browser before any POST/reload and displays only « Le SIRET doit comporter 14 chiffres valides. » immediately under that input. The server fallback now has the same explicit French rule and field-local rendering, so no `validation.digits` key can reach the public page.

@@ -1,5 +1,5 @@
 @php
-    $initialStep = max(1, min(5, (int) old('current_step', 1)));
+    $initialStep = max(1, min(5, (int) session('submission_error_step', old('current_step', 1))));
     $selectedCategories = array_map('strval', old('categories', []));
     $selectedFeatures = array_map('strval', old('features', []));
 @endphp
@@ -96,6 +96,7 @@
                         <fieldset class="hours-fieldset" data-hours-editor>
                             <legend>Horaires</legend>
                             <p class="form-help">Pour chaque jour, indiquez fermé, ouvert 24h/24, ou une à deux plages horaires.</p>
+                            @if($errors->has('hours.*'))<p class="field-error" role="alert">Vérifiez les horaires indiqués.</p>@endif
                             @foreach($days as $dayKey => $dayLabel)
                                 @php($status = old("hours.$dayKey.status", 'closed'))
                                 @php($hasSecondSlot = filled(old("hours.$dayKey.second_open")) || filled(old("hours.$dayKey.second_close")))

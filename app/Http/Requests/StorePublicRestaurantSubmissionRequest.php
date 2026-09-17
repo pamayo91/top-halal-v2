@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -86,6 +87,28 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             $siret = (string) $this->input('owner_siret');
             if ($this->input('submitter_role') === 'owner' && $siret !== '' && ! $this->isValidSiret($siret)) $validator->errors()->add('owner_siret', 'Le SIRET doit comporter 14 chiffres valides.');
         });
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            redirect()->to($this->getRedirectUrl())
+                ->withInput()
+                ->withErrors($validator)
+                ->with('submission_error_step', $this->firstErrorStep($validator))
+        );
+    }
+
+    private function firstErrorStep(Validator $validator): int
+    {
+        foreach (array_keys($validator->errors()->messages()) as $field) {
+            if (in_array($field, ['name', 'halal_meat', 'halal_chicken'], true)) return 1;
+            if (in_array($field, ['address_suggestion_token', 'latitude', 'longitude', 'map_moved'], true)) return 2;
+            if (str_starts_with($field, 'categories') || str_starts_with($field, 'features') || str_starts_with($field, 'hours.') || in_array($field, ['phone', 'website_url', 'instagram_url', 'facebook_url', 'tiktok_url', 'description'], true)) return 3;
+            if (str_starts_with($field, 'cover_photo') || str_starts_with($field, 'gallery_photos')) return 4;
+        }
+
+        return 5;
     }
 
     protected function prepareForValidation(): void { if ($this->has('owner_siret')) $this->merge(['owner_siret'=>preg_replace('/\D+/', '', (string) $this->input('owner_siret'))]); }

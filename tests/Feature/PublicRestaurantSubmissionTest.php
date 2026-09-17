@@ -501,7 +501,12 @@ class PublicRestaurantSubmissionTest extends TestCase
 
     public function test_owner_submission_rejects_missing_certification_or_invalid_siret(): void
     {
-        $this->actingAs(\App\Models\User::factory()->create())->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['submitter_role'=>'owner','owner_full_name'=>'Amina Martin','owner_company'=>'SARL Test','owner_siret'=>'123','owner_certified'=>null]))->assertSessionHasErrors(['owner_siret','owner_certified']);
+        $this->actingAs(\App\Models\User::factory()->create())->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['submitter_role'=>'owner','owner_full_name'=>'Amina Martin','owner_company'=>'SARL Test','owner_siret'=>'123','owner_certified'=>null]))->assertSessionHasErrors(['owner_siret','owner_certified'])->assertSessionHas('submission_error_step', 5);
+    }
+
+    public function test_server_validation_returns_to_the_first_step_with_an_error(): void
+    {
+        $this->actingAs(\App\Models\User::factory()->create())->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['cover_photo' => null]))->assertSessionHasErrors('cover_photo')->assertSessionHas('submission_error_step', 4);
     }
 
     public function test_address_endpoint_and_duplicate_endpoint_expose_only_the_safe_public_contract(): void
