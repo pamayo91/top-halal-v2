@@ -112,8 +112,8 @@
                             <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><span class="hours-copy-to" aria-hidden="true">vers :</span><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target="{{ $dayKey }}"> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
                         </fieldset>
 
-                        <div class="form-grid">
-                            <label for="restaurant-phone">Téléphone <input id="restaurant-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" value="{{ old('phone') }}"></label>
+                        <div class="form-grid submission-contact-grid">
+                            <label class="submission-phone-field" for="restaurant-phone">Téléphone <input id="restaurant-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" value="{{ old('phone') }}"></label>
                             <label for="restaurant-website">Site web <input id="restaurant-website" name="website_url" type="url" inputmode="url" placeholder="https://…" value="{{ old('website_url') }}"></label>
                             <label for="restaurant-instagram">Instagram <input id="restaurant-instagram" name="instagram_url" type="url" inputmode="url" placeholder="https://…" value="{{ old('instagram_url') }}"></label>
                             <label for="restaurant-facebook">Facebook <input id="restaurant-facebook" name="facebook_url" type="url" inputmode="url" placeholder="https://…" value="{{ old('facebook_url') }}"></label>

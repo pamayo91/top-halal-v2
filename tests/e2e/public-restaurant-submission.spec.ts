@@ -89,6 +89,42 @@ test('public restaurant contribution restores one correctly sized map after retu
   expect(await Promise.all([page.locator('[data-latitude]').inputValue(), page.locator('[data-longitude]').inputValue()])).toEqual(position);
 });
 
+test('public restaurant contribution keeps step-three contact fields in the requested desktop rows', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium', 'This layout is specific to the two-column desktop form.');
+  await page.goto('/ajouter-un-restaurant');
+  await page.locator('[data-restaurant-name]').fill(`Contacts ${crypto.randomUUID()}`);
+  await page.getByLabel('Viande halal').check();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByLabel('Adresse du restaurant').fill('46 Boulevard du Temple Paris');
+  await expect(page.locator('[data-address-results] button').first()).toBeVisible();
+  await page.locator('[data-address-results] button').first().click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+
+  const positions = await page.locator('.submission-contact-grid').evaluate(grid => {
+    const box = (selector: string) => (grid.querySelector(selector) as HTMLElement).getBoundingClientRect();
+    const phone = box('.submission-phone-field');
+    const website = box('label[for="restaurant-website"]');
+    const instagram = box('label[for="restaurant-instagram"]');
+    const facebook = box('label[for="restaurant-facebook"]');
+    const tiktok = box('label[for="restaurant-tiktok"]');
+
+    return {
+      gridWidth: grid.getBoundingClientRect().width,
+      phoneWidth: phone.width,
+      phoneBeforeWebsite: phone.bottom <= website.top,
+      websiteInstagramRow: Math.abs(website.top - instagram.top) < 1,
+      facebookTiktokRow: Math.abs(facebook.top - tiktok.top) < 1,
+      socialRowsOrdered: website.bottom <= facebook.top,
+    };
+  });
+
+  expect(positions.phoneWidth).toBeLessThan(positions.gridWidth);
+  expect(positions.phoneBeforeWebsite).toBe(true);
+  expect(positions.websiteInstagramRow).toBe(true);
+  expect(positions.facebookTiktokRow).toBe(true);
+  expect(positions.socialRowsOrdered).toBe(true);
+});
+
 test('public restaurant contribution keeps compact mixed hours and copied slots across steps', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
