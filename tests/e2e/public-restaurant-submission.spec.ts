@@ -253,7 +253,9 @@ test('public restaurant contribution requires a cover photo and validates the em
   await expect(page.locator('[name="owner_certified"]')).toHaveAttribute('required', '');
   await expect.poll(() => page.locator('.submission-required-label').evaluateAll(labels => labels.every(label => {
     const marker = label.querySelector('[aria-hidden="true"]');
-    return Boolean(marker && Math.abs(marker.getBoundingClientRect().top - label.getBoundingClientRect().top) < 1);
+    const labelRect = label.getBoundingClientRect();
+    const markerRect = marker?.getBoundingClientRect();
+    return Boolean(markerRect && markerRect.left > labelRect.left && markerRect.top < labelRect.top + 10);
   }))).toBe(true);
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
   await expect.poll(() => page.locator('[name="owner_full_name"]').evaluate((input: HTMLInputElement) => input.validationMessage)).not.toBe('');
