@@ -122,7 +122,7 @@ if (submission) {
             if (!field.reportValidity()) return false;
         }
         if (step === 1 && !validateHalal()) return false;
-        if (step === 3 && !validateTaxonomy()) return false;
+        if (section.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return false;
         if (step === 2) {
             if (!addressToken.value) {
                 addressQuery.setCustomValidity('Sélectionnez une adresse dans la liste proposée.');
