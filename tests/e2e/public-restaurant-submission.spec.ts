@@ -18,8 +18,8 @@ async function fillRestaurantAndAddress(page: import('@playwright/test').Page, s
   await expect(page.locator('[data-address-selected]')).toBeVisible();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
-  await page.locator('[name="categories[]"]').first().check();
-  await page.locator('[name="features[]"]').first().check();
+  await page.locator('[name="categories[]"]').last().check();
+  await page.locator('[name="features[]"]').last().check();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
 }
