@@ -100,8 +100,13 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'features.min' => 'Choisissez au moins un service ou une caractéristique.',
             'cover_photo.dimensions' => 'La photo de couverture doit mesurer au moins 800 pixels de large.',
             'gallery_photos.*.dimensions' => 'Chaque photo de galerie doit mesurer au moins 800 pixels de large.',
+            'submitter_role.required' => 'Choisissez si vous êtes le gérant ou propriétaire.',
+            'owner_full_name.required' => 'Indiquez vos nom et prénom.',
+            'owner_company.required' => 'Indiquez le nom de votre société.',
             'owner_siret.required' => 'Indiquez le SIRET.',
             'owner_siret.digits' => 'Le SIRET doit comporter 14 chiffres valides.',
+            'owner_certified.accepted' => 'Cochez la certification pour continuer.',
+            'email.required' => 'Indiquez votre adresse e-mail.',
         ];
     }
 }

@@ -320,3 +320,18 @@ test('public restaurant contribution submits a pending restaurant successfully',
   await expect(page.getByText('Consultez votre boîte e-mail et vérifiez également vos spams pour confirmer votre adresse. Ensuite, notre équipe pourra examiner la proposition.')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('a complete owner contribution submits without a server validation error', async ({ page }, testInfo) => {
+  await fillRestaurantAndAddress(page, `owner-${testInfo.project.name}-${crypto.randomUUID()}`);
+  await page.locator('[data-cover-input]').setInputFiles(cover);
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByLabel('Oui').check();
+  await page.locator('[name="owner_full_name"]').fill('Amina Martin');
+  await page.locator('[name="owner_company"]').fill('SARL Restaurant de test');
+  await page.locator('[name="owner_siret"]').fill('73282932000074');
+  await page.locator('[name="owner_certified"]').check({ force: true });
+  await page.getByLabel('Votre e-mail').fill(`owner-${testInfo.project.name}-${crypto.randomUUID()}@example.invalid`);
+  await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
+  await expect(page.getByRole('heading', { name: 'Merci pour la soumission du restaurant !' })).toBeVisible();
+  await expect(page.getByText(/validation\./)).toHaveCount(0);
+});

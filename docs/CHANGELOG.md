@@ -2,6 +2,7 @@
 
 ## 2026-09-17
 
+- Formulaire public de proposition : les retours serveur des champs gérant sont désormais strictement localisés sous chaque contrôle et tous les messages sont en français explicite ; l’alerte globale Laravel, qui pouvait exposer une clé `validation.required`, est supprimée de ce parcours.
 - Formulaire public de proposition : le SIRET gérant invalide est désormais contrôlé sans rechargement et affiche son unique message français directement sous le champ ; le secours serveur emploie le même libellé et ne peut plus exposer `validation.digits`.
 - Formulaire public de proposition : les astérisques de Nom / prénom, Société et SIRET sont maintenant solidaires de leur libellé sur une même ligne, y compris sur mobile.
 - Formulaire public de proposition : choisir « Oui » à l’étape finale rend désormais visiblement obligatoires Nom / prénom, Société, SIRET et la certification, avec blocage natif avant envoi; le retour à « Non » retire ces contraintes côté navigateur. La validation serveur conditionnelle existante reste inchangée.

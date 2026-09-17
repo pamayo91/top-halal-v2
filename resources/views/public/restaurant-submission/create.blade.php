@@ -3,7 +3,7 @@
     $selectedCategories = array_map('strval', old('categories', []));
     $selectedFeatures = array_map('strval', old('features', []));
 @endphp
-<x-layouts.app title="Ajouter un restaurant halal | Top Halal" robots="noindex,nofollow">
+<x-layouts.app title="Ajouter un restaurant halal | Top Halal" robots="noindex,nofollow" :hide-flash="true">
     <x-slot:head>
         <script>document.documentElement.classList.add('has-submission-js');</script>
     </x-slot:head>
@@ -169,13 +169,15 @@
                             </label>
                             <div class="submission-owner-fields" data-owner-fields @unless(old('submitter_role') === 'owner') hidden @endunless>
                                 <label><span class="submission-required-label">Nom / prénom <span aria-hidden="true">*</span></span><input name="owner_full_name" maxlength="255" value="{{ old('owner_full_name') }}" @required(old('submitter_role') === 'owner')></label>
+                                @error('owner_full_name')<p class="field-error">{{ $message }}</p>@enderror
                                 <label><span class="submission-required-label">Société <span aria-hidden="true">*</span></span><input name="owner_company" maxlength="255" value="{{ old('owner_company') }}" @required(old('submitter_role') === 'owner')></label>
+                                @error('owner_company')<p class="field-error">{{ $message }}</p>@enderror
                                 <label><span class="submission-required-label">SIRET <span aria-hidden="true">*</span></span><input name="owner_siret" inputmode="numeric" maxlength="20" value="{{ old('owner_siret') }}" @required(old('submitter_role') === 'owner') data-owner-siret></label>
                                 <p class="field-error" data-owner-siret-error role="alert" hidden></p>
                                 @error('owner_siret')<p class="field-error">{{ $message }}</p>@enderror
                                 <label class="submission-owner-certification"><input type="checkbox" name="owner_certified" value="1" @checked(old('owner_certified')) @required(old('submitter_role') === 'owner')><span>Je certifie être le propriétaire, le gérant ou être autorisé à gérer cet établissement. <span aria-hidden="true">*</span></span></label>
+                                @error('owner_certified')<p class="field-error">{{ $message }}</p>@enderror
                                 <p class="form-help">Après validation de votre proposition, nous vous recontacterons pour la gestion de cette fiche.</p>
-                                @foreach(['owner_full_name','owner_company','owner_certified'] as $field) @error($field)<p class="field-error">{{ $message }}</p>@enderror @endforeach
                             </div>
                             @error('submitter_role')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>

@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-17
 
+Latest public restaurant-submission server-error presentation: the page no longer shows Laravel’s global error list. Owner full name, company, SIRET and certification fallback messages render only below their individual control and now all have explicit French text; technical `validation.*` keys cannot be exposed publicly. Browser coverage also submits a complete owner proposal, proving that the valid owner path reaches the confirmation screen without a server validation error.
+
 Latest public restaurant-submission SIRET validation: an invalid owner SIRET is now caught in the browser before any POST/reload and displays only « Le SIRET doit comporter 14 chiffres valides. » immediately under that input. The server fallback now has the same explicit French rule and field-local rendering, so no `validation.digits` key can reach the public page.
 
 Latest public restaurant-submission owner-field presentation: every required marker now stays on the same line as its Name, Company or SIRET label, rather than becoming a separate grid row. Desktop/mobile browser coverage checks this layout as well as the existing required validation.
