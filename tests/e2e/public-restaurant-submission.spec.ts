@@ -104,6 +104,8 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   const tuesday = page.locator('[data-hours-day="tuesday"]');
   const sunday = page.locator('[data-hours-day="sunday"]');
   await page.getByLabel('État Lundi').selectOption('slots');
+  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetWidth', 132);
+  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetHeight', 32);
   await expect(monday.locator('[data-hours-second-slot]')).toBeHidden();
   await monday.locator('[name="hours[monday][first_open]"]').fill('00:00');
   await monday.locator('[name="hours[monday][first_close]"]').fill('09:30');
