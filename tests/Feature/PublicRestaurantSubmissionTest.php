@@ -17,10 +17,15 @@ class PublicRestaurantSubmissionTest extends TestCase
 {
     use DatabaseMigrations;
 
+    private Category $requiredCategory;
+    private Feature $requiredFeature;
+
     protected function setUp(): void
     {
         parent::setUp();
         Mail::fake();
+        $this->requiredCategory = Category::create(['legacy_term_id' => 900001, 'name' => 'Catégorie de test', 'slug' => 'categorie-de-test']);
+        $this->requiredFeature = Feature::create(['legacy_term_id' => 900002, 'name' => 'Service de test', 'slug' => 'service-de-test']);
         $this->app->instance(GeocodingService::class, new class implements GeocodingService {
             public function search(string $query, int $limit = 3): array { return ['ok' => true, 'query' => $query, 'cached' => false, 'error' => null, 'features' => [['label' => '46 Boulevard du Temple 75011 Paris', 'postcode' => '75011', 'city' => 'Paris', 'citycode' => '75111', 'latitude' => 48.866, 'longitude' => 2.364, 'id' => 'BAN-46', 'type' => 'housenumber', 'score' => .92]]]; }
             public function reverse(float $latitude, float $longitude, int $limit = 3): array { return ['ok' => true, 'query' => '', 'cached' => false, 'error' => null, 'features' => []]; }
@@ -61,6 +66,21 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertSessionHasErrors('halal_meat');
 
         $this->assertDatabaseCount('restaurants', 0);
+    }
+
+    public function test_it_requires_one_category_and_one_feature(): void
+    {
+        $withoutCategories = $this->payload();
+        unset($withoutCategories['categories']);
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $withoutCategories)
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('categories');
+
+        $withoutFeatures = $this->payload();
+        unset($withoutFeatures['features']);
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $withoutFeatures)
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors('features');
     }
 
     public function test_it_requires_a_cover_photo_and_a_valid_email(): void
@@ -668,6 +688,8 @@ class PublicRestaurantSubmissionTest extends TestCase
             'name' => 'Restaurant de test',
             'halal_meat' => '1',
             'halal_chicken' => '0',
+            'categories' => [$this->requiredCategory->id],
+            'features' => [$this->requiredFeature->id],
             'address_suggestion_token' => app(\App\Services\Location\AddressSuggestionService::class)->suggest('46 boulevard du temple')[0]['token'],
             'hours' => $hours,
             'cover_photo' => UploadedFile::fake()->image('cover.jpg', 800, 600),

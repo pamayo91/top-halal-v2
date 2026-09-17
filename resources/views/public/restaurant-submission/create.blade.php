@@ -74,18 +74,23 @@
                         <h2 id="submission-step-3-title">Les informations utiles</h2>
                         <p class="muted">Ajoutez ce qui aidera les visiteurs. Tout est vérifié avant publication.</p>
 
-                        <fieldset class="taxonomy-fieldset">
+                        <fieldset class="taxonomy-fieldset" data-taxonomy-group="categories">
                             <legend>Catégories / type de cuisine</legend>
+                            <p class="form-help">Choisissez au moins une catégorie pour continuer.</p>
                             <div class="checkbox-grid">
                                 @foreach($categories as $category)<label><input type="checkbox" name="categories[]" value="{{ $category->id }}" @checked(in_array((string) $category->id, $selectedCategories, true))> {{ $category->name }}</label>@endforeach
                             </div>
+                            <p class="field-error" hidden data-taxonomy-error="categories">Choisissez au moins une catégorie ou un type de cuisine pour continuer.</p>
+                            @error('categories')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>
-                        <fieldset class="taxonomy-fieldset">
+                        <fieldset class="taxonomy-fieldset" data-taxonomy-group="features">
                             <legend>Services et caractéristiques</legend>
-                            <p class="form-help">Une certification halal éventuelle se sélectionne ici comme un service ; elle n’est jamais obligatoire.</p>
+                            <p class="form-help">Choisissez au moins un service. Une certification halal éventuelle reste facultative.</p>
                             <div class="checkbox-grid">
                                 @foreach($features as $feature)<label><input type="checkbox" name="features[]" value="{{ $feature->id }}" @checked(in_array((string) $feature->id, $selectedFeatures, true))> {{ $feature->name }}</label>@endforeach
                             </div>
+                            <p class="field-error" hidden data-taxonomy-error="features">Choisissez au moins un service ou une caractéristique pour continuer.</p>
+                            @error('features')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>
 
                         <fieldset class="hours-fieldset" data-hours-editor>

@@ -98,6 +98,17 @@ if (submission) {
         return valid;
     };
 
+    const validateTaxonomy = () => {
+        let valid = true;
+        form.querySelectorAll('[data-taxonomy-group]').forEach(group => {
+            const selected = group.querySelector('input[type="checkbox"]:checked');
+            const error = group.querySelector('[data-taxonomy-error]');
+            error.hidden = Boolean(selected);
+            valid = Boolean(selected) && valid;
+        });
+        return valid;
+    };
+
     const validateStep = step => {
         const section = steps[step - 1];
         if (step === 4 && !coverInput.files.length) {
@@ -111,6 +122,7 @@ if (submission) {
             if (!field.reportValidity()) return false;
         }
         if (step === 1 && !validateHalal()) return false;
+        if (step === 3 && !validateTaxonomy()) return false;
         if (step === 2) {
             if (!addressToken.value) {
                 addressQuery.setCustomValidity('Sélectionnez une adresse dans la liste proposée.');
@@ -246,6 +258,7 @@ if (submission) {
         });
     });
     halalOptions.forEach(option => option.addEventListener('change', validateHalal));
+    form.querySelectorAll('[data-taxonomy-group] input[type="checkbox"]').forEach(option => option.addEventListener('change', validateTaxonomy));
     nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(() => refreshDuplicates(nameDuplicates, false), 350); });
     addressSelector.addEventListener('address-selected', () => refreshDuplicates(addressDuplicates, true));
     addressSelector.addEventListener('address-marker-moved', () => refreshDuplicates(addressDuplicates, true));

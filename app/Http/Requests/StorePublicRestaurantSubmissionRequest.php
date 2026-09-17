@@ -23,9 +23,9 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'latitude' => ['nullable', 'numeric', 'between:41,52'],
             'longitude' => ['nullable', 'numeric', 'between:-5.5,10'],
             'map_moved' => ['nullable', 'boolean'],
-            'categories' => ['nullable', 'array', 'max:10'],
+            'categories' => ['required', 'array', 'min:1', 'max:10'],
             'categories.*' => ['integer', 'distinct', Rule::exists('categories', 'id')],
-            'features' => ['nullable', 'array', 'max:20'],
+            'features' => ['required', 'array', 'min:1', 'max:20'],
             'features.*' => ['integer', 'distinct', Rule::exists('features', 'id')],
             'hours' => ['required', 'array', 'size:7'],
             'hours.*.status' => ['required', Rule::in(['closed', 'all_day', 'slots'])],
@@ -94,6 +94,10 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'categories.required' => 'Choisissez au moins une catégorie ou un type de cuisine.',
+            'categories.min' => 'Choisissez au moins une catégorie ou un type de cuisine.',
+            'features.required' => 'Choisissez au moins un service ou une caractéristique.',
+            'features.min' => 'Choisissez au moins un service ou une caractéristique.',
             'cover_photo.dimensions' => 'La photo de couverture doit mesurer au moins 800 pixels de large.',
             'gallery_photos.*.dimensions' => 'Chaque photo de galerie doit mesurer au moins 800 pixels de large.',
         ];

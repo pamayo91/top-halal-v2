@@ -18,6 +18,8 @@ async function fillRestaurantAndAddress(page: import('@playwright/test').Page, s
   await expect(page.locator('[data-address-selected]')).toBeVisible();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
+  await page.locator('[name="categories[]"]').first().check();
+  await page.locator('[name="features[]"]').first().check();
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
 }
@@ -103,6 +105,11 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   const monday = page.locator('[data-hours-day="monday"]');
   const tuesday = page.locator('[data-hours-day="tuesday"]');
   const sunday = page.locator('[data-hours-day="sunday"]');
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Choisissez au moins une catégorie ou un type de cuisine pour continuer.')).toBeVisible();
+  await expect(page.getByText('Choisissez au moins un service ou une caractéristique pour continuer.')).toBeVisible();
+  await page.locator('[name="categories[]"]').first().check();
+  await page.locator('[name="features[]"]').first().check();
   await page.getByLabel('État Lundi').selectOption('slots');
   await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetWidth', 132);
   await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetHeight', 34);
