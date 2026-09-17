@@ -236,7 +236,13 @@ test('public restaurant contribution requires a cover photo and validates the em
 
   await page.locator('[data-cover-input]').setInputFiles(cover);
   await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByRole('heading', { name: 'Vérification' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Vos informations' })).toBeVisible();
+  await expect(page.locator('[data-submission-summary]')).toHaveCount(0);
+  expect(await page.locator('[data-owner-choice]').evaluateAll(inputs => inputs.map((input: HTMLInputElement) => input.value))).toEqual(['customer', 'owner']);
+  await expect(page.getByText('Relisez la proposition avant de l’envoyer. Elle restera en attente de modération.')).toHaveCount(0);
+  await page.getByLabel('Non').check();
+  await expect(page.locator('[data-owner-fields]')).toBeHidden();
+  await expect(page.locator('[data-owner-email-help="customer"]')).toBeVisible();
   await page.getByLabel('Oui').check();
   await expect(page.locator('[data-owner-fields]')).toBeVisible();
   await expect(page.locator('[data-owner-email-help="owner"]')).toBeVisible();
@@ -289,7 +295,8 @@ test('public restaurant contribution submits a pending restaurant successfully',
   await page.getByLabel('Non').check();
   await page.getByLabel('Votre e-mail').fill(`contribution-${testInfo.project.name}@example.invalid`);
   await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
-  await expect(page.getByRole('heading', { name: 'Merci pour votre aide !' })).toBeVisible();
-  await expect(page.getByText('attend d’abord la confirmation de votre adresse e-mail')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Merci pour la soumission du restaurant !' })).toBeVisible();
+  await expect(page.getByText('Vous devez d’abord confirmer votre adresse e-mail. Elle ne sera jamais publiée.')).toBeVisible();
+  await expect(page.getByText('Consultez votre boîte e-mail et vérifiez également vos spams pour confirmer votre adresse. Ensuite, notre équipe pourra examiner la proposition.')).toBeVisible();
   expect(errors).toEqual([]);
 });

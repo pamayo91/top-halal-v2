@@ -51,7 +51,6 @@ if (submission) {
     const coverPreview = form.querySelector('[data-cover-preview]');
     const galleryInput = form.querySelector('[data-gallery-input]');
     const galleryPreview = form.querySelector('[data-gallery-preview]');
-    const summary = form.querySelector('[data-submission-summary]');
     const ownerFields = form.querySelector('[data-owner-fields]');
     const ownerChoices = [...form.querySelectorAll('[data-owner-choice]')];
     const ownerEmailHelp = [...form.querySelectorAll('[data-owner-email-help]')];
@@ -69,9 +68,7 @@ if (submission) {
     const galleryUrls = new WeakMap();
 
     const text = (element, value) => { element.textContent = value || 'Non renseigné'; return element; };
-    const inputValue = name => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
     const addressValue = name => addressSelector.querySelector(`[data-address-display="${name}"]`)?.value?.trim() || '';
-    const selectedLabels = name => [...form.querySelectorAll(`[name="${name}[]"]:checked`)].map(input => input.parentElement.textContent.trim());
 
     const setStep = (step, focus = true) => {
         currentStep = Math.max(1, Math.min(5, step));
@@ -87,7 +84,6 @@ if (submission) {
             if (active) indicator.setAttribute('aria-current', 'step'); else indicator.removeAttribute('aria-current');
         });
         finalSubmit.hidden = currentStep !== 5;
-        if (currentStep === 5) renderSummary();
         if (focus) steps[currentStep - 1].querySelector('h2')?.focus({ preventScroll: true });
         window.scrollTo({ top: submission.getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth' });
     };
@@ -239,19 +235,6 @@ if (submission) {
             row.append(image, title, up, down, remove);
             galleryPreview.append(row);
         });
-    };
-
-    const renderSummary = () => {
-        summary.replaceChildren();
-        const list = document.createElement('dl');
-        const add = (label, value) => { const term = document.createElement('dt'); text(term, label); const definition = document.createElement('dd'); text(definition, value); list.append(term, definition); };
-        add('Restaurant', nameInput.value.trim());
-        add('Offre halal', halalOptions.filter(option => option.checked).map(option => option.parentElement.textContent.trim().split('\n')[0]).join(', '));
-        add('Adresse', [addressValue('address_line1'), addressValue('postal_code'), addressValue('city_name')].filter(Boolean).join(', '));
-        add('Catégories', selectedLabels('categories').join(', '));
-        add('Services', selectedLabels('features').join(', '));
-        add('Photos', `1 couverture${galleryFiles.length ? ` + ${galleryFiles.length} galerie` : ''}`);
-        summary.append(list);
     };
 
     form.querySelectorAll('[data-next], [data-previous]').forEach(button => {

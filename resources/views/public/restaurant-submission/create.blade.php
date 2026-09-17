@@ -154,19 +154,18 @@
 
                     <section class="submission-step" data-submission-step="5" aria-labelledby="submission-step-5-title">
                         <p class="submission-kicker">Étape 5 sur 5</p>
-                        <h2 id="submission-step-5-title">Vérification</h2>
-                        <p class="muted">Relisez la proposition avant de l’envoyer. Elle restera en attente de modération.</p>
-                        <div class="submission-summary" data-submission-summary aria-live="polite"></div>
+                        <h2 id="submission-step-5-title">Vos informations</h2>
+                        <p class="muted">Indiquez comment nous pouvons vous recontacter au sujet de cette proposition.</p>
 
                         <fieldset class="submission-choice-group submission-owner-choice">
                             <legend>Êtes-vous le gérant ou propriétaire de cet établissement ?</legend>
                             <label class="choice-card choice-card--role">
-                                <input type="radio" name="submitter_role" value="owner" required @checked(old('submitter_role') === 'owner') data-owner-choice>
-                                <span><b>Oui</b><small>Je suis le gérant ou propriétaire de cet établissement. Je pourrai gérer cette fiche après validation.</small></span>
-                            </label>
-                            <label class="choice-card choice-card--role">
                                 <input type="radio" name="submitter_role" value="customer" required @checked(old('submitter_role') === 'customer') data-owner-choice>
                                 <span><b>Non</b><small>Je propose simplement ce restaurant. Il pourra être revendiqué plus tard par son gérant.</small></span>
+                            </label>
+                            <label class="choice-card choice-card--role">
+                                <input type="radio" name="submitter_role" value="owner" required @checked(old('submitter_role') === 'owner') data-owner-choice>
+                                <span><b>Oui</b><small>Je suis le gérant ou propriétaire de cet établissement. Je pourrai gérer cette fiche après validation.</small></span>
                             </label>
                             <div class="submission-owner-fields" data-owner-fields @unless(old('submitter_role') === 'owner') hidden @endunless>
                                 <label>Nom / prénom <input name="owner_full_name" maxlength="255" value="{{ old('owner_full_name') }}"></label>
@@ -197,7 +196,7 @@
                         <li data-step-indicator="2"><b>2</b><span>Adresse<small>Position et doublons</small></span></li>
                         <li data-step-indicator="3"><b>3</b><span>Informations<small>Services et horaires</small></span></li>
                         <li data-step-indicator="4"><b>4</b><span>Photos<small>Couverture et galerie</small></span></li>
-                        <li data-step-indicator="5"><b>5</b><span>Vérification<small>Récapitulatif et e-mail</small></span></li>
+                        <li data-step-indicator="5"><b>5</b><span>Vos informations<small>Rôle et e-mail</small></span></li>
                     </ol>
                 </aside>
             </div>
