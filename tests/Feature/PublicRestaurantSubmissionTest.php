@@ -148,8 +148,8 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $restaurant = Restaurant::firstOrFail();
         $this->assertCount(8, $restaurant->openingHours);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '10:00:00', 'closes_at' => '14:00:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '18:00:00', 'closes_at' => '22:00:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '10:00', 'closes_at' => '14:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '18:00', 'closes_at' => '22:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
         $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'tuesday', 'slot' => 1, 'is_closed' => 0, 'is_open_24_hours' => 1]);
         $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'slot' => 1, 'is_closed' => 1, 'is_open_24_hours' => 0]);
     }
