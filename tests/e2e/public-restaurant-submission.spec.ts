@@ -112,6 +112,7 @@ test('public restaurant contribution keeps step-three contact fields in the requ
     return {
       gridWidth: grid.getBoundingClientRect().width,
       phoneWidth: phone.width,
+      websiteWidth: website.width,
       phoneBeforeWebsite: phone.bottom <= website.top,
       websiteInstagramRow: Math.abs(website.top - instagram.top) < 1,
       facebookTiktokRow: Math.abs(facebook.top - tiktok.top) < 1,
@@ -119,7 +120,7 @@ test('public restaurant contribution keeps step-three contact fields in the requ
     };
   });
 
-  expect(positions.phoneWidth).toBeLessThan(positions.gridWidth);
+  expect(positions.phoneWidth).toBeCloseTo(positions.websiteWidth, 1);
   expect(positions.phoneBeforeWebsite).toBe(true);
   expect(positions.websiteInstagramRow).toBe(true);
   expect(positions.facebookTiktokRow).toBe(true);
