@@ -77,6 +77,9 @@ test('public restaurant contribution restores one correctly sized map after retu
 });
 
 test('public restaurant contribution keeps compact mixed hours and copied slots across steps', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('requestfailed', request => errors.push(`${request.method()} ${request.url()}`));
   await page.goto('/ajouter-un-restaurant');
   await page.locator('[data-restaurant-name]').fill('Horaires compacts');
   await page.getByLabel('Viande halal').check();
@@ -126,6 +129,30 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
   await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
   await expect(tuesday.locator('[name="hours[tuesday][second_open]"]')).toHaveValue('18:30');
+  expect(errors).toEqual([]);
+});
+
+test('public restaurant contribution keeps the hours editor within a tablet viewport', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium', 'The desktop project supplies the tablet viewport check.');
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto('/ajouter-un-restaurant');
+  await page.locator('[data-restaurant-name]').fill('Horaires tablette');
+  await page.getByLabel('Viande halal').check();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByLabel('Adresse du restaurant').fill('46 Boulevard du Temple Paris');
+  await expect(page.locator('[data-address-results] button').first()).toBeVisible();
+  await page.locator('[data-address-results] button').first().click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+
+  const monday = page.locator('[data-hours-day="monday"]');
+  await page.getByLabel('État Lundi').selectOption('slots');
+  await monday.locator('[name="hours[monday][first_open]"]').fill('09:30');
+  await monday.locator('[name="hours[monday][first_close]"]').fill('12:00');
+  await monday.getByRole('button', { name: '+ 2ème plage' }).click();
+  await monday.locator('[name="hours[monday][second_open]"]').fill('18:30');
+  await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
+
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {
