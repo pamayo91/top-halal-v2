@@ -2,6 +2,10 @@
 
 ## 2026-09-17
 
+- Compacté et clarifié la saisie publique des horaires : contrôles natifs d’heure lisibles, actions de seconde plage raccourcies, deux créneaux alignés puis responsivement repliés, et recopie de jours mieux groupée, sans modifier le contrat enregistré ni sa validation.
+
+## 2026-09-17
+
 - Reworked the public restaurant-submission hours editor into seven compact day rows. The existing server contract, three states and two-range limit remain unchanged; the second range is now intentionally added/removed, copy is compact, and navigation between steps retains all values. The public wording no longer labels the optional description or gives misleading external-link guidance.
 - Audited restaurant outbound links: the public restaurant page now renders approved Site web, Facebook, Instagram and TikTok actions exclusively through opaque `/sortie/{token}` URLs. Destination URLs remain absent from HTML, DOM, JSON-LD and embedded JavaScript; the server validates, counts and redirects. Preproduction currently has no active outbound relation on a published restaurant, so the live-data audit found no destination to follow; PHP coverage verifies every supported public button and the opaque redirect contract.
 - Corrected a regression-gate finding in dynamic public meta descriptions: apostrophes are now decoded before the one normal Blade escape, preventing double-encoded entities.

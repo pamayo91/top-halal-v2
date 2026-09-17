@@ -99,12 +99,12 @@
                                     <div class="hours-slots" data-hours-slots @if($status !== 'slots') hidden @endif>
                                         <div class="hours-slot-row"><label>De <input type="time" name="hours[{{ $dayKey }}][first_open]" value="{{ old("hours.$dayKey.first_open") }}"></label><label>à <input type="time" name="hours[{{ $dayKey }}][first_close]" value="{{ old("hours.$dayKey.first_close") }}"></label></div>
                                         <div class="hours-slot-row" data-hours-second-slot @if(!$hasSecondSlot) hidden @endif><label>De <input type="time" name="hours[{{ $dayKey }}][second_open]" value="{{ old("hours.$dayKey.second_open") }}"></label><label>à <input type="time" name="hours[{{ $dayKey }}][second_close]" value="{{ old("hours.$dayKey.second_close") }}"></label></div>
-                                        <button class="hours-slot-action" type="button" data-add-hours-slot @if($hasSecondSlot) hidden @endif>+ Ajouter une deuxième plage</button>
-                                        <button class="hours-slot-action" type="button" data-remove-hours-slot @if(!$hasSecondSlot) hidden @endif>Supprimer la deuxième plage</button>
+                                        <button class="hours-slot-action" type="button" data-add-hours-slot @if($hasSecondSlot) hidden @endif>+ 2ème plage</button>
+                                        <button class="hours-slot-action" type="button" data-remove-hours-slot @if(!$hasSecondSlot) hidden @endif>Supprimer la 2ème plage</button>
                                     </div>
                                 </div>
                             @endforeach
-                            <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target="{{ $dayKey }}"> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
+                            <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><span class="hours-copy-to" aria-hidden="true">vers :</span><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target="{{ $dayKey }}"> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
                         </fieldset>
 
                         <div class="form-grid">

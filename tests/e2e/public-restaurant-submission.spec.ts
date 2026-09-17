@@ -91,11 +91,21 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   const sunday = page.locator('[data-hours-day="sunday"]');
   await page.getByLabel('État Lundi').selectOption('slots');
   await expect(monday.locator('[data-hours-second-slot]')).toBeHidden();
-  await monday.locator('[name="hours[monday][first_open]"]').fill('10:00');
-  await monday.locator('[name="hours[monday][first_close]"]').fill('14:00');
-  await monday.getByRole('button', { name: '+ Ajouter une deuxième plage' }).click();
-  await monday.locator('[name="hours[monday][second_open]"]').fill('18:00');
-  await monday.locator('[name="hours[monday][second_close]"]').fill('22:00');
+  await monday.locator('[name="hours[monday][first_open]"]').fill('00:00');
+  await monday.locator('[name="hours[monday][first_close]"]').fill('09:30');
+  await monday.getByRole('button', { name: '+ 2ème plage' }).click();
+  await monday.locator('[name="hours[monday][second_open]"]').fill('18:30');
+  await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
+  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
+  await expect(monday.locator('[name="hours[monday][first_close]"]')).toHaveValue('09:30');
+  await expect(monday.locator('[name="hours[monday][second_open]"]')).toHaveValue('18:30');
+  await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
+  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveJSProperty('offsetWidth', 104);
+  await monday.getByRole('button', { name: 'Supprimer la 2ème plage' }).click();
+  await expect(monday.locator('[data-hours-second-slot]')).toBeHidden();
+  await monday.getByRole('button', { name: '+ 2ème plage' }).click();
+  await monday.locator('[name="hours[monday][second_open]"]').fill('18:30');
+  await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
   await page.getByLabel('État Mardi').selectOption('all_day');
   await expect(tuesday.locator('[data-hours-slots]')).toBeHidden();
   await expect(sunday.locator('[data-hours-slots]')).toBeHidden();
@@ -105,15 +115,17 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await page.locator('[data-copy-target="wednesday"]').check();
   await page.getByRole('button', { name: 'Recopier', exact: true }).click();
   await expect(page.getByLabel('État Mardi')).toHaveValue('slots');
-  await expect(tuesday.locator('[name="hours[tuesday][second_close]"]')).toHaveValue('22:00');
+  await expect(tuesday.locator('[name="hours[tuesday][second_close]"]')).toHaveValue('23:59');
+  await page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_close]"]').fill('12:00');
+  await expect(page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_close]"]')).toHaveValue('12:00');
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
   await page.getByRole('button', { name: 'Retour' }).click();
   await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
-  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('10:00');
-  await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('22:00');
-  await expect(tuesday.locator('[name="hours[tuesday][second_open]"]')).toHaveValue('18:00');
+  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
+  await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
+  await expect(tuesday.locator('[name="hours[tuesday][second_open]"]')).toHaveValue('18:30');
 });
 
 test('public restaurant contribution requires a cover photo and validates the email', async ({ page }, testInfo) => {
