@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -89,7 +90,7 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
         });
     }
 
-    protected function failedValidation(Validator $validator): void
+    protected function failedValidation(ValidatorContract $validator): void
     {
         throw new HttpResponseException(
             redirect()->to($this->getRedirectUrl())
@@ -99,7 +100,7 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
         );
     }
 
-    private function firstErrorStep(Validator $validator): int
+    private function firstErrorStep(ValidatorContract $validator): int
     {
         foreach (array_keys($validator->errors()->messages()) as $field) {
             if (in_array($field, ['name', 'halal_meat', 'halal_chicken'], true)) return 1;
