@@ -132,16 +132,16 @@
                     <section class="submission-step" data-submission-step="4" aria-labelledby="submission-step-4-title">
                         <p class="submission-kicker">Étape 4 sur 5</p>
                         <h2 id="submission-step-4-title">Les photos</h2>
-                        <p class="muted">Une belle photo de couverture est nécessaire pour permettre la vérification. Les photos sont privées jusqu’à la modération.</p>
+                        <p class="muted">Ajoutez une belle photo de couverture du restaurant.</p>
                         <label for="cover-photo">Photo de couverture <span aria-hidden="true">*</span></label>
                         <input id="cover-photo" name="cover_photo" type="file" accept="image/jpeg,image/png,image/webp" required data-cover-input>
                         <p class="form-help">JPEG, PNG ou WebP, 10 Mo maximum.</p>
                         <div class="photo-cover-preview" data-cover-preview aria-live="polite"></div>
                         @error('cover_photo')<p class="field-error">{{ $message }}</p>@enderror
 
-                        <label for="gallery-photos">Photos complémentaires (facultatives, 10 maximum)</label>
+                        <label for="gallery-photos">Photos complémentaires (10 maximum)</label>
                         <input id="gallery-photos" name="gallery_photos[]" type="file" accept="image/jpeg,image/png,image/webp" multiple data-gallery-input>
-                        <p class="form-help">Vous pouvez retirer ou réorganiser les photos avant l’envoi.</p>
+                        <p class="form-help">Vous pourrez retirer ou réorganiser les photos avant l’envoi.</p>
                         <ol class="photo-gallery-preview" data-gallery-preview aria-live="polite"></ol>
                         @error('gallery_photos')<p class="field-error">{{ $message }}</p>@enderror
                         @error('gallery_photos.*')<p class="field-error">{{ $message }}</p>@enderror

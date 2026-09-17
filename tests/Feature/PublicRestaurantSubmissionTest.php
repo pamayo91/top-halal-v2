@@ -38,6 +38,11 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertOk()
             ->assertSee('Étape 1 sur 5')
             ->assertSee('Photo de couverture')
+            ->assertSee('Ajoutez une belle photo de couverture du restaurant.')
+            ->assertSee('Photos complémentaires (10 maximum)')
+            ->assertSee('Vous pourrez retirer ou réorganiser les photos avant l’envoi.')
+            ->assertDontSee('Les photos sont privées jusqu’à la modération.')
+            ->assertDontSee('Photos complémentaires (facultatives, 10 maximum)')
             ->assertSee('Votre adresse exacte n’apparaît pas ? Sélectionnez l’adresse la plus proche proposée, puis ajustez précisément la position du restaurant sur la carte.')
             ->assertDontSee('Code INSEE')
             ->assertSee('noindex,nofollow', false);

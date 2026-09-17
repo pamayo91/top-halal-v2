@@ -248,6 +248,33 @@ test('public restaurant contribution requires a cover photo and validates the em
   await expect.poll(() => page.getByLabel('Votre e-mail').evaluate((input: HTMLInputElement) => input.validationMessage)).not.toBe('');
 });
 
+test('public restaurant contribution presents and manages step-four photos on desktop and mobile', async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('requestfailed', request => errors.push(`${request.method()} ${request.url()}`));
+  await fillRestaurantAndAddress(page, `galerie-${testInfo.project.name}-${crypto.randomUUID()}`);
+
+  await expect(page.getByText('Ajoutez une belle photo de couverture du restaurant.')).toBeVisible();
+  await expect(page.getByLabel('Photos complémentaires (10 maximum)')).toBeVisible();
+  await expect(page.getByText('Vous pourrez retirer ou réorganiser les photos avant l’envoi.')).toBeVisible();
+  await expect(page.getByText(/facultatives/i)).toHaveCount(0);
+  await page.locator('[data-cover-input]').setInputFiles(cover);
+  await expect(page.locator('[data-cover-preview] img')).toBeVisible();
+
+  await page.locator('[data-gallery-input]').setInputFiles([
+    { ...cover, name: 'galerie-un.png' },
+    { ...cover, name: 'galerie-deux.png' },
+  ]);
+  const gallery = page.locator('[data-gallery-preview]');
+  await expect(gallery.getByRole('listitem')).toHaveCount(2);
+  await gallery.getByRole('button', { name: 'Monter' }).nth(1).click();
+  await expect(gallery.getByRole('listitem').first()).toContainText('galerie-deux.png');
+  await gallery.getByRole('button', { name: 'Supprimer' }).first().click();
+  await expect(gallery.getByRole('listitem')).toHaveCount(1);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+});
+
 test('public restaurant contribution submits a pending restaurant successfully', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
