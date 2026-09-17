@@ -22,7 +22,7 @@ class AddressSuggestionService
 
         return collect($result['features'])->filter(fn (array $feature) => $this->isUsableFeature($feature))->map(function (array $feature) use ($query): array {
             $token = (string) Str::uuid();
-            Cache::put($this->key($token), $feature, now()->addMinutes(15));
+            Cache::put($this->key($token), $feature, now()->addHours(2));
             return ['token' => $token, 'label' => $this->label($feature), 'feature' => $feature];
         })->values()->all();
     }

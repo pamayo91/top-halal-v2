@@ -64,7 +64,14 @@ class PublicRestaurantSubmissionController extends Controller
     public function store(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, RestaurantLocationService $locations, MediaIngestor $media, RestaurantSubmissionMailer $mailer, DuplicateRestaurantDetector $duplicates): RedirectResponse
     {
         $data = $request->validated();
-        $location = $this->locationData($request, $suggestions, $data);
+        try {
+            $location = $this->locationData($request, $suggestions, $data);
+        } catch (ValidationException $exception) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors($exception->errors())
+                ->with('submission_error_step', 2);
+        }
         $hours = app(RestaurantHours::class)->publicSubmissionRows($data['hours']);
         $duplicateAssessment = $duplicates->assess([
             ...$location,
@@ -278,7 +285,7 @@ class PublicRestaurantSubmissionController extends Controller
         if (filled($token)) {
             $location = $suggestions->structuredFromToken($token);
             if ($location === null) {
-                throw ValidationException::withMessages(['address_line1' => 'Cette suggestion a expiré. Recherchez l’adresse à nouveau.']);
+                throw ValidationException::withMessages(['address_suggestion_token' => 'Cette suggestion a expiré. Recherchez l’adresse à nouveau.']);
             }
             return $location;
         }

@@ -2,6 +2,7 @@
 
 ## 2026-09-17
 
+- Formulaire public de proposition : le jeton opaque d’adresse sélectionnée reste valide deux heures au lieu de 15 minutes. Une expiration exceptionnelle ramène explicitement à l’étape Adresse avec son message local, au lieu de laisser l’utilisateur bloqué à l’étape 5.
 - Formulaire public de proposition : une erreur serveur provenant d’une étape antérieure ramène maintenant explicitement à cette première étape en erreur, plutôt que de laisser le visiteur à l’étape 5 sans indication visible.
 - Formulaire public de proposition : les retours serveur des champs gérant sont désormais strictement localisés sous chaque contrôle et tous les messages sont en français explicite ; l’alerte globale Laravel, qui pouvait exposer une clé `validation.required`, est supprimée de ce parcours.
 - Formulaire public de proposition : le SIRET gérant invalide est désormais contrôlé sans rechargement et affiche son unique message français directement sous le champ ; le secours serveur emploie le même libellé et ne peut plus exposer `validation.digits`.

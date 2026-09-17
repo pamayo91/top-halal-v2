@@ -8,7 +8,7 @@ use App\Services\Geocoding\GeocodingService;
 use App\Services\MediaIngestor;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\{Hash, Mail, Password, URL};
+use Illuminate\Support\Facades\{Cache, Hash, Mail, Password, URL};
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Tests\TestCase;
@@ -62,6 +62,17 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertSessionHasErrors('address_suggestion_token');
 
         $this->assertDatabaseCount('restaurants', 0);
+    }
+
+    public function test_an_expired_address_selection_returns_to_step_two_with_a_local_message(): void
+    {
+        $token = app(\App\Services\Location\AddressSuggestionService::class)->suggest('46 boulevard du temple')[0]['token'];
+        Cache::forget('address-suggestion:'.$token);
+
+        $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload(['address_suggestion_token' => $token]))
+            ->assertRedirect(route('restaurant-submissions.create'))
+            ->assertSessionHasErrors(['address_suggestion_token' => 'Cette suggestion a expiré. Recherchez l’adresse à nouveau.'])
+            ->assertSessionHas('submission_error_step', 2);
     }
 
     public function test_it_requires_one_halal_option(): void

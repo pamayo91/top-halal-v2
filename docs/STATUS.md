@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-17
 
+Latest public restaurant-submission address-token correction: the selected opaque address token remains usable for two hours rather than 15 minutes. If it nevertheless expires or is cleared before final validation, the response returns directly to step 2 with the local « Cette suggestion a expiré » guidance, rather than leaving the user on step 5. Feature coverage forces an expired token and verifies this exact recovery.
+
 Latest public restaurant-submission server-validation routing: when the final POST discovers an error from steps 1–4, the server now returns the contributor to the first affected step instead of retaining step 5 and hiding the error. Owner-field errors remain on step 5 directly beneath their relevant field.
 
 Latest public restaurant-submission server-error presentation: the page no longer shows Laravel’s global error list. Owner full name, company, SIRET and certification fallback messages render only below their individual control and now all have explicit French text; technical `validation.*` keys cannot be exposed publicly. Browser coverage also submits a complete owner proposal, proving that the valid owner path reaches the confirmation screen without a server validation error.
