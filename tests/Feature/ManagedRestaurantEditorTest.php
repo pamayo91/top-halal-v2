@@ -36,6 +36,42 @@ class ManagedRestaurantEditorTest extends TestCase
         }
     }
 
+    public function test_published_new_submission_owner_uses_the_complete_shared_editor(): void
+    {
+        [$owner, $restaurant] = $this->representedRestaurant('new submission owner');
+        $restaurant->categories()->attach($this->category('Spécialité du propriétaire', 41));
+        $restaurant->features()->attach($this->feature('Service du propriétaire', 42));
+
+        $this->assertDatabaseHas('restaurant_claims', [
+            'restaurant_id' => $restaurant->id,
+            'user_id' => $owner->id,
+            'source' => 'new_submission',
+            'status' => 'approved',
+        ]);
+        $this->assertTrue($owner->can('manage', $restaurant));
+
+        $this->actingAs($owner)->get(route('owner.restaurants.edit', $restaurant))
+            ->assertOk()
+            ->assertSee('Spécialités et services')
+            ->assertSee('Horaires')
+            ->assertSee('Adresse et position')
+            ->assertSee('Contact et liens')
+            ->assertSee('Photos')
+            ->assertSee('name="categories[]"', false)
+            ->assertSee('name="features[]"', false)
+            ->assertSee('name="hours[0][status]"', false)
+            ->assertSee('name="location_changed"', false)
+            ->assertSee('name="website_url"', false)
+            ->assertSee('name="new_photos[]"', false)
+            ->assertDontSee('name="contact_email"', false);
+
+        $this->actingAs($owner)->put(route('owner.restaurants.update', $restaurant), [
+            'name' => 'Restaurant du nouveau propriétaire',
+        ])->assertRedirect();
+
+        $this->assertSame('Restaurant du nouveau propriétaire', $restaurant->fresh()->name);
+    }
+
     public function test_a_manager_updates_business_data_media_hours_links_and_gps_without_touching_administrative_fields(): void
     {
         [$manager, $restaurant] = $this->representedRestaurant('approved claimant');
@@ -156,6 +192,10 @@ class ManagedRestaurantEditorTest extends TestCase
         $user = User::factory()->create(['role' => 'user']);
         if ($kind === 'depositor') RestaurantSubmission::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'submitter_email' => $user->email, 'submitter_role' => 'customer', 'status' => 'published', 'submitted_at' => now()]);
         if ($kind === 'approved claimant') RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'status' => 'approved', 'submitted_at' => now()]);
+        if ($kind === 'new submission owner') {
+            RestaurantSubmission::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'submitter_email' => $user->email, 'submitter_role' => 'owner', 'status' => 'published', 'submitted_at' => now()]);
+            RestaurantClaim::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'source' => 'new_submission', 'status' => 'approved', 'submitted_at' => now()]);
+        }
         if ($kind === 'legacy author') LegacyRestaurantAuthorship::create(['restaurant_id' => $restaurant->id, 'user_id' => $user->id, 'legacy_wp_id' => $restaurant->legacy_wp_id, 'legacy_wp_user_id' => random_int(1000, 9999), 'source_post_status' => 'publish']);
 
         return [$user, $restaurant];
