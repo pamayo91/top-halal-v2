@@ -162,7 +162,7 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   if (testInfo.project.name === 'desktop-chromium') {
     await expect.poll(async () => monday.evaluate(day => {
       const secondRange = day.querySelectorAll<HTMLElement>('[data-hours-slot-open]')[1]?.getBoundingClientRect();
-      const remove = day.querySelector('[data-remove-hours-slot]')?.getBoundingClientRect();
+      const remove = day.querySelector('[data-remove-hours-slot]:not([hidden])')?.getBoundingClientRect();
       return Boolean(secondRange && remove && remove.left >= secondRange.right && Math.abs(remove.top - secondRange.top) < secondRange.height);
     })).toBe(true);
   }
