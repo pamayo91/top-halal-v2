@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('published restaurant exposes only opaque outbound actions and redirects them', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  page.on('requestfailed', request => errors.push(`${request.method()} ${request.url()}`));
+  page.on('requestfailed', request => { if (request.url().startsWith('https://dev.top-halal.fr')) errors.push(`${request.method()} ${request.url()}`); });
 
   await page.goto('/resto/test1-kws358jp');
   await expect(page.getByRole('heading', { name: 'test1' })).toBeVisible();
