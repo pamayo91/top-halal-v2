@@ -5,6 +5,7 @@ type Fixture = { profile: 'depositor' | 'claimant' | 'historical'; restaurantId:
 const password = 'E2e-managed-editor-password-2026';
 const rawFixtures = process.env.E2E_MANAGED_EDITOR_FIXTURES;
 const fixtures: Fixture[] = rawFixtures ? JSON.parse(rawFixtures) : [];
+const mutationIds = process.env.E2E_MANAGED_EDITOR_MUTATION_IDS ? JSON.parse(process.env.E2E_MANAGED_EDITOR_MUTATION_IDS) as Record<string, { restaurantId: number; email: string }> : {};
 
 test.describe('Éditeur de fiche gérée', () => {
   test.skip(!rawFixtures, 'E2E_MANAGED_EDITOR_FIXTURES is required; the preproduction runner creates isolated non-human fixtures.');
@@ -30,18 +31,20 @@ test.describe('Éditeur de fiche gérée', () => {
     });
   }
 
-  test('a depositor persists changed hours and media on the shared editor', async ({ page }) => {
+  test('a depositor persists changed hours and media on the shared editor', async ({ page }, testInfo) => {
     const depositor = fixtures.find(fixture => fixture.profile === 'depositor');
     expect(depositor).toBeTruthy();
+    const key = testInfo.project.name.includes('mobile') ? 'mobile' : 'desktop';
+    const mutationFixture = mutationIds[key] ?? depositor!;
     const errors: string[] = [];
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('requestfailed', request => errors.push(`${request.method()} ${request.url()}`));
 
     await page.goto('/login');
-    await page.locator('input[name="email"]').fill(depositor!.email);
+    await page.locator('input[name="email"]').fill(mutationFixture.email);
     await page.locator('input[name="password"]').fill(password);
     await page.getByRole('button', { name: 'Se connecter' }).click();
-    await page.goto(`/account/restaurants/${depositor!.restaurantId}/edit`);
+    await page.goto(`/account/restaurants/${mutationFixture.restaurantId}/edit`);
 
     await page.locator('select[name="hours[0][status]"]').selectOption('slots');
     await page.locator('input[name="hours[0][slots][0][opens_at]"]').fill('10:30');
