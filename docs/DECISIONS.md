@@ -2,6 +2,10 @@
 
 ## 2026-09-18
 
+### D040 — Une session déposant ne vaut pas ownership pour une revendication
+
+La claimability reste déterminée exclusivement par les ownerships approuvés, une relation historique exacte et les claims actives incompatibles ; une `restaurant_submissions.user_id` de déposant non-gérant ne la bloque jamais. Lorsqu’un tel compte est authentifié, son dossier de première revendication reste complet mais est relié au `User` de session, dont l’e-mail est affiché sans pouvoir être modifié. L’approbation réutilise ce compte actif sans créer de compte, token ou activation. Cette distinction ne transforme pas le déposant en restaurateur avant l’approbation.
+
 ### D039 — Un éditeur métier commun pour les gestionnaires de fiche
 
 La route compte de modification appelle une seule policy (`RestaurantPolicy::manage`) et un seul orchestrateur transactionnel (`ManagedRestaurantUpdater`) pour les déposants encore habilités, claims approuvés et paternités historiques exactes. Les services existants restent les sources de vérité pour horaires, localisation et médias ; l’interface ne possède pas de logique de persistance divergente selon le profil.

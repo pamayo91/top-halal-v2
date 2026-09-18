@@ -50,22 +50,30 @@ class RestaurantClaimController extends Controller
 
         $request->merge(['siret' => preg_replace('/\D+/', '', (string) $request->input('siret'))]);
         $data = $request->validate([
-            'full_name' => ['required', 'string', 'max:255'], 'email' => ['required', 'email:rfc', 'max:255'],
+            'full_name' => ['required', 'string', 'max:255'],
             'company' => ['required', 'string', 'max:255'], 'siret' => ['required', 'digits:14'], 'certified' => ['accepted'],
             'identity_document' => ['required', 'file', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:10240'],
         ]);
         if (! $this->isValidSiret($data['siret'])) return back()->withErrors(['siret' => 'Le SIRET doit comporter 14 chiffres valides.'])->withInput();
-        if (User::query()->where('email', Str::lower($data['email']))->get()->contains(fn (User $candidate) => $candidate->isVerifiedRestaurateur())) {
+        $email = $user ? Str::lower($user->email) : Str::lower((string) $request->validate(['email' => ['required', 'email:rfc', 'max:255']])['email']);
+        if (! $user && User::query()->where('email', $email)->get()->contains(fn (User $candidate) => $candidate->isVerifiedRestaurateur())) {
             return back()->withErrors(['email' => 'Un compte restaurateur existe déjà avec cette adresse e-mail. Connectez-vous pour continuer.'])->withInput();
         }
         $token = Str::random(64);
+        $authenticatedIdentity = $user !== null;
         $claim = RestaurantClaim::create([
-            'restaurant_id' => $restaurant->id, 'user_id' => $user?->id, 'full_name' => $data['full_name'], 'email' => Str::lower($data['email']),
+            'restaurant_id' => $restaurant->id, 'user_id' => $user?->id, 'full_name' => $data['full_name'], 'email' => $email,
             'company' => $data['company'], 'siret' => $data['siret'], 'certified' => true,
             'identity_document_path' => $request->file('identity_document')->store('claims/identity-documents', 'local'),
-            'source' => 'first_claim', 'status' => 'pending_email_verification', 'submitted_at' => now(),
-            'email_verification_token' => hash('sha256', $token), 'email_verification_expires_at' => now()->addHours(24),
+            'source' => 'first_claim', 'status' => $authenticatedIdentity ? 'pending' : 'pending_email_verification', 'submitted_at' => now(),
+            'email_verified_at' => $authenticatedIdentity ? $user->email_verified_at : null,
+            'email_verification_token' => $authenticatedIdentity ? null : hash('sha256', $token),
+            'email_verification_expires_at' => $authenticatedIdentity ? null : now()->addHours(24),
         ]);
+        if ($authenticatedIdentity) {
+            $user->notify(new ClaimLifecycleNotification($claim, 'submitted', route('claims.show', $claim)));
+            return redirect()->route('claims.show', $claim)->with('status', 'Votre demande a bien été envoyée. Elle sera vérifiée par l’équipe Top Halal.');
+        }
         $url = URL::temporarySignedRoute('claims.verify', now()->addHours(24), ['claim' => $claim, 'token' => $token]);
         Notification::route('mail', $claim->email)->notify(new ClaimLifecycleNotification($claim, 'verify', $url));
         return redirect()->route('claims.received')->with('status', 'Votre demande a bien été enregistrée. Vérifiez votre boîte e-mail pour confirmer votre adresse.');

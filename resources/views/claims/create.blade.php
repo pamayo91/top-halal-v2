@@ -20,7 +20,8 @@
                     <h1>Revendiquer {{ $restaurant->name }}</h1>
                 </header>
 
-                <div class="claim-grid">
+                <div @class(['claim-grid', 'claim-grid-single' => $user])>
+                    @unless($user)
                     <section class="contact-form-card claim-card">
                         <h2>Vous avez déjà un compte restaurateur ?</h2>
                         <p class="claim-intro">Déjà validé par Top Halal ? Connectez-vous pour revendiquer un nouvel établissement sans refaire la vérification d’identité.</p>
@@ -33,15 +34,17 @@
                         </form>
                         <p class="claim-password-link"><a href="{{ route('password.request') }}">Mot de passe oublié ?</a></p>
                     </section>
+                    @endunless
 
                     <section class="contact-form-card claim-card">
                         <h2>Première revendication ?</h2>
-                        <p class="claim-intro">Votre identité doit être vérifiée.</p>
+                        <p class="claim-intro">Pour devenir gestionnaire officiel de cet établissement, nous devons vérifier votre identité.</p>
+                        @if($user)<p class="claim-session">Vous êtes connecté en tant que {{ $user->name }} — {{ $user->email }}</p>@endif
                         <form method="post" enctype="multipart/form-data" action="{{ route('claims.store', $restaurant) }}">
                             @csrf
                             <div class="claim-details-grid">
                                 <label>Nom et prénom <input name="full_name" required maxlength="255" value="{{ old('full_name', $user?->name) }}"></label>
-                                <label>E-mail <input name="email" type="email" required maxlength="255" value="{{ old('email', $user?->email) }}"></label>
+                                <label>E-mail <input name="email" type="email" required maxlength="255" value="{{ old('email', $user?->email) }}" @if($user) readonly aria-readonly="true" @endif></label>
                                 <label>Société <input name="company" required maxlength="255" value="{{ old('company') }}"></label>
                                 <label>SIRET <input name="siret" required inputmode="numeric" maxlength="20" value="{{ old('siret') }}"></label>
                             </div>
