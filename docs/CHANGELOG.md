@@ -2,6 +2,8 @@
 
 ## 2026-09-18
 
+- Avis restaurant : le formulaire public devient plus compact et accessible avec cinq boutons radio natifs stylés en étoiles, libellés de qualité et navigation clavier. Le champ visible devient « Prénom ou pseudo », le titre est retiré des nouveaux payloads sans toucher aux titres historiques, et identité/e-mail s’alignent en deux colonnes puis une sur mobile. L’état vide propose une invitation communautaire, les erreurs locales rouvrent le formulaire en conservant la note, et les règles de preuve d’identité, modération, auto-avis gérant et agrégat approuvé restent inchangées.
+
 - Revendications : le fallback historique qui copiait le nom du restaurant dans le nom d’un nouveau déposant non-gérant est supprimé. Un tel compte reste sans nom personnel tant qu’il n’en fournit pas un ; les fallbacks existants identifiables ne sont plus affichés dans le dossier de claim, dont le bandeau passe à l’adresse e-mail seule. L’envoi d’un premier dossier enregistre le vrai nom explicitement saisi sur ce même compte.
 
 - Revendications : un déposant non-gérant déjà connecté peut désormais revendiquer sa propre fiche encore revendicable via le seul dossier complet de première revendication. Son identité de session est préremplie et l’e-mail est en lecture seule ; le serveur ignore tout e-mail ou `user_id` falsifié, rattache la claim au même compte et n’en crée aucun autre. Après approbation, ce compte devient restaurateur/owner sans activation de mot de passe ; un refus conserve les droits de déposant existants.

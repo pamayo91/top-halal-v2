@@ -242,7 +242,7 @@ class ContributionIdentityService
     {
         if ($type === 'report') return ['message' => trim(strip_tags($data['message']))];
         return $type === 'review'
-            ? ['rating' => $data['rating'], 'title' => $data['title'] ?? null, 'content' => trim(strip_tags($data['content']))]
+            ? ['rating' => $data['rating'], 'content' => trim(strip_tags($data['content']))]
             : ['content' => trim(strip_tags($data['content']))];
     }
 

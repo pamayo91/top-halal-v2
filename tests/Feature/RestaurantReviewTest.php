@@ -30,4 +30,43 @@ class RestaurantReviewTest extends TestCase
         $this->post($url,['name'=>'Élodie','email'=>'e@example.test','rating'=>6,'content'=>'Très bon'])->assertSessionHasErrors('rating');
         $this->post($url,['name'=>'Élodie','email'=>'e@example.test','rating'=>5,'content'=>'https://example.test'])->assertSessionHasErrors('content');
     }
+
+    public function test_public_review_form_uses_accessible_stars_and_preserves_historical_titles(): void
+    {
+        RestaurantReview::create(['restaurant_id' => $this->restaurant->id, 'author_name' => 'Amina', 'rating' => 4, 'title' => 'Titre historique', 'content' => 'Très bon accueil.', 'status' => 'approved']);
+
+        $this->get(route('restaurants.show', $this->restaurant->slug))
+            ->assertOk()
+            ->assertSee('Prénom ou pseudo')
+            ->assertSee('Votre note')
+            ->assertSee('Choisissez une note')
+            ->assertSee('Votre e-mail ne sera jamais affiché publiquement.')
+            ->assertSee('Envoyer mon avis')
+            ->assertSee('Titre historique')
+            ->assertSee('name="rating" value="1"', false)
+            ->assertSee('name="rating" value="5"', false)
+            ->assertDontSee('Titre (facultatif)')
+            ->assertDontSee('<select name="rating"', false);
+    }
+
+    public function test_review_validation_reopens_the_form_and_keeps_the_selected_rating(): void
+    {
+        $this->from(route('restaurants.show', $this->restaurant->slug))
+            ->post(route('restaurants.reviews.store', $this->restaurant->slug), ['name' => 'Élodie', 'email' => 'e@example.test', 'rating' => 4, 'content' => 'https://example.test'])
+            ->assertRedirect(route('restaurants.show', $this->restaurant->slug))
+            ->assertSessionHasErrors('content');
+
+        $this->get(route('restaurants.show', $this->restaurant->slug))
+            ->assertSee('class="review-form-disclosure" open', false)
+            ->assertSee('value="4" required checked', false)
+            ->assertSee('id="review-content-error"', false);
+    }
+
+    public function test_new_reviews_ignore_a_forged_historical_title(): void
+    {
+        $this->post('/_preview/restaurant/13567/reviews', ['name' => 'Élodie', 'email' => 'e@example.test', 'rating' => 5, 'title' => 'Titre forgé', 'content' => 'Très bon'])
+            ->assertRedirect();
+
+        $this->assertNull(\App\Models\ContributionVerification::sole()->payload['title'] ?? null);
+    }
 }
