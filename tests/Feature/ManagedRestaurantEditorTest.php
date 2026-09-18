@@ -242,8 +242,8 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertStringContainsString('>Annuler</button>', $html);
         $this->assertStringContainsString('JPEG, PNG ou WebP · 800 px minimum · 10 Mo maximum', $html);
         $this->assertStringContainsString('10 photos maximum · Envoi uniquement à l’enregistrement', $html);
-        $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up hidden.*?data-owner-media-down>(?!<)/s', $html);
-        $this->assertMatchesRegularExpression('/data-media-id="'.$gallery->id.'".*?data-owner-media-up>(?!<).*?data-owner-media-down hidden/s', $html);
+        $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up\s+hidden.*?data-owner-media-down\s*>(?!<)/s', $html);
+        $this->assertMatchesRegularExpression('/data-media-id="'.$gallery->id.'".*?data-owner-media-up\s*>(?!<).*?data-owner-media-down\s+hidden/s', $html);
     }
 
     public function test_a_single_existing_photo_has_no_reordering_actions(): void
@@ -253,7 +253,7 @@ class ManagedRestaurantEditorTest extends TestCase
 
         $html = $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up hidden.*?data-owner-media-down hidden/s', $html);
+        $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up\s+hidden.*?data-owner-media-down\s+hidden/s', $html);
     }
 
     /** @return array{User, Restaurant} */
