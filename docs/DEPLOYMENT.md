@@ -39,6 +39,10 @@
 
 The preproduction SSH environment has no Node.js executable in PATH. After the Git deployment, build Vite assets with the approved workstation runtime and copy only the resulting `public/build/` artifacts to the exact preproduction `public/build/` directory; copy the *contents* (including `manifest.json`) into that exact directory, rather than nesting a `build/` directory or leaving an older manifest in place. Do not copy source files or secrets.
 
+### Filament assets
+
+Filament back-office CSS, JavaScript and fonts are vendor-published files under `public/css/filament/`, `public/js/filament/` and `public/fonts/filament/`. They are intentionally ignored by Git but must remain physically present because Apache serves them directly. Regenerate them with `/opt/alt/php84/usr/bin/php artisan filament:assets` after installing or updating dependencies that affect Filament, before validating the back office. The current deployment flow does not run this command automatically; automate it in the future deployment script rather than deleting these assets from an active environment.
+
 Before running `artisan test` on preproduction, run `artisan optimize:clear` first so PHPUnit’s SQLite testing configuration is not shadowed by the cached preproduction configuration. Recreate the configuration, route and view caches after the test run. Never run database-migrating tests against a cached preproduction configuration.
 
 ## SEO structural deployment addition

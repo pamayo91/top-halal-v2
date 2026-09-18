@@ -39,6 +39,49 @@ Thumbs.db
 /docs/generated/server-audit-*.txt
 /storage/app/audits/quick/
 
+# Private, per-run migration and data-maintenance reports.
+# Canonical generated reports are intentionally tracked; never ignore /docs/generated/ globally.
+/docs/generated/full-migration-*/
+/docs/generated/legacy-restaurant-authorships/
+/docs/generated/web-enrichment/
+/docs/generated/test-web-enrichment/
+/docs/generated/*-worker-*.md
+/docs/generated/*-idempotence*.json
+/docs/generated/*-idempotence*.md
+/docs/generated/*-dry-run*.json
+/docs/generated/*-dry-run*.md
+/docs/generated/*-post-audit*.json
+/docs/generated/address-line1-*-apply.json
+/docs/generated/address-line1-visible-suffix-*.json
+/docs/generated/trashed-unstructured-address-results-*.json
+/docs/generated/users-without-business-activity.csv
+/docs/generated/testing-missing-gps.md
+/docs/generated/test-quick-cover.md
+/docs/generated/text-encoding-audit.md
+/docs/generated/quick-cover-media.md
+/docs/generated/quick-legacy-cleanup.md
+/docs/generated/quick-restaurants-import.md
+/docs/generated/redirect-import-report.json
+/docs/generated/redirect-rule-audit.json
+/docs/generated/media-url-versioning.json
+/docs/generated/media-url-versioning.md
+/docs/generated/restaurant-media-link-repair*.json
+/docs/generated/restaurant-media-link-repair*.md
+/docs/generated/restaurant-video-removal*.json
+/docs/generated/restaurant-video-removal*.md
+/docs/generated/missing-gps-autogeocoding-*.md
+/docs/generated/missing-structured-addresses-*.json
+/docs/generated/address-consolidation-*.md
+/docs/generated/address-enrichment-*.md
+/docs/generated/address-exceptions-*.json
+/docs/generated/address-exceptions-*.md
+
+# Vendor-published back-office assets and runtime worker lock.
+/public/css/filament/
+/public/fonts/filament/
+/public/js/filament/
+/storage/framework/queue-worker.lock
+
 # Python
 __pycache__/
 *.py[cod]
