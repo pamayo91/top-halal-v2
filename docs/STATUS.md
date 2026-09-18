@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-18
 
-Latest restaurant-review micro-polish: 26 px star glyphs are now visually grouped using preserved 44 px overlapping targets, with continuous hover preview and exact temporary labels that restore the selected radio value on mouse leave. The empty-state invitation is one naturally wrapping responsive sentence, with only the restaurant question semibold. Targeted PHP passes (15 tests, 79 assertions) and desktop/mobile review Playwright passes.
+Latest restaurant-review micro-polish: 26 px star glyphs are now visually grouped using preserved 44 px overlapping targets, with continuous hover preview and exact temporary labels that restore the selected radio value on mouse leave. The empty-state invitation is one naturally wrapping responsive sentence, with only the restaurant question semibold. Targeted PHP passes (15 tests, 79 assertions), desktop/mobile review Playwright passes, and the complete 80-check regression gate passes with no new Laravel-log error.
 
 Latest restaurant-review finish: star controls now follow the same natural 1→5 order in the DOM, keyboard, submitted value, visual fill and label (`Décevant` through `Excellent`); clipped native radios no longer overlap/capture each other’s clicks. The zero-review state omits redundant `0 avis`, the rating appears before identity, the open disclosure hides its redundant CTA, and star/help/button spacing was tightened without changing the modest tinted form treatment. Targeted preproduction PHP passes (15 tests, 77 assertions), desktop/mobile review Playwright passes, and the complete 80-check regression gate passes with no new Laravel-log error.
 
