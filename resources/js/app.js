@@ -1,5 +1,6 @@
 import '../css/editorial-sidebar-overrides.css';
 import '../css/reviews.css';
+import '../css/review-rating-hover.css';
 import '../css/contact.css';
 import '../css/auth.css';
 import '../css/claim-auth.css';

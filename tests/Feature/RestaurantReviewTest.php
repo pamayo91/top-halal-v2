@@ -55,6 +55,8 @@ class RestaurantReviewTest extends TestCase
             ->assertOk()
             ->assertSee('Aucun avis pour le moment.')
             ->assertDontSee('0 avis')
+            ->assertSee('<strong>Vous connaissez Étoile ?</strong> Partagez votre expérience avec la communauté Top Halal.', false)
+            ->assertDontSee('Étoile ?<br>Partagez', false)
             ->assertSee('Donner mon avis');
     }
 
