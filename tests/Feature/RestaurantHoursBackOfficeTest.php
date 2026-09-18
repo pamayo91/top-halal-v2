@@ -71,6 +71,26 @@ class RestaurantHoursBackOfficeTest extends TestCase
         app(RestaurantHours::class)->sync(Restaurant::create(['legacy_wp_id' => 950002, 'name' => 'Validation BO', 'slug' => 'validation-bo', 'status' => 'draft']), $input);
     }
 
+    public function test_filament_edits_the_existing_supported_outbound_destinations(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $restaurant = Restaurant::create(['legacy_wp_id' => 950004, 'name' => 'Liens BO', 'slug' => 'liens-bo', 'status' => 'published']);
+
+        Livewire::actingAs($admin)
+            ->test(EditRestaurant::class, ['record' => $restaurant->getRouteKey()])
+            ->fillForm([
+                'website_url' => 'https://example.test/menu',
+                'instagram_url' => 'https://instagram.example.test/liens-bo',
+                'facebook_url' => null,
+                'tiktok_url' => null,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'label' => 'Site web', 'destination_url' => 'https://example.test/menu', 'is_active' => true]);
+        $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'label' => 'Instagram', 'destination_url' => 'https://instagram.example.test/liens-bo', 'is_active' => true]);
+    }
+
     public function test_filament_adds_a_first_slot_when_a_closed_day_becomes_open_then_saves_it(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

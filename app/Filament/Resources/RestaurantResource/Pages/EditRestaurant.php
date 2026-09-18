@@ -8,6 +8,7 @@ use App\Services\Location\RestaurantLocationService;
 use App\Services\RestaurantMediaOrderer;
 use App\Services\RestaurantMediaManager;
 use App\Services\RestaurantHours;
+use App\Services\RestaurantOutboundLinks;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Model;
@@ -15,12 +16,14 @@ use Illuminate\Support\Facades\DB;
 class EditRestaurant extends EditAuditedRecord {
     protected static string $resource = RestaurantResource::class;
     protected array $hours = [];
+    protected array $outboundLinks = [];
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
         /** @var Restaurant $restaurant */
         $restaurant = $this->getRecord();
         $data['hours'] = app(RestaurantHours::class)->editorState($restaurant->openingHours()->get());
+        $data = [...$data, ...app(RestaurantOutboundLinks::class)->formData($restaurant)];
 
         return $data;
     }
@@ -28,8 +31,10 @@ class EditRestaurant extends EditAuditedRecord {
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->hours = $data['hours'] ?? [];
+        $this->outboundLinks = array_intersect_key($data, RestaurantOutboundLinks::FIELDS);
         app(RestaurantHours::class)->validatedEditorRows($this->hours);
         unset($data['hours']);
+        unset($data['website_url'], $data['instagram_url'], $data['facebook_url'], $data['tiktok_url']);
 
         return $data;
     }
@@ -45,6 +50,7 @@ class EditRestaurant extends EditAuditedRecord {
         if ($record instanceof Restaurant) return DB::transaction(function () use ($record, $data): Restaurant {
             $restaurant = app(RestaurantLocationService::class)->update($record, $data);
             app(RestaurantHours::class)->sync($restaurant, $this->hours);
+            app(RestaurantOutboundLinks::class)->sync($restaurant, $this->outboundLinks);
 
             return $restaurant;
         });

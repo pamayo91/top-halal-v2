@@ -7,7 +7,6 @@ use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\RestaurantLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ManagedRestaurantUpdater
@@ -17,6 +16,7 @@ class ManagedRestaurantUpdater
         private RestaurantLocationService $locations,
         private RestaurantHours $hours,
         private RestaurantMediaManager $media,
+        private RestaurantOutboundLinks $outboundLinks,
     ) {}
 
     /** Update only product fields available to an authorised restaurant manager. */
@@ -61,22 +61,11 @@ class ManagedRestaurantUpdater
             $removedMediaIds = collect($data['remove_media_ids'] ?? [])->filter(fn ($id) => is_numeric($id))->map(fn ($id) => (int) $id)->all();
             $this->media->syncOrder($restaurant, array_values(array_filter($data['media_order'] ?? [], fn ($id) => ! in_array((int) $id, $removedMediaIds, true))));
             if (collect(['website_url', 'instagram_url', 'facebook_url', 'tiktok_url'])->contains(fn ($field) => array_key_exists($field, $data))) {
-                $this->syncOutboundLinks($restaurant, $data);
+                $this->outboundLinks->sync($restaurant, $data);
             }
 
             return $restaurant->fresh(['categories', 'features', 'openingHours', 'media.asset', 'outboundLinks']);
         });
     }
 
-    private function syncOutboundLinks(Restaurant $restaurant, array $data): void
-    {
-        foreach (['website_url' => 'Site web', 'instagram_url' => 'Instagram', 'facebook_url' => 'Facebook', 'tiktok_url' => 'TikTok'] as $field => $label) {
-            if (! array_key_exists($field, $data)) continue;
-            $link = $restaurant->outboundLinks()->where('label', $label)->first();
-            $url = filled($data[$field] ?? null) ? trim($data[$field]) : null;
-            if ($url === null) { $link?->delete(); continue; }
-            if ($link) { $link->update(['destination_url' => $url]); continue; }
-            $restaurant->outboundLinks()->create(['token' => Str::random(40), 'label' => $label, 'destination_url' => $url, 'is_active' => false]);
-        }
-    }
 }

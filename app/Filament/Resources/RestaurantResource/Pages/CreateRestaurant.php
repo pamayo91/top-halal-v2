@@ -9,6 +9,7 @@ use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\RestaurantLocationService;
 use App\Services\RestaurantHours;
 use App\Services\RestaurantSlugService;
+use App\Services\RestaurantOutboundLinks;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,12 +18,15 @@ class CreateRestaurant extends CreateAuditedRecord
 {
     protected static string $resource = RestaurantResource::class;
     protected array $hours = [];
+    protected array $outboundLinks = [];
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $this->hours = $data['hours'] ?? [];
+        $this->outboundLinks = array_intersect_key($data, RestaurantOutboundLinks::FIELDS);
         app(RestaurantHours::class)->validatedEditorRows($this->hours);
         unset($data['hours']);
+        unset($data['website_url'], $data['instagram_url'], $data['facebook_url'], $data['tiktok_url']);
         unset($data['location_update_source']);
         $data['legacy_wp_id'] = random_int(1000000000, 2000000000);
 
@@ -46,6 +50,7 @@ class CreateRestaurant extends CreateAuditedRecord
             $restaurant = parent::handleRecordCreation($data);
             app(RestaurantLocationService::class)->applySelectedSuggestion($restaurant, $selection);
             app(RestaurantHours::class)->sync($restaurant, $this->hours);
+            app(RestaurantOutboundLinks::class)->sync($restaurant, $this->outboundLinks);
 
             return $restaurant;
         });

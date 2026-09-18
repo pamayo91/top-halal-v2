@@ -9,7 +9,7 @@ use App\Services\Location\AddressSuggestionService;
 use App\Services\Location\DuplicateRestaurantDetector;
 use App\Services\RestaurantSubmissionModeration;
 use App\Services\RestaurantSlugService;
-use App\Services\RestaurantHours;
+use App\Services\{RestaurantHours, RestaurantOutboundLinks};
 use App\Support\RobotsMeta;
 use Filament\Actions\{Action, BulkAction, BulkActionGroup, EditAction};
 use Filament\Forms\Components\{DateTimePicker, Hidden, MarkdownEditor, Placeholder, Repeater, Select, Textarea, TextInput};
@@ -185,7 +185,13 @@ class RestaurantResource extends AdminResource
                 Select::make('categories')->relationship('categories', 'name')->multiple()->searchable()->preload(),
                 Select::make('features')->relationship('features', 'name')->multiple()->searchable()->preload(),
             ])]),
-            Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255)])]),
+            Tabs\Tab::make('Contact')->schema([Section::make()->columns(2)->schema([
+                TextInput::make('phone')->tel()->maxLength(100), TextInput::make('contact_email')->email()->maxLength(255),
+                TextInput::make('website_url')->label('Site web')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
+                TextInput::make('instagram_url')->label('Instagram')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
+                TextInput::make('facebook_url')->label('Facebook')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
+                TextInput::make('tiktok_url')->label('TikTok')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
+            ])->description('Les destinations valides apparaissent sur une fiche publiée uniquement via les liens internes sécurisés /sortie/{token}.')]),
             Tabs\Tab::make('Horaires')->schema([
                 Section::make('Horaires d’ouverture')
                     ->schema([

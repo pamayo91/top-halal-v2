@@ -104,6 +104,35 @@ class PublicFrontendTest extends TestCase
         $this->assertSame(1, $links->first()->fresh()->click_count);
     }
 
+    public function test_restaurant_renders_only_supported_active_valid_outbound_links(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 417, 'name' => 'Liens filtrés', 'slug' => 'liens-filtres', 'status' => 'published']);
+        $visible = RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'eBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Instagram', 'destination_url' => 'https://instagram.example.test/liens-filtres', 'is_active' => true]);
+        RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'fBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Site web', 'destination_url' => 'not-a-url', 'is_active' => true]);
+        RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'gBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Facebook', 'destination_url' => 'https://facebook.example.test/inactive', 'is_active' => false]);
+        RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'hBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Autre', 'destination_url' => 'https://other.example.test/hidden', 'is_active' => true]);
+
+        $this->get('/resto/liens-filtres')
+            ->assertOk()
+            ->assertSee(route('restaurants.outbound', $visible->token), false)
+            ->assertSee('Instagram')
+            ->assertDontSee('not-a-url')
+            ->assertDontSee('facebook.example.test/inactive')
+            ->assertDontSee('other.example.test/hidden');
+    }
+
+    public function test_publishing_a_restaurant_activates_only_valid_supported_outbound_links(): void
+    {
+        $restaurant = Restaurant::create(['legacy_wp_id' => 418, 'name' => 'Publication liens', 'slug' => 'publication-liens', 'status' => 'pending']);
+        $valid = RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'iBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Site web', 'destination_url' => 'https://example.test/valid', 'is_active' => false]);
+        $invalid = RestaurantOutboundLink::create(['restaurant_id' => $restaurant->id, 'token' => 'jBcDeFgHiJkLmNoPqRsT1234', 'label' => 'Facebook', 'destination_url' => 'invalid', 'is_active' => false]);
+
+        $restaurant->update(['status' => 'published']);
+
+        $this->assertTrue($valid->fresh()->is_active);
+        $this->assertFalse($invalid->fresh()->is_active);
+    }
+
     public function test_restaurant_title_is_not_double_encoded(): void
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 413, 'name' => "Adam's Burger", 'slug' => 'adams-burger', 'status' => 'published', 'city_name' => 'Lyon']);

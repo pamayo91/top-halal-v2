@@ -38,6 +38,7 @@ class Restaurant extends Model
                 $restaurant->activateSubmittedOwner();
 
                 if ($restaurant->status === 'published') {
+                    app(\App\Services\RestaurantOutboundLinks::class)->activateForPublishedRestaurant($restaurant);
                     app(\App\Services\RestaurantSubmissionMailer::class)->published($restaurant);
                 }
             }

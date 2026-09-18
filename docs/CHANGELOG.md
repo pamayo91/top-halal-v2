@@ -2,6 +2,8 @@
 
 ## 2026-09-18
 
+- Corrected restaurant outbound-link activation and rendering across public submissions, restaurateur edits and Filament; public destinations remain opaque `/sortie/{token}` routes only.
+
 - Restaurants : l’encart en pointillés « Nouvelles photos » de l’éditeur est resserré visuellement : hauteur naturelle, padding 20 px (16 px mobile), marges de paragraphes locales supprimées et espacement compact entre titre, sélecteur, compteur, contraintes et galerie. Les miniatures, le contour, les textes, validations, aperçus et l’envoi restent inchangés.
 - Restaurants : correction de l’état initial des médias de l’éditeur. La règle de grille qui affichait les paragraphes réaffichait involontairement le statut masqué de suppression. Les cartes démarrent explicitement conservées, avec `remove_media_ids[]` désactivé ; seule une action `Retirer` active l’ID concerné, masque ses actions d’ordre et montre `Suppression prévue` / `Annuler`. La régression couvre trois photos non touchées et une sauvegarde d’un autre champ sans perte de média.
 - Restaurants : les photos déjà enregistrées de l’éditeur utilisent désormais un bouton secondaire `Retirer`, qui marque localement la carte, explique que le retrait aura lieu à l’enregistrement et propose `Annuler`. Le champ `remove_media_ids[]` n’est soumis que dans cet état ; aucun média n’est retiré avant la sauvegarde. Les actions `Monter`/`Descendre` indisponibles sont masquées, sans modifier l’ordre, la couverture ou les règles média. L’aide des nouvelles photos est répartie en deux lignes avec les mêmes limites serveur.
