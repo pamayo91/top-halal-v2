@@ -5,6 +5,11 @@ const cover = {
   mimeType: 'image/png',
   buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAyAAAAABCAYAAAAmaMpmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAaSURBVEhL7cExAQAAAMKg9U9tCy+gAAAATgYMgQABm0L0EAAAAABJRU5ErkJggg==', 'base64'),
 };
+const tooNarrowPhoto = {
+  name: 'trop-petite.png',
+  mimeType: 'image/png',
+  buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL2WQAAAABJRU5ErkJggg==', 'base64'),
+};
 
 async function fillRestaurantAndAddress(page: import('@playwright/test').Page, suffix: string) {
   await page.goto('/ajouter-un-restaurant');
@@ -291,10 +296,17 @@ test('public restaurant contribution presents and manages step-four photos on de
   ]);
   const gallery = page.locator('[data-gallery-preview]');
   await expect(gallery.getByRole('listitem')).toHaveCount(2);
+  await page.locator('[data-gallery-input]').setInputFiles({ ...cover, name: 'galerie-trois.png' });
+  await expect(gallery.getByRole('listitem')).toHaveCount(3);
+  await expect(page.getByText('3 photos sélectionnées.')).toBeVisible();
+  await expect.poll(() => page.locator('[data-gallery-input]').evaluate((input: HTMLInputElement) => [...input.files ?? []].map(file => file.name))).toEqual(['galerie-un.png', 'galerie-deux.png', 'galerie-trois.png']);
+  await page.locator('[data-gallery-input]').setInputFiles(tooNarrowPhoto);
+  await expect(page.locator('[data-gallery-input]').locator('..').locator('[data-photo-picker-errors]')).toContainText('Cette image fait moins de 800 px de large.');
+  await expect(gallery.getByRole('listitem')).toHaveCount(3);
   await gallery.getByRole('button', { name: 'Monter' }).nth(1).click();
   await expect(gallery.getByRole('listitem').first()).toContainText('galerie-deux.png');
   await gallery.getByRole('button', { name: 'Supprimer' }).first().click();
-  await expect(gallery.getByRole('listitem')).toHaveCount(1);
+  await expect(gallery.getByRole('listitem')).toHaveCount(2);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(errors).toEqual([]);
 });
