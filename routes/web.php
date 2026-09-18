@@ -9,7 +9,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantReview;
 use App\Http\Controllers\PreviewCommentController;
 use App\Http\Controllers\PreviewRestaurantReviewController;
-use App\Http\Controllers\{AccountController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, ContributionVerificationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
+use App\Http\Controllers\{AccountController, AccountEmailChangeController, AuthController, ClaimActivationController, ClaimIdentityDocumentController, ContributionVerificationController, EmailVerificationController, NewPasswordController, OwnerRestaurantController, PasswordChangeController, PasswordResetLinkController, PublicRestaurantSubmissionController, RestaurantClaimController, RestaurantRemovalRequestController, SubmissionActivationController};
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
@@ -108,6 +108,8 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('password.change.required')->group(function (): void {
         Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
+        Route::get('/account/email', [AccountEmailChangeController::class, 'edit'])->name('account.email-change.edit');
+        Route::post('/account/email', [AccountEmailChangeController::class, 'store'])->middleware('throttle:account-email-change')->name('account.email-change.store');
         Route::get('/claims/{claim}', [RestaurantClaimController::class, 'show'])->name('claims.show');
         Route::get('/claims/{claim}/identity-document', ClaimIdentityDocumentController::class)->middleware('admin')->name('claims.identity-document');
         Route::get('/account/restaurants/{restaurant}/edit', [OwnerRestaurantController::class, 'edit'])->name('owner.restaurants.edit');
@@ -117,6 +119,10 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/account/restaurants/{restaurant}/demander-suppression', [RestaurantRemovalRequestController::class, 'store'])->name('owner.restaurants.removal.store');
     });
 });
+
+Route::get('/account/email/confirmation/{change}/{token}', [AccountEmailChangeController::class, 'confirm'])
+    ->middleware('throttle:6,1')
+    ->name('account.email-change.confirm');
 
 
 Route::get('/blog', [PublicContentController::class, 'blog'])->name('blog.index');

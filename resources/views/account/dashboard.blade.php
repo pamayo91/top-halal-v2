@@ -87,10 +87,16 @@
                 <div>
                     <p class="eyebrow">Sécurité</p>
                     <h2 id="securite-title">Mon profil et sécurité</h2>
-                    <p>Votre adresse de connexion : {{ auth()->user()->email }}</p>
                 </div>
                 <div class="account-security-actions">
-                    <a class="button button-secondary" href="{{ route('password.change') }}">Changer le mot de passe</a>
+                    <div class="account-security-row">
+                        <div><h3>Adresse e-mail</h3><p>{{ auth()->user()->email }}</p></div>
+                        <a class="button button-secondary" href="{{ route('account.email-change.edit') }}">Modifier mon adresse e-mail</a>
+                    </div>
+                    <div class="account-security-row">
+                        <div><h3>Mot de passe</h3><p aria-label="Mot de passe masqué">••••••••</p></div>
+                        <a class="button button-secondary" href="{{ route('password.change') }}">Changer le mot de passe</a>
+                    </div>
                     @if(auth()->user()->role === 'admin')
                         <a class="account-admin-link" href="{{ \App\Filament\Resources\RestaurantClaimResource::getUrl() }}">Administration des revendications</a>
                     @endif

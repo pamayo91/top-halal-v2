@@ -7,8 +7,10 @@ import '../css/contact-responsive.css';
 import '../css/contact-proportions.css';
 import '../css/contact-asset.css';
 import '../css/account.css';
+import '../css/owner-restaurant-editor.css';
 import '../css/typography.css';
 import { initializeAddressSelectors } from './address-selector';
+import { initializeOwnerRestaurantEditor } from './owner-restaurant-editor';
 
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
@@ -28,6 +30,8 @@ if (document.querySelector('[data-address-selector]')) {
     void import('../css/restaurant-submission.css');
     initializeAddressSelectors();
 }
+
+initializeOwnerRestaurantEditor();
 
 if (submission) {
     void import('../css/restaurant-submission.css');

@@ -1,5 +1,19 @@
 # Architectural & Product Decisions
 
+## 2026-09-18
+
+### D039 — Un éditeur métier commun pour les gestionnaires de fiche
+
+La route compte de modification appelle une seule policy (`RestaurantPolicy::manage`) et un seul orchestrateur transactionnel (`ManagedRestaurantUpdater`) pour les déposants encore habilités, claims approuvés et paternités historiques exactes. Les services existants restent les sources de vérité pour horaires, localisation et médias ; l’interface ne possède pas de logique de persistance divergente selon le profil.
+
+Les rubriques éditables sont les données métier de la fiche. Les champs de gouvernance — statut, slug, SEO, modération, doublons, identifiants, relations et snapshots — restent exclusivement administratifs. `contact_email` est aussi exclu : l’adresse unique du `User`, confirmée depuis le profil, demeure la seule référence active.
+
+### D038 — Une adresse de référence compte/restaurant, synchronisée par droits actuels
+
+Top Halal ne crée pas d’e-mail professionnel indépendant dans les formulaires de fiche. L’adresse du `User` est modifiable seulement depuis « Mon profil et sécurité », après mot de passe courant, lien signé et token aléatoire hashé de 24 heures. Le changement n’est effectif qu’à la confirmation atomique ; l’ancienne adresse reçoit ensuite une alerte de sécurité.
+
+`restaurants.contact_email` est la seule copie active autorisée. À la confirmation, elle est remplacée sur les fiches que le `RestaurantPolicy` reconnaît encore comme représentées par l’utilisateur : claim approuvé, paternité historique exacte ou dépôt toujours gérable. Les e-mails de `restaurant_submissions` et `restaurant_claims` restent des instantanés d’audit : ils ne fondent jamais un droit et ne sont pas réécrits. Un déposant ayant perdu sa gestion après une revendication approuvée ne modifie donc pas la fiche transférée.
+
 ## 2026-09-16
 
 ### D037 — General Sans auto-hébergée pour le front public

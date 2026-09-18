@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('restaurant-duplicate-check', fn (Request $request): Limit => Limit::perMinute(30)->by('restaurant-duplicates|'.$request->ip()));
         RateLimiter::for('restaurant-submission', fn (Request $request): Limit => Limit::perHour(5)->by('restaurant|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
         RateLimiter::for('contact', fn (Request $request): Limit => Limit::perHour(5)->by('contact|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
+        RateLimiter::for('account-email-change', fn (Request $request): Limit => Limit::perHour(3)->by('account-email-change|'.($request->user()?->id ?? 'guest').'|'.$request->ip()));
         RateLimiter::for('expiring-link-resend', function (Request $request): Limit {
             $subject = $request->route('submission') ?? $request->route('claim') ?? $request->route('verification');
             $id = is_object($subject) ? $subject->id : $subject;

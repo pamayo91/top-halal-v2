@@ -47,6 +47,8 @@ class EmailDeliveryLog extends Model
             'email_verification' => 'Compte - vérification e-mail',
             'password_reset' => 'Compte - réinitialisation du mot de passe',
             'password_changed' => 'Compte - mot de passe modifié',
+            'account_email_change_verification' => 'Compte - confirmation de changement d’e-mail',
+            'account_email_changed' => 'Compte - adresse e-mail modifiée',
             'claim_received' => 'Revendication - reçue',
             'claim_approved' => 'Revendication - acceptée',
             'claim_rejected' => 'Revendication - refusée',

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-18
+
+- Comptes : « Mon profil et sécurité » distingue désormais l’adresse e-mail et le mot de passe. Le changement d’adresse exige le mot de passe courant, une adresse unique et un lien de confirmation temporaire envoyé à la nouvelle adresse ; l’ancienne reste active jusqu’à cette confirmation et reçoit ensuite une alerte de sécurité.
+- Restaurants : `contact_email` est synchronisé uniquement avec les fiches encore représentées par l’utilisateur suivant la policy centrale. Aucun second champ e-mail n’est ajouté à l’éditeur restaurant, et les snapshots d’e-mail de claims/submissions sont préservés pour l’audit.
+- Restaurants : l’éditeur « Modifier la fiche » devient le socle unique des déposants encore autorisés, restaurateurs revendiqués et auteurs historiques. Il couvre désormais spécialités, services, halal, horaires multi-plages, GPS/adresse, téléphone, liens opaques et gestion de couverture/galerie, sans rendre éditables les champs administratifs ou techniques.
+
 ## 2026-09-17
 
 - Formulaire public de proposition : le jeton opaque d’adresse sélectionnée reste valide deux heures au lieu de 15 minutes. Une expiration exceptionnelle ramène explicitement à l’étape Adresse avec son message local, au lieu de laisser l’utilisateur bloqué à l’étape 5.

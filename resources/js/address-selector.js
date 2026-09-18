@@ -34,6 +34,7 @@ export const initializeAddressSelectors = () => document.querySelectorAll('[data
 
     const clearSelection = () => {
         token.value = '';
+        if (locationChanged) locationChanged.value = '0';
         selected.hidden = true;
         fields.hidden = true;
     };
@@ -50,7 +51,6 @@ export const initializeAddressSelectors = () => document.querySelectorAll('[data
                     latitude.value = point.lat.toFixed(7);
                     longitude.value = point.lng.toFixed(7);
                     mapMoved.value = '1';
-                    if (locationChanged) locationChanged.value = '1';
                     mapHelp.textContent = 'Position ajustée manuellement. Seules les coordonnées seront modifiées.';
                     container.dispatchEvent(new CustomEvent('address-marker-moved', { bubbles: true }));
                 });

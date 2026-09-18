@@ -65,4 +65,25 @@ class RestaurantMediaManager
             ->where('role', 'fallback_thumbnail')
             ->delete();
     }
+
+    /** @param array<int, mixed> $mediaIds */
+    public function detachMany(Restaurant $restaurant, array $mediaIds): void
+    {
+        $ids = collect($mediaIds)->filter(fn ($id) => is_numeric($id))->map(fn ($id) => (int) $id)->unique()->values();
+        if ($ids->isEmpty()) return;
+        $restaurant->media()->whereIn('id', $ids)->where(fn ($query) => $query->whereNull('role')->orWhere('role', '!=', 'fallback_thumbnail'))->delete();
+    }
+
+    /** @param array<int, mixed> $requestedIds */
+    public function syncOrder(Restaurant $restaurant, array $requestedIds): void
+    {
+        $photos = $restaurant->media()->where(fn ($query) => $query->whereNull('role')->orWhere('role', '!=', 'fallback_thumbnail'))->lockForUpdate()->orderBy('sort_order')->orderBy('id')->get();
+        $existing = $photos->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $requested = collect($requestedIds)->filter(fn ($id) => is_numeric($id))->map(fn ($id) => (int) $id)->unique()->values()->all();
+        if ($requested !== [] && collect($requested)->diff($existing)->isNotEmpty()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['media_order' => 'Une photo à réordonner ne fait plus partie de cette fiche. Rechargez la page.']);
+        }
+        $ordered = collect($requested)->concat(collect($existing)->reject(fn (int $id) => in_array($id, $requested, true)))->values();
+        foreach ($ordered as $position => $id) $photos->firstWhere('id', $id)?->update(['sort_order' => $position]);
+    }
 }

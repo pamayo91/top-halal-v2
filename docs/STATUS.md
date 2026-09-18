@@ -1,6 +1,10 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-17
+Last updated: 2026-09-18
+
+Latest account e-mail change: `Mon profil et sécurité` now presents distinct Address e-mail and Password rows. A connected user submits a unique RFC-valid new address and the current password; the three-per-hour per-account/IP limiter queues a 24-hour signed one-use link whose random token is stored only hashed. The account address stays unchanged until confirmation, then the transaction updates the same `User`, marks the new address verified and synchronizes `restaurants.contact_email` only for listings still represented by that user through the central policy. Historical submission/claim e-mail snapshots, user IDs, permissions and transferred former-depositor listings remain untouched. The former address receives a queued security notification; delivery logs retain no token or verification URL.
+
+Latest restaurant account editor: the prior four-field editor has been replaced by one policy-gated business editor for currently authorized depositors, approved claimants and exact historic authors. It reuses the canonical hours, location and media services to edit general data, halal flags, specialities/services, seven-day multi-slot hours, selected address or GPS-only marker refinement, phone, opaque outbound destinations and ordered cover/gallery media. E-mail remains account-only; moderation/status/slug/SEO/legacy and relationship-audit data are excluded. A focused audit is retained in `docs/generated/restaurant-editor-audit-2026-09-18.md`; PHP coverage verifies the three rights paths, actual hour/media/GPS persistence and preservation of unrelated administrative data.
 
 Latest public restaurant-submission address-token correction: the selected opaque address token remains usable for two hours rather than 15 minutes. If it nevertheless expires or is cleared before final validation, the response returns directly to step 2 with the local « Cette suggestion a expiré » guidance, rather than leaving the user on step 5. Feature coverage forces an expired token and verifies this exact recovery.
 

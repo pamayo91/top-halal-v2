@@ -9,6 +9,14 @@
 - Password reset also clears the mandatory-change flag after a successful reset.
 - The login, forgotten-password, reset-password, e-mail-verification and password-change pages use the same responsive public form-card language as restaurant claims and public restaurant proposals: calm tinted background, centred card, editorial hierarchy, icon-assisted fields and full-width action. The authenticated restaurant-edit and removal-request forms use the same language while retaining their dedicated address and moderation controls.
 
+## Account e-mail
+
+- A `User` has one reference e-mail address only. It is shown and changed exclusively from `Mon compte > Mon profil et sécurité`; a restaurant-edit form never exposes an independent e-mail control.
+- A requested replacement is stored privately with a SHA-256 token hash and a 24-hour expiry. The current address remains effective until the signed, one-use link sent to the new address is confirmed.
+- Initiation requires an authenticated account, RFC-valid and case-insensitively unique address, its current usable password, CSRF and a per-account/IP limit of three requests per hour. A later request invalidates the previous unused link.
+- Confirmation locks the request and `User`, rechecks uniqueness, changes the account address and verification timestamp atomically, then sends the security alert to the old address. Delivery logs keep only ordinary delivery metadata, never a token or verification URL.
+- `restaurants.contact_email` is the sole active restaurant contact e-mail. Confirmation synchronizes it only on restaurants currently represented by that exact user through the central `RestaurantPolicy` (approved claim, exact historic authorship, or still-valid depositor relation). Claim and submission e-mail snapshots remain historical audit data; transferred deposits are not modified.
+
 ## Restaurant claims
 - A first claim creates no account and starts as `pending_email_verification`; a private identity document plus a single-use, expiring e-mail link are required before it enters the administrator queue.
 - A verified restaurateur sees only the restaurant and the certification checkbox; subsequent claims never request identity, company, SIRET or a password and remain manually reviewed.
