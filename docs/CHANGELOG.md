@@ -2,6 +2,8 @@
 
 ## 2026-09-18
 
+- Avis restaurant : finition du composant — correction de la correspondance radio/étoiles/libellé de 1 « Décevant » à 5 « Excellent », avec ordre clavier naturel et cibles de clic non superposées. À zéro avis, le compteur redondant est absent ; lorsque le formulaire est ouvert, son CTA est masqué. La note passe avant l’identité, les étoiles et leur libellé gagnent en lisibilité, et le formulaire reste compact.
+
 - Avis restaurant : le formulaire public devient plus compact et accessible avec cinq boutons radio natifs stylés en étoiles, libellés de qualité et navigation clavier. Le champ visible devient « Prénom ou pseudo », le titre est retiré des nouveaux payloads sans toucher aux titres historiques, et identité/e-mail s’alignent en deux colonnes puis une sur mobile. L’état vide propose une invitation communautaire, les erreurs locales rouvrent le formulaire en conservant la note, et les règles de preuve d’identité, modération, auto-avis gérant et agrégat approuvé restent inchangées.
 
 - Revendications : le fallback historique qui copiait le nom du restaurant dans le nom d’un nouveau déposant non-gérant est supprimé. Un tel compte reste sans nom personnel tant qu’il n’en fournit pas un ; les fallbacks existants identifiables ne sont plus affichés dans le dossier de claim, dont le bandeau passe à l’adresse e-mail seule. L’envoi d’un premier dossier enregistre le vrai nom explicitement saisi sur ce même compte.
