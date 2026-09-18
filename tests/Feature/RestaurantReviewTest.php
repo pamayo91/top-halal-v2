@@ -49,6 +49,15 @@ class RestaurantReviewTest extends TestCase
             ->assertDontSee('<select name="rating"', false);
     }
 
+    public function test_empty_review_state_does_not_repeat_a_zero_review_count(): void
+    {
+        $this->get(route('restaurants.show', $this->restaurant->slug))
+            ->assertOk()
+            ->assertSee('Aucun avis pour le moment.')
+            ->assertDontSee('0 avis')
+            ->assertSee('Donner mon avis');
+    }
+
     public function test_review_validation_reopens_the_form_and_keeps_the_selected_rating(): void
     {
         $this->followingRedirects()
