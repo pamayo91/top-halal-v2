@@ -13,7 +13,6 @@
 .claim-card input[readonly]{background:#f1f4f4;color:#5c6870;cursor:not-allowed}
 .claim-card input:focus{outline:3px solid rgb(35 129 81 / 20%);outline-offset:1px;border-color:#238151}
 .claim-intro{margin:.7rem 0 0;color:#72808b;line-height:1.55}
-.claim-session{margin:1rem 0 0;padding:.75rem .9rem;border-left:3px solid #238151;border-radius:4px;background:#eff6f0;color:#1f4935;font-size:.92rem;line-height:1.45}
 .claim-password-link{margin:.15rem 0 0;font-size:.92rem}
 .claim-details-grid{display:grid;gap:1rem}
 .claim-document{display:grid;gap:.55rem;margin:.35rem 0;padding:1rem;border:1px solid #e1e8e2;border-radius:12px;background:#fbfdfb}

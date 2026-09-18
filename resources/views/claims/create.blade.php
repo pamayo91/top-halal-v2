@@ -39,7 +39,6 @@
                     <section class="contact-form-card claim-card">
                         <h2>{{ $user ? 'Vérifiez votre identité' : 'Première revendication ?' }}</h2>
                         <p class="claim-intro">Pour devenir gestionnaire officiel de cet établissement, nous devons vérifier votre identité.</p>
-                        @if($user)<p class="claim-session">@if($personalName)Vous êtes connecté en tant que {{ $personalName }} — {{ $user->email }}@elseVous êtes connecté avec l’adresse {{ $user->email }}@endif</p>@endif
                         <form method="post" enctype="multipart/form-data" action="{{ route('claims.store', $restaurant) }}">
                             @csrf
                             <div class="claim-details-grid">
