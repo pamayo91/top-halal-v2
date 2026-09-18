@@ -736,14 +736,14 @@ AggregateRating calculé uniquement depuis les avis valides/visibles.
 
 Règle SEO importante :
 
-AUCUNE URL externe restaurant dans le HTML public.
+AUCUNE URL externe restaurant dans le HTML public, et aucune URL tokenisée `/sortie/{token}` comme lien HTML.
 
 Pour site web / réseaux sociaux :
 
-bouton public
-→ endpoint interne V2
+bouton public dans un formulaire CSRF
+→ POST vers l’endpoint interne V2 unique `/sortie`
 → URL récupérée côté serveur
-→ 302 externe.
+→ 303 externe en GET.
 
 Ne jamais exposer l'URL externe dans :
 - HTML
