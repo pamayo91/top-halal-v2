@@ -30,9 +30,12 @@ class ManagedRestaurantEditorTest extends TestCase
                 ->assertOk()
                 ->assertSee('Spécialités et services')
                 ->assertSee('Horaires')
-                ->assertSee('Photos')
-                ->assertSee('Votre adresse e-mail se gère uniquement')
-                ->assertDontSee('name="contact_email"', false);
+            ->assertSee('Photos')
+            ->assertSee('Votre adresse e-mail se gère uniquement')
+            ->assertSee('data-hours-editor', false)
+            ->assertSee('+ Ajouter une plage')
+            ->assertDontSee('data-owner-hours', false)
+            ->assertDontSee('name="contact_email"', false);
         }
     }
 
@@ -54,8 +57,8 @@ class ManagedRestaurantEditorTest extends TestCase
             ->assertOk()
             ->assertSee('Spécialités et services')
             ->assertSee('Horaires')
-            ->assertSee('Adresse et position')
-            ->assertSee('Contact et liens')
+            ->assertSee('Adresse et localisation')
+            ->assertSee('Contact et réseaux sociaux')
             ->assertSee('Photos')
             ->assertSee('name="categories[]"', false)
             ->assertSee('name="features[]"', false)
@@ -172,6 +175,18 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertDatabaseHas('restaurant_media', ['id' => $media->id]);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'destination_url' => 'https://kept.example.test']);
         $this->assertSame('account@example.test', $restaurant->fresh()->contact_email);
+    }
+
+    public function test_the_complete_editor_requires_a_specialty_and_a_service_server_side(): void
+    {
+        [$manager, $restaurant] = $this->representedRestaurant('depositor');
+
+        $this->actingAs($manager)->put(route('owner.restaurants.update', $restaurant), [
+            'name' => 'Restaurant représenté',
+            'editor_complete' => '1',
+            'halal_meat' => '1',
+            'halal_chicken' => '0',
+        ])->assertSessionHasErrors(['categories', 'features']);
     }
 
     /** @return array{User, Restaurant} */

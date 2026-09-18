@@ -72,7 +72,7 @@ class PublicRestaurantSubmissionController extends Controller
                 ->withErrors($exception->errors())
                 ->with('submission_error_step', 2);
         }
-        $hours = app(RestaurantHours::class)->publicSubmissionRows($data['hours']);
+        $hours = app(RestaurantHours::class)->validatedEditorRows($data['hours'], 'public');
         $duplicateAssessment = $duplicates->assess([
             ...$location,
             'name' => $data['name'],

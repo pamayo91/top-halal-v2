@@ -1,7 +1,7 @@
 @php
     $initialStep = max(1, min(5, (int) session('submission_error_step', old('current_step', 1))));
-    $selectedCategories = array_map('strval', old('categories', []));
-    $selectedFeatures = array_map('strval', old('features', []));
+    $selectedCategories = array_map('intval', old('categories', []));
+    $selectedFeatures = array_map('intval', old('features', []));
 @endphp
 <x-layouts.app title="Ajouter un restaurant halal | Top Halal" robots="noindex,nofollow" :hide-flash="true">
     <x-slot:head>
@@ -42,14 +42,7 @@
                             </div>
                         @endif
 
-                        <fieldset class="submission-choice-group" data-halal-group>
-                            <legend>Que propose le restaurant ?</legend>
-                            <p class="form-help">Au moins une option est nécessaire pour continuer.</p>
-                            <label class="choice-card"><input type="checkbox" name="halal_meat" value="1" @checked(old('halal_meat')) data-halal-option> <span><b>Viande halal</b><small>Le restaurant propose de la viande halal.</small></span></label>
-                            <label class="choice-card"><input type="checkbox" name="halal_chicken" value="1" @checked(old('halal_chicken')) data-halal-option> <span><b>Poulet halal</b><small>Le restaurant propose du poulet halal.</small></span></label>
-                            <p class="field-error" hidden data-halal-error>Choisissez au moins une des deux options pour continuer.</p>
-                            @error('halal_meat')<p class="field-error">{{ $message }}</p>@enderror
-                        </fieldset>
+                        <x-restaurant.halal-options :meat="old('halal_meat')" :chicken="old('halal_chicken')" :required="true" />
 
                         <div class="submission-actions">
                             <button class="button" type="button" data-next hidden>Continuer</button>
@@ -74,44 +67,9 @@
                         <h2 id="submission-step-3-title">Les informations utiles</h2>
                         <p class="muted">Ajoutez ce qui aidera les visiteurs. Tout est vérifié avant publication.</p>
 
-                        <fieldset class="taxonomy-fieldset" data-taxonomy-group="categories">
-                            <legend>Catégories / type de cuisine</legend>
-                            <p class="form-help">Choisissez au moins une catégorie pour continuer.</p>
-                            <div class="checkbox-grid">
-                                @foreach($categories as $category)<label><input type="checkbox" name="categories[]" value="{{ $category->id }}" @if($loop->first) required @endif @checked(in_array((string) $category->id, $selectedCategories, true))> {{ $category->name }}</label>@endforeach
-                            </div>
-                            <p class="field-error" hidden data-taxonomy-error="categories">Choisissez au moins une catégorie ou un type de cuisine pour continuer.</p>
-                            @error('categories')<p class="field-error">{{ $message }}</p>@enderror
-                        </fieldset>
-                        <fieldset class="taxonomy-fieldset" data-taxonomy-group="features">
-                            <legend>Services et caractéristiques</legend>
-                            <p class="form-help">Choisissez au moins un service. Une certification halal éventuelle reste facultative.</p>
-                            <div class="checkbox-grid">
-                                @foreach($features as $feature)<label><input type="checkbox" name="features[]" value="{{ $feature->id }}" @if($loop->first) required @endif @checked(in_array((string) $feature->id, $selectedFeatures, true))> {{ $feature->name }}</label>@endforeach
-                            </div>
-                            <p class="field-error" hidden data-taxonomy-error="features">Choisissez au moins un service ou une caractéristique pour continuer.</p>
-                            @error('features')<p class="field-error">{{ $message }}</p>@enderror
-                        </fieldset>
-
-                        <fieldset class="hours-fieldset" data-hours-editor>
-                            <legend>Horaires</legend>
-                            <p class="form-help">Pour chaque jour, indiquez fermé, ouvert 24h/24, ou une à deux plages horaires.</p>
-                            @if($errors->has('hours.*'))<p class="field-error" role="alert">Vérifiez les horaires indiqués.</p>@endif
-                            @foreach($days as $dayKey => $dayLabel)
-                                @php($status = old("hours.$dayKey.status", 'closed'))
-                                @php($hasSecondSlot = filled(old("hours.$dayKey.second_open")) || filled(old("hours.$dayKey.second_close")))
-                                <div class="hours-day" data-hours-day="{{ $dayKey }}" data-hours-second-active="{{ $hasSecondSlot ? '1' : '0' }}">
-                                    <div class="hours-day-heading"><b>{{ $dayLabel }}</b><label class="sr-only" for="hours-{{ $dayKey }}-status">État {{ $dayLabel }}</label><select id="hours-{{ $dayKey }}-status" name="hours[{{ $dayKey }}][status]" data-hours-status><option value="closed" @selected($status === 'closed')>Fermé</option><option value="all_day" @selected($status === 'all_day')>Ouvert 24h/24</option><option value="slots" @selected($status === 'slots')>Horaires</option></select></div>
-                                    <div class="hours-slots" data-hours-slots @if($status !== 'slots') hidden @endif>
-                                        <div class="hours-slot-row"><label>De <input type="time" name="hours[{{ $dayKey }}][first_open]" value="{{ old("hours.$dayKey.first_open") }}"></label><label>à <input type="time" name="hours[{{ $dayKey }}][first_close]" value="{{ old("hours.$dayKey.first_close") }}"></label></div>
-                                        <div class="hours-slot-row" data-hours-second-slot @if(!$hasSecondSlot) hidden @endif><label>De <input type="time" name="hours[{{ $dayKey }}][second_open]" value="{{ old("hours.$dayKey.second_open") }}"></label><label>à <input type="time" name="hours[{{ $dayKey }}][second_close]" value="{{ old("hours.$dayKey.second_close") }}"></label></div>
-                                        <button class="hours-slot-action" type="button" data-add-hours-slot @if($hasSecondSlot) hidden @endif>+ 2ème plage</button>
-                                        <button class="hours-slot-action" type="button" data-remove-hours-slot @if(!$hasSecondSlot) hidden @endif>Supprimer la 2ème plage</button>
-                                    </div>
-                                </div>
-                            @endforeach
-                            <div class="hours-copy"><label for="hours-copy-source">Recopier depuis</label><select id="hours-copy-source" data-copy-source>@foreach($days as $dayKey => $dayLabel)<option value="{{ $dayKey }}">{{ $dayLabel }}</option>@endforeach</select><span class="hours-copy-to" aria-hidden="true">vers :</span><fieldset><legend class="sr-only">Jours à mettre à jour</legend>@foreach($days as $dayKey => $dayLabel)<label><input type="checkbox" value="{{ $dayKey }}" data-copy-target="{{ $dayKey }}"> {{ $dayLabel }}</label>@endforeach</fieldset><button class="button button-secondary button-small" type="button" data-copy-hours>Recopier</button></div>
-                        </fieldset>
+                        <x-restaurant.taxonomy-selector kind="categories" :items="$categories" :selected="$selectedCategories" :required="true" />
+                        <x-restaurant.taxonomy-selector kind="features" :items="$features" :selected="$selectedFeatures" :required="true" />
+                        <x-restaurant.hours-editor />
 
                         <div class="form-grid submission-contact-grid">
                             <label class="submission-phone-field" for="restaurant-phone">Téléphone <input id="restaurant-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" value="{{ old('phone') }}"></label>

@@ -15,6 +15,7 @@ class UpdateManagedRestaurantRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'editor_complete' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string', 'max:3000'],
             'phone' => ['nullable', 'string', 'max:100', 'regex:/^[0-9+().\s-]{6,100}$/'],
             'halal_meat' => ['nullable', 'boolean'],
@@ -53,6 +54,10 @@ class UpdateManagedRestaurantRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
+            if ($this->boolean('editor_complete')) {
+                if (count((array) $this->input('categories', [])) < 1) $validator->errors()->add('categories', 'Choisissez au moins une catégorie ou un type de cuisine.');
+                if (count((array) $this->input('features', [])) < 1) $validator->errors()->add('features', 'Choisissez au moins un service ou une caractéristique.');
+            }
             if (($this->has('halal_meat') || $this->has('halal_chicken')) && ! $this->boolean('halal_meat') && ! $this->boolean('halal_chicken')) {
                 $validator->errors()->add('halal_meat', 'Cochez au moins « Viande halal » ou « Poulet halal ».');
             }

@@ -10,7 +10,8 @@ import '../css/account.css';
 import '../css/owner-restaurant-editor.css';
 import '../css/typography.css';
 import { initializeAddressSelectors } from './address-selector';
-import { initializeOwnerRestaurantEditor } from './owner-restaurant-editor';
+import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
+import { initializeRestaurantHoursEditors, validateRestaurantHoursEditors } from './restaurant-hours-editor';
 
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
@@ -31,7 +32,8 @@ if (document.querySelector('[data-address-selector]')) {
     initializeAddressSelectors();
 }
 
-initializeOwnerRestaurantEditor();
+initializeRestaurantHoursEditors();
+initializeManagedRestaurantMedia();
 
 if (submission) {
     void import('../css/restaurant-submission.css');
@@ -155,6 +157,7 @@ if (submission) {
             return false;
         }
         if (section.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return false;
+        if (section.querySelector('[data-hours-editor]') && !validateRestaurantHoursEditors(section)) return false;
         for (const field of section.querySelectorAll('input, select, textarea')) {
             if (field.type === 'hidden' || field.disabled || !field.willValidate) continue;
             if (!field.reportValidity()) return false;
@@ -212,21 +215,6 @@ if (submission) {
         }
     };
 
-
-    const updateHoursVisibility = day => {
-        const row = form.querySelector(`[data-hours-day="${day}"]`);
-        const slots = row.querySelector('[data-hours-slots]');
-        const secondSlot = row.querySelector('[data-hours-second-slot]');
-        const addSecondSlot = row.querySelector('[data-add-hours-slot]');
-        const removeSecondSlot = row.querySelector('[data-remove-hours-slot]');
-        const hasSlots = row.querySelector('[data-hours-status]').value === 'slots';
-        slots.hidden = !hasSlots;
-        if (!hasSlots) return;
-        const hasSecondSlot = row.dataset.hoursSecondActive === '1';
-        secondSlot.hidden = !hasSecondSlot;
-        addSecondSlot.hidden = hasSecondSlot;
-        removeSecondSlot.hidden = !hasSecondSlot;
-    };
 
     const renderCover = () => {
         if (coverUrl) URL.revokeObjectURL(coverUrl);
@@ -295,30 +283,6 @@ if (submission) {
     nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(() => refreshDuplicates(nameDuplicates, false), 350); });
     addressSelector.addEventListener('address-selected', () => refreshDuplicates(addressDuplicates, true));
     addressSelector.addEventListener('address-marker-moved', () => refreshDuplicates(addressDuplicates, true));
-    form.querySelectorAll('[data-hours-status]').forEach(select => select.addEventListener('change', () => updateHoursVisibility(select.closest('[data-hours-day]').dataset.hoursDay)));
-    form.querySelectorAll('[data-add-hours-slot]').forEach(button => button.addEventListener('click', () => {
-        const row = button.closest('[data-hours-day]');
-        row.dataset.hoursSecondActive = '1';
-        updateHoursVisibility(row.dataset.hoursDay);
-        row.querySelector('[data-hours-second-slot] input')?.focus();
-    }));
-    form.querySelectorAll('[data-remove-hours-slot]').forEach(button => button.addEventListener('click', () => {
-        const row = button.closest('[data-hours-day]');
-        row.querySelectorAll('[data-hours-second-slot] input').forEach(input => { input.value = ''; });
-        row.dataset.hoursSecondActive = '0';
-        updateHoursVisibility(row.dataset.hoursDay);
-    }));
-    form.querySelector('[data-copy-hours]').addEventListener('click', () => {
-        const source = form.querySelector(`[data-hours-day="${form.querySelector('[data-copy-source]').value}"]`);
-        form.querySelectorAll('[data-copy-target]:checked').forEach(target => {
-            const row = form.querySelector(`[data-hours-day="${target.value}"]`);
-            row.querySelector('[data-hours-status]').value = source.querySelector('[data-hours-status]').value;
-            row.querySelectorAll('input[type="time"]').forEach((input, index) => { input.value = source.querySelectorAll('input[type="time"]')[index].value; });
-            row.dataset.hoursSecondActive = source.dataset.hoursSecondActive;
-            updateHoursVisibility(target.value);
-        });
-    });
-    form.querySelectorAll('[data-hours-day]').forEach(row => updateHoursVisibility(row.dataset.hoursDay));
     coverInput.addEventListener('change', renderCover);
     galleryInput.addEventListener('change', () => { galleryFiles = [...galleryFiles, ...galleryInput.files].slice(0, 10); syncGalleryInput(); renderGallery(); });
     ownerSiret?.addEventListener('blur', () => syncSiretValidation(true));

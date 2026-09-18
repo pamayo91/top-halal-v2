@@ -146,31 +146,31 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await page.locator('[name="categories[]"]').first().check();
   await page.locator('[name="features[]"]').first().check();
   await page.getByLabel('État Lundi').selectOption('slots');
-  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetWidth', 132);
-  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetHeight', 34);
-  await expect(monday.locator('[data-hours-second-slot]')).toBeHidden();
-  await monday.locator('[name="hours[monday][first_open]"]').fill('00:00');
-  await monday.locator('[name="hours[monday][first_close]"]').fill('09:30');
-  await monday.getByRole('button', { name: '+ 2ème plage' }).click();
-  await monday.locator('[name="hours[monday][second_open]"]').fill('18:45');
-  await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
-  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
-  await expect(monday.locator('[name="hours[monday][first_close]"]')).toHaveValue('09:30');
-  await expect(monday.locator('[name="hours[monday][second_open]"]')).toHaveValue('18:45');
-  await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
-  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveJSProperty('offsetWidth', 104);
+  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetWidth', 136);
+  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetHeight', 38);
+  await expect(monday.locator('[data-hours-slot]')).toHaveCount(1);
+  await monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]').fill('00:00');
+  await monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-close]').fill('09:30');
+  await monday.getByRole('button', { name: '+ Ajouter une plage' }).click();
+  await monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-open]').fill('18:45');
+  await monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]').fill('23:59');
+  await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]')).toHaveValue('00:00');
+  await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-close]')).toHaveValue('09:30');
+  await expect(monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-open]')).toHaveValue('18:45');
+  await expect(monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]')).toHaveValue('23:59');
+  await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]')).toHaveJSProperty('offsetWidth', 104);
   if (testInfo.project.name === 'desktop-chromium') {
     await expect.poll(async () => monday.evaluate(day => {
-      const secondRange = day.querySelector('[data-hours-second-slot]')?.getBoundingClientRect();
+      const secondRange = day.querySelectorAll<HTMLElement>('[data-hours-slot-open]')[1]?.getBoundingClientRect();
       const remove = day.querySelector('[data-remove-hours-slot]')?.getBoundingClientRect();
       return Boolean(secondRange && remove && remove.left >= secondRange.right && Math.abs(remove.top - secondRange.top) < secondRange.height);
     })).toBe(true);
   }
-  await monday.getByRole('button', { name: 'Supprimer la 2ème plage' }).click();
-  await expect(monday.locator('[data-hours-second-slot]')).toBeHidden();
-  await monday.getByRole('button', { name: '+ 2ème plage' }).click();
-  await monday.locator('[name="hours[monday][second_open]"]').fill('18:45');
-  await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
+  await monday.getByRole('button', { name: 'Supprimer cette plage' }).click();
+  await expect(monday.locator('[data-hours-slot]')).toHaveCount(1);
+  await monday.getByRole('button', { name: '+ Ajouter une plage' }).click();
+  await monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-open]').fill('18:45');
+  await monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]').fill('23:59');
   await page.getByLabel('État Mardi').selectOption('all_day');
   await expect(tuesday.locator('[data-hours-slots]')).toBeHidden();
   await expect(sunday.locator('[data-hours-slots]')).toBeHidden();
@@ -180,19 +180,19 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await page.locator('[data-copy-target="wednesday"]').check();
   await page.getByRole('button', { name: 'Recopier', exact: true }).click();
   await expect(page.getByLabel('État Mardi')).toHaveValue('slots');
-  await expect(tuesday.locator('[name="hours[tuesday][second_close]"]')).toHaveValue('23:59');
-  await page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_open]"]').fill('10:10');
-  await page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_close]"]').fill('12:00');
-  await expect(page.locator('[data-hours-day="wednesday"] [name="hours[wednesday][first_close]"]')).toHaveValue('12:00');
+  await expect(tuesday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]')).toHaveValue('23:59');
+  await page.locator('[data-hours-day="wednesday"] [data-hours-slot]').first().locator('[data-hours-slot-open]').fill('10:10');
+  await page.locator('[data-hours-day="wednesday"] [data-hours-slot]').first().locator('[data-hours-slot-close]').fill('12:00');
+  await expect(page.locator('[data-hours-day="wednesday"] [data-hours-slot]').first().locator('[data-hours-slot-close]')).toHaveValue('12:00');
   await expectCopyControlWithoutOverlap(page);
 
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
   await page.getByRole('button', { name: 'Retour' }).click();
   await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
-  await expect(monday.locator('[name="hours[monday][first_open]"]')).toHaveValue('00:00');
-  await expect(monday.locator('[name="hours[monday][second_close]"]')).toHaveValue('23:59');
-  await expect(tuesday.locator('[name="hours[tuesday][second_open]"]')).toHaveValue('18:45');
+  await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]')).toHaveValue('00:00');
+  await expect(monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]')).toHaveValue('23:59');
+  await expect(tuesday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-open]')).toHaveValue('18:45');
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(errors).toEqual([]);
 });
@@ -211,18 +211,16 @@ test('public restaurant contribution keeps the hours editor within standard desk
 
   const monday = page.locator('[data-hours-day="monday"]');
   await page.getByLabel('État Lundi').selectOption('slots');
-  await monday.locator('[name="hours[monday][first_open]"]').fill('09:30');
-  await monday.locator('[name="hours[monday][first_close]"]').fill('12:00');
-  await monday.getByRole('button', { name: '+ 2ème plage' }).click();
-  await monday.locator('[name="hours[monday][second_open]"]').fill('18:30');
-  await monday.locator('[name="hours[monday][second_close]"]').fill('23:59');
+  await monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]').fill('09:30');
+  await monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-close]').fill('12:00');
+  await monday.getByRole('button', { name: '+ Ajouter une plage' }).click();
+  await monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-open]').fill('18:30');
+  await monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]').fill('23:59');
 
   await expectCopyControlWithoutOverlap(page);
 
   await expect.poll(async () => monday.evaluate(day => {
-    const secondRange = day.querySelector('[data-hours-second-slot]')?.getBoundingClientRect();
-    const remove = day.querySelector('[data-remove-hours-slot]')?.getBoundingClientRect();
-    return Boolean(secondRange && remove && remove.top >= secondRange.bottom && remove.left >= secondRange.left);
+    return day.scrollWidth <= day.clientWidth;
   })).toBe(true);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.setViewportSize({ width: 768, height: 900 });

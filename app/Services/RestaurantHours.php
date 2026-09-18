@@ -48,27 +48,6 @@ class RestaurantHours
         })->values()->all();
     }
 
-    /** @return array<int, array<string, mixed>> */
-    public function publicSubmissionRows(array $input): array
-    {
-        $editor = [];
-        foreach (array_keys(self::DAYS) as $day) {
-            $entry = $input[$day];
-            $editor[] = [
-                'day' => $day,
-                'status' => $entry['status'],
-                'slots' => $entry['status'] === 'slots'
-                    ? array_values(array_filter([
-                        ['opens_at' => $entry['first_open'] ?? null, 'closes_at' => $entry['first_close'] ?? null],
-                        ['opens_at' => $entry['second_open'] ?? null, 'closes_at' => $entry['second_close'] ?? null],
-                    ], fn (array $slot): bool => filled($slot['opens_at']) || filled($slot['closes_at'])))
-                    : [],
-            ];
-        }
-
-        return $this->rows($editor, 'public');
-    }
-
     public function sync(Restaurant $restaurant, array $input): void
     {
         $rows = $this->validatedEditorRows($input);
@@ -97,9 +76,9 @@ class RestaurantHours
     }
 
     /** @return array<int, array<string, mixed>> */
-    public function validatedEditorRows(array $input): array
+    public function validatedEditorRows(array $input, string $source = 'admin'): array
     {
-        return $this->rows($input, 'admin');
+        return $this->rows($input, $source);
     }
 
     /** @return array<int, array<string, mixed>> */

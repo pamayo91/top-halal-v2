@@ -25,7 +25,7 @@ class OwnerRestaurantController extends Controller
             'categories',
             'features',
             'openingHours',
-            'media.asset',
+            'media.asset.variants',
             'outboundLinks',
         ]);
 

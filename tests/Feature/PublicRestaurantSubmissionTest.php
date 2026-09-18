@@ -176,9 +176,9 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->app->instance(MediaIngestor::class, $ingestor);
 
         $hours = [];
-        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) $hours[$day] = ['status' => 'closed'];
-        $hours['monday'] = ['status' => 'slots', 'first_open' => '10:00', 'first_close' => '14:00', 'second_open' => '18:00', 'second_close' => '22:00'];
-        $hours['tuesday'] = ['status' => 'all_day'];
+        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) $hours[$day] = ['day' => $day, 'status' => 'closed'];
+        $hours['monday'] = ['day' => 'monday', 'status' => 'slots', 'slots' => [['opens_at' => '10:00', 'closes_at' => '14:00'], ['opens_at' => '18:00', 'closes_at' => '22:00']]];
+        $hours['tuesday'] = ['day' => 'tuesday', 'status' => 'all_day'];
 
         $this->post(route('restaurant-submissions.store'), $this->payload(['hours' => $hours]))->assertRedirect(route('restaurant-submissions.thanks'));
 
@@ -703,7 +703,7 @@ class PublicRestaurantSubmissionTest extends TestCase
     private function payload(array $overrides = []): array
     {
         $hours = [];
-        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) $hours[$day] = ['status' => 'closed'];
+        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) $hours[$day] = ['day' => $day, 'status' => 'closed'];
 
         return array_replace_recursive([
             'name' => 'Restaurant de test',

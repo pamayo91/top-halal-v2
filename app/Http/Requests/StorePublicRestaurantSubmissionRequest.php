@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\RestaurantHours;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
@@ -30,11 +31,11 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'features' => ['required', 'array', 'min:1', 'max:20'],
             'features.*' => ['integer', 'distinct', Rule::exists('features', 'id')],
             'hours' => ['required', 'array', 'size:7'],
+            'hours.*.day' => ['required', Rule::in(array_keys(RestaurantHours::DAYS))],
             'hours.*.status' => ['required', Rule::in(['closed', 'all_day', 'slots'])],
-            'hours.*.first_open' => ['nullable', 'date_format:H:i'],
-            'hours.*.first_close' => ['nullable', 'date_format:H:i'],
-            'hours.*.second_open' => ['nullable', 'date_format:H:i'],
-            'hours.*.second_close' => ['nullable', 'date_format:H:i'],
+            'hours.*.slots' => ['nullable', 'array', 'max:8'],
+            'hours.*.slots.*.opens_at' => ['nullable', 'date_format:H:i'],
+            'hours.*.slots.*.closes_at' => ['nullable', 'date_format:H:i'],
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+().\s-]{6,30}$/'],
             'website_url' => ['nullable', 'url:http,https', 'max:2048'],
             'instagram_url' => ['nullable', 'url:http,https', 'max:2048'],
@@ -68,22 +69,10 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
                 $validator->errors()->add('description', 'La description ne doit pas contenir d’URL. Les liens du restaurant se renseignent dans les champs dédiés.');
             }
 
-            foreach ((array) $this->input('hours', []) as $day => $hours) {
-                if (($hours['status'] ?? null) !== 'slots') continue;
-                $firstOpen = $hours['first_open'] ?? null;
-                $firstClose = $hours['first_close'] ?? null;
-                $secondOpen = $hours['second_open'] ?? null;
-                $secondClose = $hours['second_close'] ?? null;
-                if (! $firstOpen || ! $firstClose) {
-                    $validator->errors()->add("hours.$day.first_open", 'Indiquez les deux heures de la première plage.');
-                    continue;
-                }
-                if ($firstClose <= $firstOpen) $validator->errors()->add("hours.$day.first_close", 'La fermeture doit être postérieure à l’ouverture.');
-                if (($secondOpen && ! $secondClose) || (! $secondOpen && $secondClose)) $validator->errors()->add("hours.$day.second_open", 'Indiquez les deux heures de la seconde plage, ou laissez-les toutes deux vides.');
-                if ($secondOpen && $secondClose) {
-                    if ($secondClose <= $secondOpen) $validator->errors()->add("hours.$day.second_close", 'La seconde fermeture doit être postérieure à son ouverture.');
-                    if ($secondOpen <= $firstClose) $validator->errors()->add("hours.$day.second_open", 'La seconde plage doit commencer après la première.');
-                }
+            try {
+                app(RestaurantHours::class)->validatedEditorRows((array) $this->input('hours', []));
+            } catch (\Illuminate\Validation\ValidationException $exception) {
+                foreach ($exception->errors() as $field => $messages) foreach ($messages as $message) $validator->errors()->add($field, $message);
             }
             $siret = (string) $this->input('owner_siret');
             if ($this->input('submitter_role') === 'owner' && $siret !== '' && ! $this->isValidSiret($siret)) $validator->errors()->add('owner_siret', 'Le SIRET doit comporter 14 chiffres valides.');
