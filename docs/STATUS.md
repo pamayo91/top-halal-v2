@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-18
 
-Latest restaurant outbound-links revision: restaurant actions now use native CSRF-protected `POST /sortie` forms with an opaque hidden token and local-icon submit buttons. The legacy public `GET /sortie/{token}` route is removed, and neither that tokenized URL nor any destination URL appears in public HTML, JSON-LD or JavaScript. The server preserves aggregate counting and uses HTTP 303 to continue externally in GET.
+Latest restaurant outbound-links revision: restaurant actions now use native CSRF-protected `POST /sortie` forms with an opaque hidden token and local-icon submit buttons. They open the external destination in a new tab via native `target="_blank"` plus `rel="noopener"`. The legacy public `GET /sortie/{token}` route is removed, and neither that tokenized URL nor any destination URL appears in public HTML, JSON-LD or JavaScript. The server preserves aggregate counting and uses HTTP 303 to continue externally in GET.
 
 Latest new-photo-panel visual refinement: the owner editor’s dashed `Nouvelles photos` panel has content-driven height only. Its desktop padding is 20 px (16 px on compact mobile), inherited paragraph margins are reset locally, and the heading, picker, count, two help lines and eventually gallery use the compact 6–16 px rhythm without changing media, upload, preview, validation or file-list behavior. The complete preproduction regression gate passes all 80 browser/sentinel checks with no new Laravel log error.
 
