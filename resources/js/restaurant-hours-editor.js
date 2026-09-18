@@ -36,7 +36,8 @@ const syncRow = (editor, row, focus = false) => {
     row.querySelector('[data-add-hours-slot]').hidden = !isSlots || items.length >= maxSlots;
     items.forEach((slot, slotIndex) => {
         slot.querySelectorAll('input[type="time"]').forEach(input => { input.required = isSlots; });
-        slot.querySelector('[data-remove-hours-slot]').hidden = slotIndex === 0;
+        const remove = slot.querySelector('[data-remove-hours-slot]');
+        if (remove) remove.hidden = slotIndex === 0;
     });
     renumberSlots(row, index);
 };

@@ -33,7 +33,7 @@
                         <input type="hidden" name="hours[{{ $loop->parent->index }}][slots][{{ $loop->index }}][id]" value="{{ $slot['id'] ?? '' }}" data-hours-slot-id @if(!($slot['id'] ?? null)) disabled @endif>
                         <label>De <input type="time" name="hours[{{ $loop->parent->index }}][slots][{{ $loop->index }}][opens_at]" value="{{ $slot['opens_at'] ?? '' }}" data-hours-slot-open @required($status === 'slots')></label>
                         <label>à <input type="time" name="hours[{{ $loop->parent->index }}][slots][{{ $loop->index }}][closes_at]" value="{{ $slot['closes_at'] ?? '' }}" data-hours-slot-close @required($status === 'slots')></label>
-                        <button class="hours-slot-action" type="button" data-remove-hours-slot @if($loop->first) hidden @endif>Supprimer cette plage</button>
+                        @unless($loop->first)<button class="hours-slot-action" type="button" data-remove-hours-slot>Supprimer cette plage</button>@endunless
                     </div>
                 @endforeach
                 <button class="hours-slot-action" type="button" data-add-hours-slot>+ Ajouter une plage</button>
