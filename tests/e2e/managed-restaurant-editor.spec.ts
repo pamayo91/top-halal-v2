@@ -23,8 +23,8 @@ test.describe('Éditeur de fiche gérée', () => {
 
       await expect(page.getByRole('heading', { name: /Modifier/ })).toBeVisible();
       await expect(page.getByText('Spécialités et services')).toBeVisible();
-      await expect(page.getByText('Horaires')).toBeVisible();
-      await expect(page.getByText('Photos')).toBeVisible();
+      await expect(page.getByRole('group', { name: 'Horaires' })).toBeVisible();
+      await expect(page.getByRole('group', { name: 'Photos' })).toBeVisible();
       await expect(page.locator('input[name="contact_email"]')).toHaveCount(0);
       expect(errors).toEqual([]);
     });

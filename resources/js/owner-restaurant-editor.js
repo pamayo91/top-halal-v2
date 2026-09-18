@@ -5,8 +5,9 @@ export const initializeOwnerRestaurantEditor = () => {
     const slotNames = day => {
         const dayIndex = [...form.querySelectorAll('[data-owner-hours-day]')].indexOf(day);
         day.querySelectorAll('[data-owner-hours-slot]').forEach((slot, slotIndex) => {
-            slot.querySelector('[data-owner-slot-open], input[type="time"]:first-of-type')?.setAttribute('name', `hours[${dayIndex}][slots][${slotIndex}][opens_at]`);
-            slot.querySelector('[data-owner-slot-close], input[type="time"]:last-of-type')?.setAttribute('name', `hours[${dayIndex}][slots][${slotIndex}][closes_at]`);
+            const inputs = slot.querySelectorAll('input[type="time"]');
+            inputs[0]?.setAttribute('name', `hours[${dayIndex}][slots][${slotIndex}][opens_at]`);
+            inputs[1]?.setAttribute('name', `hours[${dayIndex}][slots][${slotIndex}][closes_at]`);
         });
     };
     const addSlot = day => {
