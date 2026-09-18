@@ -51,12 +51,9 @@ class RestaurantReviewTest extends TestCase
 
     public function test_review_validation_reopens_the_form_and_keeps_the_selected_rating(): void
     {
-        $this->from(route('restaurants.show', $this->restaurant->slug))
+        $this->followingRedirects()
+            ->from(route('restaurants.show', $this->restaurant->slug))
             ->post(route('restaurants.reviews.store', $this->restaurant->slug), ['name' => 'Élodie', 'email' => 'e@example.test', 'rating' => 4, 'content' => 'https://example.test'])
-            ->assertRedirect(route('restaurants.show', $this->restaurant->slug))
-            ->assertSessionHasErrors('content');
-
-        $this->get(route('restaurants.show', $this->restaurant->slug))
             ->assertSee('class="review-form-disclosure" open', false)
             ->assertSee('value="4" required checked', false)
             ->assertSee('id="review-content-error"', false);
@@ -64,6 +61,8 @@ class RestaurantReviewTest extends TestCase
 
     public function test_new_reviews_ignore_a_forged_historical_title(): void
     {
+        Mail::fake();
+
         $this->post('/_preview/restaurant/13567/reviews', ['name' => 'Élodie', 'email' => 'e@example.test', 'rating' => 5, 'title' => 'Titre forgé', 'content' => 'Très bon'])
             ->assertRedirect();
 
