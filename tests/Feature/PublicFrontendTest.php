@@ -96,12 +96,19 @@ class PublicFrontendTest extends TestCase
         ])->map(fn (array $attributes) => RestaurantOutboundLink::create([...$attributes, 'restaurant_id' => $restaurant->id, 'is_active' => true]));
         $response = $this->get('/resto/le-cedre')->assertOk();
         foreach ($links as $link) {
-            $response->assertSee(route('restaurants.outbound', $link->token), false)
+            $response->assertSee('<form method="post" action="'.route('restaurants.outbound').'">', false)
+                ->assertSee('name="token" value="'.$link->token.'"', false)
                 ->assertSee($link->label)
                 ->assertDontSee($link->destination_url);
         }
-        $this->get('/sortie/'.$links->first()->token)->assertRedirect($links->first()->destination_url);
+        $response->assertDontSee('<a href="'.route('restaurants.outbound'), false)
+            ->assertDontSee('/sortie/'.$links->first()->token, false);
+        $this->post('/sortie', ['token' => $links->first()->token])->assertStatus(303)->assertRedirect($links->first()->destination_url);
         $this->assertSame(1, $links->first()->fresh()->click_count);
+        $this->get('/sortie')->assertNotFound();
+        $this->get('/sortie/'.$links->first()->token)->assertNotFound();
+        $this->post('/sortie', ['token' => 'not-valid'])->assertNotFound();
+        $this->post('/sortie', ['token' => str_repeat('z', 40)])->assertNotFound();
     }
 
     public function test_restaurant_renders_only_supported_active_valid_outbound_links(): void
@@ -114,7 +121,7 @@ class PublicFrontendTest extends TestCase
 
         $this->get('/resto/liens-filtres')
             ->assertOk()
-            ->assertSee(route('restaurants.outbound', $visible->token), false)
+            ->assertSee('name="token" value="'.$visible->token.'"', false)
             ->assertSee('Instagram')
             ->assertDontSee('not-a-url')
             ->assertDontSee('facebook.example.test/inactive')

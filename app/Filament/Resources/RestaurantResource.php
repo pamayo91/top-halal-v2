@@ -191,7 +191,7 @@ class RestaurantResource extends AdminResource
                 TextInput::make('instagram_url')->label('Instagram')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
                 TextInput::make('facebook_url')->label('Facebook')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
                 TextInput::make('tiktok_url')->label('TikTok')->url()->rules(['nullable', 'url:http,https'])->maxLength(2048),
-            ])->description('Les destinations valides apparaissent sur une fiche publiée uniquement via les liens internes sécurisés /sortie/{token}.')]),
+            ])->description('Les destinations valides apparaissent sur une fiche publiée via un formulaire interne POST /sortie sécurisé.')]),
             Tabs\Tab::make('Horaires')->schema([
                 Section::make('Horaires d’ouverture')
                     ->schema([
