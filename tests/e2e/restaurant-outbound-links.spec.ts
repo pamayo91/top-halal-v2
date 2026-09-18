@@ -13,7 +13,11 @@ test('published restaurant exposes only opaque outbound actions and redirects th
   await expect(actions).toHaveText(['Site web', 'Facebook']);
   const forms = page.locator('[aria-label="Liens externes du restaurant"] form');
   await expect(forms).toHaveCount(2);
-  for (const form of await forms.all()) await expect(form).toHaveAttribute('action', 'https://dev.top-halal.fr/sortie');
+  for (const form of await forms.all()) {
+    await expect(form).toHaveAttribute('action', 'https://dev.top-halal.fr/sortie');
+    await expect(form).toHaveAttribute('target', '_blank');
+    await expect(form).toHaveAttribute('rel', 'noopener');
+  }
 
   const html = await page.content();
   expect(html).not.toContain('foo.fr');

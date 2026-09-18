@@ -96,7 +96,7 @@ class PublicFrontendTest extends TestCase
         ])->map(fn (array $attributes) => RestaurantOutboundLink::create([...$attributes, 'restaurant_id' => $restaurant->id, 'is_active' => true]));
         $response = $this->get('/resto/le-cedre')->assertOk();
         foreach ($links as $link) {
-            $response->assertSee('<form method="post" action="'.route('restaurants.outbound').'">', false)
+            $response->assertSee('<form method="post" action="'.route('restaurants.outbound').'" target="_blank" rel="noopener">', false)
                 ->assertSee('name="token" value="'.$link->token.'"', false)
                 ->assertSee($link->label)
                 ->assertDontSee($link->destination_url);
