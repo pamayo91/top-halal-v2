@@ -18,7 +18,7 @@ test('published restaurant exposes only opaque outbound actions and redirects th
   const html = await page.content();
   expect(html).not.toContain('foo.fr');
   expect(html).not.toContain('www.facebook.com');
-  const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
+  const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
   expect(jsonLd).not.toContain('foo.fr');
   expect(jsonLd).not.toContain('www.facebook.com');
 
