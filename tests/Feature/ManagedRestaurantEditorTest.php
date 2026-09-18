@@ -210,6 +210,24 @@ class ManagedRestaurantEditorTest extends TestCase
         ])->assertSessionHasErrors(['categories', 'features']);
     }
 
+    public function test_preselected_taxonomies_do_not_leave_an_unchecked_checkbox_required(): void
+    {
+        [$manager, $restaurant] = $this->representedRestaurant('depositor');
+        $firstCategory = $this->category('Africaine', 501);
+        $selectedCategory = $this->category('Zoulou', 502);
+        $firstFeature = $this->feature('Accès handicapé', 503);
+        $selectedFeature = $this->feature('Wi-Fi', 504);
+        $restaurant->categories()->attach($selectedCategory);
+        $restaurant->features()->attach($selectedFeature);
+
+        $html = $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk()->getContent();
+
+        $this->assertDoesNotMatchRegularExpression('/name="categories\[\]"\s+value="'.$firstCategory->id.'"[^>]*\srequired/', $html);
+        $this->assertDoesNotMatchRegularExpression('/name="features\[\]"\s+value="'.$firstFeature->id.'"[^>]*\srequired/', $html);
+        $this->assertMatchesRegularExpression('/name="categories\[\]"\s+value="'.$selectedCategory->id.'"[^>]*checked/', $html);
+        $this->assertMatchesRegularExpression('/name="features\[\]"\s+value="'.$selectedFeature->id.'"[^>]*checked/', $html);
+    }
+
     /** @return array{User, Restaurant} */
     private function representedRestaurant(string $kind): array
     {

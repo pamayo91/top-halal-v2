@@ -22,7 +22,7 @@
     <p class="form-help">{{ $help }}</p>
     <div class="checkbox-grid">
         @foreach($items as $item)
-            <label><input type="checkbox" name="{{ $field }}[]" value="{{ $item->id }}" @if($required && $loop->first) required @endif @checked(in_array((int) $item->id, $selected, true))> <span>{{ $item->name }}</span></label>
+            <label><input type="checkbox" name="{{ $field }}[]" value="{{ $item->id }}" @if($required && $loop->first && count($selected) === 0) required @endif @checked(in_array((int) $item->id, $selected, true))> <span>{{ $item->name }}</span></label>
         @endforeach
     </div>
     @if($required)<p class="field-error" hidden data-taxonomy-error="{{ $field }}">{{ $error }}</p>@endif

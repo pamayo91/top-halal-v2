@@ -28,6 +28,34 @@ if (contactForm) {
 
 const submission = document.querySelector('[data-restaurant-submission]');
 
+const syncTaxonomyRequirement = group => {
+    const selected = group.querySelector('input[type="checkbox"]:checked');
+    const firstOption = group.querySelector('input[type="checkbox"]');
+    if (firstOption) firstOption.required = !selected;
+    return Boolean(selected);
+};
+
+const validateTaxonomyRequirements = scope => {
+    let valid = true;
+    scope.querySelectorAll('[data-taxonomy-group]').forEach(group => {
+        const selected = syncTaxonomyRequirement(group);
+        const error = group.querySelector('[data-taxonomy-error]');
+        if (error) error.hidden = selected;
+        valid = selected && valid;
+    });
+    return valid;
+};
+
+const initializeTaxonomyRequirements = () => {
+    document.querySelectorAll('[data-taxonomy-group]').forEach(group => {
+        syncTaxonomyRequirement(group);
+        group.querySelectorAll('input[type="checkbox"]').forEach(option => {
+            option.addEventListener('change', () => syncTaxonomyRequirement(group));
+            option.addEventListener('invalid', () => { group.querySelector('[data-taxonomy-error]')?.removeAttribute('hidden'); });
+        });
+    });
+};
+
 if (document.querySelector('[data-address-selector]')) {
     void import('../css/restaurant-submission.css');
     initializeAddressSelectors();
@@ -36,6 +64,7 @@ if (document.querySelector('[data-address-selector]')) {
 initializeRestaurantHoursEditors();
 initializeManagedRestaurantMedia();
 initializeRestaurantPhotoPickers();
+initializeTaxonomyRequirements();
 
 if (submission) {
     void import('../css/restaurant-submission.css');
@@ -125,22 +154,8 @@ if (submission) {
         return valid;
     };
 
-    const syncTaxonomyRequirement = group => {
-        const selected = group.querySelector('input[type="checkbox"]:checked');
-        const firstOption = group.querySelector('input[type="checkbox"]');
-        if (firstOption) firstOption.required = !selected;
-        return Boolean(selected);
-    };
-
     const validateTaxonomy = () => {
-        let valid = true;
-        form.querySelectorAll('[data-taxonomy-group]').forEach(group => {
-            const selected = syncTaxonomyRequirement(group);
-            const error = group.querySelector('[data-taxonomy-error]');
-            error.hidden = selected;
-            valid = selected && valid;
-        });
-        return valid;
+        return validateTaxonomyRequirements(form);
     };
 
     const validateStep = step => {
@@ -223,15 +238,6 @@ if (submission) {
         });
     });
     halalOptions.forEach(option => option.addEventListener('change', validateHalal));
-    form.querySelectorAll('[data-taxonomy-group]').forEach(group => {
-        syncTaxonomyRequirement(group);
-        group.querySelectorAll('input[type="checkbox"]').forEach(option => {
-            option.addEventListener('change', () => {
-                if (syncTaxonomyRequirement(group)) group.querySelector('[data-taxonomy-error]').hidden = true;
-            });
-            option.addEventListener('invalid', () => { group.querySelector('[data-taxonomy-error]').hidden = false; });
-        });
-    });
     nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(() => refreshDuplicates(nameDuplicates, false), 350); });
     addressSelector.addEventListener('address-selected', () => refreshDuplicates(addressDuplicates, true));
     addressSelector.addEventListener('address-marker-moved', () => refreshDuplicates(addressDuplicates, true));

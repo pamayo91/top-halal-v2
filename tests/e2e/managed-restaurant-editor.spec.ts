@@ -37,6 +37,11 @@ test.describe('Éditeur de fiche gérée', () => {
       await expect(page.getByRole('group', { name: 'Horaires' })).toBeVisible();
       await expect(page.getByRole('group', { name: 'Photos' })).toBeVisible();
       await expect(page.locator('input[name="contact_email"]')).toHaveCount(0);
+      await expect.poll(() => page.locator('[data-taxonomy-group]').evaluateAll(groups => groups.every(group => {
+        const selected = group.querySelector('input[type="checkbox"]:checked');
+        const required = group.querySelector<HTMLInputElement>('input[type="checkbox"]')?.required;
+        return Boolean(selected) ? !required : required === true;
+      }))).toBe(true);
       expect(errors).toEqual([]);
     });
   }
