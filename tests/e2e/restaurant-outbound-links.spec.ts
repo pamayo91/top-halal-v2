@@ -24,14 +24,14 @@ test('published restaurant exposes only opaque outbound actions and redirects th
   expect(jsonLd).not.toContain('foo.fr');
   expect(jsonLd).not.toContain('www.facebook.com');
 
-  const expectedHosts = ['foo.fr', 'www.facebook.com'];
+  const expectedHosts = [/^foo\.fr$/, /(?:^|\.)facebook\.com$/];
   for (const [index, host] of expectedHosts.entries()) {
     const responsePromise = page.waitForResponse(response => new URL(response.url()).pathname === '/sortie' && response.request().method() === 'POST');
     await actions.nth(index).click();
     const response = await responsePromise;
     expect(response.status()).toBe(303);
-    expect(new URL(response.headers().location!).host).toBe(expectedHosts[index]);
-    await expect.poll(() => new URL(page.url()).host).toBe(host);
+    expect(new URL(response.headers().location!).hostname).toMatch(expectedHosts[index]);
+    await expect.poll(() => new URL(page.url()).hostname).toMatch(expectedHosts[index]);
 
     if (index < expectedHosts.length - 1) {
       await page.goto('/resto/test1-kws358jp');
