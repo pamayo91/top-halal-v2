@@ -12,7 +12,7 @@ test('published restaurant exposes only opaque outbound actions and redirects th
   await expect(actions).toHaveCount(2);
   await expect(actions).toHaveText(['Site web', 'Facebook']);
   for (const action of await actions.all()) {
-    await expect(action).toHaveAttribute('href', /^\/sortie\/[A-Za-z0-9_-]{20,64}$/);
+    await expect(action).toHaveAttribute('href', /^https:\/\/dev\.top-halal\.fr\/sortie\/[A-Za-z0-9_-]{20,64}$/);
   }
 
   const html = await page.content();
