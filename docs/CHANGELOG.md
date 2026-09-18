@@ -6,7 +6,7 @@
 - Comptes : « Mon profil et sécurité » distingue désormais l’adresse e-mail et le mot de passe. Le changement d’adresse exige le mot de passe courant, une adresse unique et un lien de confirmation temporaire envoyé à la nouvelle adresse ; l’ancienne reste active jusqu’à cette confirmation et reçoit ensuite une alerte de sécurité.
 - Restaurants : `contact_email` est synchronisé uniquement avec les fiches encore représentées par l’utilisateur suivant la policy centrale. Aucun second champ e-mail n’est ajouté à l’éditeur restaurant, et les snapshots d’e-mail de claims/submissions sont préservés pour l’audit.
 - Restaurants : l’éditeur « Modifier la fiche » devient le socle unique des déposants encore autorisés, restaurateurs revendiqués et auteurs historiques. Il couvre désormais spécialités, services, halal, horaires multi-plages, GPS/adresse, téléphone, liens opaques et gestion de couverture/galerie, sans rendre éditables les champs administratifs ou techniques.
-- Validation préproduction : les huit parcours Playwright de l’éditeur partagé passent en desktop/mobile (trois profils, persistance réelle horaires/médias) et le gate de non-régression complet passe sans erreur Laravel nouvelle.
+- Validation préproduction : les parcours ciblés de l’éditeur partagé passent en desktop/mobile (trois profils, persistance réelle horaires/médias), la suite publique ciblée passe après conservation des sélecteurs de recopie et des contrôles visibles, et le gate de non-régression complet passe avec 80 contrôles navigateur/sentinelles et aucune nouvelle erreur Laravel.
 
 ## 2026-09-17
 
