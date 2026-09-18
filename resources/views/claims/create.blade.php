@@ -37,13 +37,13 @@
                     @endunless
 
                     <section class="contact-form-card claim-card">
-                        <h2>Première revendication ?</h2>
+                        <h2>{{ $user ? 'Vérifiez votre identité' : 'Première revendication ?' }}</h2>
                         <p class="claim-intro">Pour devenir gestionnaire officiel de cet établissement, nous devons vérifier votre identité.</p>
-                        @if($user)<p class="claim-session">Vous êtes connecté en tant que {{ $user->name }} — {{ $user->email }}</p>@endif
+                        @if($user)<p class="claim-session">@if($personalName)Vous êtes connecté en tant que {{ $personalName }} — {{ $user->email }}@elseVous êtes connecté avec l’adresse {{ $user->email }}@endif</p>@endif
                         <form method="post" enctype="multipart/form-data" action="{{ route('claims.store', $restaurant) }}">
                             @csrf
                             <div class="claim-details-grid">
-                                <label>Nom et prénom <input name="full_name" required maxlength="255" value="{{ old('full_name', $user?->name) }}"></label>
+                                <label>Nom et prénom <input name="full_name" required maxlength="255" value="{{ old('full_name', $personalName) }}"></label>
                                 <label>E-mail <input name="email" type="email" required maxlength="255" value="{{ old('email', $user?->email) }}" @if($user) readonly aria-readonly="true" @endif></label>
                                 <label>Société <input name="company" required maxlength="255" value="{{ old('company') }}"></label>
                                 <label>SIRET <input name="siret" required inputmode="numeric" maxlength="20" value="{{ old('siret') }}"></label>

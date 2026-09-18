@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use App\Notifications\VerifyEmailNotification;
 use App\Notifications\QueuedResetPasswordNotification;
 use Filament\Models\Contracts\FilamentUser;
@@ -87,6 +88,32 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     }
     public function ownedRestaurants() { return $this->belongsToMany(Restaurant::class, 'restaurant_claims', 'user_id', 'restaurant_id')->wherePivot('status', 'approved'); }
     public function submittedRestaurants() { return $this->hasMany(RestaurantSubmission::class); }
+    /**
+     * A historical non-manager submission used the restaurant name as a
+     * required User.name fallback. That value is not personal identity.
+     */
+    public function reliablePersonalName(): ?string
+    {
+        $name = trim((string) $this->name);
+
+        if ($name === '') {
+            return null;
+        }
+
+        $normalizedName = $this->normalizePersonalName($name);
+        $isRestaurantFallback = $this->submittedRestaurants()
+            ->with('restaurant:id,name')
+            ->get()
+            ->contains(fn (RestaurantSubmission $submission): bool => $submission->restaurant !== null
+                && $normalizedName === $this->normalizePersonalName($submission->restaurant->name));
+
+        return $isRestaurantFallback ? null : $name;
+    }
+
+    private function normalizePersonalName(string $value): string
+    {
+        return Str::lower(preg_replace('/\\s+/', ' ', trim(Str::ascii($value))) ?? '');
+    }
     public function ownerSubmissions() { return $this->hasMany(RestaurantSubmission::class)->where('submitter_role', 'owner'); }
     /** Submissions still manageable because no real owner has an approved claim. */
     public function manageableSubmittedRestaurants()

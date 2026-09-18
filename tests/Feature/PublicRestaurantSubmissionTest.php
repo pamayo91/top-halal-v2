@@ -255,6 +255,22 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->actingAs($user)->get(route('account.dashboard'))->assertOk()->assertSee($restaurant->name);
     }
 
+    public function test_a_new_non_manager_depositor_account_does_not_receive_the_restaurant_name_as_its_name(): void
+    {
+        $this->fakeSubmissionIngestor('non-manager-without-name');
+
+        $this->post(route('restaurant-submissions.store'), $this->payload([
+            'name' => 'Chez Ahmed',
+            'email' => 'toto@example.fr',
+            'submitter_role' => 'customer',
+        ]))->assertRedirect();
+
+        $verification = Mail::queued(TemplateMailable::class)->first(fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->get($verification->values['verification_url'])->assertOk();
+
+        $this->assertSame('', User::where('email', 'toto@example.fr')->firstOrFail()->name);
+    }
+
     public function test_an_existing_active_account_is_reused_without_an_activation_token_or_account_mutation(): void
     {
         $user = User::factory()->create([

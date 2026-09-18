@@ -24,7 +24,8 @@ class RestaurantClaimController extends Controller
             $request->session()->put('url.intended', route('claims.create', $restaurant));
             return redirect()->route('password.change');
         }
-        return view('claims.create', compact('restaurant', 'user'));
+        $personalName = $user?->reliablePersonalName();
+        return view('claims.create', compact('restaurant', 'user', 'personalName'));
     }
 
     public function login(Request $request, Restaurant $restaurant): RedirectResponse { return $this->redirectToAuthentication($request, $restaurant); }
@@ -55,6 +56,9 @@ class RestaurantClaimController extends Controller
             'identity_document' => ['required', 'file', 'image', 'mimetypes:image/jpeg,image/png,image/webp', 'max:10240'],
         ]);
         if (! $this->isValidSiret($data['siret'])) return back()->withErrors(['siret' => 'Le SIRET doit comporter 14 chiffres valides.'])->withInput();
+        if ($user && $user->reliablePersonalName() === null) {
+            $user->forceFill(['name' => $data['full_name']])->save();
+        }
         $email = $user ? Str::lower($user->email) : Str::lower((string) $request->validate(['email' => ['required', 'email:rfc', 'max:255']])['email']);
         if (! $user && User::query()->where('email', $email)->get()->contains(fn (User $candidate) => $candidate->isVerifiedRestaurateur())) {
             return back()->withErrors(['email' => 'Un compte restaurateur existe déjà avec cette adresse e-mail. Connectez-vous pour continuer.'])->withInput();

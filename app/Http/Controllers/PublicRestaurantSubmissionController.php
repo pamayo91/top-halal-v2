@@ -204,7 +204,9 @@ class PublicRestaurantSubmissionController extends Controller
 
             if (! $user) {
                 $user = User::create([
-                    'name' => $submission->owner_full_name ?: $submission->restaurant->name,
+                    // A non-manager has not supplied personal identity; never
+                    // manufacture it from the restaurant name.
+                    'name' => $submission->owner_full_name ?: '',
                     'email' => $email,
                     'password' => Hash::make(Str::random(64)),
                     'login_enabled' => true,
