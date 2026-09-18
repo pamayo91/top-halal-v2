@@ -92,16 +92,28 @@
                         <p class="submission-kicker">Étape 4 sur 5</p>
                         <h2 id="submission-step-4-title">Les photos</h2>
                         <p class="muted">Ajoutez une belle photo de couverture du restaurant.</p>
-                        <label for="cover-photo">Photo de couverture <span aria-hidden="true">*</span></label>
-                        <input id="cover-photo" name="cover_photo" type="file" accept="image/jpeg,image/png,image/webp" required data-cover-input>
-                        <p class="form-help">JPEG, PNG ou WebP, 10 Mo maximum.</p>
-                        <div class="photo-cover-preview" data-cover-preview aria-live="polite"></div>
+                        <x-restaurant.photo-picker
+                            id="cover-photo"
+                            name="cover_photo"
+                            label="Photo de couverture"
+                            button-label="Choisir la photo de couverture"
+                            help="JPEG, PNG ou WebP, 800 px de large minimum, 10 Mo maximum."
+                            :max-files="1"
+                            :required="true"
+                            kind="cover"
+                        />
                         @error('cover_photo')<p class="field-error">{{ $message }}</p>@enderror
 
-                        <label for="gallery-photos">Photos complémentaires (10 maximum)</label>
-                        <input id="gallery-photos" name="gallery_photos[]" type="file" accept="image/jpeg,image/png,image/webp" multiple data-gallery-input>
-                        <p class="form-help">Vous pourrez retirer ou réorganiser les photos avant l’envoi.</p>
-                        <ol class="photo-gallery-preview" data-gallery-preview aria-live="polite"></ol>
+                        <x-restaurant.photo-picker
+                            id="gallery-photos"
+                            name="gallery_photos[]"
+                            label="Photos complémentaires (10 maximum)"
+                            help="Vous pourrez retirer ou réorganiser les photos avant l’envoi."
+                            :max-files="10"
+                            :reorderable="true"
+                            remove-label="Supprimer"
+                            kind="gallery"
+                        />
                         @error('gallery_photos')<p class="field-error">{{ $message }}</p>@enderror
                         @error('gallery_photos.*')<p class="field-error">{{ $message }}</p>@enderror
 

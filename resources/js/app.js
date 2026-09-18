@@ -11,6 +11,7 @@ import '../css/owner-restaurant-editor.css';
 import '../css/typography.css';
 import { initializeAddressSelectors } from './address-selector';
 import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
+import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';
 import { initializeRestaurantHoursEditors, validateRestaurantHoursEditors } from './restaurant-hours-editor';
 
 const menu = document.querySelector('.menu-toggle');
@@ -34,6 +35,7 @@ if (document.querySelector('[data-address-selector]')) {
 
 initializeRestaurantHoursEditors();
 initializeManagedRestaurantMedia();
+initializeRestaurantPhotoPickers();
 
 if (submission) {
     void import('../css/restaurant-submission.css');
@@ -54,9 +56,6 @@ if (submission) {
     const nameDuplicates = form.querySelector('[data-name-duplicates]');
     const addressDuplicates = form.querySelector('[data-address-duplicates]');
     const coverInput = form.querySelector('[data-cover-input]');
-    const coverPreview = form.querySelector('[data-cover-preview]');
-    const galleryInput = form.querySelector('[data-gallery-input]');
-    const galleryPreview = form.querySelector('[data-gallery-preview]');
     const ownerFields = form.querySelector('[data-owner-fields]');
     const ownerSiret = form.querySelector('[data-owner-siret]');
     const ownerSiretError = form.querySelector('[data-owner-siret-error]');
@@ -77,9 +76,6 @@ if (submission) {
     ownerChoices.forEach(input => input.addEventListener('change', syncOwnerChoice));
     let currentStep = Number.parseInt(submission.dataset.initialStep || '1', 10) || 1;
     let nameTimer;
-    let galleryFiles = [];
-    let coverUrl;
-    const galleryUrls = new WeakMap();
 
     const text = (element, value) => { element.textContent = value || 'Non renseigné'; return element; };
     const addressValue = name => addressSelector.querySelector(`[data-address-display="${name}"]`)?.value?.trim() || '';
@@ -215,50 +211,6 @@ if (submission) {
         }
     };
 
-
-    const renderCover = () => {
-        if (coverUrl) URL.revokeObjectURL(coverUrl);
-        coverPreview.replaceChildren();
-        const file = coverInput.files[0];
-        if (!file) return;
-        coverUrl = URL.createObjectURL(file);
-        const image = document.createElement('img');
-        image.src = coverUrl;
-        image.alt = 'Aperçu de la photo de couverture';
-        coverPreview.append(image);
-    };
-
-    const galleryUrl = file => {
-        if (!galleryUrls.has(file)) galleryUrls.set(file, URL.createObjectURL(file));
-        return galleryUrls.get(file);
-    };
-
-    const syncGalleryInput = () => {
-        const transfer = new DataTransfer();
-        galleryFiles.forEach(file => transfer.items.add(file));
-        galleryInput.files = transfer.files;
-    };
-
-    const renderGallery = () => {
-        galleryPreview.replaceChildren();
-        galleryFiles.forEach((file, index) => {
-            const row = document.createElement('li');
-            const image = document.createElement('img');
-            image.src = galleryUrl(file);
-            image.alt = `Aperçu de la photo ${index + 1}`;
-            const title = document.createElement('span');
-            text(title, file.name);
-            const up = document.createElement('button'); up.type = 'button'; text(up, 'Monter'); up.disabled = index === 0;
-            up.addEventListener('click', () => { [galleryFiles[index - 1], galleryFiles[index]] = [galleryFiles[index], galleryFiles[index - 1]]; syncGalleryInput(); renderGallery(); });
-            const down = document.createElement('button'); down.type = 'button'; text(down, 'Descendre'); down.disabled = index === galleryFiles.length - 1;
-            down.addEventListener('click', () => { [galleryFiles[index], galleryFiles[index + 1]] = [galleryFiles[index + 1], galleryFiles[index]]; syncGalleryInput(); renderGallery(); });
-            const remove = document.createElement('button'); remove.type = 'button'; text(remove, 'Supprimer');
-            remove.addEventListener('click', () => { const [removed] = galleryFiles.splice(index, 1); URL.revokeObjectURL(galleryUrls.get(removed)); syncGalleryInput(); renderGallery(); });
-            row.append(image, title, up, down, remove);
-            galleryPreview.append(row);
-        });
-    };
-
     form.querySelectorAll('[data-next], [data-previous]').forEach(button => {
         button.hidden = false;
         button.addEventListener('click', async () => {
@@ -283,8 +235,6 @@ if (submission) {
     nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(() => refreshDuplicates(nameDuplicates, false), 350); });
     addressSelector.addEventListener('address-selected', () => refreshDuplicates(addressDuplicates, true));
     addressSelector.addEventListener('address-marker-moved', () => refreshDuplicates(addressDuplicates, true));
-    coverInput.addEventListener('change', renderCover);
-    galleryInput.addEventListener('change', () => { galleryFiles = [...galleryFiles, ...galleryInput.files].slice(0, 10); syncGalleryInput(); renderGallery(); });
     ownerSiret?.addEventListener('blur', () => syncSiretValidation(true));
     ownerSiret?.addEventListener('input', () => syncSiretValidation(!ownerSiretError?.hidden));
     form.addEventListener('submit', event => { if (!validateStep(5)) event.preventDefault(); });

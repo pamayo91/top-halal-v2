@@ -279,7 +279,7 @@ test('public restaurant contribution presents and manages step-four photos on de
   await fillRestaurantAndAddress(page, `galerie-${testInfo.project.name}-${crypto.randomUUID()}`);
 
   await expect(page.getByText('Ajoutez une belle photo de couverture du restaurant.')).toBeVisible();
-  await expect(page.getByLabel('Photos complémentaires (10 maximum)')).toBeVisible();
+  await expect(page.getByText('Photos complémentaires (10 maximum)')).toBeVisible();
   await expect(page.getByText('Vous pourrez retirer ou réorganiser les photos avant l’envoi.')).toBeVisible();
   await expect(page.getByText(/facultatives/i)).toHaveCount(0);
   await page.locator('[data-cover-input]').setInputFiles(cover);

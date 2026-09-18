@@ -31,8 +31,11 @@ class ManagedRestaurantEditorTest extends TestCase
                 ->assertSee('Spécialités et services')
                 ->assertSee('Horaires')
             ->assertSee('Photos')
+            ->assertSee('Photos déjà enregistrées')
+            ->assertSee('Nouvelles photos')
             ->assertSee('Votre adresse e-mail se gère uniquement')
             ->assertSee('data-hours-editor', false)
+            ->assertSee('data-owner-new-photos-input', false)
             ->assertSee('+ Ajouter une plage')
             ->assertDontSee('data-owner-hours', false)
             ->assertDontSee('name="contact_email"', false);
@@ -89,9 +92,10 @@ class ManagedRestaurantEditorTest extends TestCase
         $second = $this->media($restaurant, 'b');
         $restaurant->outboundLinks()->create(['token' => str_repeat('w', 40), 'label' => 'Site web', 'destination_url' => 'https://old.example.test', 'is_active' => true]);
 
-        $asset = MediaAsset::create(['original_path' => 'media/originals/new.jpg', 'mime' => 'image/jpeg', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
+        $firstNewAsset = MediaAsset::create(['original_path' => 'media/originals/new-one.jpg', 'mime' => 'image/jpeg', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
+        $secondNewAsset = MediaAsset::create(['original_path' => 'media/originals/new-two.jpg', 'mime' => 'image/jpeg', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('e', 64), 'status' => 'ready']);
         $ingestor = \Mockery::mock(MediaIngestor::class);
-        $ingestor->shouldReceive('ingest')->once()->with(\Mockery::type(UploadedFile::class), 'Restaurant entièrement modifié')->andReturn($asset);
+        $ingestor->shouldReceive('ingest')->twice()->with(\Mockery::type(UploadedFile::class), 'Restaurant entièrement modifié')->andReturn($firstNewAsset, $secondNewAsset);
         $this->app->instance(MediaIngestor::class, $ingestor);
 
         $hours = app(RestaurantHours::class)->editorState($restaurant->openingHours()->get());
@@ -114,7 +118,10 @@ class ManagedRestaurantEditorTest extends TestCase
             'longitude' => '2.3522000',
             'remove_media_ids' => [$second->id],
             'media_order' => [$first->id, $second->id],
-            'new_photos' => [UploadedFile::fake()->image('nouvelle-photo.jpg', 1200, 800)],
+            'new_photos' => [
+                UploadedFile::fake()->image('nouvelle-photo-un.jpg', 1200, 800),
+                UploadedFile::fake()->image('nouvelle-photo-deux.jpg', 1200, 800),
+            ],
             'website_url' => 'https://new.example.test',
             'instagram_url' => 'https://instagram.com/tophalaltest',
             'facebook_url' => '',
@@ -136,7 +143,9 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertSame('48.8566000', (string) $updated->latitude);
         $this->assertSame('2.3522000', (string) $updated->longitude);
         $this->assertDatabaseMissing('restaurant_media', ['id' => $second->id]);
-        $this->assertCount(2, $updated->media()->where('role', '!=', 'fallback_thumbnail')->get());
+        $this->assertCount(3, $updated->media()->where('role', '!=', 'fallback_thumbnail')->get());
+        $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $firstNewAsset->id]);
+        $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $secondNewAsset->id]);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'label' => 'Site web', 'destination_url' => 'https://new.example.test']);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'label' => 'Instagram', 'is_active' => false]);
         $this->assertSame('published', $updated->status);
@@ -175,6 +184,18 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertDatabaseHas('restaurant_media', ['id' => $media->id]);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'destination_url' => 'https://kept.example.test']);
         $this->assertSame('account@example.test', $restaurant->fresh()->contact_email);
+    }
+
+    public function test_a_manager_cannot_bypass_the_existing_photo_dimensions_rule(): void
+    {
+        [$manager, $restaurant] = $this->representedRestaurant('depositor');
+
+        $this->actingAs($manager)->put(route('owner.restaurants.update', $restaurant), [
+            'name' => $restaurant->name,
+            'new_photos' => [UploadedFile::fake()->image('trop-petite.jpg', 799, 600)],
+        ])->assertSessionHasErrors('new_photos.0');
+
+        $this->assertCount(0, $restaurant->media()->where('role', '!=', 'fallback_thumbnail')->get());
     }
 
     public function test_the_complete_editor_requires_a_specialty_and_a_service_server_side(): void

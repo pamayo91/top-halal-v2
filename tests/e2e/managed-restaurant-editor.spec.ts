@@ -3,6 +3,16 @@ import { expect, test } from '@playwright/test';
 type Fixture = { profile: 'depositor' | 'claimant' | 'historical'; restaurantId: number; email: string };
 
 const password = 'E2e-managed-editor-password-2026';
+const photo = {
+  name: 'nouvelle-photo-800px.png',
+  mimeType: 'image/png',
+  buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAyAAAAABCAYAAAAmaMpmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAaSURBVEhL7cExAQAAAMKg9U9tCy+gAAAATgYMgQABm0L0EAAAAABJRU5ErkJggg==', 'base64'),
+};
+const tooNarrowPhoto = {
+  name: 'trop-petite.png',
+  mimeType: 'image/png',
+  buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL2WQAAAABJRU5ErkJggg==', 'base64'),
+};
 const rawFixtures = process.env.E2E_MANAGED_EDITOR_FIXTURES;
 const fixtures: Fixture[] = rawFixtures ? JSON.parse(rawFixtures) : [];
 const mutationIds = process.env.E2E_MANAGED_EDITOR_MUTATION_IDS ? JSON.parse(process.env.E2E_MANAGED_EDITOR_MUTATION_IDS) as Record<string, { restaurantId: number; email: string }> : {};
@@ -31,6 +41,43 @@ test.describe('Éditeur de fiche gérée', () => {
     });
   }
 
+  test('the shared picker previews, accumulates and removes new photos before save', async ({ page }, testInfo) => {
+    const depositor = fixtures.find(fixture => fixture.profile === 'depositor');
+    expect(depositor).toBeTruthy();
+    const key = testInfo.project.name.includes('mobile') ? 'mobile' : 'desktop';
+    const fixture = mutationIds[key] ?? depositor!;
+
+    await page.goto('/login');
+    await page.locator('input[name="email"]').fill(fixture.email);
+    await page.locator('input[name="password"]').fill(password);
+    await page.getByRole('button', { name: 'Se connecter' }).click();
+    await page.goto(`/account/restaurants/${fixture.restaurantId}/edit`);
+
+    const picker = page.locator('[data-photo-picker]').filter({ has: page.locator('[data-owner-new-photos-input]') });
+    const input = picker.locator('[data-owner-new-photos-input]');
+    await input.setInputFiles({ ...photo, name: 'photo-un.png' });
+    await expect(picker.locator('[data-new-photo-card]')).toHaveCount(1);
+    await expect(picker.getByText('Nouvelle')).toBeVisible();
+    await expect(picker.getByText('1 photo sélectionnée.')).toBeVisible();
+
+    await input.setInputFiles([
+      { ...photo, name: 'photo-deux.png' },
+      { ...photo, name: 'photo-trois.png' },
+    ]);
+    await expect(picker.locator('[data-new-photo-card]')).toHaveCount(3);
+    await expect(picker.getByText('3 photos sélectionnées.')).toBeVisible();
+    await expect.poll(() => input.evaluate((element: HTMLInputElement) => [...element.files ?? []].map(file => file.name))).toEqual(['photo-un.png', 'photo-deux.png', 'photo-trois.png']);
+
+    await input.setInputFiles(tooNarrowPhoto);
+    await expect(picker.locator('[data-photo-picker-errors]')).toContainText('Cette image fait moins de 800 px de large.');
+    await expect(picker.locator('[data-new-photo-card]')).toHaveCount(3);
+    await picker.getByRole('button', { name: 'Retirer' }).first().click();
+    await expect(picker.locator('[data-new-photo-card]')).toHaveCount(2);
+    await expect(picker.getByText('2 photos sélectionnées.')).toBeVisible();
+    await expect.poll(() => input.evaluate((element: HTMLInputElement) => [...element.files ?? []].map(file => file.name))).toEqual(['photo-deux.png', 'photo-trois.png']);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+
   test('a depositor persists changed hours and media on the shared editor', async ({ page }, testInfo) => {
     const depositor = fixtures.find(fixture => fixture.profile === 'depositor');
     expect(depositor).toBeTruthy();
@@ -52,12 +99,19 @@ test.describe('Éditeur de fiche gérée', () => {
     await expect(page.locator('[data-owner-media-card]')).toHaveCount(2);
     await page.locator('[data-owner-media-card]').first().getByRole('button', { name: 'Descendre' }).click();
     await page.locator('[data-owner-media-card]').nth(1).getByLabel(/Retirer cette photo/).check();
+    const picker = page.locator('[data-photo-picker]').filter({ has: page.locator('[data-owner-new-photos-input]') });
+    await picker.locator('[data-owner-new-photos-input]').setInputFiles([
+      { ...photo, name: `persisted-one-${key}.png` },
+      { ...photo, name: `persisted-two-${key}.png` },
+    ]);
+    await expect(picker.locator('[data-new-photo-card]')).toHaveCount(2);
     await page.getByRole('button', { name: 'Enregistrer les modifications' }).click();
     await expect(page.getByRole('status')).toContainText('Restaurant mis à jour.');
 
     await page.reload();
     await expect(page.locator('input[name="hours[0][slots][0][opens_at]"]')).toHaveValue('10:30');
-    await expect(page.locator('[data-owner-media-card]')).toHaveCount(1);
+    await expect(page.locator('[data-owner-media-card]')).toHaveCount(3);
+    await expect(page.locator('[data-new-photo-card]')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 });

@@ -65,6 +65,7 @@
                 <section class="owner-editor-section" aria-labelledby="owner-photos-title">
                     <h2 id="owner-photos-title">Photos</h2>
                     <p class="form-help">La première photo de la galerie est utilisée comme photo de couverture. Vous pouvez réorganiser ou retirer les photos existantes.</p>
+                    <h3 class="owner-media-heading">Photos déjà enregistrées</h3>
                     <div class="owner-media-gallery" data-owner-media-list>
                         @forelse($photos as $media)
                             @php
@@ -80,7 +81,19 @@
                         @endforelse
                     </div>
                     <div data-owner-media-order>@foreach($photos as $media)<input type="hidden" name="media_order[]" value="{{ $media->id }}">@endforeach</div>
-                    <label class="owner-upload-field" for="new-photos">Ajouter des photos<input id="new-photos" type="file" name="new_photos[]" accept="image/jpeg,image/png,image/webp" multiple><span>JPEG, PNG ou WebP, 800 px de large minimum, 10 Mo par fichier (10 fichiers maximum).</span></label>
+                    <div class="owner-new-photos" aria-labelledby="owner-new-photos-title">
+                        <h3 id="owner-new-photos-title" class="owner-media-heading">Nouvelles photos</h3>
+                        <x-restaurant.photo-picker
+                            id="new-photos"
+                            name="new_photos[]"
+                            label="Ajouter des photos"
+                            help="JPEG, PNG ou WebP, 800 px de large minimum, 10 Mo par fichier (10 fichiers maximum). Les fichiers ne sont envoyés qu’à l’enregistrement."
+                            :max-files="10"
+                            presentation="owner"
+                            kind="owner"
+                            remove-label="Retirer"
+                        />
+                    </div>
                     @error('new_photos')<p class="field-error">{{ $message }}</p>@enderror
                     @error('new_photos.*')<p class="field-error">{{ $message }}</p>@enderror
                 </section>
