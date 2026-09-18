@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('published restaurant exposes only opaque outbound actions and redirects them', async ({ page }) => {
+test('published restaurant exposes only opaque outbound actions and redirects them', async ({ page, context }) => {
   const errors: string[] = [];
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   page.on('requestfailed', request => { if (request.url().startsWith('https://dev.top-halal.fr')) errors.push(`${request.method()} ${request.url()}`); });
@@ -30,12 +30,15 @@ test('published restaurant exposes only opaque outbound actions and redirects th
 
   const expectedHosts = [/^foo\.fr$/, /(?:^|\.)facebook\.com$/];
   for (const [index, host] of expectedHosts.entries()) {
-    const responsePromise = page.waitForResponse(response => new URL(response.url()).pathname === '/sortie' && response.request().method() === 'POST');
+    const popupPromise = page.waitForEvent('popup');
+    const responsePromise = context.waitForEvent('response', response => new URL(response.url()).pathname === '/sortie' && response.request().method() === 'POST');
     await actions.nth(index).click();
+    const popup = await popupPromise;
     const response = await responsePromise;
     expect(response.status()).toBe(303);
     expect(new URL(response.headers().location!).hostname).toMatch(expectedHosts[index]);
-    await expect.poll(() => new URL(page.url()).hostname).toMatch(expectedHosts[index]);
+    await expect.poll(() => new URL(popup.url()).hostname).toMatch(expectedHosts[index]);
+    await popup.close();
 
     if (index < expectedHosts.length - 1) {
       await page.goto('/resto/test1-kws358jp');
