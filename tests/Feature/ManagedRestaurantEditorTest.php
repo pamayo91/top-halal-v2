@@ -228,6 +228,34 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertMatchesRegularExpression('/name="features\[\]"\s+value="'.$selectedFeature->id.'"[^>]*checked/', $html);
     }
 
+    public function test_the_existing_photo_controls_defer_removal_and_hide_unavailable_reordering_actions(): void
+    {
+        [$manager, $restaurant] = $this->representedRestaurant('depositor');
+        $cover = $this->media($restaurant, 'm');
+        $gallery = $this->media($restaurant, 'n');
+
+        $html = $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('Retirer cette photo', $html);
+        $this->assertStringContainsString('name="remove_media_ids[]" value="'.$cover->id.'" disabled data-owner-media-remove-input', $html);
+        $this->assertStringContainsString('Cette photo sera retirée à l’enregistrement', $html);
+        $this->assertStringContainsString('>Annuler</button>', $html);
+        $this->assertStringContainsString('JPEG, PNG ou WebP · 800 px minimum · 10 Mo maximum', $html);
+        $this->assertStringContainsString('10 photos maximum · Envoi uniquement à l’enregistrement', $html);
+        $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up hidden.*?data-owner-media-down>(?!<)/s', $html);
+        $this->assertMatchesRegularExpression('/data-media-id="'.$gallery->id.'".*?data-owner-media-up>(?!<).*?data-owner-media-down hidden/s', $html);
+    }
+
+    public function test_a_single_existing_photo_has_no_reordering_actions(): void
+    {
+        [$manager, $restaurant] = $this->representedRestaurant('depositor');
+        $cover = $this->media($restaurant, 'o');
+
+        $html = $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up hidden.*?data-owner-media-down hidden/s', $html);
+    }
+
     /** @return array{User, Restaurant} */
     private function representedRestaurant(string $kind): array
     {

@@ -74,7 +74,13 @@
                             @endphp
                             <article class="owner-media-card" data-owner-media-card data-media-id="{{ $media->id }}">
                                 <img src="{{ $asset->deliveryUrl($variant?->width) }}" width="{{ $variant?->width ?? $asset->width }}" height="{{ $variant?->height ?? $asset->height }}" loading="lazy" alt="{{ $asset->alt_text ?: $restaurant->name }}">
-                                <div><strong class="owner-cover-badge" data-owner-cover-label>{{ $loop->first ? 'Couverture' : 'Galerie' }}</strong><label><input type="checkbox" name="remove_media_ids[]" value="{{ $media->id }}"> Retirer cette photo</label><p><button type="button" class="owner-small-button" data-owner-media-up>Monter</button><button type="button" class="owner-small-button" data-owner-media-down>Descendre</button></p></div>
+                                <div>
+                                    <strong class="owner-cover-badge" data-owner-cover-label>{{ $loop->first ? 'Couverture' : 'Galerie' }}</strong>
+                                    <input type="hidden" name="remove_media_ids[]" value="{{ $media->id }}" disabled data-owner-media-remove-input>
+                                    <button type="button" class="owner-small-button" data-owner-media-remove>Retirer</button>
+                                    <p class="owner-media-removal-notice" role="status" hidden data-owner-media-removal-notice>Cette photo sera retirée à l’enregistrement <button type="button" class="owner-small-button" data-owner-media-remove-cancel>Annuler</button></p>
+                                    <p><button type="button" class="owner-small-button" data-owner-media-up @if($loop->first) hidden @endif>Monter</button><button type="button" class="owner-small-button" data-owner-media-down @if($loop->last) hidden @endif>Descendre</button></p>
+                                </div>
                             </article>
                         @empty
                             <p class="form-help" data-owner-no-media>Aucune photo pour le moment.</p>
@@ -87,7 +93,8 @@
                             id="new-photos"
                             name="new_photos[]"
                             label="Ajouter des photos"
-                            help="JPEG, PNG ou WebP, 800 px de large minimum, 10 Mo par fichier (10 fichiers maximum). Les fichiers ne sont envoyés qu’à l’enregistrement."
+                            help="JPEG, PNG ou WebP · 800 px minimum · 10 Mo maximum"
+                            help-secondary="10 photos maximum · Envoi uniquement à l’enregistrement"
                             :max-files="10"
                             presentation="owner"
                             kind="owner"

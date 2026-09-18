@@ -101,9 +101,22 @@ test.describe('Éditeur de fiche gérée', () => {
     await page.locator('select[name="hours[0][status]"]').selectOption('slots');
     await page.locator('input[name="hours[0][slots][0][opens_at]"]').fill('10:30');
     await page.locator('input[name="hours[0][slots][0][closes_at]"]').fill('14:30');
-    await expect(page.locator('[data-owner-media-card]')).toHaveCount(2);
-    await page.locator('[data-owner-media-card]').first().getByRole('button', { name: 'Descendre' }).click();
-    await page.locator('[data-owner-media-card]').nth(1).getByLabel(/Retirer cette photo/).check();
+    const persistedPhotos = page.locator('[data-owner-media-card]');
+    await expect(persistedPhotos).toHaveCount(2);
+    await expect(persistedPhotos.first().locator('[data-owner-media-up]')).toBeHidden();
+    await expect(persistedPhotos.first().locator('[data-owner-media-down]')).toBeVisible();
+    await expect(persistedPhotos.nth(1).locator('[data-owner-media-up]')).toBeVisible();
+    await expect(persistedPhotos.nth(1).locator('[data-owner-media-down]')).toBeHidden();
+    await persistedPhotos.first().getByRole('button', { name: 'Descendre' }).click();
+    const pendingRemoval = persistedPhotos.nth(1);
+    await pendingRemoval.getByRole('button', { name: 'Retirer' }).click();
+    await expect(pendingRemoval).toHaveClass(/is-marked-for-removal/);
+    await expect(pendingRemoval.getByText('Cette photo sera retirée à l’enregistrement')).toBeVisible();
+    await expect(pendingRemoval.locator('[data-owner-media-remove-input]')).toBeEnabled();
+    await pendingRemoval.getByRole('button', { name: 'Annuler' }).click();
+    await expect(pendingRemoval).not.toHaveClass(/is-marked-for-removal/);
+    await expect(pendingRemoval.locator('[data-owner-media-remove-input]')).toBeDisabled();
+    await pendingRemoval.getByRole('button', { name: 'Retirer' }).click();
     const picker = page.locator('[data-photo-picker]').filter({ has: page.locator('[data-owner-new-photos-input]') });
     await picker.locator('[data-owner-new-photos-input]').setInputFiles([
       { ...photo, name: `persisted-one-${key}.png` },

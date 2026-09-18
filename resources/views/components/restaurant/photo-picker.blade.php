@@ -4,6 +4,7 @@
     'label',
     'buttonLabel' => 'Choisir des photos',
     'help' => null,
+    'helpSecondary' => null,
     'maxFiles' => 10,
     'required' => false,
     'kind' => 'gallery',
@@ -43,6 +44,7 @@
     <label class="button button-secondary restaurant-photo-picker-button" for="{{ $id }}">{{ $buttonLabel }}</label>
     <p class="form-help" data-photo-selection-count>Aucune photo sélectionnée.</p>
     @if($help)<p class="form-help">{{ $help }}</p>@endif
+    @if($helpSecondary)<p class="form-help restaurant-photo-picker-help-secondary">{{ $helpSecondary }}</p>@endif
     <p class="field-error" role="alert" hidden data-photo-picker-errors></p>
     @if($isCover)
         <div class="photo-cover-preview" data-photo-preview {!! $previewData !!} aria-live="polite"></div>
