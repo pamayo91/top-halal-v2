@@ -2,6 +2,8 @@
 
 ## 2026-09-18
 
+- Avis restaurant : ultime finition visuelle — les étoiles restent des cibles accessibles de 44 px mais sont visuellement regroupées ; le survol prévisualise continûment note et libellé sans changer le radio soumis. L’introduction de l’état vide est une phrase responsive unique, avec le nom du restaurant légèrement mis en avant.
+
 - Avis restaurant : finition du composant — correction de la correspondance radio/étoiles/libellé de 1 « Décevant » à 5 « Excellent », avec ordre clavier naturel et cibles de clic non superposées. À zéro avis, le compteur redondant est absent ; lorsque le formulaire est ouvert, son CTA est masqué. La note passe avant l’identité, les étoiles et leur libellé gagnent en lisibilité, et le formulaire reste compact.
 
 - Avis restaurant : le formulaire public devient plus compact et accessible avec cinq boutons radio natifs stylés en étoiles, libellés de qualité et navigation clavier. Le champ visible devient « Prénom ou pseudo », le titre est retiré des nouveaux payloads sans toucher aux titres historiques, et identité/e-mail s’alignent en deux colonnes puis une sur mobile. L’état vide propose une invitation communautaire, les erreurs locales rouvrent le formulaire en conservant la note, et les règles de preuve d’identité, modération, auto-avis gérant et agrégat approuvé restent inchangées.
