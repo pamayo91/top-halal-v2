@@ -12,9 +12,10 @@ export const initializeManagedRestaurantMedia = () => {
             return input;
         }));
         cards.forEach((card, index) => {
+            const markedForRemoval = card.classList.contains('is-marked-for-removal');
             card.querySelector('[data-owner-cover-label]').textContent = index === 0 ? 'Couverture' : 'Galerie';
-            card.querySelector('[data-owner-media-up]').hidden = index === 0;
-            card.querySelector('[data-owner-media-down]').hidden = index === cards.length - 1;
+            card.querySelector('[data-owner-media-up]').hidden = markedForRemoval || index === 0;
+            card.querySelector('[data-owner-media-down]').hidden = markedForRemoval || index === cards.length - 1;
         });
     };
 
@@ -28,11 +29,20 @@ export const initializeManagedRestaurantMedia = () => {
     gallery.addEventListener('click', event => {
         const card = event.target.closest('[data-owner-media-card]');
         if (!card) return;
-        if (event.target.closest('[data-owner-media-remove]')) setRemovalState(card, true);
-        if (event.target.closest('[data-owner-media-remove-cancel]')) setRemovalState(card, false);
+        if (event.target.closest('[data-owner-media-remove]')) {
+            setRemovalState(card, true);
+            sync();
+            return;
+        }
+        if (event.target.closest('[data-owner-media-remove-cancel]')) {
+            setRemovalState(card, false);
+            sync();
+            return;
+        }
         if (event.target.closest('[data-owner-media-up]') && card.previousElementSibling?.matches('[data-owner-media-card]')) gallery.insertBefore(card, card.previousElementSibling);
         if (event.target.closest('[data-owner-media-down]') && card.nextElementSibling?.matches('[data-owner-media-card]')) gallery.insertBefore(card.nextElementSibling, card);
         sync();
     });
+    gallery.querySelectorAll('[data-owner-media-card]').forEach(card => setRemovalState(card, false));
     sync();
 };

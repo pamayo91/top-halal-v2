@@ -78,7 +78,7 @@
                                     <strong class="owner-cover-badge" data-owner-cover-label>{{ $loop->first ? 'Couverture' : 'Galerie' }}</strong>
                                     <input type="hidden" name="remove_media_ids[]" value="{{ $media->id }}" disabled data-owner-media-remove-input>
                                     <button type="button" class="owner-small-button" data-owner-media-remove>Retirer</button>
-                                    <p class="owner-media-removal-notice" role="status" hidden data-owner-media-removal-notice>Cette photo sera retirée à l’enregistrement <button type="button" class="owner-small-button" data-owner-media-remove-cancel>Annuler</button></p>
+                                    <p class="owner-media-removal-notice" role="status" hidden data-owner-media-removal-notice>Suppression prévue · Cette photo sera retirée à l’enregistrement <button type="button" class="owner-small-button" data-owner-media-remove-cancel>Annuler</button></p>
                                     <p><button type="button" class="owner-small-button" data-owner-media-up @if($loop->first) hidden @endif>Monter</button><button type="button" class="owner-small-button" data-owner-media-down @if($loop->last) hidden @endif>Descendre</button></p>
                                 </div>
                             </article>

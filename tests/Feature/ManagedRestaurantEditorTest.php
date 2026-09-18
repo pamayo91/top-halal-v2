@@ -90,6 +90,7 @@ class ManagedRestaurantEditorTest extends TestCase
         $restaurant->openingHours()->create(['day' => 'monday', 'slot' => 1, 'opens_at' => '11:00', 'closes_at' => '14:00', 'legacy_key' => 'legacy:monday:1']);
         $first = $this->media($restaurant, 'a');
         $second = $this->media($restaurant, 'b');
+        $third = $this->media($restaurant, 'd');
         $restaurant->outboundLinks()->create(['token' => str_repeat('w', 40), 'label' => 'Site web', 'destination_url' => 'https://old.example.test', 'is_active' => true]);
 
         $firstNewAsset = MediaAsset::create(['original_path' => 'media/originals/new-one.jpg', 'mime' => 'image/jpeg', 'width' => 1200, 'height' => 800, 'bytes' => 10, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
@@ -117,7 +118,7 @@ class ManagedRestaurantEditorTest extends TestCase
             'latitude' => '48.8566000',
             'longitude' => '2.3522000',
             'remove_media_ids' => [$second->id],
-            'media_order' => [$first->id, $second->id],
+            'media_order' => [$first->id, $second->id, $third->id],
             'new_photos' => [
                 UploadedFile::fake()->image('nouvelle-photo-un.jpg', 1200, 800),
                 UploadedFile::fake()->image('nouvelle-photo-deux.jpg', 1200, 800),
@@ -143,7 +144,9 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertSame('48.8566000', (string) $updated->latitude);
         $this->assertSame('2.3522000', (string) $updated->longitude);
         $this->assertDatabaseMissing('restaurant_media', ['id' => $second->id]);
-        $this->assertCount(3, $updated->media()->where('role', '!=', 'fallback_thumbnail')->get());
+        $this->assertDatabaseHas('restaurant_media', ['id' => $first->id]);
+        $this->assertDatabaseHas('restaurant_media', ['id' => $third->id]);
+        $this->assertCount(4, $updated->media()->where('role', '!=', 'fallback_thumbnail')->get());
         $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $firstNewAsset->id]);
         $this->assertDatabaseHas('restaurant_media', ['restaurant_id' => $restaurant->id, 'media_asset_id' => $secondNewAsset->id]);
         $this->assertDatabaseHas('restaurant_outbound_links', ['restaurant_id' => $restaurant->id, 'label' => 'Site web', 'destination_url' => 'https://new.example.test']);
@@ -238,7 +241,7 @@ class ManagedRestaurantEditorTest extends TestCase
 
         $this->assertStringNotContainsString('Retirer cette photo', $html);
         $this->assertStringContainsString('name="remove_media_ids[]" value="'.$cover->id.'" disabled data-owner-media-remove-input', $html);
-        $this->assertStringContainsString('Cette photo sera retirée à l’enregistrement', $html);
+        $this->assertStringContainsString('Suppression prévue · Cette photo sera retirée à l’enregistrement', $html);
         $this->assertStringContainsString('>Annuler</button>', $html);
         $this->assertStringContainsString('JPEG, PNG ou WebP · 800 px minimum · 10 Mo maximum', $html);
         $this->assertStringContainsString('10 photos maximum · Envoi uniquement à l’enregistrement', $html);
@@ -254,6 +257,40 @@ class ManagedRestaurantEditorTest extends TestCase
         $html = $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk()->getContent();
 
         $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up\s+hidden.*?data-owner-media-down\s+hidden/s', $html);
+    }
+
+    public function test_three_existing_photos_start_preserved_and_an_unrelated_save_keeps_every_photo(): void
+    {
+        [$manager, $restaurant] = $this->representedRestaurant('depositor');
+        $category = $this->category('Catégorie conservée', 601);
+        $feature = $this->feature('Service conservé', 602);
+        $restaurant->categories()->attach($category);
+        $restaurant->features()->attach($feature);
+        $photos = [
+            $this->media($restaurant, 'p'),
+            $this->media($restaurant, 'q'),
+            $this->media($restaurant, 'r'),
+        ];
+
+        $html = $this->actingAs($manager)->get(route('owner.restaurants.edit', $restaurant))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('is-marked-for-removal', $html);
+        $this->assertSame(3, substr_count($html, 'data-owner-media-remove>Retirer</button>'));
+        $this->assertSame(3, preg_match_all('/name="remove_media_ids\[\]"[^>]*\sdisabled\s+data-owner-media-remove-input/', $html));
+        $this->assertSame(3, preg_match_all('/<p[^>]*\shidden\s+data-owner-media-removal-notice>/', $html));
+
+        $this->actingAs($manager)->put(route('owner.restaurants.update', $restaurant), [
+            'name' => 'Restaurant représenté sans retrait média',
+            'editor_complete' => '1',
+            'halal_meat' => '1',
+            'halal_chicken' => '0',
+            'categories' => [$category->id],
+            'features' => [$feature->id],
+            'media_order' => collect($photos)->pluck('id')->all(),
+        ])->assertRedirect();
+
+        $this->assertSame(3, $restaurant->fresh()->media()->where('role', '!=', 'fallback_thumbnail')->count());
+        foreach ($photos as $photo) $this->assertDatabaseHas('restaurant_media', ['id' => $photo->id]);
     }
 
     /** @return array{User, Restaurant} */

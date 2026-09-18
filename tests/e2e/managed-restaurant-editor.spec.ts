@@ -103,6 +103,10 @@ test.describe('Éditeur de fiche gérée', () => {
     await page.locator('input[name="hours[0][slots][0][closes_at]"]').fill('14:30');
     const persistedPhotos = page.locator('[data-owner-media-card]');
     await expect(persistedPhotos).toHaveCount(2);
+    await expect(persistedPhotos.locator('.is-marked-for-removal')).toHaveCount(0);
+    await expect(persistedPhotos.locator('[data-owner-media-removal-notice]:visible')).toHaveCount(0);
+    await expect(persistedPhotos.getByRole('button', { name: 'Retirer' })).toHaveCount(2);
+    await expect.poll(() => persistedPhotos.locator('[data-owner-media-remove-input]').evaluateAll(inputs => inputs.every((input: HTMLInputElement) => input.disabled))).toBe(true);
     await expect(persistedPhotos.first().locator('[data-owner-media-up]')).toBeHidden();
     await expect(persistedPhotos.first().locator('[data-owner-media-down]')).toBeVisible();
     await expect(persistedPhotos.nth(1).locator('[data-owner-media-up]')).toBeVisible();
@@ -111,11 +115,15 @@ test.describe('Éditeur de fiche gérée', () => {
     const pendingRemoval = persistedPhotos.nth(1);
     await pendingRemoval.getByRole('button', { name: 'Retirer' }).click();
     await expect(pendingRemoval).toHaveClass(/is-marked-for-removal/);
-    await expect(pendingRemoval.getByText('Cette photo sera retirée à l’enregistrement')).toBeVisible();
+    await expect(pendingRemoval.getByText('Suppression prévue')).toBeVisible();
     await expect(pendingRemoval.locator('[data-owner-media-remove-input]')).toBeEnabled();
+    await expect(pendingRemoval.locator('[data-owner-media-up]')).toBeHidden();
+    await expect(pendingRemoval.locator('[data-owner-media-down]')).toBeHidden();
     await pendingRemoval.getByRole('button', { name: 'Annuler' }).click();
     await expect(pendingRemoval).not.toHaveClass(/is-marked-for-removal/);
     await expect(pendingRemoval.locator('[data-owner-media-remove-input]')).toBeDisabled();
+    await expect(pendingRemoval.locator('[data-owner-media-up]')).toBeVisible();
+    await expect(pendingRemoval.locator('[data-owner-media-down]')).toBeHidden();
     await pendingRemoval.getByRole('button', { name: 'Retirer' }).click();
     const picker = page.locator('[data-photo-picker]').filter({ has: page.locator('[data-owner-new-photos-input]') });
     await picker.locator('[data-owner-new-photos-input]').setInputFiles([
