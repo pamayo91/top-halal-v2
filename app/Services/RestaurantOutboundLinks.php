@@ -80,7 +80,7 @@ class RestaurantOutboundLinks
             ->filter(fn (RestaurantOutboundLink $link): bool => $link->is_active
                 && in_array($link->label, self::FIELDS, true)
                 && self::validDestination($link->destination_url))
-            ->sortBy(fn (RestaurantOutboundLink $link): int => array_search($link->label, self::FIELDS, true))
+            ->sortBy(fn (RestaurantOutboundLink $link): int => array_search($link->label, array_values(self::FIELDS), true))
             ->values();
     }
 }
