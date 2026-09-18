@@ -21,3 +21,5 @@
 ## Couverture automatisée
 
 `ManagedRestaurantEditorTest` exerce les trois profils, une modification complète (horaires multi-plages, ajout/retrait média, GPS, liens), la persistance, et la conservation du statut, slug et e-mail. Les tests existants vérifient le transfert du déposant, la paternité historique et la non-duplication de compte lors du changement d’adresse.
+
+La préproduction a exécuté les huit parcours Playwright correspondants en Chromium desktop et Pixel 7 : ouverture par déposant, claimant et auteur historique, puis sauvegarde réelle de créneaux et de médias pour chaque format. Les cinq fixtures non humaines créées pour cette validation ont été supprimées après le contrôle. Le gate complet de régression a ensuite confirmé les sentinelles V2, les médias, les relations, les réponses HTTP, le navigateur et les logs Laravel.
