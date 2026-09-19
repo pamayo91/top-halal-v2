@@ -29,6 +29,17 @@ for (const [key, path] of Object.entries(sentinels.urls)) {
       const response = await page.goto(path);
       expect(response?.status(), `${key} must never return 500`).not.toBe(500);
       expect(response?.status()).toBe(key === 'not_found' ? 404 : 200);
+
+      const surfaces = await page.evaluate(() => ({
+        html: getComputedStyle(document.documentElement).backgroundColor,
+        body: getComputedStyle(document.body).backgroundColor,
+        pageShells: [...document.querySelectorAll<HTMLElement>('*')]
+          .filter(element => [...element.classList].some(className => className.endsWith('-page')))
+          .map(element => getComputedStyle(element).backgroundColor),
+      }));
+      expect(surfaces.html).toBe('rgb(251, 250, 247)');
+      expect(surfaces.body).toBe('rgb(251, 250, 247)');
+      expect(surfaces.pageShells.every(color => color === 'rgba(0, 0, 0, 0)' || color === 'rgb(251, 250, 247)')).toBe(true);
     }
     expect(consoleErrors).toEqual([]);
     expect(networkFailures).toEqual([]);
