@@ -18,7 +18,15 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::table('comments', fn (Blueprint $table) => $table->dropConstrainedForeignId('moderation_notification_log_id'));
-        Schema::table('restaurant_reviews', fn (Blueprint $table) => $table->dropConstrainedForeignId('moderation_notification_log_id'));
+        Schema::table('comments', function (Blueprint $table): void {
+            $table->dropUnique(['moderation_notification_log_id']);
+            $table->dropForeign(['moderation_notification_log_id']);
+            $table->dropColumn('moderation_notification_log_id');
+        });
+        Schema::table('restaurant_reviews', function (Blueprint $table): void {
+            $table->dropUnique(['moderation_notification_log_id']);
+            $table->dropForeign(['moderation_notification_log_id']);
+            $table->dropColumn('moderation_notification_log_id');
+        });
     }
 };

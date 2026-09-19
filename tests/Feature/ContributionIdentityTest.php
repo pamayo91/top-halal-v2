@@ -106,7 +106,7 @@ class ContributionIdentityTest extends TestCase
         $review = RestaurantReview::latest('id')->firstOrFail();
         $this->assertSame($restaurantUser->id, $review->user_id);
         $this->assertSame('owner@example.test', $review->author_email);
-        Mail::assertNothingQueued();
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_review_admin_review');
     }
 
     public function test_email_comparison_is_case_insensitive_without_creating_a_second_identity(): void
