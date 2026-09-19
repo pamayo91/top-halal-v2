@@ -11,6 +11,13 @@ test.describe('Contact public', () => {
     await expect(page.getByRole('heading', { name: 'Envoyez-nous un message' })).toBeVisible();
     await expect(page.locator('.contact-topics li')).toHaveCount(3);
     await expect(page.locator('.contact-sticker')).toBeVisible();
+    const contactBackground = await page.locator('.contact-page').evaluate(element => ({
+      color: getComputedStyle(element).backgroundColor,
+      image: getComputedStyle(element).backgroundImage,
+    }));
+    expect(contactBackground.color).toBe('rgb(251, 250, 247)');
+    expect(contactBackground.image).toContain('radial-gradient');
+    expect(contactBackground.image).not.toContain('linear-gradient');
     await expect(page.locator('.contact-illustration')).toHaveAttribute('src', /images\/contact\/contact-illustration\.png/);
     if (testInfo.project.name === 'mobile-chromium') {
       await expect(page.locator('.contact-topics')).toBeHidden();

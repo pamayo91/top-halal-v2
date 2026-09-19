@@ -2,6 +2,8 @@
 
 ## 2026-09-19
 
+- Front public : le fond global standard devient un dégradé vertical non répétitif très doux de `#f7f7f1` vers `#fbfaf7` sur 24 rem, avec `#fbfaf7` conservé comme couleur de repli pour toute page longue. Les fonds propres de Contact et revendication, ainsi que les fonds intentionnels de composants et de sections, restent inchangés.
+
 - Front public : le token global `--page-background` fixe désormais le fond par défaut à `#fbfaf7` sur `html` et `body`. Les shells de compte, d’édition restaurateur et de proposition héritent ce socle au lieu de leur ancien dégradé crème/blanc ; les cartes, champs et sections volontairement colorés restent inchangés. Les décors doux Contact et revendication sont conservés au-dessus de cette même base.
 
 - Avis restaurant : la policy centrale reconnaît aussi le gérant explicitement déclaré d’une proposition publiée, sans confondre ce statut avec le droit temporaire d’un déposant. Son propre formulaire est masqué et toute soumission directe est refusée avant création d’avis, vérification, notification ou Delivery Log. Le préremplissage « Prénom ou pseudo » privilégie désormais les identités humaines explicites de claim/soumission et laisse le champ vide lorsque le seul nom disponible est commercial. Le résumé affiche étoiles, moyenne approuvée à une décimale utile et compteur naturel ; les cartes harmonisent leurs étoiles, tout en conservant les titres historiques non vides.
