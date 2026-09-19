@@ -9,7 +9,7 @@ if (!raw) {
 const sentinels = JSON.parse(raw) as Payload;
 
 for (const [key, path] of Object.entries(sentinels.urls)) {
-  test(`sentinel ${key} has its expected HTTP status and no browser failures`, async ({ page }) => {
+  test(`sentinel ${key} has its expected HTTP status and no browser failures`, async ({ page }, testInfo) => {
     const consoleErrors: string[] = [];
     const networkFailures: string[] = [];
     const legacyRequests: string[] = [];
@@ -46,6 +46,9 @@ for (const [key, path] of Object.entries(sentinels.urls)) {
       expect(surfaces.htmlImage).toContain('rgb(251, 250, 247)');
       expect(surfaces.bodyImage).toBe(surfaces.htmlImage);
       expect(surfaces.pageShells.every(color => color === 'rgba(0, 0, 0, 0)' || color === 'rgb(251, 250, 247)')).toBe(true);
+      if (key === 'article.featured_media' && testInfo.project.name === 'mobile-chromium') {
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      }
     }
     expect(consoleErrors).toEqual([]);
     expect(networkFailures).toEqual([]);

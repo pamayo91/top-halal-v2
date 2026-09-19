@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-19
+Last updated: 2026-09-20
+
+Latest editorial mobile correction: wide tables within article prose now scroll inside their own mobile container rather than widening the whole page. Their content and desktop layout are unchanged; the preproduction mobile article sentinel asserts that the document itself has no horizontal overflow.
 
 Latest public saffron accent: the local design system now exposes only `--color-saffron` (`#D9A441`) and `--color-saffron-soft` (`#F8F0DD`) as a decorative/valuation accent. It is currently used only on restaurant review stars (summary, published cards and native rating choices); nearby values remain neutral and focus rings, buttons, links, navigation, form controls and success states remain green. No unsupported restaurant/editorial promotion badge was introduced.
 

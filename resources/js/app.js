@@ -1,4 +1,5 @@
 import '../css/editorial-sidebar-overrides.css';
+import '../css/editorial-tables.css';
 import '../css/reviews.css';
 import '../css/review-anchor.css';
 import '../css/review-rating-hover.css';

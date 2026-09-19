@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-20
+
+- Éditorial mobile : les tables larges des articles défilent désormais dans leur propre conteneur au lieu d’élargir la page. Une sentinelle Playwright protège l’article représentatif contre tout débordement horizontal du document.
+
 ## 2026-09-19
 
 - Front public : ajout des tokens locaux `--color-saffron` (`#D9A441`) et `--color-saffron-soft` (`#F8F0DD`) comme accent de valorisation strictement minoritaire. Les étoiles des avis restaurant (fiche, résumé, cartes et sélection du formulaire) deviennent safran ; les textes voisins restent neutres et les focus, CTA, liens, navigation et contrôles restent verts. Aucun badge artificiel ni autre refonte n’est introduit.
