@@ -44,6 +44,8 @@ class EmailDeliveryLog extends Model
             'contact_admin' => 'Contact - notification admin',
             'contact_confirmation' => 'Contact - confirmation utilisateur',
             'contribution_email_verification' => 'Contribution - vérification e-mail',
+            'restaurant_review_admin_review' => 'Avis - revue opérationnelle',
+            'editorial_comment_admin_review' => 'Commentaire - revue opérationnelle',
             'email_verification' => 'Compte - vérification e-mail',
             'password_reset' => 'Compte - réinitialisation du mot de passe',
             'password_changed' => 'Compte - mot de passe modifié',

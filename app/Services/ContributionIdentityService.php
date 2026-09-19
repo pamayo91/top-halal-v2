@@ -110,7 +110,7 @@ class ContributionIdentityService
         $user = $request->user() ?: User::query()->where('email', $email)->first();
 
         if ($user && ($request->user()?->is($user) || $this->hasProof($request, $user))) {
-            $this->createDirectContribution($contributionType, $targetType, $targetId, $user, $data, $email, $request->user()?->is($user) ?? false);
+            DB::transaction(fn () => $this->createDirectContribution($contributionType, $targetType, $targetId, $user, $data, $email, $request->user()?->is($user) ?? false));
 
             return ['verified' => true, 'verification' => null];
         }
@@ -210,7 +210,7 @@ class ContributionIdentityService
                 throw new RestaurantReviewOwnershipException();
             }
 
-            return RestaurantReview::create([
+            $review = RestaurantReview::create([
                 'restaurant_id' => $restaurant->id,
                 'user_id' => $user->id,
                 'author_name' => trim($data['name']),
@@ -220,6 +220,10 @@ class ContributionIdentityService
                 'content' => trim(strip_tags($data['content'])),
                 'status' => 'pending',
             ]);
+
+            app(ContributionModerationMailer::class)->notifyForPending($review);
+
+            return $review;
         }
 
         $model = match ($targetType) {
@@ -229,7 +233,7 @@ class ContributionIdentityService
         };
         $content = $model::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
 
-        return Comment::create([
+        $comment = Comment::create([
             $targetType === 'article' ? 'article_id' : 'page_id' => $content->id,
             'user_id' => $user->id,
             'author_name' => trim($data['name']),
@@ -237,6 +241,10 @@ class ContributionIdentityService
             'content' => trim(strip_tags($data['content'])),
             'status' => 'pending',
         ]);
+
+        app(ContributionModerationMailer::class)->notifyForPending($comment);
+
+        return $comment;
     }
 
     private function payload(string $type, array $data): array

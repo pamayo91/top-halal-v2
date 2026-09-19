@@ -12,4 +12,5 @@ class RestaurantReview extends Model
     protected function casts(): array { return ['approved_at' => 'datetime']; }
     public function restaurant(): BelongsTo { return $this->belongsTo(Restaurant::class); }
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function moderationNotificationLog(): BelongsTo { return $this->belongsTo(EmailDeliveryLog::class, 'moderation_notification_log_id'); }
 }

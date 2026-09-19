@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\TemplateMailable;
-use App\Models\{Article, Comment, ContributionVerification, Restaurant, RestaurantReview, User};
+use App\Models\{Article, Comment, ContributionVerification, Restaurant, RestaurantReview, Setting, User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\{Mail, URL};
 use Tests\TestCase;
@@ -20,6 +20,7 @@ class ContributionIdentityTest extends TestCase
         parent::setUp();
         $this->restaurant = Restaurant::create(['legacy_wp_id' => 7001, 'name' => 'Identité avis', 'slug' => 'identite-avis', 'status' => 'published']);
         $this->article = Article::create(['legacy_wp_id' => 7002, 'original_title' => 'Identité commentaire', 'title' => 'Identité commentaire', 'slug' => 'identite-commentaire', 'legacy_url' => '/identite-commentaire', 'status' => 'published']);
+        Setting::create(['key' => 'contact_settings', 'group' => 'contact', 'value' => ['recipient' => 'operations@example.test']]);
         Mail::fake();
     }
 
@@ -33,6 +34,7 @@ class ContributionIdentityTest extends TestCase
         $this->assertSame('review', $verification->contribution_type);
         $this->assertNull($verification->used_at);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contribution_email_verification' && $mail->values['user_name'] === 'Amina');
+        Mail::assertNotQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_review_admin_review');
 
         $this->get($this->verificationUrl())
             ->assertOk()
@@ -56,6 +58,12 @@ class ContributionIdentityTest extends TestCase
         $this->assertSame($user->id, $review->user_id);
         $this->assertSame('pending', $review->status);
         $this->assertNotNull($verification->fresh()->used_at);
+        $this->assertNotNull($review->moderation_notification_log_id);
+        $this->assertDatabaseHas('email_delivery_logs', ['id' => $review->moderation_notification_log_id, 'template_key' => 'restaurant_review_admin_review', 'recipient' => 'operations@example.test']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_review_admin_review'
+            && $mail->hasTo('operations@example.test')
+            && $mail->replyToAddress === 'amina@example.test'
+            && $mail->values['admin_url'] === url('/admin/restaurant-reviews?tableFilters[status][value]=pending'));
     }
 
     public function test_trusted_identity_skips_a_new_email_but_an_absent_or_expired_proof_requires_one(): void
@@ -67,7 +75,7 @@ class ContributionIdentityTest extends TestCase
         Mail::fake();
         $this->post('/resto/identite-avis/avis', $this->reviewPayload(['content' => 'Toujours excellent']))->assertRedirect();
         $this->assertSame(2, RestaurantReview::count());
-        Mail::assertNothingQueued();
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_review_admin_review');
 
         $this->app['session']->flush();
         $this->post('/resto/identite-avis/avis', $this->reviewPayload(['content' => 'Sans preuve']))->assertRedirect();
@@ -138,6 +146,31 @@ class ContributionIdentityTest extends TestCase
         $comment = Comment::sole();
         $this->assertSame('pending', $comment->status);
         $this->assertSame(User::where('email', 'amina@example.test')->value('id'), $comment->user_id);
+        $this->assertNotNull($comment->moderation_notification_log_id);
+        $this->assertDatabaseHas('email_delivery_logs', ['id' => $comment->moderation_notification_log_id, 'template_key' => 'editorial_comment_admin_review', 'recipient' => 'operations@example.test']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'editorial_comment_admin_review'
+            && $mail->hasTo('operations@example.test')
+            && $mail->replyToAddress === 'amina@example.test'
+            && $mail->values['admin_url'] === url('/admin/comments?tableFilters[status][value]=pending'));
+    }
+
+    public function test_authenticated_contributors_queue_one_operational_alert_when_their_review_or_comment_enters_pending(): void
+    {
+        $user = User::factory()->create(['email' => 'connecte@example.test']);
+
+        $this->actingAs($user)->post('/resto/identite-avis/avis', [
+            'name' => 'Amina', 'rating' => 4, 'content' => 'Très bon service.',
+        ])->assertRedirect();
+        $this->actingAs($user)->post('/identite-commentaire/commentaires', [
+            'name' => 'Amina', 'content' => 'Merci pour ces informations.',
+        ])->assertRedirect();
+
+        $this->assertDatabaseCount('restaurant_reviews', 1);
+        $this->assertDatabaseCount('comments', 1);
+        $this->assertDatabaseCount('email_delivery_logs', 2);
+        Mail::assertQueued(TemplateMailable::class, 2);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_review_admin_review');
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'editorial_comment_admin_review');
     }
 
     public function test_expired_and_used_tokens_never_create_a_second_contribution(): void
@@ -155,6 +188,8 @@ class ContributionIdentityTest extends TestCase
         $this->get($url)->assertOk();
         $this->get($url)->assertOk()->assertSee('Cet avis a déjà été confirmé.');
         $this->assertDatabaseCount('restaurant_reviews', 1);
+        $this->assertDatabaseCount('email_delivery_logs', 2);
+        Mail::assertQueued(TemplateMailable::class, 2);
     }
 
     public function test_urls_remain_rejected_for_reviews_and_comments(): void

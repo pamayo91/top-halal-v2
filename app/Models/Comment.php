@@ -20,6 +20,7 @@ class Comment extends Model
     public function article(): BelongsTo { return $this->belongsTo(Article::class); }
     public function page(): BelongsTo { return $this->belongsTo(Page::class); }
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function moderationNotificationLog(): BelongsTo { return $this->belongsTo(EmailDeliveryLog::class, 'moderation_notification_log_id'); }
     public function parent(): BelongsTo { return $this->belongsTo(self::class, 'parent_id'); }
     public function children(): HasMany { return $this->hasMany(self::class, 'parent_id'); }
 }

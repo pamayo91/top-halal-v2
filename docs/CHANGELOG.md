@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-19
+
+- Avis et commentaires éditoriaux : une alerte opérationnelle transactionnelle est désormais mise en queue une seule fois lorsque la contribution entre réellement en modération `pending`, après confirmation e-mail si nécessaire. Les deux templates administrables réutilisent le destinataire central Contact, l’historique de livraison, le Reply-To vérifié et une CTA BO filtrée ; aucune alerte n’est créée à la simple saisie, sur échec/expiration ou sur un lien déjà consommé.
+
 ## 2026-09-18
 
 - Avis restaurant : ultime finition visuelle — les étoiles restent des cibles accessibles de 44 px mais sont visuellement regroupées ; le survol prévisualise continûment note et libellé sans changer le radio soumis. L’introduction de l’état vide est une phrase responsive unique, avec le nom du restaurant légèrement mis en avant.
