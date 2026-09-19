@@ -32,10 +32,18 @@ class RestaurantReviewOwnershipTest extends TestCase
         $this->assertReviewIsRefused($owner);
     }
 
-    public function test_owner_with_an_approved_new_submission_claim_cannot_submit_a_review(): void
+    public function test_owner_of_a_published_new_submission_cannot_submit_a_review(): void
     {
         $owner = User::factory()->create(['role' => 'user']);
-        RestaurantClaim::create(['restaurant_id' => $this->restaurant->id, 'user_id' => $owner->id, 'source' => 'new_submission', 'status' => 'approved', 'submitted_at' => now()]);
+        RestaurantSubmission::create([
+            'restaurant_id' => $this->restaurant->id,
+            'user_id' => $owner->id,
+            'submitter_email' => $owner->email,
+            'submitter_role' => 'owner',
+            'owner_full_name' => 'Amina Martin',
+            'status' => 'published',
+            'submitted_at' => now(),
+        ]);
 
         $this->assertReviewIsRefused($owner);
     }
@@ -137,6 +145,7 @@ class RestaurantReviewOwnershipTest extends TestCase
 
         $this->assertDatabaseCount('restaurant_reviews', 0);
         $this->assertDatabaseCount('contribution_verifications', 0);
+        $this->assertDatabaseCount('email_delivery_logs', 0);
     }
 
     private function restaurant(string $slug): Restaurant

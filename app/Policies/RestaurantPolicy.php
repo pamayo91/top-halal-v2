@@ -20,6 +20,16 @@ class RestaurantPolicy
                 ->where('restaurant_id', $restaurant->id)
                 ->where('user_id', $user->id)
                 ->where('status', 'approved')
+                ->exists()
+            // A published proposal whose author explicitly declared that they
+            // manage the restaurant is an effective manager too. Normally it
+            // has already materialised an approved `new_submission` claim,
+            // but keeping this relation in the central rule protects records
+            // created before that hand-off completed.
+            || $restaurant->submission()
+                ->where('user_id', $user->id)
+                ->where('submitter_role', 'owner')
+                ->where('status', 'published')
                 ->exists();
     }
 

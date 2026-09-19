@@ -89,6 +89,40 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     public function ownedRestaurants() { return $this->belongsToMany(Restaurant::class, 'restaurant_claims', 'user_id', 'restaurant_id')->wherePivot('status', 'approved'); }
     public function submittedRestaurants() { return $this->hasMany(RestaurantSubmission::class); }
     /**
+     * Personal identity that is safe to suggest as the public author of a
+     * review. Restaurant-account `name` values have historically sometimes
+     * held a commercial name, so restaurant-related identities use the
+     * explicit human fields captured by their claim/submission instead.
+     */
+    public function reviewAuthorName(): ?string
+    {
+        $claimName = $this->claims()
+            ->whereNotNull('full_name')
+            ->where('full_name', '!=', '')
+            ->latest('submitted_at')
+            ->value('full_name');
+        if (filled($claimName)) return trim($claimName);
+
+        $submissionName = $this->submittedRestaurants()
+            ->where('submitter_role', 'owner')
+            ->whereNotNull('owner_full_name')
+            ->where('owner_full_name', '!=', '')
+            ->latest('submitted_at')
+            ->value('owner_full_name');
+        if (filled($submissionName)) return trim($submissionName);
+
+        // A plain account has no business relation from which its name could
+        // have been inherited, so its chosen account name remains suitable.
+        if (! $this->claims()->exists()
+            && ! $this->submittedRestaurants()->exists()
+            && ! $this->legacyRestaurantAuthorships()->exists()) {
+            return filled($this->name) ? trim($this->name) : null;
+        }
+
+        return null;
+    }
+
+    /**
      * A historical non-manager submission used the restaurant name as a
      * required User.name fallback. That value is not personal identity.
      */
@@ -96,9 +130,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     {
         $name = trim((string) $this->name);
 
-        if ($name === '') {
-            return null;
-        }
+        if ($name === '') return null;
 
         $normalizedName = $this->normalizePersonalName($name);
         $isRestaurantFallback = $this->submittedRestaurants()
