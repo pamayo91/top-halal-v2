@@ -4,6 +4,8 @@
 
 - Avis restaurant : la policy centrale reconnaît aussi le gérant explicitement déclaré d’une proposition publiée, sans confondre ce statut avec le droit temporaire d’un déposant. Son propre formulaire est masqué et toute soumission directe est refusée avant création d’avis, vérification, notification ou Delivery Log. Le préremplissage « Prénom ou pseudo » privilégie désormais les identités humaines explicites de claim/soumission et laisse le champ vide lorsque le seul nom disponible est commercial. Le résumé affiche étoiles, moyenne approuvée à une décimale utile et compteur naturel ; les cartes harmonisent leurs étoiles, tout en conservant les titres historiques non vides.
 
+- Avis restaurant : un déposant non-gérant ayant encore un droit actif de gestion sur sa propre proposition est désormais aussi exclu de l’avis sur cette fiche. La policy d’éligibilité réutilise la requête centrale de représentation sans modifier son statut, son droit d’édition ou les règles de revendication ; le même compte peut noter une fiche qu’il ne gère pas.
+
 - Avis et commentaires éditoriaux : une alerte opérationnelle transactionnelle est désormais mise en queue une seule fois lorsque la contribution entre réellement en modération `pending`, après confirmation e-mail si nécessaire. Les deux templates administrables réutilisent le destinataire central Contact, l’historique de livraison, le Reply-To vérifié et une CTA BO filtrée ; aucune alerte n’est créée à la simple saisie, sur échec/expiration ou sur un lien déjà consommé.
 
 ## 2026-09-18

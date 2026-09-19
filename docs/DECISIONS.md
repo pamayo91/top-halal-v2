@@ -4,7 +4,7 @@
 
 ### D041 — Avis : propriété effective et identité publique ne se déduisent pas du droit d’édition ou du nom de compte
 
-L’interdiction d’auto-avis utilise exclusivement `RestaurantPolicy::isRestaurantManager` : claim approuvée, paternité legacy exacte, ou proposition publiée dont le déposant s’est explicitement déclaré gérant. Elle ne réutilise pas `manage`, qui comprend volontairement les déposants non-gérants. La même règle est vérifiée avant toute création ou envoi d’e-mail.
+L’interdiction d’auto-avis utilise `RestaurantPolicy::mayReviewRestaurant`, négation de la requête centrale des fiches actuellement représentées : claim approuvée, paternité legacy exacte ou soumission encore gérable. Elle ne transforme pas un déposant non-gérant en owner et ne modifie pas `manage` ; elle interdit seulement son conflit d’intérêt sur sa propre fiche. La même règle est vérifiée avant toute création ou envoi d’e-mail.
 
 Le préremplissage d’un avis ne déduit jamais une identité humaine du nom commercial d’une fiche ni d’une comparaison heuristique. Pour un compte lié à un restaurant, seules les valeurs humaines explicites `restaurant_claims.full_name` ou `restaurant_submissions.owner_full_name` sont suggérées ; sans elles, le champ reste vide. Les comptes sans relation restaurant peuvent conserver leur nom de compte choisi.
 

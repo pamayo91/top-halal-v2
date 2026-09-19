@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 class RestaurantPolicy
 {
     /**
-     * The exact restaurant-manager rule shared by owner features and review
-     * eligibility. A depositor is deliberately not a manager here.
+     * The exact restaurant-manager/ownership rule. A depositor is
+     * deliberately not a manager here.
      */
     public function isRestaurantManager(User $user, Restaurant $restaurant): bool
     {
