@@ -2,7 +2,7 @@
 
 Le front public est rendu côté serveur avec Blade. Il n’utilise ni SPA, ni police distante, ni bibliothèque UI. La feuille CSS locale constitue le design system : couleurs, typographie General Sans auto-hébergée, boutons, formulaires, cartes, étiquettes, états vides et grilles responsive.
 
-- Le fond par défaut de tout le shell public est le token `--page-background` (`#fbfaf7`), appliqué à `html` et `body`. Les shells de page transparents le laissent apparaître ; seuls les composants et sections qui portent intentionnellement leur propre fond le surchargent. Les décors translucides des parcours Contact et revendication conservent ce socle.
+- Le fond par défaut de tout le shell public conserve le token de référence `--page-background` (`#fbfaf7`) et utilise le dégradé non répétitif `--page-background-gradient`, de `--page-background-start` (`#f7f7f1`) vers `--page-background-end` (`#fbfaf7`) sur 24 rem. Il est appliqué à `html` et `body`, puis se termine sur la couleur de référence, sans rupture sur les pages longues. Les composants et sections qui portent intentionnellement leur propre fond le surchargent. Contact et revendication conservent strictement leurs décors translucides propres.
 
 - General Sans est la police unique du front public, servie localement via une unique WOFF2 variable (200–700) avec `font-display: swap`. Les usages sont limités à 400 (texte), 500 (métadonnées), 600 (navigation, formulaires, boutons et petits titres) et 700 (H1/grands titres). Le fichier officiel et la licence ITF Free Font License 2.0 sont dans `resources/fonts/general-sans/`; aucun CSS, préconnexion ou fichier de police tiers ne doit être ajouté.
 

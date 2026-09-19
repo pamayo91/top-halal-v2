@@ -33,12 +33,18 @@ for (const [key, path] of Object.entries(sentinels.urls)) {
       const surfaces = await page.evaluate(() => ({
         html: getComputedStyle(document.documentElement).backgroundColor,
         body: getComputedStyle(document.body).backgroundColor,
+        htmlImage: getComputedStyle(document.documentElement).backgroundImage,
+        bodyImage: getComputedStyle(document.body).backgroundImage,
         pageShells: [...document.querySelectorAll<HTMLElement>('*')]
           .filter(element => [...element.classList].some(className => className.endsWith('-page')))
           .map(element => getComputedStyle(element).backgroundColor),
       }));
       expect(surfaces.html).toBe('rgb(251, 250, 247)');
       expect(surfaces.body).toBe('rgb(251, 250, 247)');
+      expect(surfaces.htmlImage).toContain('linear-gradient');
+      expect(surfaces.htmlImage).toContain('rgb(247, 247, 241)');
+      expect(surfaces.htmlImage).toContain('rgb(251, 250, 247)');
+      expect(surfaces.bodyImage).toBe(surfaces.htmlImage);
       expect(surfaces.pageShells.every(color => color === 'rgba(0, 0, 0, 0)' || color === 'rgb(251, 250, 247)')).toBe(true);
     }
     expect(consoleErrors).toEqual([]);
