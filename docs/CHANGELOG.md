@@ -2,6 +2,8 @@
 
 ## 2026-09-19
 
+- Avis restaurant : la policy centrale reconnaît aussi le gérant explicitement déclaré d’une proposition publiée, sans confondre ce statut avec le droit temporaire d’un déposant. Son propre formulaire est masqué et toute soumission directe est refusée avant création d’avis, vérification, notification ou Delivery Log. Le préremplissage « Prénom ou pseudo » privilégie désormais les identités humaines explicites de claim/soumission et laisse le champ vide lorsque le seul nom disponible est commercial. Le résumé affiche étoiles, moyenne approuvée à une décimale utile et compteur naturel ; les cartes harmonisent leurs étoiles, tout en conservant les titres historiques non vides.
+
 - Avis et commentaires éditoriaux : une alerte opérationnelle transactionnelle est désormais mise en queue une seule fois lorsque la contribution entre réellement en modération `pending`, après confirmation e-mail si nécessaire. Les deux templates administrables réutilisent le destinataire central Contact, l’historique de livraison, le Reply-To vérifié et une CTA BO filtrée ; aucune alerte n’est créée à la simple saisie, sur échec/expiration ou sur un lien déjà consommé.
 
 ## 2026-09-18
