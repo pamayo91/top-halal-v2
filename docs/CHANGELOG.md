@@ -2,6 +2,8 @@
 
 ## 2026-09-19
 
+- Front public : ajout des tokens locaux `--color-saffron` (`#D9A441`) et `--color-saffron-soft` (`#F8F0DD`) comme accent de valorisation strictement minoritaire. Les étoiles des avis restaurant (fiche, résumé, cartes et sélection du formulaire) deviennent safran ; les textes voisins restent neutres et les focus, CTA, liens, navigation et contrôles restent verts. Aucun badge artificiel ni autre refonte n’est introduit.
+
 - Front public : le fond global standard devient un dégradé vertical non répétitif très doux de `#f7f7f1` vers `#fbfaf7` sur 24 rem, avec `#fbfaf7` conservé comme couleur de repli pour toute page longue. Les fonds propres de Contact et revendication, ainsi que les fonds intentionnels de composants et de sections, restent inchangés.
 
 - Front public : le token global `--page-background` fixe désormais le fond par défaut à `#fbfaf7` sur `html` et `body`. Les shells de compte, d’édition restaurateur et de proposition héritent ce socle au lieu de leur ancien dégradé crème/blanc ; les cartes, champs et sections volontairement colorés restent inchangés. Les décors doux Contact et revendication sont conservés au-dessus de cette même base.

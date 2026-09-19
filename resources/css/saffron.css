@@ -1,0 +1,42 @@
+/* Decorative and valuation accent only: actions and focus remain Top Halal green. */
+:root {
+    --color-saffron: #D9A441;
+    --color-saffron-soft: #F8F0DD;
+}
+
+/* Ratings: retain neutral copy and green navigational links around the star. */
+.rating {
+    color: var(--ink);
+}
+
+.rating-star,
+.review-summary-stars,
+.review-rating-display {
+    color: var(--color-saffron);
+}
+
+/* The rating is interactive, but its selection remains a decorative star state. */
+.review-rating-stars:has(label[for="review-rating-1"]:hover) label[for="review-rating-1"],
+.review-rating-stars:has(label[for="review-rating-2"]:hover) label[for="review-rating-1"],
+.review-rating-stars:has(label[for="review-rating-2"]:hover) label[for="review-rating-2"],
+.review-rating-stars:has(label[for="review-rating-3"]:hover) label[for="review-rating-1"],
+.review-rating-stars:has(label[for="review-rating-3"]:hover) label[for="review-rating-2"],
+.review-rating-stars:has(label[for="review-rating-3"]:hover) label[for="review-rating-3"],
+.review-rating-stars:has(label[for="review-rating-4"]:hover) label[for="review-rating-1"],
+.review-rating-stars:has(label[for="review-rating-4"]:hover) label[for="review-rating-2"],
+.review-rating-stars:has(label[for="review-rating-4"]:hover) label[for="review-rating-3"],
+.review-rating-stars:has(label[for="review-rating-4"]:hover) label[for="review-rating-4"],
+.review-rating-stars:has(label[for="review-rating-5"]:hover) label,
+.review-rating-stars:has(#review-rating-1:checked) label[for="review-rating-1"],
+.review-rating-stars:has(#review-rating-2:checked) label[for="review-rating-1"],
+.review-rating-stars:has(#review-rating-2:checked) label[for="review-rating-2"],
+.review-rating-stars:has(#review-rating-3:checked) label[for="review-rating-1"],
+.review-rating-stars:has(#review-rating-3:checked) label[for="review-rating-2"],
+.review-rating-stars:has(#review-rating-3:checked) label[for="review-rating-3"],
+.review-rating-stars:has(#review-rating-4:checked) label[for="review-rating-1"],
+.review-rating-stars:has(#review-rating-4:checked) label[for="review-rating-2"],
+.review-rating-stars:has(#review-rating-4:checked) label[for="review-rating-3"],
+.review-rating-stars:has(#review-rating-4:checked) label[for="review-rating-4"],
+.review-rating-stars:has(#review-rating-5:checked) label {
+    color: var(--color-saffron);
+}
