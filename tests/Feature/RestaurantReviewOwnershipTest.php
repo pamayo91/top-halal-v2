@@ -56,7 +56,7 @@ class RestaurantReviewOwnershipTest extends TestCase
         $this->assertReviewIsRefused($manager);
     }
 
-    public function test_non_manager_depositor_can_submit_a_review(): void
+    public function test_non_manager_depositor_with_an_active_management_right_cannot_review_their_own_restaurant(): void
     {
         $depositor = User::factory()->create(['role' => 'user']);
         RestaurantSubmission::create([
@@ -69,8 +69,27 @@ class RestaurantReviewOwnershipTest extends TestCase
         ]);
 
         $this->assertFalse($depositor->can('isRestaurantManager', $this->restaurant));
-        $this->actingAs($depositor)->post($this->reviewUrl(), $this->reviewPayload())->assertRedirect();
-        $this->assertDatabaseHas('restaurant_reviews', ['restaurant_id' => $this->restaurant->id, 'user_id' => $depositor->id, 'status' => 'pending']);
+        $this->assertTrue($depositor->can('manage', $this->restaurant));
+        $this->assertFalse($depositor->can('mayReviewRestaurant', $this->restaurant));
+        $this->assertReviewIsRefused($depositor);
+    }
+
+    public function test_non_manager_depositor_can_review_a_restaurant_they_do_not_manage(): void
+    {
+        $depositor = User::factory()->create(['role' => 'user']);
+        RestaurantSubmission::create([
+            'restaurant_id' => $this->restaurant->id,
+            'user_id' => $depositor->id,
+            'submitter_email' => $depositor->email,
+            'submitter_role' => 'customer',
+            'status' => 'published',
+            'submitted_at' => now(),
+        ]);
+
+        $this->assertTrue($depositor->can('manage', $this->restaurant));
+        $this->assertTrue($depositor->can('mayReviewRestaurant', $this->otherRestaurant));
+        $this->actingAs($depositor)->post(route('restaurants.reviews.store', $this->otherRestaurant->slug), $this->reviewPayload())->assertRedirect();
+        $this->assertDatabaseHas('restaurant_reviews', ['restaurant_id' => $this->otherRestaurant->id, 'user_id' => $depositor->id, 'status' => 'pending']);
     }
 
     public function test_standard_user_can_submit_a_review(): void
@@ -133,7 +152,7 @@ class RestaurantReviewOwnershipTest extends TestCase
 
     private function assertReviewIsRefused(User $user): void
     {
-        $this->assertTrue($user->can('isRestaurantManager', $this->restaurant));
+        $this->assertFalse($user->can('mayReviewRestaurant', $this->restaurant));
         $this->actingAs($user)->get(route('restaurants.show', $this->restaurant->slug))
             ->assertOk()
             ->assertSee(RestaurantReviewOwnershipException::MESSAGE)

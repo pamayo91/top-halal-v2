@@ -33,6 +33,16 @@ class RestaurantPolicy
                 ->exists();
     }
 
+    /**
+     * Review eligibility follows the actual restaurant-management conflict,
+     * not ownership alone. In particular, a non-manager depositor may retain
+     * a temporary editor right but must not review that same listing.
+     */
+    public function mayReviewRestaurant(User $user, Restaurant $restaurant): bool
+    {
+        return ! $this->representedRestaurantsQuery($user)->whereKey($restaurant)->exists();
+    }
+
     public function manage(User $user, Restaurant $restaurant): bool
     {
         if ($user->role === 'admin') {

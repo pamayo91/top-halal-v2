@@ -206,7 +206,7 @@ class ContributionIdentityService
         if ($contributionType === 'review') {
             abort_unless($targetType === 'restaurant', 404);
             $restaurant = Restaurant::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
-            if ($user->can('isRestaurantManager', $restaurant)) {
+            if (! $user->can('mayReviewRestaurant', $restaurant)) {
                 throw new RestaurantReviewOwnershipException();
             }
 
