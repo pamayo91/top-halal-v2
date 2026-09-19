@@ -14,9 +14,18 @@ class ContributionVerificationController extends Controller
     {
         $state = $identities->linkState($verification, $token);
         if ($state === 'invalid') abort(404);
-        if ($state !== 'valid') return view('public.expiring-link-status', ['eyebrow' => 'Vérification e-mail', 'title' => $state === 'expired' ? 'Ce lien a expiré.' : 'Cette contribution a déjà été confirmée.', 'message' => $state === 'expired' ? 'Vous pouvez recevoir un nouveau lien pour continuer.' : 'Aucune nouvelle contribution ne sera créée.', 'resendUrl' => $state === 'expired' ? route('contributions.verify.resend', [$verification, $token]) : null]);
+        if ($state !== 'valid') return view('public.expiring-link-status', [
+            'eyebrow' => 'Vérification e-mail',
+            'title' => $state === 'expired' ? 'Ce lien a expiré.' : ($state === 'used' && $verification->contribution_type === 'review' ? 'Cet avis a déjà été confirmé.' : 'Cette contribution ne peut plus être confirmée.'),
+            'message' => $state === 'expired' ? 'Vous pouvez recevoir un nouveau lien pour continuer.' : ($state === 'used' ? 'Aucune nouvelle contribution ne sera créée.' : 'Le contenu concerné n’est plus disponible.'),
+            'resendUrl' => $state === 'expired' ? route('contributions.verify.resend', [$verification, $token]) : null,
+        ]);
         $request->session()->regenerate();
         $result = $identities->verify($request, $verification, $token);
+
+        if ($result['contribution_type'] === 'review' && ! ($result['review_ownership_forbidden'] ?? false)) {
+            $request->session()->flash('review_email_confirmed', true);
+        }
 
         return view('public.contributions.email-verified', $result);
     }

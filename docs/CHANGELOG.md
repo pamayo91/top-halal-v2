@@ -390,6 +390,8 @@
 
 ## Unreleased
 
+- Review e-mail confirmation now returns visitors to the relevant restaurant `#avis` anchor, with an accessible pending-verification or post-confirmation status and anchor-safe scroll positioning. The review-specific confirmation page uses precise e-mail/moderation wording and a server-derived restaurant CTA; consumed and unavailable links are handled without creating a duplicate or misleadingly implying a new confirmation.
+
 - Formulaire public d’ajout de restaurant : à l’étape 3, le téléphone est seul sur sa ligne desktop mais garde exactement la largeur d’une colonne Site web/Instagram ; les liens Site web/Instagram puis Facebook/TikTok s’alignent sur les deux lignes suivantes.
 
 - Le front public adopte General Sans en WOFF2 variable locale (400/500/600/700), téléchargée depuis Fontshare/Indian Type Foundry avec la licence FFL 2.0 conservée dans le dépôt. Les titres, navigation, contrôles et formulaires suivent une hiérarchie de graisses cohérente sans appel de police tiers; Filament n’est pas modifié.

@@ -25,7 +25,8 @@ class ContributionIdentityTest extends TestCase
 
     public function test_new_review_requires_email_verification_before_it_is_created_then_creates_an_identity_and_pending_review(): void
     {
-        $this->post('/resto/identite-avis/avis', $this->reviewPayload())->assertRedirect();
+        $this->post('/resto/identite-avis/avis', $this->reviewPayload())
+            ->assertRedirect(route('restaurants.show', $this->restaurant->slug).'#avis');
 
         $this->assertDatabaseCount('restaurant_reviews', 0);
         $verification = ContributionVerification::sole();
@@ -33,7 +34,19 @@ class ContributionIdentityTest extends TestCase
         $this->assertNull($verification->used_at);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contribution_email_verification' && $mail->values['user_name'] === 'Amina');
 
-        $this->get($this->verificationUrl())->assertOk()->assertSee('Votre identité est confirmée.');
+        $this->get($this->verificationUrl())
+            ->assertOk()
+            ->assertSee('Adresse confirmée')
+            ->assertSee('Votre e-mail est confirmé.')
+            ->assertDontSee('Votre identité est confirmée.')
+            ->assertSee('Votre avis a bien été envoyé à l’équipe Top Halal. Il sera publié après validation.')
+            ->assertSee('Retourner au restaurant')
+            ->assertSee(route('restaurants.show', $this->restaurant->slug).'#avis');
+
+        $this->get(route('restaurants.show', $this->restaurant->slug))
+            ->assertOk()
+            ->assertSee('Merci, votre avis a bien été confirmé. Il sera publié après validation par notre équipe.')
+            ->assertDontSee('Vérifiez votre adresse e-mail pour confirmer votre avis.');
 
         $user = User::where('email', 'amina@example.test')->sole();
         $review = RestaurantReview::sole();
@@ -140,7 +153,7 @@ class ContributionIdentityTest extends TestCase
         $this->post('/resto/identite-avis/avis', $this->reviewPayload())->assertRedirect();
         $url = $this->verificationUrl();
         $this->get($url)->assertOk();
-        $this->get($url)->assertOk()->assertSee('Cette contribution a déjà été confirmée.');
+        $this->get($url)->assertOk()->assertSee('Cet avis a déjà été confirmé.');
         $this->assertDatabaseCount('restaurant_reviews', 1);
     }
 

@@ -85,6 +85,7 @@ class ContributionIdentityService
     {
         if (! hash_equals($verification->token_hash, hash('sha256', $token))) return 'invalid';
         if ($verification->used_at) return 'used';
+        if (! $this->canContinue($verification)) return 'closed';
         if (! $verification->expires_at->isFuture()) return $this->canContinue($verification) ? 'expired' : 'closed';
         return 'valid';
     }
@@ -265,7 +266,7 @@ class ContributionIdentityService
     private function destinationUrl(ContributionVerification $verification): string
     {
         return match ($verification->target_type) {
-            'restaurant' => route('restaurants.show', Restaurant::query()->findOrFail($verification->target_id)->slug),
+            'restaurant' => route('restaurants.show', Restaurant::query()->findOrFail($verification->target_id)->slug).'#avis',
             'article', 'page' => route('editorial.show', ($verification->target_type === 'article' ? Article::query() : Page::query())->findOrFail($verification->target_id)->slug),
         };
     }

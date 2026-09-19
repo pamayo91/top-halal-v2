@@ -109,7 +109,8 @@ class PublicContentController extends Controller
             return back()->with('review_ownership_forbidden', true);
         }
 
-        return back()->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
+        return redirect()->to(route('restaurants.show', $restaurant->slug).'#avis')
+            ->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
     }
 
     public function storeRestaurantReport(StoreContentReportRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
