@@ -22,6 +22,14 @@ test('restaurant correction form shares the compact review card on desktop and m
   const errors: string[] = []; page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto('/resto/hayat-2');
   await expect(page.getByText('Une information à corriger ?', { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => {
+    const information = document.querySelector('.restaurant-information')!;
+    const reviews = document.querySelector('#avis')!;
+    const report = document.querySelector('.report-correction')!;
+    const bottom = (element: Element) => element.getBoundingClientRect().bottom + scrollY;
+    const titleTop = (section: Element) => section.querySelector('h2')!.getBoundingClientRect().top + scrollY;
+    return Math.round(titleTop(reviews) - bottom(information)) === Math.round(titleTop(report) - bottom(reviews));
+  })).toBe(true);
   await page.getByText('Signaler une erreur', { exact: true }).click();
   const correctionForm = page.locator('.report-form'); const reviewForm = page.locator('form.review-form:not(.report-form)');
   await expect(correctionForm).toBeVisible();

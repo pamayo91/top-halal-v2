@@ -1,5 +1,7 @@
 # Changelog
 
+- Restaurants : l’espace vertical entre `Informations` et le titre `Avis` reprend exactement l’espace de référence existant entre la fin des avis et `Une information à corriger ?`, sans modifier les autres espacements de la fiche.
+
 - Restaurants : le formulaire public `Signaler une erreur` réutilise désormais la carte compacte des avis, avec les mêmes champs, fond, bordure, arrondi, padding et action alignée. Son traitement, sa validation, son anti-spam et ses routes restent inchangés ; une couverture Playwright protège les rendus desktop et mobile ainsi que la validation native.
 
 ## 2026-09-20
