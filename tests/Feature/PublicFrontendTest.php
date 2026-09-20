@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Category;
 use App\Models\Comment;
 use App\Models\ContentMedia;
+use App\Models\EditorialCategory;
 use App\Models\Feature;
 use App\Models\MediaAsset;
 use App\Models\MediaVariant;
@@ -24,6 +25,30 @@ use Tests\TestCase;
 class PublicFrontendTest extends TestCase
 {
     use DatabaseMigrations;
+
+    public function test_blog_starts_with_its_article_grid_without_public_category_navigation(): void
+    {
+        $category = EditorialCategory::create(['legacy_term_id' => 8001, 'name' => 'Blog', 'slug' => 'blog']);
+        $article = Article::create([
+            'legacy_wp_id' => 8001,
+            'original_title' => 'Article du guide',
+            'title' => 'Article du guide',
+            'slug' => 'article-du-guide',
+            'legacy_url' => '/article-du-guide',
+            'status' => 'published',
+        ]);
+        $article->categories()->attach($category);
+
+        $this->get('/blog')
+            ->assertOk()
+            ->assertSee('rel="canonical" href="'.route('blog.index').'"', false)
+            ->assertSee('content="index,follow"', false)
+            ->assertSee('<div class="article-grid article-grid-wide">', false)
+            ->assertSee('Blog')
+            ->assertDontSee('Catégories du guide')
+            ->assertDontSee('Toutes les catégories')
+            ->assertDontSee('href="'.route('blog.index', ['categorie' => 'blog']).'"', false);
+    }
 
     public function test_specialty_fallback_thumbnail_is_used_on_cards_but_not_as_a_restaurant_cover(): void
     {

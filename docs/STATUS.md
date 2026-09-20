@@ -4,6 +4,8 @@ Last updated: 2026-09-20
 
 Latest restaurant detail spacing correction: the gap from `Informations` to the `Avis` title now exactly matches the existing gap from the end of `Avis` to `Une information à corriger ?`; the reference gap and all other restaurant-detail spacing remain unchanged.
 
+Latest blog taxonomy presentation correction: `/blog` now starts directly with its article grid, without its V2-added public editorial-category navigation. Editorial taxonomy records, article relations, direct legacy-compatible category URLs and the small non-clickable article-card label remain intact; the blog’s canonical, indexability and pagination are unchanged.
+
 Latest restaurant report-form presentation: the public `Une information à corriger ?` block now opens the existing report flow inside the same compact, lightly tinted card system as the review form. It keeps its title, toggle, route, validation, identity verification, anti-spam and submission behavior unchanged; the textarea is a matching reasonable height, the desktop action aligns right, and the mobile card stays within the normal page width with a full-width action.
 
 Latest editorial mobile correction: wide tables within article prose now scroll inside their own mobile container rather than widening the whole page. Their content and desktop layout are unchanged; the preproduction mobile article sentinel asserts that the document itself has no horizontal overflow.
