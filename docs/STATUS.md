@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-20
 
+Latest navigation back-office refactor: the Menu editor is now a compact two-level tree with modal item editing, destination summaries, explicit French add-submenu wording, drag-and-drop plus keyboard-safe ordering controls. Existing `menus` / `menu_items`, destination resolution, ordering and visibility fields remain intact. Server validation rejects cross-menu parents and third-level nesting; no-link items keep their accessible public button trigger and no longer retain irrelevant link options.
+
 Latest restaurant detail spacing correction: the gap from `Informations` to the `Avis` title now exactly matches the existing gap from the end of `Avis` to `Une information à corriger ?`; the reference gap and all other restaurant-detail spacing remain unchanged.
 
 Latest blog taxonomy presentation correction: `/blog` now starts directly with its article grid, without its V2-added public editorial-category navigation. Editorial taxonomy records, article relations, direct legacy-compatible category URLs and the small non-clickable article-card label remain intact; the blog’s canonical, indexability and pagination are unchanged.

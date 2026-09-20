@@ -1,5 +1,7 @@
 # Changelog
 
+- Navigation back-office : remplacement du Repeater Filament imbriqué par une arborescence compacte avec édition modale, résumé de destination, états/visibilités, ajout clair d’élément ou de sous-menu, glisser-déposer et commandes monter/descendre. Le modèle `menus`/`menu_items`, les destinations et les relations existantes sont conservés. La validation serveur interdit désormais aussi tout parent externe au menu et tout troisième niveau ; « Aucun lien » neutralise `nofollow` et l’ouverture dans un nouvel onglet.
+
 - Blog : suppression de la seule navigation/filtres publics de catégories au-dessus de la grille de `/blog`. Les taxonomies éditoriales migrées et leurs relations restent conservées en interne, le petit libellé des cartes reste affiché, et canonical, indexabilité, pagination et URLs d’articles restent inchangés.
 
 - Restaurants : l’espace vertical entre `Informations` et le titre `Avis` reprend exactement l’espace de référence existant entre la fin des avis et `Une information à corriger ?`, sans modifier les autres espacements de la fiche.

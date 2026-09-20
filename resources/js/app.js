@@ -254,12 +254,13 @@ if (submission) {
 }
 menu?.addEventListener('click', () => { const open = menu.getAttribute('aria-expanded') === 'true'; menu.setAttribute('aria-expanded', String(!open)); mobileNav.hidden = open; });
 
+let lastSubmenuToggle = null;
 document.querySelectorAll('[data-submenu-toggle]').forEach(toggle => {
     toggle.addEventListener('click', () => {
         const panel = document.getElementById(toggle.getAttribute('aria-controls'));
         if (!panel) return;
         const open = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!open)); panel.hidden = open;
+        toggle.setAttribute('aria-expanded', String(!open)); panel.hidden = open; lastSubmenuToggle = toggle;
     });
 });
 document.addEventListener('keydown', event => {
@@ -268,6 +269,7 @@ document.addEventListener('keydown', event => {
         document.getElementById(toggle.getAttribute('aria-controls'))?.setAttribute('hidden', '');
         toggle.setAttribute('aria-expanded', 'false');
     });
+    if (lastSubmenuToggle) { lastSubmenuToggle.focus(); lastSubmenuToggle = null; }
     if (menu?.getAttribute('aria-expanded') === 'true') { menu.setAttribute('aria-expanded', 'false'); mobileNav.hidden = true; menu.focus(); }
 });
 

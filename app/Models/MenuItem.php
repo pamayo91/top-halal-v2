@@ -22,9 +22,22 @@ class MenuItem extends Model
     protected static function booted(): void
     {
         static::saving(function (self $item): void {
+            if ($item->parent_id !== null) {
+                $parent = self::query()->find($item->parent_id);
+
+                if ($parent === null || $parent->menu_id !== $item->menu_id) {
+                    throw ValidationException::withMessages(['parent_id' => 'Le parent doit appartenir au même menu.']);
+                }
+
+                if ($parent->parent_id !== null) {
+                    throw ValidationException::withMessages(['parent_id' => 'Un sous-menu ne peut pas contenir de troisième niveau.']);
+                }
+            }
             $item->linkable_type = self::linkableClassFor($item->link_type);
             if ($item->link_type !== 'city') { $item->destination_key = null; }
             if (! in_array($item->link_type, ['internal_url', 'external_url'], true)) { $item->url = null; }
+            if (in_array($item->link_type, ['none', 'internal_url'], true)) { $item->target_blank = false; }
+            if ($item->link_type === 'none') { $item->nofollow = false; }
             if ($item->link_type === 'internal_url' && ! self::validInternalUrl((string) $item->url)) {
                 throw ValidationException::withMessages(['url' => 'Une URL interne doit commencer par / et ne peut pas contenir de protocole.']);
             }
