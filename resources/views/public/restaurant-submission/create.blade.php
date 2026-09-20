@@ -12,7 +12,7 @@
         <div class="shell submission-shell">
             <header class="submission-header">
                 <a href="{{ route('restaurants.index') }}" class="submission-back">← Retour aux restaurants</a>
-                <p class="eyebrow">Référencer une adresse</p>
+                <p class="eyebrow accented-eyebrow">Référencer une adresse</p>
                 <h1>Ajoutez un restaurant halal</h1>
                 <p class="hero-copy">Quelques informations suffisent. Chaque proposition est vérifiée avant toute publication.</p>
                 <div class="submission-progress" aria-label="Progression du formulaire" aria-live="polite">

@@ -464,5 +464,7 @@
 - Ajout de la file BO minimale et des quatre statuts de traitement, sans assignation ni modification automatique de contenu.
 # 2026-09-14
 
+- Étendu avec sobriété l’accent safran public aux traits éditoriaux courts, catégories d’articles, citations, sidebar et sélection de texte, sans modifier les états fonctionnels verts ni la logique métier.
+
 - La page 404 publique adopte le shell Top Halal, un layout responsive à deux colonnes, les CTA Accueil/Annuaire et quatre repères de confiance fixes, tout en conservant HTTP 404 et `noindex,follow`.
 - Les réglages ajoutent les seules personnalisations autorisées de la page 404 : illustration V2, titre et texte, avec repli vers les valeurs par défaut.

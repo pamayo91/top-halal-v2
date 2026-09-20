@@ -20,7 +20,7 @@
 <x-slot:head><script type="application/ld+json">@json($schema)</script></x-slot:head>
 <div class="shell"><x-breadcrumbs :items="$breadcrumbItems" />
 @php($restaurantH1 = \Illuminate\Support\Str::startsWith(\Illuminate\Support\Str::lower($restaurant->name), 'quick halal') ? $restaurant->name : (\Illuminate\Support\Str::startsWith(\Illuminate\Support\Str::lower($restaurant->name), 'quick ') ? 'Quick Halal '.preg_replace('/^quick\s+/i', '', $restaurant->name) : $restaurant->name))
-<article class="restaurant-detail"><div class="restaurant-main"><p class="eyebrow">Restaurant halal @if($restaurant->city_name) · {{ $restaurant->city_name }} @endif</p><h1>{{ $restaurantH1 }}</h1>
+<article class="restaurant-detail"><div class="restaurant-main"><p class="eyebrow accented-eyebrow">Restaurant halal @if($restaurant->city_name) · {{ $restaurant->city_name }} @endif</p><h1>{{ $restaurantH1 }}</h1>
 @if($aggregate['count'])<p class="rating"><span class="rating-star" aria-hidden="true">★</span> {{ number_format($aggregate['average'],1,',','') }}/5 <a href="#avis">{{ $aggregate['count'] }} avis</a></p>@endif
 @if($hero && $hero->width && $hero->height)<img class="restaurant-hero" src="{{ $heroUrl }}" width="{{ $hero->width }}" height="{{ $hero->height }}" fetchpriority="high" alt="{{ $hero->alt_text ?: $restaurant->name }}">@endif
 @if($restaurant->description)<section class="prose"><h2>À propos</h2><p>{{ $restaurant->description }}</p></section>@endif

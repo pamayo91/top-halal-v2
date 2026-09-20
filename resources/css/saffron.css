@@ -4,6 +4,23 @@
     --color-saffron-soft: #F8F0DD;
 }
 
+::selection { background: var(--color-saffron-soft); color: var(--ink); }
+
+/* Short, non-functional editorial markers: never heading-wide rules or card borders. */
+.accented-eyebrow::after { content: ""; display: block; width: 28px; height: 2px; margin-top: .45rem; border-radius: 2px; background: var(--color-saffron); }
+.section-heading-accent h2::after { content: ""; display: block; width: 32px; height: 2px; margin-top: .55rem; border-radius: 2px; background: var(--color-saffron); }
+
+/* Reserved for an actual editorial/promotional label supplied by content. */
+.badge-accent { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .5rem; border-radius: 999px; background: var(--color-saffron-soft); color: var(--ink); font-size: .78rem; font-weight: 700; line-height: 1.2; }
+
+.article-card-kicker { display: flex; align-items: center; gap: .45rem; }
+.article-card-kicker::before,.sidebar-articles .sidebar-title::before { content: ""; display: inline-block; width: 10px; height: 2px; flex: 0 0 auto; border-radius: 2px; background: var(--color-saffron); }
+.sidebar-articles .sidebar-title::before { display: block; width: 24px; margin: 0 0 .55rem; }
+
+.prose blockquote { margin: 1.5rem 0; padding: .1rem 0 .1rem 1rem; border-left: 3px solid var(--color-saffron); }
+.prose blockquote > :first-child { margin-top: 0; }
+.prose blockquote > :last-child { margin-bottom: 0; }
+
 /* Ratings: retain neutral copy and green navigational links around the star. */
 .rating {
     color: var(--ink);
