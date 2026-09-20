@@ -17,3 +17,22 @@ test('restaurant review form is a single column on mobile', async ({ page }) => 
   expect(await page.locator('.review-identity-fields').evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(1);
   await page.locator('label[for="review-rating-1"]').click(); await page.getByLabel('1 étoile').focus(); await page.keyboard.press('ArrowRight'); await expect(page.getByLabel('2 étoiles')).toBeChecked();
 });
+
+test('restaurant correction form shares the compact review card on desktop and mobile', async ({ page }) => {
+  const errors: string[] = []; page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  await page.goto('/resto/hayat-2');
+  await expect(page.getByText('Une information à corriger ?', { exact: true })).toBeVisible();
+  await page.getByText('Signaler une erreur', { exact: true }).click();
+  const correctionForm = page.locator('.report-form'); const reviewForm = page.locator('.review-form');
+  await expect(correctionForm).toBeVisible();
+  expect(await correctionForm.evaluate(element => getComputedStyle(element).maxWidth)).toBe(await reviewForm.evaluate(element => getComputedStyle(element).maxWidth));
+  expect((await correctionForm.boundingBox())!.width).toBeLessThanOrEqual((await page.locator('.restaurant-main').boundingBox())!.width);
+  await expect(correctionForm.locator('textarea[name="message"]')).toHaveCSS('min-height', '128px');
+  await expect(correctionForm.locator('.review-form-actions')).toHaveCSS('justify-content', 'flex-end');
+  await correctionForm.locator('input[name="email"]').fill('invalid'); await correctionForm.getByRole('button', { name: 'Envoyer le signalement' }).click();
+  await expect(correctionForm.locator('input[name="email"]')).toBeFocused(); expect(errors).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 }); await page.reload(); await page.getByText('Signaler une erreur', { exact: true }).click();
+  const mobileForm = page.locator('.report-form'); const mobileAction = mobileForm.locator('.review-form-actions');
+  expect((await mobileForm.boundingBox())!.width).toBeLessThanOrEqual(358);
+  expect(Math.round((await mobileAction.locator('.button').boundingBox())!.width)).toBe(Math.round((await mobileAction.boundingBox())!.width));
+});

@@ -1,5 +1,7 @@
 # Changelog
 
+- Restaurants : le formulaire public `Signaler une erreur` réutilise désormais la carte compacte des avis, avec les mêmes champs, fond, bordure, arrondi, padding et action alignée. Son traitement, sa validation, son anti-spam et ses routes restent inchangés ; une couverture Playwright protège les rendus desktop et mobile ainsi que la validation native.
+
 ## 2026-09-20
 
 - Non-régression : les sentinelles restaurant déclarent désormais leurs invariants par rôle. Les sentinelles catégories, média et adresse ne snapshotent plus les avis vivants ; la sentinelle avis protège précisément chaque avis historique sélectionné (rattachement, identité legacy, statut) sans échouer lorsqu'un nouvel avis V2 légitime est ajouté.

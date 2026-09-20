@@ -33,3 +33,6 @@ Reviews are separate domain objects from editorial comments.
 - For an authenticated review author, the `Prénom ou pseudo` suggestion uses a recorded human claim/submission identity first. A restaurant-related account name is never assumed human; if no explicit human identity is available, the field is empty. New reviews render exactly the submitted author name.
 - Published-review summaries show rounded stars, the approved-only average with at most one useful decimal, and the correctly singularized review count. Historical titles remain visible only when non-empty; title-less reviews reserve no title space.
 - JSON-LD AggregateRating/Review is deferred and must be emitted only for publicly visible approved V2 reviews.
+## Signalement public sur fiche restaurant
+
+Le bloc public `Une information à corriger ?` conserve son titre, son toggle `Signaler une erreur` et tout son traitement existant. Lorsqu’il est ouvert, son formulaire réemploie la carte compacte des avis (fond léger, bordure, rayon, champs, padding et action alignée à droite) et reste limité à la même largeur de lecture sur desktop. Sur mobile, il occupe la largeur disponible sans débordement et son action devient pleine largeur comme celle du formulaire d’avis.

@@ -40,13 +40,13 @@
 @if(auth()->user() && app(\App\Policies\RestaurantPolicy::class)->manage(auth()->user(), $restaurant))
 <p>Vous pouvez modifier cette fiche directement.</p><a class="button" href="{{ route('owner.restaurants.edit', $restaurant) }}">Modifier les informations de cette fiche</a><p class="muted">Pour tout autre problème, vous pouvez aussi nous le signaler ci-dessous.</p>
 @endif
-<details><summary>Signaler une erreur</summary><form class="stack-form" method="post" action="{{ route('restaurants.reports.store', $restaurant->slug) }}">@csrf
+<details class="report-form-disclosure"@if($errors->hasAny(['email', 'message', 'website'])) open @endif><summary>Signaler une erreur</summary><form class="review-form report-form" method="post" action="{{ route('restaurants.reports.store', $restaurant->slug) }}">@csrf
 @if(auth()->check())
 <p class="muted">Signalement envoyé avec le compte {{ auth()->user()->email }}.</p>
 @else
 <label for="report-email">E-mail <input id="report-email" name="email" type="email" required value="{{ old('email') }}"></label>
 @endif
-<label for="report-message">Information à corriger <textarea id="report-message" name="message" maxlength="2000" required>{{ old('message') }}</textarea></label><input class="hp" name="website" tabindex="-1" autocomplete="off"><button class="button">Envoyer le signalement</button></form></details>
+<label for="report-message">Information à corriger <textarea id="report-message" name="message" maxlength="2000" required>{{ old('message') }}</textarea></label><input class="hp" name="website" tabindex="-1" autocomplete="off"><div class="review-form-actions"><button class="button">Envoyer le signalement</button></div></form></details>
 @endif
 </section>
 @endif
