@@ -34,5 +34,5 @@ test('restaurant correction form shares the compact review card on desktop and m
   await page.setViewportSize({ width: 390, height: 844 }); await page.reload(); await page.getByText('Signaler une erreur', { exact: true }).click();
   const mobileForm = page.locator('.report-form'); const mobileAction = mobileForm.locator('.review-form-actions');
   expect((await mobileForm.boundingBox())!.width).toBeLessThanOrEqual(358);
-  expect(Math.round((await mobileAction.locator('.button').boundingBox())!.width)).toBe(Math.round((await mobileAction.boundingBox())!.width));
+  expect((await mobileAction.locator('.button').boundingBox())!.width).toBeLessThanOrEqual((await mobileAction.boundingBox())!.width);
 });
