@@ -13,6 +13,7 @@ class PublicSaffronAccentTest extends TestCase
         $restaurantTemplate = file_get_contents(resource_path('views/public/restaurant.blade.php'));
         $editorialTemplate = file_get_contents(resource_path('views/public/editorial.blade.php'));
         $submissionTemplate = file_get_contents(resource_path('views/public/restaurant-submission/create.blade.php'));
+        $breadcrumbsTemplate = file_get_contents(resource_path('views/components/breadcrumbs.blade.php'));
 
         $this->assertStringContainsString('--color-saffron: #D9A441', $css);
         $this->assertStringContainsString('--color-saffron-soft: #F8F0DD', $css);
@@ -24,6 +25,9 @@ class PublicSaffronAccentTest extends TestCase
         $this->assertStringContainsString('.badge-accent', $css);
         $this->assertStringContainsString('.prose blockquote', $css);
         $this->assertStringContainsString('::selection', $css);
+        $this->assertStringContainsString('.breadcrumb-separator', $css);
+        $this->assertStringContainsString('.sidebar-card .sidebar-title::after', $css);
+        $this->assertStringContainsString('class="breadcrumb-separator"', $breadcrumbsTemplate);
         $this->assertStringNotContainsString('.button', $css);
     }
 }
