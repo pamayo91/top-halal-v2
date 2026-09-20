@@ -26,6 +26,7 @@ class PublicSaffronAccentTest extends TestCase
         $this->assertStringContainsString('.prose blockquote', $css);
         $this->assertStringContainsString('::selection', $css);
         $this->assertStringContainsString('.breadcrumb-separator', $css);
+        $this->assertStringContainsString('.breadcrumbs > span:not([aria-current])', $css);
         $this->assertStringContainsString('.sidebar-card .sidebar-title::after', $css);
         $this->assertStringContainsString('class="breadcrumb-separator"', $breadcrumbsTemplate);
         $this->assertStringNotContainsString('.button', $css);

@@ -12,7 +12,8 @@
 
 /* Breadcrumb labels remain neutral/interactive; only their visual delimiters carry the accent. */
 .breadcrumbs > .breadcrumb-separator,
-.breadcrumbs > span[aria-hidden="true"] { color: var(--color-saffron); font-weight: 700; }
+.breadcrumbs > span[aria-hidden="true"],
+.breadcrumbs > span:not([aria-current]) { color: var(--color-saffron); font-weight: 700; }
 
 /* Reserved for an actual editorial/promotional label supplied by content. */
 .badge-accent { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .5rem; border-radius: 999px; background: var(--color-saffron-soft); color: var(--ink); font-size: .78rem; font-weight: 700; line-height: 1.2; }
