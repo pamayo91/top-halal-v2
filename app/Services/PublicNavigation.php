@@ -74,7 +74,7 @@ class PublicNavigation
         if (! $item->is_active || ! ($surface === 'desktop' ? $item->visible_desktop : $item->visible_mobile)) return null;
         $children = $item->children->map(fn (MenuItem $child) => $this->item($child, $surface))->filter()->values()->all();
         $url = $this->urlFor($item);
-        if ($item->link_type !== 'none' && $url === null && $children === []) return null;
+        if (in_array($item->link_type, ['page', 'article', 'category', 'feature', 'city'], true) && $url === null && $children === []) return null;
         return ['id' => $item->id, 'label' => $item->label, 'url' => $url, 'children' => $children, 'target_blank' => $item->target_blank, 'nofollow' => $item->nofollow];
     }
 
