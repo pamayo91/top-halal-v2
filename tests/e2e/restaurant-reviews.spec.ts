@@ -4,7 +4,7 @@ test('public restaurant review uses accessible stars, requires identity verifica
   const errors: string[] = []; page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto('/resto/hayat-2'); await expect(page.locator('h1')).toBeVisible(); await expect(page.locator('[data-review-aggregate]')).toContainText('avis'); await page.getByText('Donner mon avis', { exact: true }).click();
   await expect(page.getByText('Prénom ou pseudo', { exact: true })).toBeVisible(); await expect(page.getByText('Choisissez une note', { exact: true })).toBeVisible(); await expect(page.locator('select[name="rating"]')).toHaveCount(0); await expect(page.locator('input[name="title"]')).toHaveCount(0);
-  const reviewForm = page.locator('.review-form');
+  const reviewForm = page.locator('form.review-form:not(.report-form)');
   for (const [rating, label] of [['1', 'Décevant'], ['2', 'Moyen'], ['3', 'Bien'], ['4', 'Très bien'], ['5', 'Excellent']]) { await reviewForm.locator(`label[for="review-rating-${rating}"]`).click(); await expect(reviewForm.locator(`input[name="rating"][value="${rating}"]`)).toBeChecked(); await expect(reviewForm.getByText(label, { exact: true })).toBeVisible(); }
   await reviewForm.locator('label[for="review-rating-2"]').click(); await reviewForm.locator('label[for="review-rating-4"]').hover(); await expect(reviewForm.getByText('Très bien', { exact: true })).toBeVisible(); await page.locator('h1').hover(); await expect(reviewForm.getByText('Moyen', { exact: true })).toBeVisible();
   await reviewForm.locator('input[name="name"]').fill('Codex review'); await reviewForm.locator('input[name="email"]').fill('codex-review-test@example.invalid'); await reviewForm.locator('textarea[name="content"]').fill('Validation sans lien.'); await reviewForm.getByRole('button',{name:'Envoyer mon avis'}).click(); await expect(page).toHaveURL(/\/resto\/hayat-2#avis$/); await expect(page.locator('#avis')).toBeInViewport(); await expect(page.getByRole('status')).toContainText('Vérifiez votre adresse e-mail');
@@ -23,7 +23,7 @@ test('restaurant correction form shares the compact review card on desktop and m
   await page.goto('/resto/hayat-2');
   await expect(page.getByText('Une information à corriger ?', { exact: true })).toBeVisible();
   await page.getByText('Signaler une erreur', { exact: true }).click();
-  const correctionForm = page.locator('.report-form'); const reviewForm = page.locator('.review-form');
+  const correctionForm = page.locator('.report-form'); const reviewForm = page.locator('form.review-form:not(.report-form)');
   await expect(correctionForm).toBeVisible();
   expect(await correctionForm.evaluate(element => getComputedStyle(element).maxWidth)).toBe(await reviewForm.evaluate(element => getComputedStyle(element).maxWidth));
   expect((await correctionForm.boundingBox())!.width).toBeLessThanOrEqual((await page.locator('.restaurant-main').boundingBox())!.width);
