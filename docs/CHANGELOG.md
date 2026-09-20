@@ -2,6 +2,8 @@
 
 ## 2026-09-20
 
+- Non-régression : les sentinelles restaurant déclarent désormais leurs invariants par rôle. Les sentinelles catégories, média et adresse ne snapshotent plus les avis vivants ; la sentinelle avis protège précisément chaque avis historique sélectionné (rattachement, identité legacy, statut) sans échouer lorsqu'un nouvel avis V2 légitime est ajouté.
+
 - Éditorial mobile : les tables larges des articles défilent désormais dans leur propre conteneur au lieu d’élargir la page. Une sentinelle Playwright protège l’article représentatif contre tout débordement horizontal du document.
 
 ## 2026-09-19

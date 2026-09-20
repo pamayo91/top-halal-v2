@@ -75,4 +75,4 @@ Le titre par défaut d’une fiche publiée est `Restaurant {nom} Halal à {vill
 
 ## Non-régression
 
-Une modification sans rapport dans Filament doit préserver les relations existantes de la fiche : médias, catégories, services, zones, avis, horaires et adresse/GPS. Le registre V2 de sentinelles compare ces relations exactement sur préproduction et bloque toute perte inattendue.
+Une modification sans rapport dans Filament doit préserver les relations existantes de la fiche : médias, catégories, services, zones, avis, horaires et adresse/GPS. Le registre V2 de sentinelles protège sur préproduction les invariants pertinents pour chacune de ses fiches représentatives, sans assimiler une contribution publique normale à une régression : une sentinelle catégories, média ou adresse ne snapshotte pas les avis vivants. La sentinelle d'avis conserve les avis historiques sélectionnés (rattachement, identité legacy et statut) tout en autorisant les nouveaux avis V2.

@@ -25,15 +25,15 @@ class SentinelRegistry
         $sentinels = [];
         $restaurant = fn (): Builder => Restaurant::query()->where('status', 'published');
 
-        $this->addRestaurant($sentinels, 'restaurant.gallery', (clone $restaurant())->has('media.asset', '>=', 2)->orderByDesc('id')->first());
-        $this->addRestaurant($sentinels, 'restaurant.single_media', (clone $restaurant())->has('media.asset', '=', 1)->orderByDesc('id')->first());
-        $this->addRestaurant($sentinels, 'restaurant.no_media', (clone $restaurant())->doesntHave('media')->orderByDesc('id')->first());
-        $this->addRestaurant($sentinels, 'restaurant.categories', (clone $restaurant())->has('categories')->orderByDesc('id')->first());
-        $this->addRestaurant($sentinels, 'restaurant.features', (clone $restaurant())->has('features')->orderByDesc('id')->first());
-        $this->addRestaurant($sentinels, 'restaurant.reviews', (clone $restaurant())->has('reviews')->orderByDesc('id')->first());
-        $this->addRestaurant($sentinels, 'restaurant.structured_address', (clone $restaurant())->whereNotNull('address_line1')->whereNotNull('city_code')->whereNotNull('latitude')->whereNotNull('longitude')->orderByDesc('id')->first());
+        $this->addRestaurant($sentinels, 'restaurant.gallery', (clone $restaurant())->has('media.asset', '>=', 2)->orderByDesc('id')->first(), ['media']);
+        $this->addRestaurant($sentinels, 'restaurant.single_media', (clone $restaurant())->has('media.asset', '=', 1)->orderByDesc('id')->first(), ['media']);
+        $this->addRestaurant($sentinels, 'restaurant.no_media', (clone $restaurant())->doesntHave('media')->orderByDesc('id')->first(), ['media']);
+        $this->addRestaurant($sentinels, 'restaurant.categories', (clone $restaurant())->has('categories')->orderByDesc('id')->first(), ['categories']);
+        $this->addRestaurant($sentinels, 'restaurant.features', (clone $restaurant())->has('features')->orderByDesc('id')->first(), ['features']);
+        $this->addRestaurant($sentinels, 'restaurant.reviews', (clone $restaurant())->has('reviews')->orderByDesc('id')->first(), ['reviews']);
+        $this->addRestaurant($sentinels, 'restaurant.structured_address', (clone $restaurant())->whereNotNull('address_line1')->whereNotNull('city_code')->whereNotNull('latitude')->whereNotNull('longitude')->orderByDesc('id')->first(), ['address']);
         $this->addRestaurant($sentinels, 'restaurant.o_sha', (clone $restaurant())->whereRaw('LOWER(name) = ?', ['o sha'])->first());
-        $this->addRestaurant($sentinels, 'restaurant.pending_preview', Restaurant::query()->where('status', 'pending')->latest('id')->first(), false);
+        $this->addRestaurant($sentinels, 'restaurant.pending_preview', Restaurant::query()->where('status', 'pending')->latest('id')->first(), [], false);
 
         $this->addArticle($sentinels, 'article.featured_media', Article::query()->where('status', 'published')->whereHas('featuredMedia.asset')->orderByDesc('id')->first());
         $this->addArticle($sentinels, 'article.inline_media', Article::query()->where('status', 'published')->whereHas('contentMedia.asset', fn (Builder $query) => $query->where('role', 'inline'))->orderByDesc('id')->first());
@@ -55,29 +55,34 @@ class SentinelRegistry
     }
 
     /** @param array<string, array{subject_type: string, subject_id: int|null, route_path: string|null, baseline: array<string, mixed>}> $sentinels */
-    private function addRestaurant(array &$sentinels, string $key, ?Restaurant $restaurant, bool $public = true): void
+    private function addRestaurant(array &$sentinels, string $key, ?Restaurant $restaurant, array $invariants = [], bool $public = true): void
     {
         if (! $restaurant) {
             return;
         }
 
-        $restaurant->load(['media.asset.variants', 'categories', 'features', 'reviews', 'openingHours']);
+        $relations = [];
+        if (in_array('media', $invariants, true)) $relations[] = 'media.asset.variants';
+        if (in_array('categories', $invariants, true)) $relations[] = 'categories';
+        if (in_array('features', $invariants, true)) $relations[] = 'features';
+        if (in_array('reviews', $invariants, true)) $relations[] = 'reviews';
+        $restaurant->load($relations);
         $routePath = $public ? '/resto/'.$restaurant->slug : null;
-        $sentinels[$key] = ['subject_type' => 'restaurant', 'subject_id' => $restaurant->id, 'route_path' => $routePath, 'baseline' => [
+        $baseline = [
             'id' => $restaurant->id,
             'legacy_wp_id' => $restaurant->legacy_wp_id,
             'slug' => $restaurant->slug,
             'status' => $restaurant->status,
-            'categories' => $restaurant->categories->pluck('id')->sort()->values()->all(),
-            'features' => $restaurant->features->pluck('id')->sort()->values()->all(),
-            'reviews' => $restaurant->reviews->pluck('id')->sort()->values()->all(),
-            'opening_hours' => $restaurant->openingHours->pluck('id')->sort()->values()->all(),
-            'address' => $restaurant->only(['address_line1', 'address_line2', 'postal_code', 'city_name', 'city_code', 'country_code', 'latitude', 'longitude']),
-            'media' => $restaurant->media->map(fn ($media): array => [
+        ];
+        if (in_array('categories', $invariants, true)) $baseline['categories'] = $restaurant->categories->pluck('id')->sort()->values()->all();
+        if (in_array('features', $invariants, true)) $baseline['features'] = $restaurant->features->pluck('id')->sort()->values()->all();
+        if (in_array('address', $invariants, true)) $baseline['address'] = $restaurant->only(['address_line1', 'address_line2', 'postal_code', 'city_name', 'city_code', 'country_code', 'latitude', 'longitude']);
+        if (in_array('media', $invariants, true)) $baseline['media'] = $restaurant->media->map(fn ($media): array => [
                 'id' => $media->id, 'media_asset_id' => $media->media_asset_id, 'legacy_attachment_id' => $media->legacy_attachment_id,
                 'asset' => $media->asset ? $this->assetBaseline($media->asset) : null,
-            ])->values()->all(),
-        ]];
+            ])->values()->all();
+        if (in_array('reviews', $invariants, true)) $baseline['reviews'] = $restaurant->reviews->map(fn ($review): array => $this->reviewBaseline($review))->values()->all();
+        $sentinels[$key] = ['subject_type' => 'restaurant', 'subject_id' => $restaurant->id, 'route_path' => $routePath, 'baseline' => $baseline];
     }
 
     /** @param array<string, array{subject_type: string, subject_id: int|null, route_path: string|null, baseline: array<string, mixed>}> $sentinels */
@@ -105,6 +110,17 @@ class SentinelRegistry
         return [
             'id' => $asset->id, 'original_path' => $asset->original_path, 'mime' => $asset->mime, 'status' => $asset->status,
             'variants' => $asset->variants->map(fn ($variant): array => ['id' => $variant->id, 'path' => $variant->path, 'format' => $variant->format, 'width' => $variant->width])->values()->all(),
+        ];
+    }
+
+    /** @return array<string, int|string|null> */
+    private function reviewBaseline(object $review): array
+    {
+        return [
+            'id' => $review->id,
+            'restaurant_id' => $review->restaurant_id,
+            'legacy_wp_review_id' => $review->legacy_wp_review_id,
+            'status' => $review->status,
         ];
     }
 
@@ -186,13 +202,53 @@ class SentinelRegistry
     /** @param array<string, mixed> $baseline @param array<int, string> $errors @param array<int, string> $mediaUrls */
     private function verifyRestaurant(string $key, Restaurant $restaurant, array $baseline, array &$errors, array &$mediaUrls): void
     {
-        $restaurant->load(['media.asset.variants', 'categories', 'features', 'reviews', 'openingHours']);
-        foreach (['categories' => 'categories', 'features' => 'features', 'reviews' => 'reviews', 'opening_hours' => 'openingHours'] as $baselineKey => $relation) {
-            $actual = $restaurant->{$relation}->pluck('id')->sort()->values()->all();
-            if ($actual !== ($baseline[$baselineKey] ?? [])) $errors[] = "{$key}: {$baselineKey} relation changed unexpectedly.";
+        $invariants = $this->restaurantInvariants($key);
+        $relations = [];
+        if (in_array('media', $invariants, true)) $relations[] = 'media.asset.variants';
+        if (in_array('categories', $invariants, true)) $relations[] = 'categories';
+        if (in_array('features', $invariants, true)) $relations[] = 'features';
+        if (in_array('reviews', $invariants, true)) $relations[] = 'reviews';
+        $restaurant->load($relations);
+
+        if (in_array('categories', $invariants, true) && $restaurant->categories->pluck('id')->sort()->values()->all() !== ($baseline['categories'] ?? [])) $errors[] = "{$key}: categories relation changed unexpectedly.";
+        if (in_array('features', $invariants, true) && $restaurant->features->pluck('id')->sort()->values()->all() !== ($baseline['features'] ?? [])) $errors[] = "{$key}: features relation changed unexpectedly.";
+        if (in_array('reviews', $invariants, true)) $this->verifyProtectedReviews($key, $restaurant, $baseline['reviews'] ?? [], $errors);
+        if (in_array('address', $invariants, true) && ($baseline['address'] ?? []) !== $restaurant->only(array_keys($baseline['address'] ?? []))) $errors[] = "{$key}: structured address or GPS changed unexpectedly.";
+        if (in_array('media', $invariants, true)) $this->verifyMedia($key, $baseline['media'] ?? [], $restaurant->media->keyBy('id')->all(), $errors, $mediaUrls);
+    }
+
+    /** @return array<int, string> */
+    private function restaurantInvariants(string $key): array
+    {
+        return match ($key) {
+            'restaurant.gallery', 'restaurant.single_media', 'restaurant.no_media' => ['media'],
+            'restaurant.categories' => ['categories'],
+            'restaurant.features' => ['features'],
+            'restaurant.reviews' => ['reviews'],
+            'restaurant.structured_address' => ['address'],
+            default => [],
+        };
+    }
+
+    /** @param array<int, array<string, mixed>|int> $expectedReviews @param array<int, string> $errors */
+    private function verifyProtectedReviews(string $key, Restaurant $restaurant, array $expectedReviews, array &$errors): void
+    {
+        $actual = $restaurant->reviews->keyBy('id');
+        foreach ($expectedReviews as $expected) {
+            // Scalar IDs are the original baseline format. Keep them valid while
+            // preproduction is migrated deliberately to the richer invariant.
+            $expected = is_int($expected) ? ['id' => $expected, 'restaurant_id' => $restaurant->id] : $expected;
+            $review = $actual->get($expected['id'] ?? null);
+            if (! $review) {
+                $errors[] = "{$key}: protected review #".($expected['id'] ?? '?')." is missing or no longer belongs to the restaurant.";
+                continue;
+            }
+            foreach (['restaurant_id', 'legacy_wp_review_id', 'status'] as $field) {
+                if (array_key_exists($field, $expected) && (string) $review->{$field} !== (string) $expected[$field]) {
+                    $errors[] = "{$key}: protected review #{$review->id} {$field} changed unexpectedly.";
+                }
+            }
         }
-        if (($baseline['address'] ?? []) !== $restaurant->only(array_keys($baseline['address'] ?? []))) $errors[] = "{$key}: structured address or GPS changed unexpectedly.";
-        $this->verifyMedia($key, $baseline['media'] ?? [], $restaurant->media->keyBy('id')->all(), $errors, $mediaUrls);
     }
 
     /** @param array<string, mixed> $baseline @param array<int, string> $errors @param array<int, string> $mediaUrls */

@@ -2,7 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\{Article, Category, Feature, MediaAsset, Page, RedirectRule, Restaurant, RestaurantMedia, RestaurantReview};
+use App\Models\{Article, Category, Feature, MediaAsset, Page, RedirectRule, RegressionSentinel, Restaurant, RestaurantMedia, RestaurantReview};
+use App\Services\Regression\SentinelRegistry;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -40,6 +41,63 @@ class RegressionSentinelTest extends TestCase
         app(\App\Services\Location\RestaurantLocationService::class)->update($restaurant, ['description' => 'Texte édité uniquement']);
 
         $this->artisan('regression:verify')->assertSuccessful();
+    }
+
+    public function test_live_reviews_do_not_affect_category_media_or_address_sentinels(): void
+    {
+        $sentinels = $this->registerRestaurantSentinels();
+
+        foreach (['restaurant.categories', 'restaurant.single_media', 'restaurant.structured_address'] as $key) {
+            RestaurantReview::create([
+                'restaurant_id' => $sentinels[$key], 'author_name' => 'Nouvel avis', 'rating' => 4,
+                'content' => 'Contribution publique légitime.', 'status' => 'pending',
+            ]);
+        }
+
+        self::assertSame([], app(SentinelRegistry::class)->verify()['errors']);
+    }
+
+    public function test_review_sentinel_keeps_its_protected_review_without_rejecting_a_new_one(): void
+    {
+        $sentinels = $this->registerRestaurantSentinels();
+        $restaurantId = $sentinels['restaurant.reviews'];
+        $protectedReview = RestaurantReview::where('restaurant_id', $restaurantId)->sole();
+
+        RestaurantReview::create([
+            'restaurant_id' => $restaurantId, 'author_name' => 'Nouvel avis', 'rating' => 4,
+            'content' => 'Contribution publique légitime.', 'status' => 'pending',
+        ]);
+
+        self::assertSame([], app(SentinelRegistry::class)->verify()['errors']);
+
+        $otherRestaurant = Restaurant::create([
+            'legacy_wp_id' => 900004, 'name' => 'Autre restaurant', 'slug' => 'autre-restaurant', 'status' => 'published',
+        ]);
+        $protectedReview->update(['restaurant_id' => $otherRestaurant->id]);
+
+        self::assertContains(
+            "restaurant.reviews: protected review #{$protectedReview->id} is missing or no longer belongs to the restaurant.",
+            app(SentinelRegistry::class)->verify()['errors'],
+        );
+    }
+
+    /** @return array<string, int> */
+    private function registerRestaurantSentinels(): array
+    {
+        Storage::fake('local');
+        $this->makeRepresentativeData();
+        $singleMedia = Restaurant::create([
+            'legacy_wp_id' => 900003, 'name' => 'Photo unique', 'slug' => 'photo-unique', 'status' => 'published',
+        ]);
+        RestaurantMedia::create([
+            'restaurant_id' => $singleMedia->id, 'legacy_attachment_id' => 900003,
+            'media_asset_id' => MediaAsset::where('legacy_attachment_id', 900001)->value('id'), 'status' => 'ready',
+        ]);
+        $this->artisan('regression:sentinels', ['--refresh-baseline' => true])->assertSuccessful();
+
+        return RegressionSentinel::query()->whereIn('key', [
+            'restaurant.categories', 'restaurant.single_media', 'restaurant.structured_address', 'restaurant.reviews',
+        ])->get()->mapWithKeys(fn (RegressionSentinel $sentinel): array => [$sentinel->key => $sentinel->subject_id])->all();
     }
 
     private function makeRepresentativeData(): Restaurant
