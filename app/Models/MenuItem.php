@@ -56,7 +56,7 @@ class MenuItem extends Model
         };
     }
 
-    private static function validInternalUrl(string $url): bool { return str_starts_with($url, '/') && ! str_starts_with($url, '//') && ! str_contains($url, '\\') && ! preg_match('/[\x00-\x1F]/', $url); }
+    private static function validInternalUrl(string $url): bool { return $url !== '/#' && str_starts_with($url, '/') && ! str_starts_with($url, '//') && ! str_contains($url, '\\') && ! preg_match('/[\x00-\x1F]/', $url); }
     private static function validExternalUrl(string $url): bool { $parts = parse_url($url); return filter_var($url, FILTER_VALIDATE_URL) !== false && in_array($parts['scheme'] ?? null, ['http', 'https'], true); }
 
     public function menu(): BelongsTo { return $this->belongsTo(Menu::class); }

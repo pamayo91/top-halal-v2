@@ -113,6 +113,6 @@ class PublicNavigation
         return route('cities.show', $city->slug);
     }
 
-    public function validInternalUrl(string $url): bool { return str_starts_with($url, '/') && ! str_starts_with($url, '//') && ! str_contains($url, '\\') && ! preg_match('/[\x00-\x1F]/', $url); }
+    public function validInternalUrl(string $url): bool { return $url !== '/#' && str_starts_with($url, '/') && ! str_starts_with($url, '//') && ! str_contains($url, '\\') && ! preg_match('/[\x00-\x1F]/', $url); }
     public function validExternalUrl(string $url): bool { $parts = parse_url($url); return filter_var($url, FILTER_VALIDATE_URL) !== false && in_array($parts['scheme'] ?? null, ['http', 'https'], true); }
 }
