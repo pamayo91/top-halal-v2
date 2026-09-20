@@ -464,6 +464,8 @@
 - Ajout de la file BO minimale et des quatre statuts de traitement, sans assignation ni modification automatique de contenu.
 # 2026-09-14
 
+- Remplacé le focus bleu natif des champs publics par une bordure/ring safran accessible, et réchauffé le séparateur horizontal existant du footer sans modifier boutons, liens ou surface.
+
 - Renforcé les accents safran décoratifs partagés : séparateurs de fil d’Ariane, traits sous les titres de sidebar et sections éditoriales de villes, sans modifier les libellés, liens ou états fonctionnels.
 
 - Étendu avec sobriété l’accent safran public aux traits éditoriaux courts, catégories d’articles, citations, sidebar et sélection de texte, sans modifier les états fonctionnels verts ni la logique métier.

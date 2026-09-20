@@ -6,6 +6,24 @@
 
 ::selection { background: var(--color-saffron-soft); color: var(--ink); }
 
+/* Public form fields use one visible, warm focus treatment instead of browser blue.
+   Buttons and links intentionally keep their existing interaction styling. */
+main :is(input, textarea, select):focus {
+    outline: none !important;
+    border-color: var(--color-saffron) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-saffron) 18%, transparent) !important;
+}
+
+/* Search already has a purpose-built containing ring, so avoid a second inner field ring. */
+.restaurant-search-field:focus-within::after { border-color: var(--color-saffron); }
+.search-input-wrap input:focus { border-color: transparent !important; box-shadow: none !important; }
+
+/* Native rating radios are visually represented by their adjacent star label. */
+.review-rating-input:focus-visible + .review-rating-star { outline-color: var(--color-saffron); }
+
+/* A single warm, full-width separator is the footer's only additional saffron detail. */
+.site-footer .footer-bottom { border-top-color: color-mix(in srgb, var(--color-saffron) 72%, transparent); }
+
 /* Short, non-functional editorial markers: never heading-wide rules or card borders. */
 .accented-eyebrow::after { content: ""; display: block; width: 28px; height: 2px; margin-top: .45rem; border-radius: 2px; background: var(--color-saffron); }
 .section-heading-accent h2::after { content: ""; display: block; width: 36px; height: 2px; margin-top: .55rem; border-radius: 2px; background: var(--color-saffron); }
