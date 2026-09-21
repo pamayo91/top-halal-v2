@@ -131,7 +131,8 @@ class PublicNavigation
         $route = request()->route()?->getName() ?? '';
         $path = '/'.ltrim(request()->path(), '/');
         $isExactUrl = $item['url'] !== null && rtrim($item['url'], '/') === rtrim($path, '/');
-        $isRestaurantUniverse = str_starts_with($route, 'restaurants.') || $route === 'cities.show';
+        $isRestaurantUniverse = str_starts_with($route, 'restaurants.')
+            || in_array($route, ['cities.show', 'city-specialties.show', 'features.show'], true);
         $isCuisineUniverse = in_array($route, ['categories.show', 'city-specialties.show'], true);
         $isBlogUniverse = $route === 'blog.index' || $route === 'editorial.show';
         $isSemanticMatch = match ($item['link_type']) {
