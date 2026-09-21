@@ -16,6 +16,26 @@
     text-decoration: none;
 }
 
+.site-header .nav-item {
+    display: inline-grid;
+    grid-template-columns: max-content;
+}
+
+/* Reserve the active (700) width without exposing duplicate text to assistive tech. */
+.site-header .nav-item::before {
+    grid-area: 1 / 1;
+    visibility: hidden;
+    content: attr(data-nav-label);
+    font: inherit;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.site-header .nav-item > .nav-label {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+}
+
 .site-header .nav-menu-list a.nav-item,
 .site-header .nav-menu-list button.nav-item,
 .site-header .mobile-menu-list a.nav-item,

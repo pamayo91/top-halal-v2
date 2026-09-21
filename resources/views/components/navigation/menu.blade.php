@@ -6,11 +6,11 @@
     @php($panelId = ($mobile ? 'mobile' : 'desktop').'-submenu-'.$item['id'])
     <li class="{{ $hasChildren ? 'has-submenu' : '' }}">
         @if($item['url'])
-            <a class="nav-item{{ $item['is_active'] ? ' is-active' : '' }}" href="{{ $item['url'] }}" @if($item['target_blank']) target="_blank" rel="noopener noreferrer{{ $item['nofollow'] ? ' nofollow' : '' }}" @elseif($item['nofollow']) rel="nofollow" @endif>{{ $item['label'] }}</a>
+            <a class="nav-item{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}" href="{{ $item['url'] }}" @if($item['target_blank']) target="_blank" rel="noopener noreferrer{{ $item['nofollow'] ? ' nofollow' : '' }}" @elseif($item['nofollow']) rel="nofollow" @endif><span class="nav-label">{{ $item['label'] }}</span></a>
         @elseif($hasChildren)
-            <button class="nav-item nav-parent{{ $item['is_active'] ? ' is-active' : '' }}" type="button" data-submenu-toggle aria-expanded="false" aria-controls="{{ $panelId }}"><span>{{ $item['label'] }}</span></button>
+            <button class="nav-item nav-parent{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}" type="button" data-submenu-toggle aria-expanded="false" aria-controls="{{ $panelId }}"><span class="nav-label">{{ $item['label'] }}</span></button>
         @else
-            <span class="nav-item nav-item-static{{ $item['is_active'] ? ' is-active' : '' }}">{{ $item['label'] }}</span>
+            <span class="nav-item nav-item-static{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}"><span class="nav-label">{{ $item['label'] }}</span></span>
         @endif
         @if($hasChildren)
             @if($item['url'])<button class="submenu-toggle" type="button" data-submenu-toggle aria-label="Ouvrir le sous-menu {{ $item['label'] }}" aria-expanded="false" aria-controls="{{ $panelId }}"></button>@endif

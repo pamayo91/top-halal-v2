@@ -119,3 +119,30 @@ test('header states have an obvious stable visual hierarchy', async ({ page }, t
   expect(parentHover.markerHeight).toBe('2px');
   expect(parentHover.markerOpacity).toBe('1');
 });
+
+test('header item positions stay fixed across hover and active routes', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop geometry assertions.');
+
+  const positions = async () => page.locator('.main-nav .nav-menu-list > li > .nav-item').evaluateAll(elements => elements.map(element => {
+    const rect = element.getBoundingClientRect();
+    return { label: element.textContent?.trim(), x: rect.x, width: rect.width };
+  }));
+
+  await page.goto('/restaurants');
+  await page.evaluate(() => document.fonts.ready);
+  const restaurantsRoute = await positions();
+  for (const label of ['Restaurants', 'Cuisines', 'Blog']) {
+    await page.locator('.main-nav .nav-item', { hasText: label }).hover();
+    await page.waitForTimeout(150);
+    const current = await positions();
+    current.forEach((item, index) => {
+      expect(item.x).toBeCloseTo(restaurantsRoute[index].x, 4);
+      expect(item.width).toBeCloseTo(restaurantsRoute[index].width, 4);
+    });
+  }
+
+  await page.goto('/blog');
+  await page.evaluate(() => document.fonts.ready);
+  const blogRoute = await positions();
+  blogRoute.forEach((item, index) => expect(item.x).toBeCloseTo(restaurantsRoute[index].x, 4));
+});
