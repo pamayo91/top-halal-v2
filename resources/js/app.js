@@ -256,20 +256,31 @@ if (submission) {
 menu?.addEventListener('click', () => { const open = menu.getAttribute('aria-expanded') === 'true'; menu.setAttribute('aria-expanded', String(!open)); mobileNav.hidden = open; });
 
 let lastSubmenuToggle = null;
-document.querySelectorAll('[data-submenu-toggle]').forEach(toggle => {
-    toggle.addEventListener('click', () => {
-        const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+const submenuGroups = [...document.querySelectorAll('.has-submenu')].map(owner => {
+    const toggles = [...owner.querySelectorAll(':scope > [data-submenu-toggle]')];
+    const panel = document.getElementById(toggles[0]?.getAttribute('aria-controls'));
+    const setOpen = open => {
         if (!panel) return;
-        const open = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!open)); panel.hidden = open; lastSubmenuToggle = toggle;
-    });
+        toggles.forEach(toggle => toggle.setAttribute('aria-expanded', String(open)));
+        panel.hidden = !open;
+    };
+
+    toggles.forEach(toggle => toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        setOpen(open);
+        if (open) lastSubmenuToggle = toggle;
+    }));
+
+    if (window.matchMedia('(hover: hover)').matches) {
+        owner.addEventListener('pointerenter', () => setOpen(true));
+        owner.addEventListener('pointerleave', () => setOpen(false));
+    }
+
+    return { toggles, setOpen };
 });
 document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
-    document.querySelectorAll('[data-submenu-toggle][aria-expanded="true"]').forEach(toggle => {
-        document.getElementById(toggle.getAttribute('aria-controls'))?.setAttribute('hidden', '');
-        toggle.setAttribute('aria-expanded', 'false');
-    });
+    submenuGroups.forEach(({ setOpen }) => setOpen(false));
     if (lastSubmenuToggle) { lastSubmenuToggle.focus(); lastSubmenuToggle = null; }
     if (menu?.getAttribute('aria-expanded') === 'true') { menu.setAttribute('aria-expanded', 'false'); mobileNav.hidden = true; menu.focus(); }
 });
