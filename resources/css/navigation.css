@@ -19,11 +19,12 @@
 .site-header .nav-item {
     display: inline-grid;
     grid-template-columns: max-content;
+    grid-template-areas: 'label';
 }
 
 /* Reserve the active (700) width without exposing duplicate text to assistive tech. */
 .site-header .nav-item::before {
-    grid-area: 1 / 1;
+    grid-area: label;
     visibility: hidden;
     content: attr(data-nav-label);
     font: inherit;
@@ -32,7 +33,7 @@
 }
 
 .site-header .nav-item > .nav-label {
-    grid-area: 1 / 1;
+    grid-area: label;
     white-space: nowrap;
 }
 
