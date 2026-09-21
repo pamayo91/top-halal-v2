@@ -53,19 +53,6 @@
     content: '';
 }
 
-.site-header .nav-chevron {
-    width: 8px;
-    height: 8px;
-    flex: 0 0 auto;
-    margin-top: -3px;
-    border-right: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: rotate(45deg);
-    transition: transform .16s ease;
-}
-
-.site-header [data-submenu-toggle][aria-expanded="true"] .nav-chevron { transform: rotate(225deg); }
-
 .site-header .submenu-toggle { display: inline-flex; align-items: center; justify-content: center; }
 .site-header .submenu li > .is-active { color: var(--green-dark); font-weight: 700; text-decoration: none; }
 
