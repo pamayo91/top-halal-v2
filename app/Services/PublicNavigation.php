@@ -17,7 +17,7 @@ class PublicNavigation
     public function header(): array
     {
         if (! Schema::hasTable('settings')) return $this->defaultHeader();
-        return Cache::rememberForever(self::HEADER_KEY, function (): array {
+        $header = Cache::rememberForever(self::HEADER_KEY, function (): array {
             $config = (array) (Setting::where('key', 'header_navigation')->value('value') ?? []);
             $menu = $this->menu((int) ($config['menu_id'] ?? 0), 'header_main');
             return [
@@ -29,6 +29,12 @@ class PublicNavigation
                 'submission_label' => $config['submission_label'] ?? 'Ajouter un restaurant',
             ];
         });
+
+        return [
+            ...$header,
+            'menu' => $this->markActiveTree($header['menu']),
+            'mobile_menu' => $this->markActiveTree($header['mobile_menu']),
+        ];
     }
 
     public function footer(): array
@@ -75,7 +81,7 @@ class PublicNavigation
         $children = $item->children->map(fn (MenuItem $child) => $this->item($child, $surface))->filter()->values()->all();
         $url = $this->urlFor($item);
         if (in_array($item->link_type, ['page', 'article', 'category', 'feature', 'city'], true) && $url === null && $children === []) return null;
-        return ['id' => $item->id, 'label' => $item->label, 'url' => $url, 'children' => $children, 'target_blank' => $item->target_blank, 'nofollow' => $item->nofollow];
+        return ['id' => $item->id, 'label' => $item->label, 'url' => $url, 'link_type' => $item->link_type, 'children' => $children, 'is_active' => false, 'target_blank' => $item->target_blank, 'nofollow' => $item->nofollow];
     }
 
     private function urlFor(MenuItem $item): ?string
@@ -111,6 +117,36 @@ class PublicNavigation
     {
         if (! $slug || ! ($city = $this->cities->cityForSlug($slug))) return null;
         return route('cities.show', $city->slug);
+    }
+
+    private function markActiveTree(array $menu): array
+    {
+        $menu['items'] = array_map(fn (array $item): array => $this->markActiveItem($item), $menu['items']);
+        return $menu;
+    }
+
+    private function markActiveItem(array $item): array
+    {
+        $item['children'] = array_map(fn (array $child): array => $this->markActiveItem($child), $item['children']);
+        $route = request()->route()?->getName() ?? '';
+        $path = '/'.ltrim(request()->path(), '/');
+        $isExactUrl = $item['url'] !== null && rtrim($item['url'], '/') === rtrim($path, '/');
+        $isRestaurantUniverse = str_starts_with($route, 'restaurants.') || $route === 'cities.show';
+        $isCuisineUniverse = in_array($route, ['categories.show', 'city-specialties.show'], true);
+        $isBlogUniverse = $route === 'blog.index' || $route === 'editorial.show';
+        $isSemanticMatch = match ($item['link_type']) {
+            'category' => $isCuisineUniverse,
+            'city' => $route === 'cities.show',
+            'feature' => $route === 'features.show',
+            default => false,
+        };
+        $isSectionMatch = match ($item['url']) {
+            '/restaurants' => $isRestaurantUniverse,
+            '/blog' => $isBlogUniverse,
+            default => false,
+        };
+        $item['is_active'] = $isExactUrl || $isSemanticMatch || $isSectionMatch || collect($item['children'])->contains('is_active', true);
+        return $item;
     }
 
     public function validInternalUrl(string $url): bool { return $url !== '/#' && str_starts_with($url, '/') && ! str_starts_with($url, '//') && ! str_contains($url, '\\') && ! preg_match('/[\x00-\x1F]/', $url); }

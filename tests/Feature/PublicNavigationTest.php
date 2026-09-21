@@ -63,4 +63,17 @@ class PublicNavigationTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $child->id, 'label' => 'Troisième niveau', 'link_type' => 'none']);
     }
+
+    public function test_header_marks_current_sections_and_no_link_parents_as_active(): void
+    {
+        $menu = Menu::where('location', 'header_main')->firstOrFail();
+        MenuItem::where('menu_id', $menu->id)->delete();
+        MenuItem::create(['menu_id' => $menu->id, 'label' => 'Blog', 'link_type' => 'internal_url', 'url' => '/blog']);
+        $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Cuisines', 'link_type' => 'none', 'sort_order' => 2]);
+        $category = Category::create(['legacy_term_id' => 999, 'name' => 'Cuisine active', 'slug' => 'cuisine-active']);
+        MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Cuisine active', 'link_type' => 'category', 'linkable_id' => $category->id]);
+
+        $this->get('/blog')->assertOk()->assertSee('class="nav-item is-active" href="/blog"', false);
+        $this->get('/specialites/cuisine-active')->assertOk()->assertSee('class="nav-item nav-parent is-active"', false)->assertSee('class="is-active" href="/specialites/cuisine-active"', false);
+    }
 }

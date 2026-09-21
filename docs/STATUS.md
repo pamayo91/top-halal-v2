@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-20
 
+Latest header finishing pass: root navigation typography is explicitly restored through one General Sans `nav-item` primitive, and text chevrons are replaced by a small inline SVG that rotates with the submenu state. The SSR active state covers restaurant, cuisine/facet and blog/article universes, propagates from active children to no-link parents, and stays outside the globally cached navigation tree.
+
 Latest header navigation correction: root menu links and no-link submenu triggers now share the `nav-item` visual primitive. A no-link parent with children is visually indistinguishable from a clickable root item, retains a visible keyboard focus and submenu chevron, and remains a semantic button without a phantom URL.
 
 Latest navigation back-office refactor: the Menu editor is now a compact two-level tree with modal item editing, destination summaries, explicit French add-submenu wording, drag-and-drop plus keyboard-safe ordering controls. Existing `menus` / `menu_items`, destination resolution, ordering and visibility fields remain intact. Server validation rejects cross-menu parents and third-level nesting; no-link items keep their accessible public button trigger and no longer retain irrelevant link options.

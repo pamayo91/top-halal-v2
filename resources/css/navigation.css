@@ -8,8 +8,10 @@
     padding: 0;
     background: transparent;
     color: var(--green);
-    font: inherit;
-    line-height: inherit;
+    font-family: var(--site-font);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -33,3 +35,30 @@
 
 .site-header .nav-menu-list .nav-item-static,
 .site-header .mobile-menu-list .nav-item-static { cursor: default; }
+
+.site-header .nav-item.is-active {
+    color: var(--green-dark);
+    font-weight: 650;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+.site-header .nav-item.is-active:hover { color: var(--green-dark); }
+
+.nav-chevron {
+    width: .9rem;
+    height: .9rem;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5;
+    text-decoration: none;
+    transition: transform .15s ease;
+}
+
+[data-submenu-toggle][aria-expanded="true"] .nav-chevron { transform: rotate(180deg); }
+
+.submenu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+.submenu li > .is-active { font-weight: 700; text-decoration-thickness: 2px; }

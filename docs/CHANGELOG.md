@@ -1,5 +1,7 @@
 # Changelog
 
+- Header : restauration de la typographie racine explicite General Sans (1 rem, 600, line-height 1.5) commune aux liens, boutons et textes ; remplacement des caractères chevron par le même SVG local léger, avec rotation à l’ouverture. Ajout d’un état actif SSR sans JavaScript pour Restaurants, Cuisines, Blog, enfants et parents de sous-menu, sans déplacement de layout.
+
 - Header : les liens et déclencheurs de sous-menu partagent désormais la classe `nav-item`. Un parent racine « Aucun lien » avec enfants a exactement le même style, focus visible et chevron qu’une entrée cliquable, tout en restant un bouton sémantique sans URL fictive.
 
 - Navigation back-office : remplacement du Repeater Filament imbriqué par une arborescence compacte avec édition modale, résumé de destination, états/visibilités, ajout clair d’élément ou de sous-menu, glisser-déposer et commandes monter/descendre. Le modèle `menus`/`menu_items`, les destinations et les relations existantes sont conservés. La validation serveur interdit désormais aussi tout parent externe au menu et tout troisième niveau ; « Aucun lien » neutralise `nofollow` et l’ouverture dans un nouvel onglet.
