@@ -96,6 +96,7 @@ test('header states have an obvious stable visual hierarchy', async ({ page }, t
   expect(normal.weight).toBe('600');
 
   await blog.hover();
+  await page.waitForTimeout(150);
   const hover = await blog.evaluate(element => { const style = getComputedStyle(element); const marker = getComputedStyle(element, '::after'); return { color: style.color, markerColor: marker.backgroundColor, markerHeight: marker.height, markerOpacity: marker.opacity }; });
   expect(hover.color).toBe('rgb(7, 68, 54)');
   expect(hover.markerColor).toBe('rgb(11, 93, 75)');
@@ -110,6 +111,7 @@ test('header states have an obvious stable visual hierarchy', async ({ page }, t
 
   await restaurants.hover();
   await cuisines.hover();
+  await page.waitForTimeout(150);
   const activeHover = await restaurants.evaluate(element => getComputedStyle(element, '::after').height);
   const parentHover = await cuisines.evaluate(element => { const style = getComputedStyle(element); const marker = getComputedStyle(element, '::after'); return { color: style.color, markerHeight: marker.height, markerOpacity: marker.opacity }; });
   expect(activeHover).toBe('3px');
