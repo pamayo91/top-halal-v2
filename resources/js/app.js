@@ -280,9 +280,10 @@ const submenuGroups = [...document.querySelectorAll('.has-submenu')].map(owner =
 });
 document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
+    const submenuWasOpen = submenuGroups.some(({ toggles }) => toggles.some(toggle => toggle.getAttribute('aria-expanded') === 'true'));
     submenuGroups.forEach(({ setOpen }) => setOpen(false));
     if (lastSubmenuToggle) { lastSubmenuToggle.focus(); lastSubmenuToggle = null; }
-    if (menu?.getAttribute('aria-expanded') === 'true') { menu.setAttribute('aria-expanded', 'false'); mobileNav.hidden = true; menu.focus(); }
+    if (!submenuWasOpen && menu?.getAttribute('aria-expanded') === 'true') { menu.setAttribute('aria-expanded', 'false'); mobileNav.hidden = true; menu.focus(); }
 });
 
 document.querySelectorAll('[data-restaurant-search]').forEach(form => {
