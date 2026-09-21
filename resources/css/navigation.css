@@ -1,5 +1,6 @@
 /* One visual primitive for root links and semantic submenu buttons. */
-.nav-menu-list .nav-item {
+.site-header .nav-menu-list .nav-item,
+.site-header .mobile-menu-list .nav-item {
     display: inline-flex;
     align-items: center;
     gap: .15rem;
@@ -13,16 +14,22 @@
     text-underline-offset: 3px;
 }
 
-.nav-menu-list a.nav-item,
-.nav-menu-list button.nav-item { cursor: pointer; }
+.site-header .nav-menu-list a.nav-item,
+.site-header .nav-menu-list button.nav-item,
+.site-header .mobile-menu-list a.nav-item,
+.site-header .mobile-menu-list button.nav-item { cursor: pointer; }
 
-.nav-menu-list a.nav-item:hover,
-.nav-menu-list button.nav-item:hover { color: var(--green-dark); }
+.site-header .nav-menu-list a.nav-item:hover,
+.site-header .nav-menu-list button.nav-item:hover,
+.site-header .mobile-menu-list a.nav-item:hover,
+.site-header .mobile-menu-list button.nav-item:hover { color: var(--green-dark); }
 
-.nav-menu-list .nav-item:focus-visible {
+.site-header .nav-menu-list .nav-item:focus-visible,
+.site-header .mobile-menu-list .nav-item:focus-visible {
     outline: 3px solid rgb(35 129 81 / 30%);
     outline-offset: 3px;
     border-radius: 3px;
 }
 
-.nav-menu-list .nav-item-static { cursor: default; }
+.site-header .nav-menu-list .nav-item-static,
+.site-header .mobile-menu-list .nav-item-static { cursor: default; }
