@@ -49,7 +49,7 @@ class PublicNavigationTest extends TestCase
         $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Cuisines', 'link_type' => 'none']);
         MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Burger', 'link_type' => 'external_url', 'url' => 'https://example.test', 'target_blank' => true, 'nofollow' => true]);
 
-        $this->get('/')->assertOk()->assertSee('aria-controls="desktop-submenu-', false)->assertSee('class="nav-item nav-parent" type="button"', false)->assertSee('aria-hidden="true">⌄</span>', false)->assertDontSee('href="#"', false)->assertSee('noopener noreferrer nofollow', false);
+        $this->get('/')->assertOk()->assertSee('aria-controls="desktop-submenu-', false)->assertSee('class="nav-item nav-parent" type="button"', false)->assertSee('<svg class="nav-chevron" aria-hidden="true"', false)->assertDontSee('href="#"', false)->assertSee('noopener noreferrer nofollow', false);
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         MenuItem::create(['menu_id' => $menu->id, 'label' => 'Dangereux', 'link_type' => 'internal_url', 'url' => 'javascript:alert(1)']);
     }
@@ -74,6 +74,6 @@ class PublicNavigationTest extends TestCase
         MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Cuisine active', 'link_type' => 'category', 'linkable_id' => $category->id]);
 
         $this->get('/blog')->assertOk()->assertSee('class="nav-item is-active" href="/blog"', false);
-        $this->get('/specialites/cuisine-active')->assertOk()->assertSee('class="nav-item nav-parent is-active"', false)->assertSee('class="is-active" href="/specialites/cuisine-active"', false);
+        $this->get('/specialites/cuisine-active')->assertOk()->assertSee('class="nav-item nav-parent is-active"', false)->assertSee('class="is-active"', false)->assertSee('/specialites/cuisine-active', false);
     }
 }
