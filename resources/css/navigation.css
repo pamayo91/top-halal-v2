@@ -16,7 +16,8 @@
     text-decoration: none;
 }
 
-.site-header .nav-item {
+.site-header .nav-menu-list .nav-item,
+.site-header .mobile-menu-list .nav-item {
     display: inline-grid;
     grid-template-columns: max-content;
     grid-template-areas: 'label';
