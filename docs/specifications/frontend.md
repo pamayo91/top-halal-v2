@@ -8,7 +8,7 @@ Le front public est rendu côté serveur avec Blade. Il n’utilise ni SPA, ni p
 
 - General Sans est la police unique du front public, servie localement via une unique WOFF2 variable (200–700) avec `font-display: swap`. Les usages sont limités à 400 (texte), 500 (métadonnées), 600 (navigation, formulaires, boutons et petits titres) et 700 (H1/grands titres). Le fichier officiel et la licence ITF Free Font License 2.0 sont dans `resources/fonts/general-sans/`; aucun CSS, préconnexion ou fichier de police tiers ne doit être ajouté.
 
-- L’en-tête conserve les parcours Restaurant, Guide et Compte ; le menu mobile est une amélioration progressive très légère.
+- L’en-tête conserve les parcours Restaurant, Guide et Compte ; le menu mobile est une amélioration progressive très légère. Les entrées racine utilisent la même classe visuelle `nav-item` qu’elles soient un lien ou un bouton de sous-menu : un parent « Aucun lien » avec enfants garde donc la typographie, les espacements, le focus visible et le chevron d’un parent cliquable, sans URL factice.
 - Lorsqu’un administrateur actif consulte une fiche restaurant, un article ou une page, l’en-tête rend un raccourci SSR « Éditer » vers son formulaire Filament ; les visiteurs et autres comptes ne reçoivent pas ce markup.
 - Les pages publiques partagent une navigation clavier, un lien d’évitement, des fils d’Ariane et des états de formulaire accessibles.
 - L’accueil, `/blog`, les collections, fiches, articles, pages, auth et compte sont des vues Blade responsives.

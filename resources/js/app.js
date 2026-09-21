@@ -14,6 +14,7 @@ import '../css/contact-asset.css';
 import '../css/account.css';
 import '../css/owner-restaurant-editor.css';
 import '../css/typography.css';
+import '../css/navigation.css';
 import { initializeAddressSelectors } from './address-selector';
 import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
 import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';

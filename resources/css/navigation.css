@@ -1,0 +1,28 @@
+/* One visual primitive for root links and semantic submenu buttons. */
+.nav-menu-list .nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .15rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--green);
+    font: inherit;
+    line-height: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.nav-menu-list a.nav-item,
+.nav-menu-list button.nav-item { cursor: pointer; }
+
+.nav-menu-list a.nav-item:hover,
+.nav-menu-list button.nav-item:hover { color: var(--green-dark); }
+
+.nav-menu-list .nav-item:focus-visible {
+    outline: 3px solid rgb(35 129 81 / 30%);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+.nav-menu-list .nav-item-static { cursor: default; }
