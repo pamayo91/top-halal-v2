@@ -51,6 +51,7 @@ class EditMenu extends EditRecord
         $data['linkable_id'] = in_array($data['link_type'], ['page', 'article', 'category', 'feature'], true) ? (int) $data['linkable_id'] : null;
         $data['destination_key'] = $data['link_type'] === 'city' ? $data['destination_key'] : null;
         $data['url'] = in_array($data['link_type'], ['internal_url', 'external_url'], true) ? $data['url'] : null;
+        if ($data['link_type'] === 'internal_url') $data['url'] = $this->normalizeInternalUrl($data['url']);
         if ($data['link_type'] === 'none') { $data['target_blank'] = false; $data['nofollow'] = false; }
         if ($data['link_type'] === 'internal_url') $data['target_blank'] = false;
         $item = $this->editingItemId === null ? new MenuItem(['menu_id' => $this->getRecord()->id, 'sort_order' => $this->nextSortOrder($data['parent_id'])]) : $this->item($this->editingItemId);
@@ -91,6 +92,20 @@ class EditMenu extends EditRecord
     }
 
     public function destinationOptions(): array { return ['page' => Page::query()->orderBy('title')->pluck('title', 'id')->all(), 'article' => Article::query()->orderBy('title')->pluck('title', 'id')->all(), 'category' => Category::query()->orderBy('name')->pluck('name', 'id')->all(), 'feature' => Feature::query()->orderBy('name')->pluck('name', 'id')->all(), 'city' => app(CityPageResolver::class)->cities()->mapWithKeys(fn (object $city): array => [$city->slug => $city->city_name.($city->is_ambiguous ? ' — '.$city->department['name'] : '')])->all()]; }
+    private function normalizeInternalUrl(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '' || str_starts_with($url, '/')) return $url;
+        $parts = parse_url($url);
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $configuredHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+        $allowedHosts = array_filter([strtolower(request()->getHost()), $configuredHost]);
+        if (! in_array($host, $allowedHosts, true) || ! in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true)) return $url;
+        $path = '/'.ltrim((string) ($parts['path'] ?? ''), '/');
+        if (isset($parts['query'])) $path .= '?'.$parts['query'];
+        if (isset($parts['fragment'])) $path .= '#'.$parts['fragment'];
+        return $path;
+    }
     private function itemRules(): array { return ['parent_id' => ['nullable', 'integer'], 'label' => ['required', 'string', 'max:160'], 'link_type' => ['required', Rule::in(array_keys(MenuItem::LINK_TYPES))], 'linkable_id' => ['nullable', 'integer', Rule::requiredIf(fn () => in_array($this->itemData['link_type'] ?? null, ['page', 'article', 'category', 'feature'], true))], 'destination_key' => ['nullable', 'string', Rule::requiredIf(fn () => ($this->itemData['link_type'] ?? null) === 'city')], 'url' => ['nullable', 'string', 'max:2048', Rule::requiredIf(fn () => in_array($this->itemData['link_type'] ?? null, ['internal_url', 'external_url'], true))], 'is_active' => ['boolean'], 'visible_desktop' => ['boolean'], 'visible_mobile' => ['boolean'], 'target_blank' => ['boolean'], 'nofollow' => ['boolean']]; }
     private function treeItem(MenuItem $item): array { return ['id' => $item->id, 'label' => $item->label, 'summary' => $this->summary($item), 'is_active' => $item->is_active, 'desktop' => $item->visible_desktop, 'mobile' => $item->visible_mobile, 'children' => $item->children->map(fn (MenuItem $child): array => $this->treeItem($child))->all()]; }
     private function summary(MenuItem $item): string { if ($item->link_type === 'none') return 'Aucun lien'; if (in_array($item->link_type, ['internal_url', 'external_url'], true)) return (string) $item->url; if ($item->link_type === 'city') return 'Ville · '.($this->destinationOptions()['city'][$item->destination_key] ?? 'Cible indisponible'); $label = MenuItem::LINK_TYPES[$item->link_type] ?? $item->link_type; return $label.' · '.($item->linkable?->title ?? $item->linkable?->name ?? 'Cible indisponible'); }
