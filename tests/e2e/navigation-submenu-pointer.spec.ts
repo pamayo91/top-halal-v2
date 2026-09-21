@@ -46,6 +46,19 @@ test('desktop submenu keeps a continuous pointer path from its parent to every c
 
   await page.mouse.move(panelBox.x + panelBox.width + 24, panelBox.y + (panelBox.height / 2), { steps: 4 });
   await expect(panel).toBeHidden();
+
+  await page.setViewportSize({ width: 1920, height: 900 });
+  await parent.hover();
+  await expect(panel).toBeVisible();
+  const wideParentBox = await parent.boundingBox();
+  const widePanelBox = await panel.boundingBox();
+  expect(wideParentBox).not.toBeNull();
+  expect(widePanelBox).not.toBeNull();
+  if (!wideParentBox || !widePanelBox) return;
+
+  await page.mouse.move(widePanelBox.x + 24, wideParentBox.y + (wideParentBox.height / 2), { steps: 4 });
+  await page.mouse.move(widePanelBox.x + 24, widePanelBox.y + 1, { steps: 8 });
+  await expect(panel).toBeVisible();
 });
 
 test('mobile no-link parent opens on tap and closes with Escape while retaining focus', async ({ page }, testInfo) => {
