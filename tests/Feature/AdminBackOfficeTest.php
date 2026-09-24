@@ -53,7 +53,7 @@ class AdminBackOfficeTest extends TestCase
     public function test_menu_editor_moves_root_and_submenu_items_in_both_directions(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
-        $menu = Menu::create(['name' => 'Menu de test', 'slug' => 'menu-de-test', 'location' => 'footer_2', 'is_active' => true]);
+        $menu = Menu::create(['name' => 'Menu de test', 'slug' => 'menu-de-test', 'location' => 'test_menu', 'is_active' => true]);
         $first = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Premier', 'link_type' => 'internal_url', 'url' => '/premier', 'sort_order' => 1]);
         $second = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Second', 'link_type' => 'internal_url', 'url' => '/second', 'sort_order' => 2]);
         $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Parent', 'link_type' => 'none', 'sort_order' => 3]);
