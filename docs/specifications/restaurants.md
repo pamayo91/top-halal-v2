@@ -29,6 +29,7 @@ Suggested core data includes name/slug/description/status/owner, address/postcod
 
 ## Public page
 - Fast server-rendered content.
+- The shareable proximity URL is `/restaurants?near_me=1`. It deliberately asks the visitor’s browser for location only after they voluntarily open that URL; when accepted it replaces `near_me=1` with rounded `lat`/`lng` query parameters and applies the existing directory search. Compatible filters such as `q`, `categories[]` and `features[]` are preserved; a conflicting `ville` filter is removed. If location is unavailable or refused, the one-time parameter is removed and the directory stays usable with a clear message.
 - Core info and opening hours. When validated hours are available, the public detail page renders a compact semantic schedule card with one stored day per row, separated services and an unobtrusive current-day highlight. A server-side `Europe/Paris` status is displayed only when the current schedule is complete: open (with closing time), between services (with the next opening time), closed for the day, or the next opening on the following day. Incomplete schedules retain their available display but never produce a guessed live status.
 - categories/features.
 - Services are rendered as local inline SVG icons plus their text labels. The icon set has no external dependency; three domain-specific icons (halal certification, prayer room and decor) follow the same 24px rounded-stroke style as the Lucide-derived icons.

@@ -1,5 +1,7 @@
 # Changelog
 
+- Recherche restaurants : ajout de l’URL publique réutilisable `/restaurants?near_me=1`. Elle déclenche une demande explicite de géolocalisation puis conserve les filtres compatibles (`q`, spécialités, services) en affichant les résultats proches ; un refus laisse l’annuaire utilisable sans boucle de demande.
+
 - Header : restauration de la typographie racine explicite General Sans (1 rem, 600, line-height 1.5) commune aux liens, boutons et textes ; remplacement des caractères chevron par le même SVG local léger, avec rotation à l’ouverture. Ajout d’un état actif SSR sans JavaScript pour Restaurants, Cuisines, Blog, enfants et parents de sous-menu, sans déplacement de layout.
 
 - Header : les liens et déclencheurs de sous-menu partagent désormais la classe `nav-item`. Un parent racine « Aucun lien » avec enfants a exactement le même style, focus visible et chevron qu’une entrée cliquable, tout en restant un bouton sémantique sans URL fictive.

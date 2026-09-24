@@ -319,20 +319,24 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     form.addEventListener('submit', event => { if (selectedRestaurant) { event.preventDefault(); window.location.assign(`/resto/${encodeURIComponent(selectedRestaurant)}`); } });
 });
 
-document.querySelectorAll('[data-near-me-cta]').forEach(link => {
-    link.addEventListener('click', event => {
-        if (!navigator.geolocation) return;
-        event.preventDefault();
-        link.setAttribute('aria-busy', 'true');
+const nearMeUrl = new URL(window.location.href);
+if (nearMeUrl.pathname === '/restaurants' && nearMeUrl.searchParams.get('near_me') === '1') {
+    const status = document.querySelector('[data-near-me-request]');
+    const cancel = message => {
+        nearMeUrl.searchParams.delete('near_me');
+        history.replaceState({}, '', nearMeUrl);
+        if (status) { status.classList.add('flash-error'); status.textContent = message; }
+    };
+
+    if (!navigator.geolocation) {
+        cancel('La géolocalisation n’est pas disponible. Choisissez une ville.');
+    } else {
         navigator.geolocation.getCurrentPosition(({ coords }) => {
-            const url = new URL(link.href);
-            url.searchParams.set('lat', coords.latitude.toFixed(5));
-            url.searchParams.set('lng', coords.longitude.toFixed(5));
-            url.hash = '';
-            window.location.assign(url);
-        }, () => {
-            link.removeAttribute('aria-busy');
-            window.location.assign(link.href);
-        }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
-    });
-});
+            nearMeUrl.searchParams.delete('near_me');
+            nearMeUrl.searchParams.delete('ville');
+            nearMeUrl.searchParams.set('lat', coords.latitude.toFixed(5));
+            nearMeUrl.searchParams.set('lng', coords.longitude.toFixed(5));
+            window.location.assign(nearMeUrl);
+        }, () => cancel('Impossible d’obtenir votre position. Choisissez une ville.'), { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
+    }
+}

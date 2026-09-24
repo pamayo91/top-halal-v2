@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-20
+Last updated: 2026-09-24
+
+Latest restaurant proximity-link addition: `/restaurants?near_me=1` is a reusable public entry point for menus and content. It asks the visitor’s browser for location, replaces the one-time flag with rounded coordinates, preserves compatible search filters (including `q`) and removes an incompatible city filter. Refusal or unavailable geolocation leaves the directory usable and clears the flag so it does not prompt again on reload.
 
 Latest header finishing pass: root navigation typography is explicitly restored through one General Sans `nav-item` primitive, and text chevrons are replaced by a small inline SVG that rotates with the submenu state. The SSR active state covers restaurant, cuisine/facet and blog/article universes, propagates from active children to no-link parents, and stays outside the globally cached navigation tree.
 

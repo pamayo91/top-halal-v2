@@ -40,3 +40,19 @@ test('near me sends mocked coordinates only after the voluntary choice', async (
   await search.getByRole('button', { name: 'Autour de moi' }).click();
   await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522/);
 });
+
+test('near-me URL requests location and preserves compatible filters', async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });
+  await page.goto('/restaurants?near_me=1&q=burger&categories%5B%5D=burger');
+  await page.waitForURL(/\/restaurants\?.*q=burger.*categories.*lat=48\.85660.*lng=2\.35220/);
+  expect(new URL(page.url()).searchParams.has('near_me')).toBe(false);
+});
+
+test('near-me URL stays usable after a refused location request', async ({ page, context }) => {
+  await context.grantPermissions([]);
+  await page.goto('/restaurants?near_me=1&q=burger');
+  await expect(page.getByText('Impossible d’obtenir votre position. Choisissez une ville.')).toBeVisible();
+  expect(new URL(page.url()).searchParams.has('near_me')).toBe(false);
+  expect(new URL(page.url()).searchParams.get('q')).toBe('burger');
+});

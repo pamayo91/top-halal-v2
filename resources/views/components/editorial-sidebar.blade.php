@@ -34,7 +34,7 @@
         @endif
         </section>
     @elseif($block['type'] === 'near_me')
-        <section class="sidebar-card sidebar-near-me"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.25"/></svg><p class="sidebar-title">{{ $title }}</p><p>Découvrez les restaurants halal proches de vous.</p><a class="button button-small" data-near-me-cta href="{{ route('restaurants.index') }}#recherche">Trouver autour de moi <span aria-hidden="true">→</span></a></section>
+        <section class="sidebar-card sidebar-near-me"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.25"/></svg><p class="sidebar-title">{{ $title }}</p><p>Découvrez les restaurants halal proches de vous.</p><a class="button button-small" href="{{ route('restaurants.index', ['near_me' => 1]) }}">Trouver autour de moi <span aria-hidden="true">→</span></a></section>
     @elseif($block['type'] === 'featured')
         @php($featured = \App\Models\Restaurant::with('media.asset.variants')->where('status','published')->whereIn('id', $manualIds($block))->limit($block['limit'])->get())
         @if($featured->isNotEmpty())<section class="sidebar-card sidebar-restaurants"><p class="sidebar-title">{{ $title }}</p><div class="sidebar-compact-list">@foreach($featured as $restaurant)<x-editorial-sidebar-restaurant :restaurant="$restaurant" />@endforeach</div></section>@endif
