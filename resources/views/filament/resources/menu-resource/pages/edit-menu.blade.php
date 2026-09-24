@@ -1,6 +1,6 @@
 <x-filament-panels::page>
     @php($tree = $this->tree())
-    <div class="menu-editor" x-data="{ dragging: null, submitMove(url) { const form = document.createElement('form'); form.method = 'post'; form.action = url; form.innerHTML = '<input type=\"hidden\" name=\"_token\" value=\"{{ csrf_token() }}\">'; document.body.appendChild(form); form.submit(); } }">
+    <div class="menu-editor" x-data="{ dragging: null, submitMove(url) { const form = document.createElement('form'); const token = document.createElement('input'); form.method = 'post'; form.action = url; token.type = 'hidden'; token.name = '_token'; token.value = '{{ csrf_token() }}'; form.appendChild(token); document.body.appendChild(form); form.submit(); } }">
         <div class="menu-editor__intro"><div><h2>{{ $this->getRecord()->name }}</h2><p>Vue synthétique : glissez un élément sur un parent pour créer un sous-menu, ou dans la zone principale pour le remettre à la racine. Deux niveaux maximum.</p></div><x-filament::button wire:click="openCreate">+ Ajouter un élément</x-filament::button></div>
         <div class="menu-editor__tree" x-on:dragover.prevent x-on:drop.prevent="if (dragging) $wire.moveItem(dragging, null, {{ count($tree) }})">
             @forelse($tree as $position => $item)
