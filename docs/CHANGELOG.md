@@ -1,6 +1,6 @@
 # Changelog
 
-- Navigation back-office : les boutons Monter/Descendre réordonnent désormais leurs frères dans une transaction verrouillée et déterministe, y compris dans les sous-menus. Les lignes de l’arborescence gardent une clé Livewire stable et les deux contrôles sont temporairement désactivés pendant leur requête, afin que l’ordre visible et celui enregistré restent synchronisés.
+- Navigation back-office : les boutons Monter/Descendre réordonnent désormais leurs frères dans une transaction verrouillée et déterministe, y compris dans les sous-menus. Ils utilisent un POST Laravel classique protégé par CSRF, plutôt qu’une mise à jour Livewire, afin de rester fonctionnels lorsqu’un filtre d’hébergement rejette ce transport. Les lignes de l’arborescence gardent une clé Livewire stable.
 
 - Recherche restaurants : ajout de l’URL publique réutilisable `/restaurants?near_me=1`. Elle déclenche une demande explicite de géolocalisation puis conserve les filtres compatibles (`q`, spécialités, services) en affichant les résultats proches ; un refus laisse l’annuaire utilisable sans boucle de demande.
 

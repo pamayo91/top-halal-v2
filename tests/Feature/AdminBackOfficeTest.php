@@ -72,6 +72,11 @@ class AdminBackOfficeTest extends TestCase
 
         $this->assertSame([$first->id, $second->id, $parent->id], MenuItem::query()->where('menu_id', $menu->id)->whereNull('parent_id')->orderBy('sort_order')->pluck('id')->all());
         $this->assertSame([$child->id, $sibling->id], MenuItem::query()->where('parent_id', $parent->id)->orderBy('sort_order')->pluck('id')->all());
+
+        $this->actingAs($admin)->from("/admin/menus/{$menu->id}/edit")
+            ->post(route('admin.menu-items.move', ['menu' => $menu, 'item' => $second, 'direction' => -1]))
+            ->assertRedirect("/admin/menus/{$menu->id}/edit");
+        $this->assertSame([$second->id, $first->id, $parent->id], MenuItem::query()->where('menu_id', $menu->id)->whereNull('parent_id')->orderBy('sort_order')->pluck('id')->all());
     }
 
     public function test_restaurant_back_office_lists_newest_records_first_and_shows_their_publication_date(): void

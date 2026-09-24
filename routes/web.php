@@ -14,6 +14,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\RestaurantOutboundController;
 use App\Http\Controllers\RestaurantSearchSuggestionController;
 use App\Http\Controllers\AdminAddressAutocompleteController;
+use App\Http\Controllers\AdminMenuItemOrderController;
 use App\Http\Controllers\{PublicContentController, RobotsController, SitemapController};
 use App\Http\Controllers\ContactController;
 
@@ -31,6 +32,7 @@ Route::get('/media/{asset}/v/{version}/{width?}', [MediaController::class, 'show
 Route::get('/media/{asset}/{width?}', [MediaController::class, 'legacy'])->whereNumber('asset')->whereNumber('width')->name('media.legacy');
 Route::post('/sortie', RestaurantOutboundController::class)->name('restaurants.outbound');
 Route::get('/admin/location/autocomplete', AdminAddressAutocompleteController::class)->middleware(['auth', 'admin', 'throttle:address-autocomplete'])->name('admin.location.autocomplete');
+Route::post('/admin/menus/{menu}/items/{item}/move/{direction}', AdminMenuItemOrderController::class)->middleware(['auth', 'admin'])->whereIn('direction', ['-1', '1'])->name('admin.menu-items.move');
 Route::get('/ajouter-un-restaurant', [PublicRestaurantSubmissionController::class, 'create'])->name('restaurant-submissions.create');
 Route::get('/ajouter-un-restaurant/adresses', [PublicRestaurantSubmissionController::class, 'addressAutocomplete'])->middleware('throttle:public-address-autocomplete')->name('restaurant-submissions.addresses');
 Route::get('/ajouter-un-restaurant/doublons', [PublicRestaurantSubmissionController::class, 'duplicates'])->middleware('throttle:restaurant-duplicate-check')->name('restaurant-submissions.duplicates');

@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-24
 
-Latest navigation-order correction: the Menu editor’s up/down controls now reorder sibling items transactionally with row locks and a deterministic ID tiebreaker, for both root items and one-level submenus. Stable Livewire row keys keep the rendered tree in sync after a swap, and the order controls disable while their request is in flight. Focused back-office coverage exercises both directions at both levels.
+Latest navigation-order correction: the Menu editor’s up/down controls now submit a normal CSRF-protected Laravel POST instead of a Livewire update, avoiding the hosting filter rejection observed on that transport. They reorder sibling items transactionally with row locks and a deterministic ID tiebreaker, for both root items and one-level submenus; the editor returns with the persisted order. Stable Livewire row keys still protect tree rendering and focused back-office coverage exercises both directions at both levels.
 
 Latest restaurant proximity-link addition: `/restaurants?near_me=1` is a reusable public entry point for menus and content. It asks the visitor’s browser for location, replaces the one-time flag with rounded coordinates, preserves compatible search filters (including `q`) and removes an incompatible city filter. Refusal or unavailable geolocation leaves the directory usable and clears the flag so it does not prompt again on reload.
 
