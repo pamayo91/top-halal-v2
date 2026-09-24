@@ -85,10 +85,27 @@ class EditMenu extends EditRecord
 
     public function moveBy(int $itemId, int $direction): void
     {
-        $item = $this->item($itemId); $siblings = MenuItem::query()->where('menu_id', $this->getRecord()->id)->where('parent_id', $item->parent_id)->orderBy('sort_order')->pluck('id')->all(); $index = array_search($item->id, $siblings, true);
-        if ($index === false || ! isset($siblings[$index + $direction])) return;
-        [$siblings[$index], $siblings[$index + $direction]] = [$siblings[$index + $direction], $siblings[$index]];
-        foreach ($siblings as $order => $id) MenuItem::whereKey($id)->update(['sort_order' => $order + 1]); app(PublicNavigation::class)->forget();
+        if (! in_array($direction, [-1, 1], true)) abort(422);
+
+        DB::transaction(function () use ($itemId, $direction): void {
+            $item = $this->item($itemId);
+            $siblings = MenuItem::query()
+                ->where('menu_id', $this->getRecord()->id)
+                ->where('parent_id', $item->parent_id)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+            $index = $siblings->search(fn (MenuItem $sibling): bool => $sibling->is($item));
+
+            if ($index === false || ! $siblings->has($index + $direction)) return;
+
+            $ordered = $siblings->values();
+            [$ordered[$index], $ordered[$index + $direction]] = [$ordered[$index + $direction], $ordered[$index]];
+            foreach ($ordered as $order => $sibling) $sibling->updateQuietly(['sort_order' => $order + 1]);
+        });
+
+        app(PublicNavigation::class)->forget();
     }
 
     public function destinationOptions(): array { return ['page' => Page::query()->orderBy('title')->pluck('title', 'id')->all(), 'article' => Article::query()->orderBy('title')->pluck('title', 'id')->all(), 'category' => Category::query()->orderBy('name')->pluck('name', 'id')->all(), 'feature' => Feature::query()->orderBy('name')->pluck('name', 'id')->all(), 'city' => app(CityPageResolver::class)->cities()->mapWithKeys(fn (object $city): array => [$city->slug => $city->city_name.($city->is_ambiguous ? ' — '.$city->department['name'] : '')])->all()]; }

@@ -2,10 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\MenuResource\Pages\EditMenu;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
+use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,Menu,MenuItem,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
 use App\Services\MediaIngestor;
 use App\Services\RestaurantMediaManager;
 use Filament\Forms\Components\DateTimePicker;
@@ -47,6 +48,30 @@ class AdminBackOfficeTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $this->actingAs($admin)->get('/admin/restaurants')->assertOk();
+    }
+
+    public function test_menu_editor_moves_root_and_submenu_items_in_both_directions(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $menu = Menu::create(['name' => 'Menu de test', 'slug' => 'menu-de-test', 'location' => 'footer_2', 'is_active' => true]);
+        $first = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Premier', 'link_type' => 'internal_url', 'url' => '/premier', 'sort_order' => 1]);
+        $second = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Second', 'link_type' => 'internal_url', 'url' => '/second', 'sort_order' => 2]);
+        $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Parent', 'link_type' => 'none', 'sort_order' => 3]);
+        $child = MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Sous-menu', 'link_type' => 'internal_url', 'url' => '/sous-menu', 'sort_order' => 1]);
+        $sibling = MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Autre sous-menu', 'link_type' => 'internal_url', 'url' => '/autre-sous-menu', 'sort_order' => 2]);
+
+        Livewire::actingAs($admin)->test(EditMenu::class, ['record' => $menu->getRouteKey()])
+            ->call('moveBy', $second->id, -1)
+            ->assertHasNoErrors()
+            ->call('moveBy', $second->id, 1)
+            ->assertHasNoErrors()
+            ->call('moveBy', $sibling->id, -1)
+            ->assertHasNoErrors()
+            ->call('moveBy', $sibling->id, 1)
+            ->assertHasNoErrors();
+
+        $this->assertSame([$first->id, $second->id, $parent->id], MenuItem::query()->where('menu_id', $menu->id)->whereNull('parent_id')->orderBy('sort_order')->pluck('id')->all());
+        $this->assertSame([$child->id, $sibling->id], MenuItem::query()->where('parent_id', $parent->id)->orderBy('sort_order')->pluck('id')->all());
     }
 
     public function test_restaurant_back_office_lists_newest_records_first_and_shows_their_publication_date(): void

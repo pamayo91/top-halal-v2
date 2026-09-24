@@ -1,5 +1,7 @@
 # Changelog
 
+- Navigation back-office : les boutons Monter/Descendre réordonnent désormais leurs frères dans une transaction verrouillée et déterministe, y compris dans les sous-menus. Les lignes de l’arborescence gardent une clé Livewire stable et les deux contrôles sont temporairement désactivés pendant leur requête, afin que l’ordre visible et celui enregistré restent synchronisés.
+
 - Recherche restaurants : ajout de l’URL publique réutilisable `/restaurants?near_me=1`. Elle déclenche une demande explicite de géolocalisation puis conserve les filtres compatibles (`q`, spécialités, services) en affichant les résultats proches ; un refus laisse l’annuaire utilisable sans boucle de demande.
 
 - Header : restauration de la typographie racine explicite General Sans (1 rem, 600, line-height 1.5) commune aux liens, boutons et textes ; remplacement des caractères chevron par le même SVG local léger, avec rotation à l’ouverture. Ajout d’un état actif SSR sans JavaScript pour Restaurants, Cuisines, Blog, enfants et parents de sous-menu, sans déplacement de layout.
