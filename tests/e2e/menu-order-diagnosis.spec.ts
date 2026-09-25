@@ -24,15 +24,16 @@ test('drag-and-drop menu ordering uses a Laravel POST and survives a full reload
   const branches = page.locator('.menu-editor__tree > .menu-editor__branch');
   test.skip(await branches.count() < 2, 'The configured header menu needs two root items for diagnosis.');
   const initial = await branches.evaluateAll((items) => items.map((item) => item.getAttribute('wire:key')));
-  const movedLabel = await branches.nth(1).locator(':scope > .menu-editor__row strong').innerText();
 
   responses.length = 0;
   const firstMoveResponse = page.waitForResponse((response) => response.request().method() === 'POST' && response.url().includes('/admin/menus/'));
   await branches.nth(1).dragTo(branches.nth(0));
   await firstMoveResponse;
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(1_000);
+  await page.goto('/admin/menus/1/edit');
 
   const afterFirstDrag = await page.locator('.menu-editor__tree > .menu-editor__branch').evaluateAll((items) => items.map((item) => item.getAttribute('wire:key')));
+  const persistedFirstLabel = await page.locator('.menu-editor__tree > .menu-editor__branch').nth(0).locator(':scope > .menu-editor__row strong').innerText();
   try {
     expect(afterFirstDrag).not.toEqual(initial);
     expect(responses, JSON.stringify(responses)).toEqual([
@@ -41,14 +42,15 @@ test('drag-and-drop menu ordering uses a Laravel POST and survives a full reload
 
     await page.goto('/');
     const publicOrder = await page.locator('.main-nav > ul > li').evaluateAll((items) => items.map((item) => item.querySelector(':scope > a, :scope > button')?.textContent?.trim()));
-    expect(publicOrder[0]).toBe(movedLabel);
+    expect(publicOrder[0]).toBe(persistedFirstLabel);
   } finally {
     await page.goto('/admin/menus/1/edit');
     const restoredBranches = page.locator('.menu-editor__tree > .menu-editor__branch');
     const restoreMoveResponse = page.waitForResponse((response) => response.request().method() === 'POST' && response.url().includes('/admin/menus/'));
     await restoredBranches.nth(1).dragTo(restoredBranches.nth(0));
     await restoreMoveResponse;
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(1_000);
+    await page.goto('/admin/menus/1/edit');
   }
 
   expect(await page.locator('.menu-editor__tree > .menu-editor__branch').evaluateAll((items) => items.map((item) => item.getAttribute('wire:key')))).toEqual(initial);

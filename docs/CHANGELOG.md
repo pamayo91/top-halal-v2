@@ -1,5 +1,7 @@
 # Changelog
 
+- Navigation back-office : le glisser-déposer emprunte désormais lui aussi un POST Laravel classique CSRF vers le transactionnel `MenuItemOrderer`, et ne sollicite plus Livewire. Le déplacement verrouille le menu, renumérote les frères de façon déterministe, invalide le cache public et refuse les parents externes, les cycles et le troisième niveau. La couverture Playwright préproduction contrôle le POST 302, le rechargement complet, la persistance et le rendu public, puis restaure le menu.
+
 - Navigation back-office : les boutons Monter/Descendre réordonnent désormais leurs frères dans une transaction verrouillée et déterministe, y compris dans les sous-menus. Ils utilisent un POST Laravel classique protégé par CSRF, plutôt qu’une mise à jour Livewire, sans formulaire HTML imbriqué dans le formulaire Filament parent. Les lignes de l’arborescence gardent une clé Livewire stable.
 
 - Recherche restaurants : ajout de l’URL publique réutilisable `/restaurants?near_me=1`. Elle déclenche une demande explicite de géolocalisation puis conserve les filtres compatibles (`q`, spécialités, services) en affichant les résultats proches ; un refus laisse l’annuaire utilisable sans boucle de demande.

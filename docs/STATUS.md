@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-24
 
+Latest navigation drag-and-drop correction: all order changes now use the CSRF-protected Laravel POST transport; drag-and-drop no longer invokes the host-filter-sensitive Livewire update endpoint. The transactional orderer locks the menu rows, persists deterministic sibling positions, validates hierarchy safety and invalidates public navigation cache. The deployed preproduction browser regression performs a real drag, observes the 302 POST, reloads, compares the public menu and restores the original order.
+
 Latest navigation-order correction: the Menu editor’s up/down controls now submit a normal CSRF-protected Laravel POST instead of a Livewire update, avoiding both the hosting filter rejection observed on that transport and invalid nested forms inside the Filament edit form. They reorder sibling items transactionally with row locks and a deterministic ID tiebreaker, for both root items and one-level submenus; the editor returns with the persisted order. Stable Livewire row keys still protect tree rendering and focused back-office coverage exercises both directions at both levels.
 
 Latest restaurant proximity-link addition: `/restaurants?near_me=1` is a reusable public entry point for menus and content. It asks the visitor’s browser for location, replaces the one-time flag with rounded coordinates, preserves compatible search filters (including `q`) and removes an incompatible city filter. Refusal or unavailable geolocation leaves the directory usable and clears the flag so it does not prompt again on reload.
