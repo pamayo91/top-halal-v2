@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-24
 
-Latest editorial URL-stability correction: the Filament title callbacks for Pages and Articles now generate a slug only during creation. Existing editorial slugs are locked in edit forms, so a title change cannot alter the public URL. Regression coverage creates each content type, records its slug/route, edits its title through Filament and verifies the same URL still renders the renamed content.
+Latest editorial URL-stability correction: the Filament title callbacks for Pages and Articles now generate a slug only during creation. A title change cannot alter the public URL; an administrator can deliberately edit the slug, which creates a visible exact 301 from the former editorial URL to the new one. Cross-content duplicates, redirect-source conflicts and loops are rejected before saving. Regression coverage protects automatic stability and the manual Page/Article redirect flow.
 
 Latest navigation submenu drag correction: nested draggable event propagation no longer overwrites the dragged child with its parent. The deployed preproduction regression reorders the real `Autour de moi` child under `Restaurants`, receives the normal Laravel POST redirect and restores the exact original sibling order without a 422.
 

@@ -9,7 +9,7 @@ Les catégories et tags éditoriaux migrés restent des métadonnées internes/d
 ## Pages
 No page-builder dependency. Use a constrained set of lightweight content blocks when structured layout is required.
 
-For Pages and Articles, the slug is generated from the title only while creating a new record. Once saved, it is immutable in the back-office: changing the title never changes the slug or public URL. Existing stored URLs are never rewritten by this rule.
+For Pages and Articles, the slug is generated from the title only while creating a new record. A later title change never changes the slug or public URL. Administrators may still explicitly change a slug in the back-office: the application creates an exact 301 from the previous URL to the new URL, visible in `Redirections`. Cross-content duplicates, redirect-source conflicts and redirect loops are rejected. Existing stored URLs are never rewritten by automatic generation.
 
 ## Migration
 - Preserve useful URLs and publication dates.
