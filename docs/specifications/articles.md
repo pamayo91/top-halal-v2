@@ -29,6 +29,8 @@ Les blocs disponibles sont : sommaire, recherche restaurant, restaurants liés, 
 La présentation publique utilise une colonne éditoriale principale et une rail secondaire d’environ 70/30 sur desktop. Les contenus liés utilisent les variantes média V2 compactes lorsqu’elles existent, avec un fallback de hauteur stable. Le CTA de proximité ne duplique pas le formulaire de recherche : sa géolocalisation navigateur reste volontaire, déclenchée uniquement après clic, et son fallback mène au parcours de recherche existant.
 
 Les libellés des cartes de sidebar ne sont pas des titres H2 afin de préserver le plan sémantique du contenu éditorial. Dans le sommaire, seuls les H2 reçoivent une numérotation continue ; les H3 restent des liens indentés sans numéro.
+
+Sur desktop, un sommaire réellement long conserve sa liste SSR complète en haut de lecture, limitée à 72 vh avec défilement interne si nécessaire. Après le début de lecture, une amélioration JavaScript légère le compacte en indiquant la section en cours et un bouton `Afficher le sommaire`; ce bouton redéploie la liste. Les petits sommaires et le rendu mobile gardent leur présentation existante, y compris sans JavaScript.
 ## Inline legacy media debt
 
 During the controlled editorial pilot, direct `top-halal.fr/wp-content` and `top-halal.fr/wp-contenu` inline images are removed from stored V2 HTML rather than being rendered from WordPress. `legacy:audit-inline-media` records the legacy source URL/path, content type and ID, ordinal position, nearby context and resolved attachment ID when available. This is a media-reconciliation backlog only: no physical file is copied in this phase.

@@ -1,4 +1,5 @@
 import '../css/editorial-sidebar-overrides.css';
+import '../css/sticky-toc.css';
 import '../css/editorial-tables.css';
 import '../css/reviews.css';
 import '../css/review-anchor.css';
@@ -19,6 +20,7 @@ import { initializeAddressSelectors } from './address-selector';
 import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
 import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';
 import { initializeRestaurantHoursEditors, validateRestaurantHoursEditors } from './restaurant-hours-editor';
+import './sticky-toc';
 
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
