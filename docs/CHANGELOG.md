@@ -498,3 +498,4 @@
 
 - La page 404 publique adopte le shell Top Halal, un layout responsive à deux colonnes, les CTA Accueil/Annuaire et quatre repères de confiance fixes, tout en conservant HTTP 404 et `noindex,follow`.
 - Les réglages ajoutent les seules personnalisations autorisées de la page 404 : illustration V2, titre et texte, avec repli vers les valeurs par défaut.
+- Improved desktop UX for long editorial tables of contents: full SSR list with a 72 vh internal scroll cap, then a lightweight sticky compact state showing the current section and an accessible expand control. Short contents and mobile presentation remain unchanged.

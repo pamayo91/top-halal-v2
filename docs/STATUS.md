@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-24
 
+Latest long-editorial-TOC UX: on desktop only, a genuinely tall article table of contents remains fully SSR and internally scrollable within 72 vh at the top of reading, then becomes a compact sticky summary after the reader progresses. The compact state identifies the current heading and can reopen the complete table of contents; short tables and the mobile layout are unchanged.
+
 Latest redirect back-office correction: each redirect row now exposes a confirmation-protected `Supprimer` action. Deletion immediately invalidates the runtime redirect cache through the model hook and is recorded in the administrative audit log.
 
 Latest editorial URL-stability correction: the Filament title callbacks for Pages and Articles now generate a slug only during creation. A title change cannot alter the public URL; an administrator can deliberately edit the slug, which creates a visible exact 301 from the former editorial URL to the new one. Cross-content duplicates, redirect-source conflicts and loops are rejected before saving. Regression coverage protects automatic stability and the manual Page/Article redirect flow.

@@ -41,6 +41,20 @@ class EditorialSidebarTest extends TestCase
         self::assertCount(3, $sidebar['toc']);
     }
 
+    public function test_desktop_table_of_contents_keeps_its_complete_ssr_list_and_compact_controls(): void
+    {
+        $article = $this->article(['content_html' => '<h2>Premier titre</h2><h2>Second titre</h2>']);
+
+        $this->get('/'.$article->slug)
+            ->assertOk()
+            ->assertSee('data-sticky-toc', false)
+            ->assertSee('data-toc-current', false)
+            ->assertSee('data-toc-toggle', false)
+            ->assertSee('Afficher le sommaire')
+            ->assertSee('href="#premier-titre"', false)
+            ->assertSee('href="#second-titre"', false);
+    }
+
     private function article(array $attributes = []): Article
     {
         return Article::create(array_merge(['legacy_wp_id' => random_int(1, 999999999), 'original_title' => 'Article', 'title' => 'Article', 'slug' => 'article-'.random_int(1, 999999999), 'legacy_url' => '/article', 'status' => 'published'], $attributes));
