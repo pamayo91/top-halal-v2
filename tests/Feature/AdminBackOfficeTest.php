@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\MenuResource\Pages\EditMenu;
+use App\Filament\Resources\RedirectRuleResource\Pages\ListRedirectRules;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
@@ -178,6 +179,20 @@ class AdminBackOfficeTest extends TestCase
         }
 
         $this->actingAs($admin)->get('/bo')->assertNotFound();
+    }
+
+    public function test_an_administrator_can_delete_a_redirect_rule_from_the_back_office_and_the_action_is_audited(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $rule = RedirectRule::create(['source_path' => '/redirection-a-supprimer', 'match_type' => 'exact', 'destination' => '/cible', 'status_code' => 301, 'priority' => 100, 'is_active' => true]);
+
+        Livewire::actingAs($admin)
+            ->test(ListRedirectRules::class)
+            ->callTableAction('delete', $rule)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseMissing('redirect_rules', ['id' => $rule->id]);
+        $this->assertDatabaseHas('admin_audit_logs', ['action' => 'redirect_rule.deleted', 'subject_id' => $rule->id]);
     }
 
     public function test_admin_moderation_changes_visibility_status_and_is_audited(): void

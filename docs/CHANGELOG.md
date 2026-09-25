@@ -2,6 +2,8 @@
 
 ## 2026-09-25
 
+- Added the confirmation-protected deletion action for individual redirect rules in the back-office, with redirect-cache invalidation and admin audit coverage.
+
 - Fixed editorial URL stability in Filament: Pages and Articles generate their slug only at creation; editing a title preserves the existing slug and public URL. Administrators can deliberately edit an editorial slug, which creates an exact visible 301 from the old URL; duplicates, redirect conflicts and loops are rejected. Added Filament regression coverage for both content types.
 
 - Navigation back-office : les événements de glisser-déposer d’un sous-menu ne remontent plus vers son parent `draggable`. Un déplacement de « Autour de moi » manipule désormais bien cet élément, plutôt que « Restaurants », et ne déclenche plus le rejet hiérarchique 422. La régression navigateur préproduction déplace ce sous-menu, vérifie le POST et restaure l’ordre.

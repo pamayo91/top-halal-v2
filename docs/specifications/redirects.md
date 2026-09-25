@@ -40,7 +40,7 @@ Suggested fields:
 - A 410 is a terminal response reserved for an explicitly justified technical/legal removal. The business default remains: exact equivalent, relevant parent/city/category, semantic equivalent, then 301 to `/`.
 
 ## Administration
-Search, create, edit, disable/delete, test a URL, import htaccess/CSV, export CSV, show hits/last hit.
+Search, create, edit, disable/delete, test a URL, import htaccess/CSV, export CSV, show hits/last hit. The row-level `Supprimer` action is confirmation-protected, invalidates the redirect cache and creates an administrative audit entry.
 
 ## Import validation
 Classify each source rule as:
