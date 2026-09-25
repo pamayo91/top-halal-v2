@@ -24,7 +24,7 @@ test('drag-and-drop menu ordering uses a Laravel POST and survives a full reload
   const branches = page.locator('.menu-editor__tree > .menu-editor__branch');
   test.skip(await branches.count() < 2, 'The configured header menu needs two root items for diagnosis.');
   const initial = await branches.evaluateAll((items) => items.map((item) => item.getAttribute('wire:key')));
-  const movedLabel = await branches.nth(1).locator('strong').innerText();
+  const movedLabel = await branches.nth(1).locator(':scope > .menu-editor__row strong').innerText();
 
   responses.length = 0;
   await Promise.all([
