@@ -1,8 +1,8 @@
 <x-filament-panels::page>
     @php($tree = $this->tree())
-    <div class="menu-editor" x-data="{ dragging: null, submitMove(url) { const form = document.createElement('form'); const token = document.createElement('input'); form.method = 'post'; form.action = url; token.type = 'hidden'; token.name = '_token'; token.value = '{{ csrf_token() }}'; form.appendChild(token); document.body.appendChild(form); form.submit(); } }">
+    <div class="menu-editor" x-data="{ dragging: null, submitMove(url, data = {}) { const form = document.createElement('form'); form.method = 'post'; form.action = url; const values = { _token: '{{ csrf_token() }}', ...data }; Object.entries(values).forEach(([name, value]) => { const input = document.createElement('input'); input.type = 'hidden'; input.name = name; input.value = value ?? ''; form.appendChild(input); }); document.body.appendChild(form); form.submit(); } }">
         <div class="menu-editor__intro"><div><h2>{{ $this->getRecord()->name }}</h2><p>Vue synthétique : glissez un élément sur un parent pour créer un sous-menu, ou dans la zone principale pour le remettre à la racine. Deux niveaux maximum.</p></div><x-filament::button wire:click="openCreate">+ Ajouter un élément</x-filament::button></div>
-        <div class="menu-editor__tree" x-on:dragover.prevent x-on:drop.prevent="if (dragging) $wire.moveItem(dragging, null, {{ count($tree) }})">
+        <div class="menu-editor__tree" x-on:dragover.prevent x-on:drop.prevent="if (dragging) submitMove('{{ route('admin.menu-items.move', ['menu' => $this->getRecord(), 'item' => '__ITEM__', 'direction' => 1]) }}'.replace('__ITEM__', dragging), { parent_id: null, position: {{ count($tree) }} })">
             @forelse($tree as $position => $item)
                 @include('filament.resources.menu-resource.partials.item-row', ['item' => $item, 'position' => $position, 'parentId' => null, 'depth' => 0])
             @empty <p class="menu-editor__empty">Ce menu est vide. Ajoutez son premier élément.</p> @endforelse
