@@ -27,10 +27,10 @@ test('drag-and-drop menu ordering uses a Laravel POST and survives a full reload
   const movedLabel = await branches.nth(1).locator(':scope > .menu-editor__row strong').innerText();
 
   responses.length = 0;
-  await Promise.all([
-    page.waitForURL(/\/admin\/menus\/1\/edit$/),
-    branches.nth(1).dragTo(branches.nth(0)),
-  ]);
+  const firstMoveResponse = page.waitForResponse((response) => response.request().method() === 'POST' && response.url().includes('/admin/menus/'));
+  await branches.nth(1).dragTo(branches.nth(0));
+  await firstMoveResponse;
+  await page.waitForTimeout(300);
 
   const afterFirstDrag = await page.locator('.menu-editor__tree > .menu-editor__branch').evaluateAll((items) => items.map((item) => item.getAttribute('wire:key')));
   try {
@@ -45,10 +45,10 @@ test('drag-and-drop menu ordering uses a Laravel POST and survives a full reload
   } finally {
     await page.goto('/admin/menus/1/edit');
     const restoredBranches = page.locator('.menu-editor__tree > .menu-editor__branch');
-    await Promise.all([
-      page.waitForURL(/\/admin\/menus\/1\/edit$/),
-      restoredBranches.nth(1).dragTo(restoredBranches.nth(0)),
-    ]);
+    const restoreMoveResponse = page.waitForResponse((response) => response.request().method() === 'POST' && response.url().includes('/admin/menus/'));
+    await restoredBranches.nth(1).dragTo(restoredBranches.nth(0));
+    await restoreMoveResponse;
+    await page.waitForTimeout(300);
   }
 
   expect(await page.locator('.menu-editor__tree > .menu-editor__branch').evaluateAll((items) => items.map((item) => item.getAttribute('wire:key')))).toEqual(initial);
