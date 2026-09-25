@@ -7,6 +7,8 @@ use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\{AdminAuditLog,Article,Comment,MediaAsset,Menu,MenuItem,RedirectRule,Restaurant,RestaurantClaim,RestaurantMedia,RestaurantReview,User};
+use App\Models\Setting;
+use App\Services\PublicNavigation;
 use App\Services\MediaIngestor;
 use App\Services\RestaurantMediaManager;
 use Filament\Forms\Components\DateTimePicker;
@@ -75,6 +77,18 @@ class AdminBackOfficeTest extends TestCase
 
         $this->actingAs($admin)->from("/admin/menus/{$menu->id}/edit")
             ->post(route('admin.menu-items.move', ['menu' => $menu, 'item' => $second, 'direction' => -1]))
+            ->assertRedirect("/admin/menus/{$menu->id}/edit");
+        $this->assertSame([$second->id, $first->id, $parent->id], MenuItem::query()->where('menu_id', $menu->id)->whereNull('parent_id')->orderBy('sort_order')->pluck('id')->all());
+
+        Setting::updateOrCreate(['key' => 'header_navigation'], ['group' => 'navigation', 'value' => ['menu_id' => $menu->id]]);
+        $this->actingAs($admin)->from("/admin/menus/{$menu->id}/edit")
+            ->post(route('admin.menu-items.move', ['menu' => $menu, 'item' => $parent, 'direction' => 1]), ['parent_id' => null, 'position' => 0])
+            ->assertRedirect("/admin/menus/{$menu->id}/edit");
+        $this->assertSame([$parent->id, $second->id, $first->id], MenuItem::query()->where('menu_id', $menu->id)->whereNull('parent_id')->orderBy('sort_order')->pluck('id')->all());
+        $this->assertSame(['Parent', 'Second', 'Premier'], array_column(app(PublicNavigation::class)->header()['menu']['items'], 'label'));
+
+        $this->actingAs($admin)->from("/admin/menus/{$menu->id}/edit")
+            ->post(route('admin.menu-items.move', ['menu' => $menu, 'item' => $parent, 'direction' => 1]), ['parent_id' => null, 'position' => 2])
             ->assertRedirect("/admin/menus/{$menu->id}/edit");
         $this->assertSame([$second->id, $first->id, $parent->id], MenuItem::query()->where('menu_id', $menu->id)->whereNull('parent_id')->orderBy('sort_order')->pluck('id')->all());
     }
