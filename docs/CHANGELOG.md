@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25
+
+- Fixed editorial URL stability in Filament: Pages and Articles generate their slug only at creation; editing a title preserves the existing slug and public URL. Added Filament regression coverage for both content types.
+
 - Navigation back-office : les événements de glisser-déposer d’un sous-menu ne remontent plus vers son parent `draggable`. Un déplacement de « Autour de moi » manipule désormais bien cet élément, plutôt que « Restaurants », et ne déclenche plus le rejet hiérarchique 422. La régression navigateur préproduction déplace ce sous-menu, vérifie le POST et restaure l’ordre.
 
 - Navigation back-office : le glisser-déposer emprunte désormais lui aussi un POST Laravel classique CSRF vers le transactionnel `MenuItemOrderer`, et ne sollicite plus Livewire. Le déplacement verrouille le menu, renumérote les frères de façon déterministe, invalide le cache public et refuse les parents externes, les cycles et le troisième niveau. La couverture Playwright préproduction contrôle le POST 302, le rechargement complet, la persistance et le rendu public, puis restaure le menu.

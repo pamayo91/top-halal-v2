@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-24
 
+Latest editorial URL-stability correction: the Filament title callbacks for Pages and Articles now generate a slug only during creation. Existing editorial slugs are locked in edit forms, so a title change cannot alter the public URL. Regression coverage creates each content type, records its slug/route, edits its title through Filament and verifies the same URL still renders the renamed content.
+
 Latest navigation submenu drag correction: nested draggable event propagation no longer overwrites the dragged child with its parent. The deployed preproduction regression reorders the real `Autour de moi` child under `Restaurants`, receives the normal Laravel POST redirect and restores the exact original sibling order without a 422.
 
 Latest navigation drag-and-drop correction: all order changes now use the CSRF-protected Laravel POST transport; drag-and-drop no longer invokes the host-filter-sensitive Livewire update endpoint. The transactional orderer locks the menu rows, persists deterministic sibling positions, validates hierarchy safety and invalidates public navigation cache. The deployed preproduction browser regression performs a real drag, observes the 302 POST, reloads, compares the public menu and restores the original order.
