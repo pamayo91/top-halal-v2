@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const email = process.env.PREPROD_ADMIN_EMAIL;
 const password = process.env.PREPROD_ADMIN_PASSWORD;
 
-test('diagnosis: Autour de moi can be reordered within Restaurants', async ({ page }) => {
+test('Autour de moi can be reordered within Restaurants', async ({ page }) => {
   test.skip(!email || !password, 'Dedicated preproduction administrator required.');
   const responses: Array<{ url: string; status: number }> = [];
   page.on('response', (response) => {
