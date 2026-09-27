@@ -77,7 +77,7 @@ class PublicRestaurantSearchTest extends TestCase
             ->assertOk()
             ->assertDontSee('Nom ou ville')
             ->assertDontSee('Toutes les villes')
-            ->assertSee('Spécialité 9')
+            ->assertSee('000 spécialité 9')
             ->assertSee('Filtres (1)')
             ->assertSee('aria-expanded="true"', false)
             ->assertSee('Voir moins');
