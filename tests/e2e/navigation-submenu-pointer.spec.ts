@@ -120,6 +120,43 @@ test('header states have an obvious stable visual hierarchy', async ({ page }, t
   expect(parentHover.markerOpacity).toBe('1');
 });
 
+test('desktop submenu uses an airy full-width link treatment without a header gap', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop submenu visual treatment.');
+
+  await page.goto('/restaurants');
+  const parent = page.locator('.nav-menu-list .nav-parent', { hasText: 'Cuisines' });
+  await parent.hover();
+  const panel = page.locator(`#${await parent.getAttribute('aria-controls')}`);
+  const link = panel.locator('a').first();
+  await expect(panel).toBeVisible();
+  await expect(link).toBeVisible();
+
+  const panelBox = await panel.boundingBox();
+  const parentItemBox = await parent.locator('xpath=..').boundingBox();
+  const linkBox = await link.boundingBox();
+  expect(panelBox).not.toBeNull();
+  expect(parentItemBox).not.toBeNull();
+  expect(linkBox).not.toBeNull();
+  if (!panelBox || !parentItemBox || !linkBox) return;
+
+  expect(panelBox.width).toBeGreaterThanOrEqual(260);
+  expect(panelBox.y).toBeCloseTo(parentItemBox.y + parentItemBox.height, 1);
+  expect(linkBox.width).toBeCloseTo(panelBox.width - 14, 1);
+
+  const resting = await link.evaluate(element => {
+    const style = getComputedStyle(element);
+    return { color: style.color, decoration: style.textDecorationLine, weight: style.fontWeight, minHeight: style.minHeight };
+  });
+  expect(resting.color).toBe('rgb(22, 35, 31)');
+  expect(resting.decoration).toBe('none');
+  expect(resting.weight).toBe('600');
+  expect(resting.minHeight).toBe('44px');
+
+  await link.hover();
+  await expect(link).toHaveCSS('background-color', 'rgb(239, 248, 242)');
+  await expect(link).toHaveCSS('color', 'rgb(11, 93, 75)');
+});
+
 test('header item positions stay fixed across hover and active routes', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop geometry assertions.');
 

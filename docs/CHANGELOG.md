@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-27
+
+- Modernisation ciblée des sous-menus desktop : panneau plus confortable, liens pleine largeur sans soulignement, états hover/focus verts et aucune modification mobile ou du soulignement actif de la navigation principale.
+
 ## 2026-09-25
 
 - Added the confirmation-protected deletion action for individual redirect rules in the back-office, with redirect-cache invalidation and admin audit coverage.

@@ -93,17 +93,61 @@
 }
 
 .site-header .submenu-toggle { display: inline-flex; align-items: center; justify-content: center; }
-.site-header .submenu li > .is-active { color: var(--green-dark); font-weight: 700; text-decoration: none; }
 
-/* The panel stays visually offset while its owning list item keeps the pointer path continuous. */
-@media (hover: hover) {
-    .site-header .nav-menu-list > .has-submenu::after {
-        position: absolute;
-        z-index: 4;
-        top: 100%;
-        left: 0;
-        width: max(100%, 13rem);
-        height: .5rem;
-        content: '';
-    }
+/* Desktop only: a compact, full-width menu panel without a gap below the header. */
+.site-header .nav-menu-list .submenu {
+    top: 100%;
+    min-width: 16.5rem;
+    padding: .45rem;
+    border-color: #dbe5de;
+    border-radius: 11px;
+    box-shadow: 0 10px 24px rgb(22 35 31 / 10%);
+}
+
+.site-header .nav-menu-list .submenu li + li { margin-top: .1rem; }
+
+.site-header .nav-menu-list .submenu li > a,
+.site-header .nav-menu-list .submenu li > span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    padding: .7rem .8rem;
+    border-radius: 8px;
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+}
+
+.site-header .nav-menu-list .submenu li > a::after {
+    color: var(--green);
+    content: '→';
+    opacity: 0;
+    transform: translateX(-3px);
+    transition: opacity .14s ease, transform .14s ease;
+}
+
+.site-header .nav-menu-list .submenu li > a:hover,
+.site-header .nav-menu-list .submenu li > a:focus-visible {
+    background: #eff8f2;
+    color: var(--green);
+}
+
+.site-header .nav-menu-list .submenu li > a:hover::after,
+.site-header .nav-menu-list .submenu li > a:focus-visible::after {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.site-header .nav-menu-list .submenu li > a:focus-visible {
+    outline: 3px solid rgb(35 129 81 / 30%);
+    outline-offset: -2px;
+}
+
+.site-header .nav-menu-list .submenu li > .is-active {
+    color: var(--green-dark);
+    font-weight: 700;
+    text-decoration: none;
 }
