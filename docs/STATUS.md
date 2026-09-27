@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-27
 
+Latest editorial editor enhancement: Articles and Pages share a focused Filament RichEditor extension for link SEO. The link dialog reads and writes combinable `nofollow`, `sponsored` and `ugc` tokens alongside the native `_blank` option, preserving unrelated existing `rel` tokens and leaving untouched links alone. Its toolbar is now an opaque CSS-sticky bar below the measured administration top bar, with responsive wrapping.
+
 Latest restaurant-directory UX pass: `/restaurants` no longer applies Paris implicitly; the shared search keeps an explicit Paris shortcut only on the homepage, while its existing voluntary location suggestions remain available. Directory results now use the canonical publication/addition recency order with a deterministic ID tie-breaker. The desktop sidebar contains only compact specialty/service filters, sticky within the viewport; mobile uses an accessible lightweight drawer. Result wording, restaurant-name link states and server pagination have been refined without changing SEO, routes, facets or specialty fallback imagery.
 
 Latest editorial editor correction: the Article RichEditor now accepts legitimate deeply nested list content up to 20 Livewire property-path levels (the prior default of 10 rejected the existing Quick halal article before saving). Existing payload size and request safeguards remain enabled.

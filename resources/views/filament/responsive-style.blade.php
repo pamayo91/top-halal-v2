@@ -1,6 +1,8 @@
 <style id="fi-admin-responsive">
     .fi-main { max-width: 100%; min-width: 0; }
     .fi-main-ctn, .fi-page, .fi-section, .fi-ta { min-width: 0; }
+    .editorial-rich-editor .fi-fo-rich-editor-toolbar { position: sticky; top: var(--fi-editor-toolbar-offset, 4rem); z-index: 20; box-sizing: border-box; width: 100%; max-width: 100%; background: white; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+    .dark .editorial-rich-editor .fi-fo-rich-editor-toolbar { background: var(--gray-900); }
     .restaurant-hours-slots.fi-fo-repeater { --restaurant-hours-fields-width: 26rem; --restaurant-hours-action-width: 10.5rem; position: relative; display: block; width: fit-content; max-width: 100%; }
     .restaurant-hours-slots .fi-fo-repeater-items { display: grid; grid-template-columns: max-content; gap: .25rem; width: max-content; }
     .restaurant-hours-slots .fi-fo-repeater-item { display: grid; grid-template-columns: var(--restaurant-hours-fields-width) var(--restaurant-hours-action-width); align-items: center; column-gap: .5rem; border-radius: 0; background: transparent; box-shadow: none; }
@@ -26,6 +28,7 @@
 
     @media (max-width: 767px) {
         .fi-main { padding-inline: .75rem; }
+        .editorial-rich-editor .fi-fo-rich-editor-toolbar { gap-inline: .5rem; padding-inline: .5rem; }
         .fi-page-header-main-ctn, .fi-ta-header-ctn, .fi-ta-header-toolbar, .fi-ta-header-toolbar-ctn { min-width: 0; flex-wrap: wrap; }
         .fi-ta-header-toolbar-actions, .fi-ta-header-toolbar .fi-input-wrp { width: 100%; max-width: none; }
         .fi-ta-content { max-width: 100%; }

@@ -26,4 +26,14 @@ class ContentSanitizerTest extends TestCase
         $this->assertSame($html, $result['html']);
         $this->assertSame([], $result['removed']);
     }
+
+    public function test_it_preserves_editorial_link_seo_and_target_attributes(): void
+    {
+        $html = '<p><a href="https://example.com" rel="nofollow">Nofollow</a> <a href="https://example.com" rel="sponsored">Sponsored</a> <a href="https://example.com" rel="ugc">UGC</a> <a href="https://example.com" rel="sponsored nofollow" target="_blank">Combined</a></p>';
+
+        $result = app(ContentSanitizer::class)->sanitize($html);
+
+        $this->assertSame($html, $result['html']);
+        $this->assertSame([], $result['removed']);
+    }
 }

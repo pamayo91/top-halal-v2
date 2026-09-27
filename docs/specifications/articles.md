@@ -4,7 +4,7 @@
 Store clean HTML/content structure, title/slug/excerpt/status/author/media/SEO metadata/publication dates and source type (`manual`, `ai`, `imported`).
 Approved public comments are displayed from newest to oldest.
 
-The back-office RichEditor supports legitimate nested editorial lists. Livewire accepts property paths up to 20 levels deep for this content; its other payload limits remain in force.
+The back-office RichEditor supports legitimate nested editorial lists. Livewire accepts property paths up to 20 levels deep for this content; its other payload limits remain in force. Articles and Pages share the editorial RichEditor extension: its link dialogue supports combinable `nofollow`, `sponsored` and `ugc` `rel` tokens, plus the native `_blank` option. Existing non-SEO `rel` tokens are retained when a link is edited, while no automatic rewrite is applied to untouched legacy links. The toolbar is CSS-sticky below the measured Filament top bar, with an opaque surface and responsive wrapping.
 
 Les catégories et tags éditoriaux migrés restent des métadonnées internes/de-conciliation et peuvent alimenter le petit libellé non cliquable d’une carte d’article. Le listing public `/blog` ne rend aucune navigation ni filtre de catégories ; il présente directement sa grille d’articles. Les données et relations de taxonomie ne sont pas supprimées pour cette règle de présentation.
 

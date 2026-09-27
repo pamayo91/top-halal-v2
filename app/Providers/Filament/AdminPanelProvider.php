@@ -35,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')->pages([AdminDashboard::class, \App\Filament\Pages\SettingsPage::class])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => view('filament.responsive-style'))
+            ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => view('filament.sticky-editor-toolbar'))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => view('filament.location-map-assets'))
             ->middleware([EncryptCookies::class, AddQueuedCookiesToResponse::class, StartSession::class, AuthenticateSession::class, ShareErrorsFromSession::class, VerifyCsrfToken::class, SubstituteBindings::class, DisableBladeIconComponents::class, DispatchServingFilamentEvent::class])
             ->authMiddleware([Authenticate::class, EnsureAdmin::class]);

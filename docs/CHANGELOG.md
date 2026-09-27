@@ -2,6 +2,8 @@
 
 ## 2026-09-27
 
+- Éditeur éditorial : Articles et Pages partagent désormais une extension légère du RichEditor Filament. La boîte de dialogue des liens gère `nofollow`, `sponsored`, `ugc` et `_blank`, relit les attributs d’un lien existant et préserve les jetons `rel` non SEO. La barre d’outils est sticky sous le header réellement mesuré, opaque et adaptée aux petites largeurs ; le sanitizer protège explicitement la conservation des attributs SEO et de `target`.
+
 - Corrected the Article RichEditor save failure for deeply nested editorial lists: Livewire now accepts up to 20 property-path levels (instead of 10), while the existing payload-size, call-count and component-count safeguards remain active.
 
 - Modernisation ciblée des sous-menus desktop : panneau plus confortable, liens pleine largeur sans soulignement, états hover/focus verts et aucune modification mobile ou du soulignement actif de la navigation principale.
