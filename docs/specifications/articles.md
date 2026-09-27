@@ -4,6 +4,8 @@
 Store clean HTML/content structure, title/slug/excerpt/status/author/media/SEO metadata/publication dates and source type (`manual`, `ai`, `imported`).
 Approved public comments are displayed from newest to oldest.
 
+The back-office RichEditor supports legitimate nested editorial lists. Livewire accepts property paths up to 20 levels deep for this content; its other payload limits remain in force.
+
 Les catégories et tags éditoriaux migrés restent des métadonnées internes/de-conciliation et peuvent alimenter le petit libellé non cliquable d’une carte d’article. Le listing public `/blog` ne rend aucune navigation ni filtre de catégories ; il présente directement sa grille d’articles. Les données et relations de taxonomie ne sont pas supprimées pour cette règle de présentation.
 
 ## Pages

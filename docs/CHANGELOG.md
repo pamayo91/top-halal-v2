@@ -2,6 +2,8 @@
 
 ## 2026-09-27
 
+- Corrected the Article RichEditor save failure for deeply nested editorial lists: Livewire now accepts up to 20 property-path levels (instead of 10), while the existing payload-size, call-count and component-count safeguards remain active.
+
 - Modernisation ciblée des sous-menus desktop : panneau plus confortable, liens pleine largeur sans soulignement, états hover/focus verts et aucune modification mobile ou du soulignement actif de la navigation principale.
 
 ## 2026-09-25
