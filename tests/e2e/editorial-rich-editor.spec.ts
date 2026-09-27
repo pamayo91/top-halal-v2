@@ -59,6 +59,16 @@ test.describe('Editorial rich editor', () => {
     });
     expect(stickyGeometry.toolbarTop).toBeGreaterThanOrEqual(stickyGeometry.headerBottom - 1);
     expect(stickyGeometry.toolbarTop).toBeLessThanOrEqual(stickyGeometry.headerBottom + 1);
+
+    await page.getByRole('button', { name: 'Créer', exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/articles\/[^/]+\/edit/);
+    await expect(page.locator('.editorial-rich-editor .tiptap a')).toHaveAttribute('rel', /nofollow sponsored ugc/);
+    await expect(page.locator('.editorial-rich-editor .tiptap a')).toHaveAttribute('target', '_blank');
+
+    await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
+    const deleteDialog = page.getByRole('dialog');
+    await deleteDialog.getByRole('button', { name: /Supprimer|Confirmer/, exact: false }).last().click();
+    await expect(page).toHaveURL(/\/admin\/articles$/);
     expect(consoleErrors).toEqual([]);
   });
 });
