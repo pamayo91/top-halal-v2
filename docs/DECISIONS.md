@@ -211,3 +211,7 @@ La première revendication est un dossier sans compte : document privé, confirm
 ### D031 — Espace limité pour chaque déposant vérifié
 
 Chaque déposant d’une proposition publique qui confirme son e-mail reçoit, quel que soit son rôle déclaré, un lien d’activation de mot de passe dans l’e-mail de confirmation. Son secret est un jeton aléatoire de 64 caractères, haché, expirant et consommé à l’usage ; aucune signature d’URL redondante et fragile n’est requise. L’accès est porté par `restaurant_submissions.user_id`, avec le droit de gérer exclusivement ses propres propositions. Il ne crée pas de `restaurant_claim`, ce qui laisse la fiche revendicable par son véritable gérant.
+# Commentaires éditoriaux : pagination de fils crawlable (2026-09-27)
+
+Les commentaires éditoriaux sont paginés en lots de 20 fils racines, du plus récent au plus ancien. Chaque lot SSR contient tous les descendants approuvés de ses racines; le HTML expose un lien vers `?comments_page=N` et reste donc crawlable sans JavaScript. Le JavaScript intercepte seulement ce lien pour ajouter le fragment SSR. Toutes les pages de commentaires conservent la canonical de l’URL éditoriale principale. Les descendants conservent leur `parent_id` réel mais sont limités à deux niveaux visuels.
+

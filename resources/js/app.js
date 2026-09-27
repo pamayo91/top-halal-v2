@@ -288,6 +288,46 @@ document.addEventListener('keydown', event => {
     if (!submenuWasOpen && menu?.getAttribute('aria-expanded') === 'true') { menu.setAttribute('aria-expanded', 'false'); mobileNav.hidden = true; menu.focus(); }
 });
 
+document.addEventListener('click', async event => {
+    const cancel = event.target.closest('[data-reply-cancel]');
+    if (cancel) {
+        const details = cancel.closest('[data-reply-details]');
+        if (details) { details.open = false; details.querySelector('summary')?.focus(); }
+        return;
+    }
+
+    const link = event.target.closest('[data-comments-load-more]');
+    if (!link || !window.fetch) return;
+    event.preventDefault();
+    if (link.dataset.loading === 'true') return;
+    link.dataset.loading = 'true';
+    link.setAttribute('aria-busy', 'true');
+    const originalLabel = link.textContent;
+    link.textContent = 'Chargement des commentaires…';
+    try {
+        const response = await fetch(link.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!response.ok) throw new Error('comments request failed');
+        document.querySelector('[data-comment-threads]')?.insertAdjacentHTML('beforeend', await response.text());
+        const next = response.headers.get('X-Comments-Next-Page');
+        const remaining = response.headers.get('X-Comments-Remaining');
+        if (next) {
+            link.href = `${next}#commentaires`;
+            link.textContent = originalLabel;
+            link.dataset.loading = 'false';
+            link.removeAttribute('aria-busy');
+            const count = document.querySelector('[data-comments-remaining]');
+            if (count && remaining !== null) count.textContent = `${remaining} commentaires restants`;
+        } else {
+            link.closest('.comment-load-more')?.remove();
+        }
+    } catch (_) {
+        link.textContent = originalLabel;
+        link.dataset.loading = 'false';
+        link.removeAttribute('aria-busy');
+        window.location.assign(link.href);
+    }
+});
+
 document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     const location = form.querySelector('[data-location-input]'); const cityValue = form.querySelector('[data-location-value]');
     const query = form.querySelector('[data-query-input]'); const category = form.querySelector('[data-category-input]');

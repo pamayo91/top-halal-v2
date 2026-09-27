@@ -505,3 +505,10 @@
 - Improved desktop UX for long editorial tables of contents: full SSR list with a 72 vh internal scroll cap, then a lightweight sticky compact state showing the current section and an accessible expand control. Short contents and mobile presentation remain unchanged.
 
 - Refined the long desktop table-of-contents states: its initial full SSR list is now control-free and capped at 68 vh; the compact sticky state alone shows `Afficher le sommaire`, and its reopened sticky state uses a title-aligned `Réduire ↑` control.
+# 2026-09-27 — Commentaires éditoriaux : fils, réponses et pagination SSR
+
+- Pagination des commentaires par 20 fils racines SSR avec descendants complets, compteur des messages approuvés et lien de lot suivant crawlable.
+- Enhancement JavaScript léger pour ajouter le lot SSR sans rechargement, sans dépendance supplémentaire.
+- Réponses inline, limitées à deux niveaux visuels, avec validation serveur stricte du parent et réemploi intégral de l’identité/vérification/modération existante.
+- Canonical des URLs `comments_page` maintenue sur l’URL éditoriale principale.
+

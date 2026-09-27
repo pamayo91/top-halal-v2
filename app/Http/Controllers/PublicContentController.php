@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
 use App\Services\ContributionIdentityService;
 
 class PublicContentController extends Controller
@@ -25,6 +25,7 @@ class PublicContentController extends Controller
         private readonly GeographicPageResolver $geography,
         private readonly NearbyCityService $nearbyCities,
         private readonly EditorialSidebar $sidebar,
+        private readonly CommentThreads $commentThreads,
     ) {}
     public function home(): View
     {
@@ -208,15 +209,24 @@ class PublicContentController extends Controller
     public function category(string $slug): Response { return $this->taxonomy(Category::where('slug', $slug)->firstOrFail(), 'spécialité'); }
     public function feature(string $slug): Response { return $this->taxonomy(Feature::where('slug', $slug)->firstOrFail(), 'service'); }
 
-    public function editorial(string $slug): Response
+    public function editorial(Request $request, string $slug): Response
     {
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::with('featuredMedia.asset')->where('slug', $slug)->where('status', 'published')->firstOrFail();
-        $comments = $content->comments()->where('status', 'approved')->latest('created_at')->get();
+        $commentThreads = $this->commentThreads->for($content);
+        $visibleCommentsCount = $this->commentThreads->visibleCount($content);
+
+        if ($request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->view('public.partials.comment-threads', compact('content', 'commentThreads'))
+                ->header('X-Comments-Next-Page', $commentThreads->hasMorePages() ? (string) $commentThreads->nextPageUrl() : '')
+                ->header('X-Comments-Loaded', (string) $commentThreads->count())
+                ->header('X-Comments-Remaining', (string) max(0, $visibleCommentsCount - ($commentThreads->currentPage() * CommentThreads::PER_PAGE)));
+        }
+
         $isArticle = $content instanceof Article;
         $adminEditUrl = $this->adminEditUrlFor($content);
         $sidebar = $this->sidebar->for($content);
 
-        return response()->view('public.editorial', compact('content', 'comments', 'isArticle', 'adminEditUrl', 'sidebar'));
+        return response()->view('public.editorial', compact('content', 'commentThreads', 'visibleCommentsCount', 'isArticle', 'adminEditUrl', 'sidebar'));
     }
 
     public function storeComment(StoreCommentRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse

@@ -23,6 +23,9 @@ Fields: author name, email, content; optional authenticated user relationship.
 - Email is private.
 - Add honeypot + rate limiting + CSRF + spam controls.
 - Support threaded replies via `parent_id`.
+- Public editorial pages paginate comments by 20 approved root threads (`comments_page`), newest thread first. All approved descendants of each displayed root are rendered server-side in chronological order, so a conversation is never cut between pages. The visible hierarchy is capped at two levels even when historical parentage is deeper; a reply to a reply identifies its immediate recipient.
+- The public counter counts every approved visible message, roots and replies included. `?comments_page=N` has the editorial root canonical and the next batch is always exposed as a normal crawlable HTML link; small JavaScript only intercepts that link to append the SSR fragment.
+- A reply uses the same identity proof, honeypot, CSRF, URL-free validation, rate limit and pending moderation workflow as a root comment. Its parent must be an approved comment on exactly the same published article or page; this is rechecked both before a verification record is created and before the contribution is created after e-mail confirmation.
 - Admin can approve, reject, mark spam and delete through the temporary technical command; a full authenticated interface belongs to the future accounts/admin scope.
 
 ## Tests

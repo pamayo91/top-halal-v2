@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Hash, URL};
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ContributionIdentityService
 {
@@ -23,6 +24,8 @@ class ContributionIdentityService
     /** @return array{verified: bool, verification: ?ContributionVerification} */
     public function submitComment(Request $request, Article|Page $content, array $data): array
     {
+        $this->assertCommentParent($content, $data['parent_id'] ?? null);
+
         return $this->submit($request, 'comment', $content instanceof Article ? 'article' : 'page', $content->id, $data);
     }
 
@@ -232,9 +235,12 @@ class ContributionIdentityService
             default => abort(404),
         };
         $content = $model::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
+        $parentId = $data['parent_id'] ?? null;
+        $this->assertCommentParent($content, $parentId);
 
         $comment = Comment::create([
             $targetType === 'article' ? 'article_id' : 'page_id' => $content->id,
+            'parent_id' => $parentId,
             'user_id' => $user->id,
             'author_name' => trim($data['name']),
             'author_email' => Str::lower(trim($email)),
@@ -252,7 +258,7 @@ class ContributionIdentityService
         if ($type === 'report') return ['message' => trim(strip_tags($data['message']))];
         return $type === 'review'
             ? ['rating' => $data['rating'], 'content' => trim(strip_tags($data['content']))]
-            : ['content' => trim(strip_tags($data['content']))];
+            : ['content' => trim(strip_tags($data['content'])), 'parent_id' => $data['parent_id'] ?? null];
     }
 
     private function hasProof(Request $request, User $user): bool
@@ -301,5 +307,21 @@ class ContributionIdentityService
     private function publicUrl(Restaurant|Article|Page $content): string
     {
         return $content instanceof Restaurant ? route('restaurants.show', $content->slug) : route('editorial.show', $content->slug);
+    }
+
+    private function assertCommentParent(Article|Page $content, mixed $parentId): void
+    {
+        if ($parentId === null || $parentId === '') return;
+
+        $foreignKey = $content instanceof Article ? 'article_id' : 'page_id';
+        $valid = Comment::query()
+            ->whereKey((int) $parentId)
+            ->where($foreignKey, $content->id)
+            ->where('status', 'approved')
+            ->exists();
+
+        if (! $valid) {
+            throw ValidationException::withMessages(['parent_id' => 'Le commentaire auquel vous répondez n’est plus disponible.']);
+        }
     }
 }
