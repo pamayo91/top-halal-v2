@@ -19,7 +19,7 @@ test.describe('Editorial rich editor', () => {
     await expect(page).toHaveURL(/\/admin$/);
 
     await page.goto('/admin/articles/create');
-    await page.getByLabel('Titre').fill(`Validation éditeur ${Date.now()}`);
+    await page.getByRole('textbox', { name: 'Title*', exact: true }).fill(`Validation éditeur ${Date.now()}`);
     const editor = page.locator('.editorial-rich-editor .tiptap');
     await editor.click();
     await page.keyboard.insertText('Lien SEO');
@@ -32,7 +32,7 @@ test.describe('Editorial rich editor', () => {
     await dialog.getByLabel('Sponsored').check();
     await dialog.getByLabel('UGC').check();
     await dialog.getByLabel('Ouvrir dans un nouvel onglet').check();
-    await dialog.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Soumettre', exact: true }).click();
 
     const link = editor.locator('a');
     await expect(link).toHaveAttribute('rel', /nofollow sponsored ugc/);
