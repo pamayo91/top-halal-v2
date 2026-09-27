@@ -50,7 +50,9 @@ class EditorialSidebarTest extends TestCase
             ->assertSee('data-sticky-toc', false)
             ->assertSee('data-toc-current', false)
             ->assertSee('data-toc-toggle', false)
+            ->assertSee('data-toc-collapse', false)
             ->assertSee('Afficher le sommaire')
+            ->assertSee('Réduire', false)
             ->assertSee('href="#premier-titre"', false)
             ->assertSee('href="#second-titre"', false);
     }
