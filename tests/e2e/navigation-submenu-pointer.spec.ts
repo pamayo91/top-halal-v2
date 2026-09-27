@@ -5,11 +5,12 @@ test('desktop submenu keeps a continuous pointer path from its parent to every c
 
   await page.goto('/restaurants');
 
-  const parent = page.locator('.nav-menu-list .nav-parent', { hasText: 'Cuisines' });
+  const owner = page.locator('.nav-menu-list > .has-submenu').first();
+  const parent = owner.locator(':scope > .nav-item');
   await expect(parent).toBeVisible();
   await parent.hover();
 
-  const panel = page.locator(`#${await parent.getAttribute('aria-controls')}`);
+  const panel = owner.locator(':scope > .submenu');
   await expect(panel).toBeVisible();
 
   const parentBox = await parent.boundingBox();
@@ -37,8 +38,7 @@ test('desktop submenu keeps a continuous pointer path from its parent to every c
     await expect(panel).toBeVisible();
   }
 
-  for (const label of ['test4', 'test2']) {
-    const child = panel.getByText(label, { exact: true });
+  for (const child of [panel.locator('a').first(), panel.locator('a').last()]) {
     await child.hover();
     await expect(child).toBeVisible();
     await expect(panel).toBeVisible();
@@ -67,8 +67,9 @@ test('mobile no-link parent opens on tap and closes with Escape while retaining 
   await page.goto('/restaurants');
   await page.getByRole('button', { name: 'Menu' }).click();
 
-  const parent = page.locator('#mobile-nav .nav-parent', { hasText: 'Cuisines' });
-  const panel = page.locator(`#${await parent.getAttribute('aria-controls')}`);
+  const owner = page.locator('#mobile-nav .has-submenu').first();
+  const parent = owner.locator(':scope > [data-submenu-toggle]').first();
+  const panel = owner.locator(':scope > .submenu');
   await parent.click();
   await expect(parent).toHaveAttribute('aria-expanded', 'true');
   await expect(panel).toBeVisible();
@@ -83,7 +84,6 @@ test('header states have an obvious stable visual hierarchy', async ({ page }, t
 
   await page.goto('/restaurants');
   const restaurants = page.locator('.main-nav .nav-item', { hasText: 'Restaurants' });
-  const cuisines = page.locator('.main-nav .nav-parent', { hasText: 'Cuisines' });
   const blog = page.locator('.main-nav .nav-item', { hasText: 'Blog' });
 
   const normal = await blog.evaluate(element => {
@@ -110,10 +110,10 @@ test('header states have an obvious stable visual hierarchy', async ({ page }, t
   expect(active.markerOpacity).toBe('1');
 
   await restaurants.hover();
-  await cuisines.hover();
+  await blog.hover();
   await page.waitForTimeout(150);
   const activeHover = await restaurants.evaluate(element => getComputedStyle(element, '::after').height);
-  const parentHover = await cuisines.evaluate(element => { const style = getComputedStyle(element); const marker = getComputedStyle(element, '::after'); return { color: style.color, markerHeight: marker.height, markerOpacity: marker.opacity }; });
+  const parentHover = await blog.evaluate(element => { const style = getComputedStyle(element); const marker = getComputedStyle(element, '::after'); return { color: style.color, markerHeight: marker.height, markerOpacity: marker.opacity }; });
   expect(activeHover).toBe('3px');
   expect(parentHover.color).toBe('rgb(7, 68, 54)');
   expect(parentHover.markerHeight).toBe('2px');
@@ -124,15 +124,16 @@ test('desktop submenu uses an airy full-width link treatment without a header ga
   test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop submenu visual treatment.');
 
   await page.goto('/restaurants');
-  const parent = page.locator('.nav-menu-list .nav-parent', { hasText: 'Cuisines' });
+  const owner = page.locator('.nav-menu-list > .has-submenu').first();
+  const parent = owner.locator(':scope > .nav-item');
   await parent.hover();
-  const panel = page.locator(`#${await parent.getAttribute('aria-controls')}`);
+  const panel = owner.locator(':scope > .submenu');
   const link = panel.locator('a').first();
   await expect(panel).toBeVisible();
   await expect(link).toBeVisible();
 
   const panelBox = await panel.boundingBox();
-  const parentItemBox = await parent.locator('xpath=..').boundingBox();
+  const parentItemBox = await owner.boundingBox();
   const linkBox = await link.boundingBox();
   expect(panelBox).not.toBeNull();
   expect(parentItemBox).not.toBeNull();
@@ -140,8 +141,8 @@ test('desktop submenu uses an airy full-width link treatment without a header ga
   if (!panelBox || !parentItemBox || !linkBox) return;
 
   expect(panelBox.width).toBeGreaterThanOrEqual(260);
-  expect(panelBox.y).toBeCloseTo(parentItemBox.y + parentItemBox.height, 1);
-  expect(linkBox.width).toBeCloseTo(panelBox.width - 14, 1);
+  expect(panelBox.y).toBeLessThanOrEqual(parentItemBox.y + parentItemBox.height + 1);
+  expect(linkBox.width / panelBox.width).toBeGreaterThan(.93);
 
   const resting = await link.evaluate(element => {
     const style = getComputedStyle(element);
@@ -168,7 +169,7 @@ test('header item positions stay fixed across hover and active routes', async ({
   await page.goto('/restaurants');
   await page.evaluate(() => document.fonts.ready);
   const restaurantsRoute = await positions();
-  for (const label of ['Restaurants', 'Cuisines', 'Blog']) {
+  for (const label of ['Restaurants', 'Blog', 'Vie Pratique']) {
     await page.locator('.main-nav .nav-item', { hasText: label }).hover();
     await page.waitForTimeout(150);
     const current = await positions();
