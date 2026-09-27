@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-27
 
+Latest desktop submenu refinement: header dropdowns remain directly attached to their root item and preserve the green active underline on primary navigation, while desktop panels now use a 264 px minimum width, subtle border/shadow, full-width dark semibold links and a pale-green hover/focus state with a small right arrow. There is no submenu chevron and mobile navigation is unchanged.
+
 Latest long-editorial-TOC UX: on desktop only, a genuinely tall article table of contents remains fully SSR and internally scrollable within 68 vh at the top of reading, with no visible control. After the reader progresses it becomes a compact sticky summary identifying the current heading and offering `Afficher le sommaire`; its sticky expanded state uses only a small title-aligned `Réduire ↑` control. Short tables and the mobile layout are unchanged.
 
 Latest redirect back-office correction: each redirect row now exposes a confirmation-protected `Supprimer` action. Deletion immediately invalidates the runtime redirect cache through the model hook and is recorded in the administrative audit log.
