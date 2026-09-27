@@ -49,6 +49,54 @@ test('directory starts without a city and exposes its mobile filter drawer', asy
   }
 });
 
+test('directory filter options visibly collapse, expand, and keep a selected later option exposed', async ({ page }) => {
+  const isMobile = (page.viewportSize()?.width ?? 0) < 760;
+  await page.goto('/restaurants');
+
+  if (isMobile) {
+    await page.getByRole('button', { name: /Filtres/ }).click();
+  }
+
+  const drawer = page.locator('[data-filters-drawer]');
+  const specialtyGroup = drawer.locator('[data-filter-group]').first();
+  const specialtyOptions = specialtyGroup.locator('[data-filter-option]');
+  const specialtyToggle = specialtyGroup.locator('[data-filter-toggle]');
+  expect(await specialtyOptions.count()).toBeGreaterThan(8);
+  await expect(specialtyOptions.nth(7)).toBeVisible();
+  await expect(specialtyOptions.nth(8)).toBeHidden();
+  await expect(specialtyToggle).toHaveText('Voir toutes les spécialités');
+
+  const laterSpecialty = await specialtyOptions.nth(8).locator('input').getAttribute('value');
+  await specialtyToggle.click();
+  await expect(specialtyOptions.nth(8)).toBeVisible();
+  await expect(specialtyToggle).toHaveText('Voir moins');
+  await specialtyToggle.click();
+  await expect(specialtyOptions.nth(8)).toBeHidden();
+
+  const serviceGroup = drawer.locator('[data-filter-group]').nth(1);
+  const serviceOptions = serviceGroup.locator('[data-filter-option]');
+  const serviceToggle = serviceGroup.locator('[data-filter-toggle]');
+  expect(await serviceOptions.count()).toBeGreaterThan(8);
+  await expect(serviceOptions.nth(7)).toBeVisible();
+  await expect(serviceOptions.nth(8)).toBeHidden();
+  await expect(serviceToggle).toHaveText('Voir tous les services');
+  await serviceToggle.click();
+  await expect(serviceOptions.nth(8)).toBeVisible();
+  await expect(serviceToggle).toHaveText('Voir moins');
+  await serviceToggle.click();
+  await expect(serviceOptions.nth(8)).toBeHidden();
+
+  if (isMobile) {
+    await page.getByRole('button', { name: 'Fermer les filtres' }).click();
+  }
+  await page.goto(`/restaurants?categories%5B%5D=${encodeURIComponent(laterSpecialty ?? '')}`);
+  if (isMobile) {
+    await page.getByRole('button', { name: /Filtres/ }).click();
+  }
+  await expect(drawer.locator('[data-filter-group]').first().locator('[data-filter-option]').nth(8)).toBeVisible();
+  await expect(drawer.locator('[data-filter-group]').first().locator('[data-filter-toggle]')).toHaveText('Voir moins');
+});
+
 test('near me sends mocked coordinates only after the voluntary choice', async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });

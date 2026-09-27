@@ -6,10 +6,16 @@
         <aside class="filters" id="directory-filters" data-filters-drawer aria-labelledby="directory-filters-title">
             <div class="filters-drawer-heading"><h2 id="directory-filters-title">Filtres</h2><button type="button" class="filters-close" data-filters-close aria-label="Fermer les filtres">×</button></div>
             <form action="{{ route('restaurants.index') }}" method="get">
+                @php
+                    $selectedCategories = (array) request('categories', []);
+                    $selectedFeatures = (array) request('features', []);
+                    $categoryFilterExpanded = $categories->values()->slice(8)->contains(fn ($category) => in_array($category->slug, $selectedCategories, true));
+                    $featureFilterExpanded = $features->values()->slice(8)->contains(fn ($feature) => in_array($feature->slug, $selectedFeatures, true));
+                @endphp
                 @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
                 @if(request('ville'))<input type="hidden" name="ville" value="{{ request('ville') }}">@endif
-                <fieldset data-filter-group data-filter-limit="8"><legend>Spécialités</legend>@foreach($categories as $category)<label data-filter-option><input type="checkbox" name="categories[]" value="{{ $category->slug }}" @checked(in_array($category->slug, (array) request('categories', [])))> {{ $category->name }}</label>@endforeach<button type="button" class="filter-list-toggle" data-filter-toggle hidden aria-expanded="false">Voir toutes les spécialités</button></fieldset>
-                <fieldset data-filter-group data-filter-limit="8"><legend>Services</legend>@foreach($features as $feature)<label data-filter-option><input type="checkbox" name="features[]" value="{{ $feature->slug }}" @checked(in_array($feature->slug, (array) request('features', [])))> {{ $feature->name }}</label>@endforeach<button type="button" class="filter-list-toggle" data-filter-toggle hidden aria-expanded="false">Voir tous les services</button></fieldset>
+                <fieldset data-filter-group data-filter-limit="8"><legend>Spécialités</legend>@foreach($categories as $index => $category)<label data-filter-option @if(! $categoryFilterExpanded && $index >= 8) hidden @endif><input type="checkbox" name="categories[]" value="{{ $category->slug }}" @checked(in_array($category->slug, $selectedCategories, true))> {{ $category->name }}</label>@endforeach<button type="button" class="filter-list-toggle" data-filter-toggle data-expand-label="Voir toutes les spécialités" aria-expanded="{{ $categoryFilterExpanded ? 'true' : 'false' }}">{{ $categoryFilterExpanded ? 'Voir moins' : 'Voir toutes les spécialités' }}</button></fieldset>
+                <fieldset data-filter-group data-filter-limit="8"><legend>Services</legend>@foreach($features as $index => $feature)<label data-filter-option @if(! $featureFilterExpanded && $index >= 8) hidden @endif><input type="checkbox" name="features[]" value="{{ $feature->slug }}" @checked(in_array($feature->slug, $selectedFeatures, true))> {{ $feature->name }}</label>@endforeach<button type="button" class="filter-list-toggle" data-filter-toggle data-expand-label="Voir tous les services" aria-expanded="{{ $featureFilterExpanded ? 'true' : 'false' }}">{{ $featureFilterExpanded ? 'Voir moins' : 'Voir tous les services' }}</button></fieldset>
                 <button class="button" type="submit">Appliquer les filtres</button>@if($hasFilters)<a class="button button-secondary" href="{{ route('restaurants.index') }}">Réinitialiser</a>@endif
             </form>
         </aside>

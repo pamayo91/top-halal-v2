@@ -111,16 +111,15 @@ if (filtersDrawer && filtersTrigger) {
         const options = [...group.querySelectorAll('[data-filter-option]')];
         const toggle = group.querySelector('[data-filter-toggle]');
         if (!toggle || options.length <= Number(group.dataset.filterLimit)) return;
-        const baseLabel = toggle.textContent;
-        const show = expanded => {
-            options.forEach((option, index) => { option.hidden = !expanded && index >= Number(group.dataset.filterLimit) && !option.querySelector('input:checked'); });
-            toggle.hidden = false;
+        const baseLabel = toggle.dataset.expandLabel;
+        const setExpanded = expanded => {
+            options.forEach((option, index) => { option.hidden = !expanded && index >= Number(group.dataset.filterLimit); });
             toggle.setAttribute('aria-expanded', String(expanded));
             toggle.textContent = expanded ? 'Voir moins' : baseLabel;
         };
         const hasHiddenSelection = options.slice(Number(group.dataset.filterLimit)).some(option => option.querySelector('input:checked'));
-        show(hasHiddenSelection);
-        toggle.addEventListener('click', () => show(toggle.getAttribute('aria-expanded') !== 'true'));
+        setExpanded(toggle.getAttribute('aria-expanded') === 'true' || hasHiddenSelection);
+        toggle.addEventListener('click', () => setExpanded(toggle.getAttribute('aria-expanded') !== 'true'));
     });
 }
 
