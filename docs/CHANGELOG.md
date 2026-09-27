@@ -440,6 +440,8 @@
 
 ## Unreleased
 
+- Corrected the restaurant-directory filter visibility regression: extras are now genuinely hidden in the first SSR paint, toggle visibly on desktop/mobile, and a selected item after position eight renders expanded immediately.
+
 - Review e-mail confirmation now returns visitors to the relevant restaurant `#avis` anchor, with an accessible pending-verification or post-confirmation status and anchor-safe scroll positioning. The review-specific confirmation page uses precise e-mail/moderation wording and a server-derived restaurant CTA; consumed and unavailable links are handled without creating a duplicate or misleadingly implying a new confirmation.
 
 - Formulaire public d’ajout de restaurant : à l’étape 3, le téléphone est seul sur sa ligne desktop mais garde exactement la largeur d’une colonne Site web/Instagram ; les liens Site web/Instagram puis Facebook/TikTok s’alignent sur les deux lignes suivantes.

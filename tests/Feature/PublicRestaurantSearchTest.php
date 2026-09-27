@@ -63,9 +63,15 @@ class PublicRestaurantSearchTest extends TestCase
         $response->assertOk()->assertSeeInOrder(['Le plus récent', 'Le plus ancien'])->assertSee('2 restaurants halal');
     }
 
-    public function test_directory_sidebar_contains_only_taxonomy_filters_and_keeps_active_values_visible(): void
+    public function test_directory_sidebar_contains_only_taxonomy_filters_and_expands_for_an_active_value_after_the_initial_eight(): void
     {
         foreach (range(1, 9) as $number) Category::firstOrCreate(['slug' => "specialite-{$number}"], ['legacy_term_id' => 100 + $number, 'name' => "Spécialité {$number}"]);
+
+        $this->get('/restaurants')
+            ->assertOk()
+            ->assertSee('<label data-filter-option hidden><input type="checkbox" name="categories[]" value="specialite-9"', false)
+            ->assertSee('aria-expanded="false"', false)
+            ->assertSee('Voir toutes les spécialités');
 
         $this->get('/restaurants?categories[]=specialite-9')
             ->assertOk()
@@ -73,6 +79,7 @@ class PublicRestaurantSearchTest extends TestCase
             ->assertDontSee('Toutes les villes')
             ->assertSee('Spécialité 9')
             ->assertSee('Filtres (1)')
-            ->assertSee('Voir toutes les spécialités');
+            ->assertSee('aria-expanded="true"', false)
+            ->assertSee('Voir moins');
     }
 }
