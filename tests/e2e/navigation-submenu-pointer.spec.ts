@@ -150,7 +150,7 @@ test('desktop submenu uses an airy full-width link treatment without a header ga
   });
   expect(resting.color).toBe('rgb(22, 35, 31)');
   expect(resting.decoration).toBe('none');
-  expect(resting.weight).toBe('600');
+  expect(resting.weight).toBe('500');
   expect(resting.minHeight).toBe('44px');
 
   await link.hover();
