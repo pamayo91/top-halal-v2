@@ -73,6 +73,12 @@ class PublicRestaurantSearchTest extends TestCase
             ->assertSee('aria-expanded="false"', false)
             ->assertSee('Voir toutes les spécialités');
 
+        $this->get('/restaurants')
+            ->assertOk()
+            ->assertSee('<label data-filter-option hidden><input type="checkbox" name="categories[]" value="specialite-9"', false)
+            ->assertSee('aria-expanded="false"', false)
+            ->assertSee('Voir toutes les spécialités');
+
         $this->get('/restaurants?categories[]=specialite-9')
             ->assertOk()
             ->assertDontSee('Nom ou ville')
