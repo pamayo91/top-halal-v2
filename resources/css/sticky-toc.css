@@ -16,5 +16,6 @@
     .sidebar-toc.is-compact [data-toc-current],.sidebar-toc.is-compact [data-toc-toggle]{display:block}
     .sidebar-toc.is-compact [data-toc-toggle]{margin-top:.7rem}
     .sidebar-toc.is-compact.is-expanded{max-height:68vh;overflow:auto}
+    .sidebar-toc.is-compact.is-expanded [data-toc-toggle]{display:none}
     .sidebar-toc.is-compact.is-expanded [data-toc-list]{display:grid;margin-top:.8rem}
 }

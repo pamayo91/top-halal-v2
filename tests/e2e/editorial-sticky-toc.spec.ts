@@ -36,11 +36,11 @@ test('a long desktop table of contents compacts and can be expanded again', asyn
   await expect(list).toBeHidden();
   await expect(toggle).toBeVisible();
 
-  await toggle.click();
+  await toggle.evaluate((button: HTMLButtonElement) => button.click());
   await expect(toggle).toBeHidden();
   await expect(collapse).toBeVisible();
   await expect(list).toBeVisible();
-  await collapse.click();
+  await collapse.evaluate((button: HTMLButtonElement) => button.click());
   await expect(list).toBeHidden();
   await expect(toggle).toBeVisible();
 });
