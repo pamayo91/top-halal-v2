@@ -39,6 +39,7 @@ test('directory starts without a city and exposes its mobile filter drawer', asy
   await search.getByLabel('Localisation').focus();
   await expect(search.getByRole('button', { name: 'Autour de moi' })).toBeVisible();
   if ((page.viewportSize()?.width ?? 0) < 760) {
+    await search.getByLabel('Localisation').press('Escape');
     const trigger = page.getByRole('button', { name: /Filtres/ });
     await trigger.click();
     await expect(page.getByRole('dialog', { name: 'Filtres' })).toBeVisible();
