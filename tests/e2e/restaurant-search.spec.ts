@@ -43,7 +43,7 @@ test('directory starts without a city and exposes its mobile filter drawer', asy
     const trigger = page.getByRole('button', { name: /Filtres/ });
     await trigger.click();
     await expect(page.getByRole('dialog', { name: 'Filtres' })).toBeVisible();
-    await expect(page.getByRole('dialog').getByText('Spécialités')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Spécialités', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Fermer les filtres' }).click();
     await expect(page.getByRole('dialog')).toBeHidden();
   }
