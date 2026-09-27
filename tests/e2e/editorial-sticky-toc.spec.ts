@@ -13,7 +13,7 @@ test('a long desktop table of contents compacts and can be expanded again', asyn
 
   const headings = Array.from({ length: 20 }, (_, index) => `<h2 id="section-${index + 1}" style="height:140px">Section ${index + 1}</h2>`).join('');
   const links = Array.from({ length: 20 }, (_, index) => `<li class="toc-level-2"><a href="#section-${index + 1}">Section ${index + 1}</a></li>`).join('');
-  await page.setContent(`${styles}<section class="sidebar-card sidebar-toc" data-sticky-toc><p class="sidebar-title">Sommaire</p><div class="sidebar-toc-current" data-toc-current hidden><a data-toc-current-link href="#section-1">Section 1</a></div><button class="sidebar-toc-toggle" type="button" data-toc-toggle aria-expanded="false" hidden>Afficher le sommaire</button><ol data-toc-list>${links}</ol></section>${headings}`);
+  await page.setContent(`${styles}<section class="sidebar-card sidebar-toc" data-sticky-toc><div class="sidebar-toc-header"><p class="sidebar-title">Sommaire</p><button class="sidebar-toc-collapse" type="button" data-toc-collapse hidden>Réduire <span aria-hidden="true">↑</span></button></div><div class="sidebar-toc-current" data-toc-current hidden><a data-toc-current-link href="#section-1">Section 1</a></div><button class="sidebar-toc-toggle" type="button" data-toc-toggle aria-expanded="false" hidden>Afficher le sommaire</button><ol data-toc-list>${links}</ol></section>${headings}`);
   await page.evaluate(src => new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
     const fixtureSrc = new URL(src); fixtureSrc.searchParams.set('fixture', 'sticky-toc');
@@ -24,16 +24,23 @@ test('a long desktop table of contents compacts and can be expanded again', asyn
   const toc = page.locator('[data-sticky-toc]');
   const list = toc.locator('[data-toc-list]');
   const toggle = toc.locator('[data-toc-toggle]');
-  await expect(toggle).toBeVisible();
-  expect(await toc.evaluate(element => Number.parseFloat(getComputedStyle(element).maxHeight))).toBeLessThanOrEqual(900 * .72);
+  const collapse = toc.locator('[data-toc-collapse]');
+  await expect(toggle).toBeHidden();
+  await expect(collapse).toBeHidden();
+  await expect(list).toBeVisible();
+  expect(await toc.evaluate(element => Number.parseFloat(getComputedStyle(element).maxHeight))).toBeLessThanOrEqual(900 * .68);
 
   await page.evaluate(() => window.scrollTo(0, 2_200));
   await expect(toc).toHaveClass(/is-compact/);
   await expect(toc.locator('[data-toc-current-link]')).not.toHaveText('Section 1');
   await expect(list).toBeHidden();
+  await expect(toggle).toBeVisible();
 
   await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  await expect(toggle).toHaveText('Réduire le sommaire');
+  await expect(toggle).toBeHidden();
+  await expect(collapse).toBeVisible();
   await expect(list).toBeVisible();
+  await collapse.click();
+  await expect(list).toBeHidden();
+  await expect(toggle).toBeVisible();
 });
