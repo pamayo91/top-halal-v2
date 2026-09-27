@@ -113,7 +113,7 @@
     justify-content: space-between;
     width: 100%;
     min-height: 44px;
-    padding: .7rem .8rem;
+    padding: .625rem .8rem;
     border-radius: 8px;
     color: var(--ink);
     font-weight: 600;
@@ -124,6 +124,7 @@
 .site-header .nav-menu-list .submenu li > a::after {
     color: var(--green);
     content: '→';
+    font-size: .9em;
     opacity: 0;
     transform: translateX(-3px);
     transition: opacity .14s ease, transform .14s ease;
@@ -137,7 +138,7 @@
 
 .site-header .nav-menu-list .submenu li > a:hover::after,
 .site-header .nav-menu-list .submenu li > a:focus-visible::after {
-    opacity: 1;
+    opacity: .65;
     transform: translateX(0);
 }
 
