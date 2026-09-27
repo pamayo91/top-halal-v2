@@ -1,9 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-for (const device of ['desktop', 'mobile']) {
-  test(`Quick halal exposes crawlable threaded comments on ${device}`, async ({ page }, testInfo) => {
-    test.skip(device === 'mobile' && !testInfo.project.name.includes('mobile'), 'Mobile project only.');
-    test.skip(device === 'desktop' && !testInfo.project.name.includes('desktop'), 'Desktop project only.');
+test('Quick halal exposes crawlable threaded comments', async ({ page }) => {
     const errors: string[] = [];
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('requestfailed', request => errors.push(request.url()));
@@ -26,5 +23,4 @@ for (const device of ['desktop', 'mobile']) {
     await page.locator('[data-reply-details] summary').first().click();
     await expect(page.getByText(/Répondre à/).first()).toBeVisible();
     expect(errors).toEqual([]);
-  });
-}
+});
