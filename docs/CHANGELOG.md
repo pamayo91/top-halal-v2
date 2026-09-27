@@ -512,3 +512,9 @@
 - Réponses inline, limitées à deux niveaux visuels, avec validation serveur stricte du parent et réemploi intégral de l’identité/vérification/modération existante.
 - Canonical des URLs `comments_page` maintenue sur l’URL éditoriale principale.
 
+# 2026-09-27 — Annuaire restaurants : passe UX ciblée
+
+- L’annuaire démarre sans filtre Paris implicite, tout en conservant les suggestions et la géolocalisation volontaire ; l’accueil garde son raccourci Paris explicite.
+- Les résultats sont désormais déterministes du plus récemment publié/ajouté au plus ancien ; la sidebar est exclusivement dédiée aux spécialités/services, repliable sur desktop et disponible dans un drawer accessible sur mobile.
+- Compteur français, liens de cartes, pagination et états clavier affinés sans toucher aux routes, canonicals, noindex, facettes ou fallbacks média.
+

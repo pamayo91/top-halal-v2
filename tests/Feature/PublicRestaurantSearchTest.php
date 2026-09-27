@@ -11,12 +11,13 @@ class PublicRestaurantSearchTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function test_home_search_defaults_to_paris_and_only_exposes_published_city_data(): void
+    public function test_directory_has_no_default_city_while_home_keeps_its_explicit_paris_shortcut(): void
     {
         Restaurant::create(['legacy_wp_id' => 1, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         Restaurant::create(['legacy_wp_id' => 2, 'name' => 'Caché', 'slug' => 'cache', 'status' => 'pending', 'city_name' => 'Ville cachée']);
 
         $this->get('/')->assertOk()->assertSee('Localisation')->assertSee('value="Paris"', false)->assertSee('Paris publié')->assertDontSee('Ville cachée');
+        $this->get('/restaurants')->assertOk()->assertSee('placeholder="Ville ou localisation"', false)->assertDontSee('value="Paris"', false)->assertDontSee('name="ville" value="paris"', false)->assertSee('Autour de moi');
         $this->getJson('/restaurants/recherche/villes?q=par')->assertOk()->assertJsonPath('cities.0.slug', 'paris');
     }
 
@@ -50,5 +51,28 @@ class PublicRestaurantSearchTest extends TestCase
         RedirectRule::create(['source_path' => '/restaurants/recherche', 'match_type' => 'exact', 'destination' => '/resto/recherche', 'status_code' => 301, 'priority' => 1, 'is_active' => true]);
 
         $this->get('/restaurants/recherche?ville=paris')->assertRedirect('/restos/paris');
+    }
+
+    public function test_directory_orders_restaurants_by_canonical_publication_date_and_formats_its_count(): void
+    {
+        Restaurant::create(['legacy_wp_id' => 10, 'name' => 'Le plus ancien', 'slug' => 'le-plus-ancien', 'status' => 'published', 'legacy_published_at' => '2024-01-01 10:00:00']);
+        Restaurant::create(['legacy_wp_id' => 11, 'name' => 'Le plus récent', 'slug' => 'le-plus-recent', 'status' => 'published', 'legacy_published_at' => '2025-01-01 10:00:00']);
+
+        $response = $this->get('/restaurants');
+
+        $response->assertOk()->assertSeeInOrder(['Le plus récent', 'Le plus ancien'])->assertSee('2 restaurants halal');
+    }
+
+    public function test_directory_sidebar_contains_only_taxonomy_filters_and_keeps_active_values_visible(): void
+    {
+        foreach (range(1, 9) as $number) Category::firstOrCreate(['slug' => "specialite-{$number}"], ['legacy_term_id' => 100 + $number, 'name' => "Spécialité {$number}"]);
+
+        $this->get('/restaurants?categories[]=specialite-9')
+            ->assertOk()
+            ->assertDontSee('Nom ou ville')
+            ->assertDontSee('Toutes les villes')
+            ->assertSee('Spécialité 9')
+            ->assertSee('Filtres (1)')
+            ->assertSee('Voir toutes les spécialités');
     }
 }

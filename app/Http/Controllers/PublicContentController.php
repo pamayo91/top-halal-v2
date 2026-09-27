@@ -39,10 +39,15 @@ class PublicContentController extends Controller
 
     public function index(Request $request): View
     {
+        $cities = $this->citySeo->cities()->sortBy('city_name')->map(fn (object $city): object => (object) ['name' => $this->cityLabel($city), 'slug' => $city->slug]);
+        $selectedCity = $cities->firstWhere('slug', $request->input('ville'));
+
         return view('public.restaurants.index', [
             'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
-            'cities' => $this->citySeo->cities()->sortBy('city_name')->map(fn (object $city): object => (object) ['name' => $this->cityLabel($city), 'slug' => $city->slug]),
+            'cities' => $cities,
+            'selectedCity' => $selectedCity,
+            'activeFilterCount' => count((array) $request->input('categories', [])) + count((array) $request->input('features', [])),
             'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
     }

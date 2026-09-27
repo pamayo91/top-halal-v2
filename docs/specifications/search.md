@@ -11,7 +11,9 @@
 
 ## Recherche publique à deux champs
 
-L’accueil et l’annuaire réutilisent le même composant Blade SSR : une localisation et une spécialité ou un restaurant. Paris est sa valeur initiale. Les villes sont calculées depuis `restaurants.city_name` des seules fiches publiées, classées par volume, avec une liste courte et une recherche asynchrone légère ; aucune donnée redondante ni code INSEE ne sert à cette fonction. Une ville seule mène à `/restos/{Str::slug(city_name)}`.
+L’accueil et l’annuaire réutilisent le même composant Blade SSR : une localisation et une spécialité ou un restaurant. L’annuaire s’ouvre sans ville sélectionnée (`Ville ou localisation`) ; l’accueil conserve son raccourci explicite Paris. Les villes sont calculées depuis `restaurants.city_name` des seules fiches publiées, classées par volume, avec une liste courte et une recherche asynchrone légère ; aucune donnée redondante ni code INSEE ne sert à cette fonction. Une ville seule mène à `/restos/{Str::slug(city_name)}`.
+
+La liste `/restaurants` est ordonnée par date canonique de publication décroissante (`legacy_published_at`, puis `created_at` pour les créations V2), avec `id DESC` comme départage déterministe. Les filtres de spécialités et services restent les seules entrées de la sidebar : sur desktop elles sont repliables après huit valeurs et sticky sans dépasser le viewport ; sur mobile elles sont présentées dans un drawer léger et accessible. Les filtres actifs restent toujours visibles.
 
 Les suggestions, limitées et déclenchées après deux caractères, distinguent toutes les spécialités V2 et les restaurants publiés. Une spécialité est donc proposée dès sa création, même avant d’être associée à une fiche publiée. Les restaurants de la ville sélectionnée sont proposés en premier, sans exclure les autres villes. La sélection explicite d’un restaurant ouvre directement sa fiche.
 

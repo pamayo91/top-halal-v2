@@ -16,6 +16,7 @@ import '../css/account.css';
 import '../css/owner-restaurant-editor.css';
 import '../css/typography.css';
 import '../css/navigation.css';
+import '../css/directory-filters.css';
 import { initializeAddressSelectors } from './address-selector';
 import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
 import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';
@@ -73,6 +74,55 @@ initializeRestaurantHoursEditors();
 initializeManagedRestaurantMedia();
 initializeRestaurantPhotoPickers();
 initializeTaxonomyRequirements();
+
+const filtersDrawer = document.querySelector('[data-filters-drawer]');
+const filtersTrigger = document.querySelector('[data-filters-trigger]');
+if (filtersDrawer && filtersTrigger) {
+    document.documentElement.classList.add('filters-enhanced');
+    const close = () => {
+        filtersDrawer.classList.remove('is-open');
+        filtersDrawer.removeAttribute('role');
+        filtersDrawer.removeAttribute('aria-modal');
+        filtersTrigger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    };
+    const open = () => {
+        filtersDrawer.classList.add('is-open');
+        filtersDrawer.setAttribute('role', 'dialog');
+        filtersDrawer.setAttribute('aria-modal', 'true');
+        filtersTrigger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+        filtersDrawer.querySelector('[data-filters-close]')?.focus();
+    };
+    filtersTrigger.addEventListener('click', open);
+    filtersDrawer.querySelector('[data-filters-close]')?.addEventListener('click', () => { close(); filtersTrigger.focus(); });
+    filtersDrawer.addEventListener('click', event => { if (event.target === filtersDrawer) { close(); filtersTrigger.focus(); } });
+    document.addEventListener('keydown', event => {
+        if (!filtersDrawer.classList.contains('is-open')) return;
+        if (event.key === 'Escape') { close(); filtersTrigger.focus(); return; }
+        if (event.key !== 'Tab') return;
+        const focusable = [...filtersDrawer.querySelectorAll('button:not([disabled]), a[href], input:not([disabled])')].filter(element => !element.hidden && !element.closest('[hidden]'));
+        if (!focusable.length) return;
+        const first = focusable[0]; const last = focusable.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    filtersDrawer.querySelectorAll('[data-filter-group]').forEach(group => {
+        const options = [...group.querySelectorAll('[data-filter-option]')];
+        const toggle = group.querySelector('[data-filter-toggle]');
+        if (!toggle || options.length <= Number(group.dataset.filterLimit)) return;
+        const baseLabel = toggle.textContent;
+        const show = expanded => {
+            options.forEach((option, index) => { option.hidden = !expanded && index >= Number(group.dataset.filterLimit) && !option.querySelector('input:checked'); });
+            toggle.hidden = false;
+            toggle.setAttribute('aria-expanded', String(expanded));
+            toggle.textContent = expanded ? 'Voir moins' : baseLabel;
+        };
+        const hasHiddenSelection = options.slice(Number(group.dataset.filterLimit)).some(option => option.querySelector('input:checked'));
+        show(hasHiddenSelection);
+        toggle.addEventListener('click', () => show(toggle.getAttribute('aria-expanded') !== 'true'));
+    });
+}
 
 if (submission) {
     void import('../css/restaurant-submission.css');

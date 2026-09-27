@@ -31,6 +31,23 @@ test('near me is requested only after the voluntary choice and keeps the search 
   await expect(search.getByLabel('Localisation')).toBeFocused();
 });
 
+test('directory starts without a city and exposes its mobile filter drawer', async ({ page }) => {
+  await page.goto('/restaurants');
+  const search = page.locator('[data-restaurant-search]');
+  await expect(search.getByLabel('Localisation')).toHaveValue('');
+  await expect(search.getByLabel('Localisation')).toHaveAttribute('placeholder', 'Ville ou localisation');
+  await search.getByLabel('Localisation').focus();
+  await expect(search.getByRole('button', { name: 'Autour de moi' })).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) < 760) {
+    const trigger = page.getByRole('button', { name: /Filtres/ });
+    await trigger.click();
+    await expect(page.getByRole('dialog', { name: 'Filtres' })).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Spécialités')).toBeVisible();
+    await page.getByRole('button', { name: 'Fermer les filtres' }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+  }
+});
+
 test('near me sends mocked coordinates only after the voluntary choice', async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });

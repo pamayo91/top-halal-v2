@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-27
 
+Latest restaurant-directory UX pass: `/restaurants` no longer applies Paris implicitly; the shared search keeps an explicit Paris shortcut only on the homepage, while its existing voluntary location suggestions remain available. Directory results now use the canonical publication/addition recency order with a deterministic ID tie-breaker. The desktop sidebar contains only compact specialty/service filters, sticky within the viewport; mobile uses an accessible lightweight drawer. Result wording, restaurant-name link states and server pagination have been refined without changing SEO, routes, facets or specialty fallback imagery.
+
 Latest desktop submenu refinement: header dropdowns remain directly attached to their root item and preserve the green active underline on primary navigation, while desktop panels now use a 264 px minimum width, subtle border/shadow, full-width dark semibold links and a pale-green hover/focus state with a small right arrow. There is no submenu chevron and mobile navigation is unchanged.
 
 Latest editorial comments: approved comments now load as 20 complete root threads per SSR page, with every approved descendant retained in its thread and displayed at a maximum of two visual levels. The next batch is a crawlable `comments_page` link (enhanced with a small append-only JS fetch), every paginated URL canonicalizes to its editorial root, and replies reuse the exact contribution identity, verification, moderation and URL-free rules after server-side same-content parent validation.
