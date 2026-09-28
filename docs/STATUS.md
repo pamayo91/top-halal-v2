@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-28
 
+Latest public specialty-autocomplete correction: selecting a specialty now submits only its V2 category filter, never the visible specialty label as a competing free-text query. Free text remains `q`; editing after a specialty selection invalidates only that automatic category. City/GPS state, sidebar filters, direct restaurant navigation and SEO behaviour are unchanged.
+
 Latest public restaurant-search state correction: location is a persistent, normalised constraint shared by the directory, voluntary GPS proximity and city landings. Filter changes and pagination retain the active GPS coordinates or INSEE city code; an explicit change of location removes the other mode. City landings retain their SEO presentation while exposing the shared SSR search and filters; filtered combinations remain `noindex,follow` directory results.
 
 Latest nearby-search correction: « Autour de moi » is now an actual server-side 30 km radius, bounding-box prefiltered then ordered by exact distance. It never falls back outside the radius. Desktop specialty/service checkboxes apply immediately with minimal progressive JS; the mobile drawer keeps its grouped CTA, and the primary search submits those same checked filters.

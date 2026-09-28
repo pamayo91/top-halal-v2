@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\{CommuneReference, Feature, RedirectRule, Restaurant};
+use App\Services\PublicRestaurantSearch;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\Request;
 use Tests\TestCase;
 
 class PublicRestaurantSearchTest extends TestCase
@@ -95,6 +97,58 @@ class PublicRestaurantSearchTest extends TestCase
 
         $this->get('/restaurants/recherche?city_code=75056&q=grill&categories[]=burger&features[]=terrasse')
             ->assertRedirect('/restaurants?q=grill&city_code=75056&categories%5B0%5D=burger&features%5B0%5D=terrasse');
+    }
+
+    public function test_specialty_selection_state_is_a_category_only_and_matches_the_manual_filter_population(): void
+    {
+        $this->commune('75056', 'Paris', '75');
+        $pizzeria = Category::firstOrCreate(['slug' => 'pizzeria'], ['legacy_term_id' => 307, 'name' => 'Pizzeria']);
+        $matchingCategory = Restaurant::create(['legacy_wp_id' => 307, 'name' => 'Chez Napoli', 'slug' => 'chez-napoli', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111']);
+        $matchingCategory->categories()->attach($pizzeria);
+
+        $search = app(PublicRestaurantSearch::class);
+        $suggestionState = $search->state(new Request(['city_code' => '75056', 'categories' => ['pizzeria']]));
+        $manualState = $search->state(new Request(['city_code' => '75056', 'categories' => ['pizzeria']]));
+
+        $this->assertSame('', $suggestionState['q']);
+        $this->assertSame('75056', $suggestionState['city_code']);
+        $this->assertSame(['pizzeria'], $suggestionState['categories']);
+        $this->assertSame(
+            $search->apply($search->published(), new Request(), $manualState)->pluck('id')->all(),
+            $search->apply($search->published(), new Request(), $suggestionState)->pluck('id')->all(),
+        );
+        $this->assertSame([$matchingCategory->id], $search->apply($search->published(), new Request(), $suggestionState)->pluck('id')->all());
+
+        $doubleConstraint = $search->state(new Request(['city_code' => '75056', 'q' => 'Pizzeria', 'categories' => ['pizzeria']]));
+        $this->assertSame([], $search->apply($search->published(), new Request(), $doubleConstraint)->pluck('id')->all());
+    }
+
+    public function test_specialty_selection_preserves_nearby_gps_and_the_fixed_radius_without_text(): void
+    {
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 308, 'name' => 'Burger']);
+
+        $state = app(PublicRestaurantSearch::class)->state(new Request(['lat' => '48.8566', 'lng' => '2.3522', 'categories' => [$burger->slug]]));
+
+        $this->assertSame('', $state['q']);
+        $this->assertTrue($state['nearby']);
+        $this->assertSame(48.8566, $state['lat']);
+        $this->assertSame(2.3522, $state['lng']);
+        $this->assertSame(30, $state['radius_km']);
+        $this->assertSame(['burger'], $state['categories']);
+    }
+
+    public function test_free_text_and_manual_editing_after_a_specialty_selection_do_not_keep_an_automatic_category(): void
+    {
+        $search = app(PublicRestaurantSearch::class);
+
+        $freeText = $search->state(new Request(['city_code' => '75056', 'q' => 'pizza']));
+        $editedSelection = $search->state(new Request(['city_code' => '75056', 'q' => 'Quick']));
+
+        $this->assertSame('pizza', $freeText['q']);
+        $this->assertSame([], $freeText['categories']);
+        $this->assertSame('75056', $freeText['city_code']);
+        $this->assertSame('Quick', $editedSelection['q']);
+        $this->assertSame([], $editedSelection['categories']);
     }
 
     public function test_city_landing_exposes_shared_filters_and_keeps_its_city_when_filtering(): void

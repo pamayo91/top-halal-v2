@@ -395,7 +395,7 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
             form.append(input);
         });
     };
-    let cityTimer; let queryTimer; let selectedRestaurant = null; let active = -1;
+    let cityTimer; let queryTimer; let selectedRestaurant = null; let selectedCategory = null; let active = -1;
     const buttons = container => [...container.querySelectorAll('button:not([disabled])')];
     const close = container => { container.hidden = true; active = -1; };
     const clearNearbyState = () => form.querySelectorAll('[data-nearby-state]').forEach(input => { input.disabled = true; });
@@ -405,8 +405,15 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     const loadCities = async (term = '') => {
         try { const response = await fetch(`${form.dataset.citiesUrl}?q=${encodeURIComponent(term)}`, { headers: { Accept: 'application/json' } }); if (!response.ok) return; const data = await response.json(); cities.querySelectorAll('[data-city-name]').forEach(el => el.remove()); data.cities.forEach(city => cities.append(cityButton(city))); cities.hidden = false; location.setAttribute('aria-expanded', 'true'); } catch (_) { /* Native form submission remains available. */ }
     };
+    const clearSelectedCategory = () => {
+        if (!selectedCategory) return;
+        selectedCategory = null;
+        category.value = '';
+        category.disabled = true;
+        query.name = 'q';
+    };
     const renderSuggestions = data => {
-        suggestions.replaceChildren(); selectedRestaurant = null; category.disabled = true;
+        suggestions.replaceChildren(); selectedRestaurant = null;
         if (data.specialties.length) { const heading = document.createElement('p'); heading.className = 'search-group-label'; heading.textContent = 'Spécialités'; suggestions.append(heading); data.specialties.forEach(item => { const button = document.createElement('button'); button.type = 'button'; button.role = 'option'; button.textContent = item.name; button.dataset.category = item.slug; suggestions.append(button); }); }
         if (data.restaurants.length) { const heading = document.createElement('p'); heading.className = 'search-group-label'; heading.textContent = 'Restaurants'; suggestions.append(heading); data.restaurants.forEach(item => { const button = document.createElement('button'); button.type = 'button'; button.role = 'option'; button.dataset.restaurant = item.slug; button.textContent = item.name; if (item.city_name) { const city = document.createElement('small'); city.textContent = item.city_name; button.append(city); } suggestions.append(button); }); }
         suggestions.hidden = !data.specialties.length && !data.restaurants.length; query.setAttribute('aria-expanded', String(!suggestions.hidden));
@@ -419,8 +426,8 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     query.addEventListener('focus', () => close(cities));
     document.addEventListener('pointerdown', event => { if (!form.contains(event.target)) close(cities); });
     cities.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.matches('[data-near-me]')) { if (!navigator.geolocation) return showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); button.disabled = true; navigator.geolocation.getCurrentPosition(({ coords }) => { synchronizeDirectoryFilters(); const params = new URLSearchParams(new FormData(form)); params.delete('city_code'); params.delete('location'); params.delete('ville'); params.delete('lat'); params.delete('lng'); params.set('lat', coords.latitude); params.set('lng', coords.longitude); window.location.assign(`${form.action.replace('/recherche', '')}?${params.toString()}`); }, () => { button.disabled = false; showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }); return; } chooseCity(button.dataset.cityName, button.dataset.cityCode); });
-    query.addEventListener('input', () => { selectedRestaurant = null; category.disabled = true; clearTimeout(queryTimer); queryTimer = setTimeout(loadSuggestions, 220); });
-    suggestions.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.dataset.category) { category.value = button.dataset.category; category.disabled = false; query.value = button.textContent; close(suggestions); return; } if (button.dataset.restaurant) { selectedRestaurant = button.dataset.restaurant; query.value = button.childNodes[0].textContent; close(suggestions); } });
+    query.addEventListener('input', () => { selectedRestaurant = null; clearSelectedCategory(); clearTimeout(queryTimer); queryTimer = setTimeout(loadSuggestions, 220); });
+    suggestions.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.dataset.category) { selectedCategory = { label: button.textContent, slug: button.dataset.category }; category.value = selectedCategory.slug; category.disabled = false; query.value = selectedCategory.label; query.removeAttribute('name'); close(suggestions); return; } if (button.dataset.restaurant) { clearSelectedCategory(); selectedRestaurant = button.dataset.restaurant; query.value = button.childNodes[0].textContent; close(suggestions); } });
     [location, query].forEach(input => input.addEventListener('keydown', event => { const container = input === location ? cities : suggestions; const options = buttons(container); if (event.key === 'Escape') { close(container); return; } if (!options.length || container.hidden) return; if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); active = (active + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length; options[active].focus(); } }));
     form.addEventListener('submit', event => { synchronizeDirectoryFilters(); if (selectedRestaurant) { event.preventDefault(); window.location.assign(`/resto/${encodeURIComponent(selectedRestaurant)}`); return; } const nearby = [...form.querySelectorAll('[data-nearby-state]')].some(input => !input.disabled); if (location.value.trim() !== '' && cityValue.value === '' && !nearby) { event.preventDefault(); showMessage("Nous n'avons pas trouvé cette ville. Vérifiez l'orthographe ou sélectionnez une suggestion."); } });
 });

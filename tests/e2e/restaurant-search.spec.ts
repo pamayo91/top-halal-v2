@@ -164,6 +164,45 @@ test('city landing shares filters and keeps Paris when applying one', async ({ p
   await page.waitForURL(/\/restaurants\?.*city_code=75056.*categories/);
 });
 
+test('a specialty suggestion is exactly the Paris manual specialty filter without a competing text query', async ({ page }) => {
+  await page.goto('/restaurants?city_code=75056&categories%5B%5D=pizzeria');
+  const manualCount = (await page.locator('[data-results-count]').textContent())?.trim();
+  expect(manualCount).toBeTruthy();
+
+  await page.goto('/restos/paris');
+  const search = page.locator('[data-restaurant-search]');
+  const query = search.getByLabel('Spécialité ou nom de restaurant');
+  await query.fill('pizz');
+  await expect(search.locator('[data-suggestions-list]')).toBeVisible();
+  await search.getByRole('option', { name: 'Pizzeria', exact: true }).click();
+  await expect(query).toHaveValue('Pizzeria');
+  await expect(query).not.toHaveAttribute('name', 'q');
+  await search.getByRole('button', { name: 'Rechercher' }).click();
+  await page.waitForURL(/\/restaurants\?.*city_code=75056.*categories/);
+
+  const parameters = new URL(page.url()).searchParams;
+  expect(parameters.has('q')).toBe(false);
+  expect(parameters.getAll('categories[0]')).toContain('pizzeria');
+  await expect(page.locator('[data-results-count]')).toHaveText(manualCount ?? '');
+  await expect(page.locator('[data-directory-filter-form] input[name="categories[]"][value="pizzeria"]')).toBeChecked();
+});
+
+test('free text and an edit after a specialty suggestion submit text only', async ({ page }) => {
+  await page.goto('/restos/paris');
+  const search = page.locator('[data-restaurant-search]');
+  const query = search.getByLabel('Spécialité ou nom de restaurant');
+  await query.fill('pizz');
+  await search.getByRole('option', { name: 'Pizzeria', exact: true }).click();
+  await query.fill('Quick');
+  await expect(query).toHaveAttribute('name', 'q');
+  await search.getByRole('button', { name: 'Rechercher' }).click();
+  await page.waitForURL(/\/restaurants\?.*q=Quick.*city_code=75056/);
+
+  const parameters = new URL(page.url()).searchParams;
+  expect(parameters.get('q')).toBe('Quick');
+  expect(parameters.getAll('categories[0]')).not.toContain('pizzeria');
+});
+
 test('nearby results are limited to thirty kilometres and sorted by distance', async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });

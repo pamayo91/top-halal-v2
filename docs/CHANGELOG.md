@@ -545,3 +545,8 @@
 - « Autour de moi » limite désormais réellement les résultats à 30 km côté serveur, après boîte englobante et avant tri exact par distance ; aucun fallback hors rayon n’est appliqué.
 - Le moteur principal synchronise les spécialités/services cochés avant soumission. Sur desktop, les cases appliquent immédiatement la recherche SSR ; le drawer mobile conserve une validation groupée accessible.
 
+# 2026-09-28 — Autocomplete de spécialité sans double contrainte
+
+- Une suggestion de spécialité active désormais uniquement `categories[]` : son libellé reste affichable dans le champ, sans devenir simultanément une recherche texte `q`.
+- Une saisie libre conserve `q` sans inventer de spécialité ; toute retouche après une sélection annule précisément la spécialité automatique, sans effacer les filtres de sidebar choisis volontairement.
+
