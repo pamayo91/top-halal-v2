@@ -53,6 +53,18 @@ class CitySpecialtySeoPagesTest extends TestCase
         $this->get('/sitemap.xml')->assertDontSee('/restos/marseille/burger', false);
     }
 
+    public function test_open_city_specialty_listing_uses_the_canonical_recency_order(): void
+    {
+        $burger = $this->specialty('Burger', 'burger');
+        $older = $this->published('Marseille Burger ancien', 'marseille-burger-ancien', 'Marseille', '13206', $burger);
+        $newer = $this->published('Marseille Burger récent', 'marseille-burger-recent', 'Marseille', '13206', $burger);
+        $older->update(['legacy_published_at' => '2025-01-01 10:00:00']);
+        $newer->update(['legacy_published_at' => '2026-01-01 10:00:00']);
+        CitySpecialtySeoPage::create(['city_code' => '13055', 'category_id' => $burger->id, 'state' => 'open']);
+
+        $this->get('/restos/marseille/burger')->assertOk()->assertSeeInOrder([$newer->name, $older->name]);
+    }
+
     public function test_filters_remain_usable_when_a_matching_facet_is_closed_and_an_open_facet_can_use_its_canonical_url(): void
     {
         $burger = $this->specialty('Burger', 'burger');

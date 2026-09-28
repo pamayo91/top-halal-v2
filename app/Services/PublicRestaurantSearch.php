@@ -38,11 +38,15 @@ class PublicRestaurantSearch
             $clamp = DB::connection()->getDriverName() === 'sqlite' ? 'min' : 'least';
             $distance = "(6371 * acos({$clamp}(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))";
             $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km');
-        } else {
-            // Restaurants do not have an independent published_at column. The
-            // legacy publication timestamp is canonical; V2 records use creation.
-            $query->orderByRaw('COALESCE(legacy_published_at, created_at) DESC')->orderByDesc('id');
-        }
+        } else $this->orderByRecent($query);
         return $query;
+    }
+
+    /** Apply the one canonical default order to every non-proximity public listing. */
+    public function orderByRecent(Builder $query): Builder
+    {
+        // Restaurants do not have an independent published_at column. The
+        // legacy publication timestamp is canonical; V2 records use creation.
+        return $query->orderByRaw('COALESCE(legacy_published_at, created_at) DESC')->orderByDesc('id');
     }
 }

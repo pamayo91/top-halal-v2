@@ -528,4 +528,5 @@
 
 - L’autocomplete partagé recherche désormais toutes les communes officielles locales par code INSEE, avec tolérance aux accents et séparateurs simples.
 - Les communes sans restaurant ouvrent un résultat `noindex,follow` à zéro résultat ; les textes non résolus et les modifications manuelles ne peuvent plus reprendre Paris silencieusement.
+- Tous les listings publics hors proximité sont désormais classés par date canonique de publication, y compris les pages géographiques et de taxonomie.
 

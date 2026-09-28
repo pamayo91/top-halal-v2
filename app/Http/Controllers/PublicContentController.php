@@ -31,7 +31,7 @@ class PublicContentController extends Controller
     public function home(): View
     {
         return view('public.home', [
-            'featuredRestaurants' => $this->search->published()->latest('legacy_published_at')->limit(6)->get(),
+            'featuredRestaurants' => $this->search->orderByRecent($this->search->published())->limit(6)->get(),
             'cities' => $this->topCities(),
             'categories' => Category::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(10)->get(),
             'articles' => Article::with(['categories', 'featuredMedia.asset.variants', 'contentMedia.asset.variants'])->where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->limit(3)->get(),
@@ -140,7 +140,7 @@ class PublicContentController extends Controller
             return $this->geographicListing(
                 term: (object) ['name' => $city->city_name],
                 kind: 'ville',
-                restaurants: $this->search->published()->whereIn('city_code', $city->source_city_codes)->paginate(12)->withQueryString(),
+                restaurants: $this->search->orderByRecent($this->search->published()->whereIn('city_code', $city->source_city_codes))->paginate(12)->withQueryString(),
                 open: (bool) $citySeo?->open,
                 citySeo: $citySeo,
                 breadcrumbs: $this->cityBreadcrumbs($city),
@@ -163,7 +163,7 @@ class PublicContentController extends Controller
             return $this->geographicListing(
                 term: (object) ['name' => $department->name],
                 kind: 'département',
-                restaurants: $this->geography->scopeDepartment($this->search->published(), $department)->paginate(12)->withQueryString(),
+                restaurants: $this->search->orderByRecent($this->geography->scopeDepartment($this->search->published(), $department))->paginate(12)->withQueryString(),
                 open: $department->restaurants_count >= $this->citySeo->threshold(),
                 breadcrumbs: $this->departmentBreadcrumbs($department),
             );
@@ -173,7 +173,7 @@ class PublicContentController extends Controller
             return $this->geographicListing(
                 term: (object) ['name' => $region->name],
                 kind: 'région',
-                restaurants: $this->geography->scopeRegion($this->search->published(), $region)->paginate(12)->withQueryString(),
+                restaurants: $this->search->orderByRecent($this->geography->scopeRegion($this->search->published(), $region))->paginate(12)->withQueryString(),
                 open: $region->restaurants_count >= $this->citySeo->threshold(),
                 breadcrumbs: $this->breadcrumbs((object) ['name' => $region->name]),
             );
@@ -197,9 +197,9 @@ class PublicContentController extends Controller
         $seoPage = $specialtyPage ?? $servicePage;
         $service = $servicePage !== null;
 
-        $restaurants = $this->search->published()
+        $restaurants = $this->search->orderByRecent($this->search->published()
             ->whereIn('city_code', $cityPage->source_city_codes)
-            ->whereHas($service ? 'features' : 'categories', fn (Builder $query) => $query->whereKey($term->id))
+            ->whereHas($service ? 'features' : 'categories', fn (Builder $query) => $query->whereKey($term->id)))
             ->paginate(12)
             ->withQueryString();
         $defaults = ($service ? $this->cityServices : $this->citySpecialties)->defaults($cityPage, $term, $restaurants->total());
@@ -265,7 +265,7 @@ class PublicContentController extends Controller
         return response()->view('public.taxonomy', [
             'term' => $term,
             'kind' => $kind,
-            'restaurants' => $query->paginate(12)->withQueryString(),
+            'restaurants' => $this->search->orderByRecent($query)->paginate(12)->withQueryString(),
             'breadcrumbs' => $this->breadcrumbs($term),
         ]);
     }

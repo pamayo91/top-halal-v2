@@ -68,6 +68,17 @@ class PublicRestaurantSearchTest extends TestCase
         $response->assertOk()->assertSeeInOrder(['Le plus récent', 'Le plus ancien'])->assertSee('2 restaurants halal');
     }
 
+    public function test_taxonomy_listing_uses_the_same_canonical_recency_order(): void
+    {
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 42, 'name' => 'Burger']);
+        $older = Restaurant::create(['legacy_wp_id' => 12, 'name' => 'Burger ancien', 'slug' => 'burger-ancien', 'status' => 'published', 'legacy_published_at' => '2025-01-01 10:00:00']);
+        $newer = Restaurant::create(['legacy_wp_id' => 13, 'name' => 'Burger récent', 'slug' => 'burger-recent', 'status' => 'published', 'legacy_published_at' => '2026-01-01 10:00:00']);
+        $older->categories()->attach($burger);
+        $newer->categories()->attach($burger);
+
+        $this->get('/specialites/burger')->assertOk()->assertSeeInOrder([$newer->name, $older->name]);
+    }
+
     public function test_directory_sidebar_contains_only_taxonomy_filters_and_expands_for_an_active_value_after_the_initial_eight(): void
     {
         foreach (range(1, 9) as $number) Category::firstOrCreate(['slug' => "specialite-{$number}"], ['legacy_term_id' => 100 + $number, 'name' => "000 spécialité {$number}"]);

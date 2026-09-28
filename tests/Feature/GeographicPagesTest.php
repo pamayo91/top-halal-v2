@@ -42,6 +42,18 @@ class GeographicPagesTest extends TestCase
             ->assertSee('"@type":"BreadcrumbList"', false);
     }
 
+    public function test_city_department_and_region_listings_use_the_canonical_recency_order(): void
+    {
+        $older = $this->published(250, 'Marseille ancien', 'marseille-ancien', 'Marseille', '13206');
+        $newer = $this->published(251, 'Marseille récent', 'marseille-recent', 'Marseille', '13206');
+        $older->update(['legacy_published_at' => '2025-01-01 10:00:00']);
+        $newer->update(['legacy_published_at' => '2026-01-01 10:00:00']);
+
+        foreach (['/restos/marseille', '/restos/bouches-du-rhone', '/restos/provence-alpes-cote-d-azur'] as $url) {
+            $this->get($url)->assertOk()->assertSeeInOrder([$newer->name, $older->name]);
+        }
+    }
+
     public function test_homonymous_city_names_have_precise_pages_and_a_noindex_disambiguation_page(): void
     {
         $seineSaintDenis = $this->published(301, 'Saint-Denis 93', 'saint-denis-93-restaurant', 'Saint-Denis', '93066');
