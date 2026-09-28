@@ -300,7 +300,7 @@ class PublicContentController extends Controller
     {
         return $this->citySeo->cities()
             ->sortByDesc('restaurants_count')
-            ->take(11)
+            ->take(10)
             ->map(fn (object $city): array => ['name' => $city->city_name, 'label' => $this->cityLabel($city), 'city_code' => $city->city_code, 'slug' => $city->slug])
             ->sortByDesc(fn (array $city): bool => $city['slug'] === 'paris')
             ->values();

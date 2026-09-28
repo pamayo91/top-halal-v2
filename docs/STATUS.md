@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-28 — Corrections UI ciblées de l’accueil
+
+Le hero et le CTA ont été compactés. Les panneaux Ville/Spécialité affichent jusqu’à dix liens équilibrés et leurs SVG locaux dédiés. Les cartes du Guide sont à nouveau matérialisées, les colonnes éditoriales sont visuellement inversées, et les quatre cartes de confiance ont une hauteur/ligne commune avec pin, cloche, étoile et check circulaire. La validation préproduction reste à exécuter après déploiement.
+
 ## 2026-09-28 — Finition densité de l’accueil
 
 Le bloc « Restaurants récemment ajoutés » expose désormais jusqu’à huit entrées publiées, en quatre colonnes sur desktop, deux sur tablette et une sur mobile. Cartes, chevauchement du hero, panneaux, grilles éditoriales, bande verte, confiance, transparence et CTA ont été recalibrés pour une densité plus raffinée sans toucher aux textes, à l’ordre, aux routes, aux comportements ou au JavaScript. Compilation Vite, test PHP ciblé, Playwright homepage desktop/mobile et gate complète préproduction sont validés.

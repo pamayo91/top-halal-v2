@@ -20,7 +20,10 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
   await expect(page.getByRole('link', { name: 'Ajouter un restaurant' }).last()).toHaveAttribute('href', /\/ajouter-un-restaurant$/);
   const restaurantCards = page.locator('.home-restaurant-grid > .restaurant-card');
   await expect(restaurantCards).toHaveCount(8);
+  await expect(page.locator('.home-explore-panel').first().locator('.link-list > li')).toHaveCount(10);
+  await expect(page.locator('.home-explore-title svg')).toHaveCount(2);
   if (testInfo.project.name === 'desktop-chromium') expect((await page.locator('.home-restaurant-grid').evaluate(grid => getComputedStyle(grid).gridTemplateColumns.split(' ').length))).toBe(4);
+  if (testInfo.project.name === 'desktop-chromium') expect(await page.locator('.home-why-grid > article').evaluateAll(cards => cards.map(card => ({ height: Math.round(card.getBoundingClientRect().height), top: Math.round(card.getBoundingClientRect().top) })))).then(cards => cards.every(card => card.height === cards[0].height && card.top === cards[0].top))).toBeTruthy();
   expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'explore', 'restaurant-editorial', 'guide', 'editorial', 'why', 'transparency', 'cta']);
   await expect(page.locator('[data-home-section="cta"] .home-submission-cta')).toBeVisible();
   expect(await page.locator('body').evaluate(body => body.scrollWidth <= window.innerWidth)).toBeTruthy();
