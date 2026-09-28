@@ -30,6 +30,15 @@ class EditorialRichEditor extends RichEditor
         ]);
     }
 
+    /** @return array<int, array<int, string>> */
+    public function getDefaultToolbarButtons(): array
+    {
+        return [
+            ...parent::getDefaultToolbarButtons(),
+            ['sourceCode'],
+        ];
+    }
+
     /** @return array<Action> */
     public function getDefaultActions(): array
     {
