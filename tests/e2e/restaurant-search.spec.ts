@@ -209,6 +209,25 @@ test('free text and an edit after a specialty suggestion submit text only', asyn
   expect(parameters.getAll('categories[0]')).toEqual([]);
 });
 
+test('a nearby specialty suggestion keeps GPS and submits no competing text query', async ({ page }) => {
+  await page.goto('/restaurants?lat=48.8566&lng=2.3522');
+  const search = page.locator('[data-restaurant-search]');
+  const query = search.getByLabel('Spécialité ou nom de restaurant');
+  await query.fill('burg');
+  const specialty = search.getByRole('option', { name: 'Burger', exact: true });
+  const specialtySlug = await specialty.getAttribute('data-category');
+  expect(specialtySlug).toBeTruthy();
+  await specialty.click();
+  await search.getByRole('button', { name: 'Rechercher' }).click();
+  await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522.*categories/);
+
+  const parameters = new URL(page.url()).searchParams;
+  expect(parameters.has('q')).toBe(false);
+  expect(parameters.get('lat')).toBe('48.8566');
+  expect(parameters.get('lng')).toBe('2.3522');
+  expect(parameters.getAll('categories[0]')).toContain(specialtySlug);
+});
+
 test('nearby results are limited to thirty kilometres and sorted by distance', async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });
