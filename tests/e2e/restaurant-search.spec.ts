@@ -25,7 +25,7 @@ test('official accent-insensitive commune selection keeps its INSEE identity and
   const search = page.locator('[data-restaurant-search]').first();
   const location = search.getByLabel('Localisation');
   await expect(location).toHaveValue('Paris');
-  await location.fill('Abergement Clemenciat');
+  await location.fill('L Abergement Clemenciat');
   await expect(search.getByRole('button', { name: /Abergement-Clémenciat/ })).toBeVisible();
   await search.getByRole('button', { name: /Abergement-Clémenciat/ }).click();
   await expect(search.locator('[data-location-value]')).toHaveValue('01001');
