@@ -11,8 +11,11 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
   await expect(page.getByRole('heading', { name: 'Trouvez votre restaurant halal, simplement.' })).toBeVisible();
   for (const title of ['Trouvez facilement un restaurant halal', 'Le halal au quotidien, et bien plus encore', 'Des informations pour mieux choisir']) {
     const heading = page.getByRole('heading', { name: title });
-    await heading.evaluate(element => element.scrollIntoView({ block: 'center' }));
-    await expect(heading).toBeVisible();
+    expect(await heading.evaluate(element => {
+      element.scrollIntoView({ block: 'center' });
+      const style = getComputedStyle(element);
+      return !element.closest('[hidden]') && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    })).toBeTruthy();
   }
   await expect(page.getByRole('link', { name: 'Ajouter un restaurant' }).last()).toHaveAttribute('href', /\/ajouter-un-restaurant$/);
   const restaurantCards = page.locator('.home-restaurant-grid > .restaurant-card');
