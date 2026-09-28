@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\{CitySeoService, NearbyCityService, PublicNavigation};
+use App\Services\{CitySeoService, HomepageSettings, NearbyCityService, PublicNavigation};
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
@@ -26,6 +26,7 @@ class Setting extends Model
             if (in_array($setting->key, ['header_navigation', 'footer_navigation'], true)) {
                 app(PublicNavigation::class)->forget();
             }
+            if ($setting->key === HomepageSettings::SETTINGS_KEY) app(HomepageSettings::class)->forget();
         };
 
         static::saved($invalidateNearbyCities);

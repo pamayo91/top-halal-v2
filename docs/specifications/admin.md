@@ -20,6 +20,8 @@ La page « Réglages » comprend une section « SEO local — pages villes » av
 
 La page « Réglages » comprend aussi une section « Page 404 ». Elle permet uniquement de sélectionner une illustration raster depuis la médiathèque V2, de personnaliser le titre et le texte. Une valeur vide revient aux valeurs par défaut du code et à l’illustration V2 validée par défaut ; ni le statut HTTP, ni les destinations, ni le layout ou les repères de confiance ne sont administrables.
 
+La page dédiée « Contenu > Page d'accueil » stocke ses valeurs non sensibles dans le réglage `homepage`, mis en cache et invalidé à la sauvegarde. Elle permet uniquement le SEO, les textes du hero, trois blocs éditoriaux activables, l’introduction du guide, les textes des quatre cartes fixes « Pourquoi Top Halal ? » et le texte du CTA final. Blade conserve l’ordre, le layout, les icônes, les routes et le moteur de recherche ; aucun HTML libre, image, style ou contrôle de grille n’est exposé.
+
 Dans une fiche restaurant existante, l’action « Ajouter des photos » charge directement des JPEG, PNG ou WebP (10 Mo maximum par fichier) dans le pipeline V2, puis les associe à la fin de sa galerie. L’administrateur peut remonter la nouvelle photo pour en faire la couverture, ou la retirer de la fiche. Une miniature de spécialité peut aussi être retirée individuellement lorsqu’elle est inutile. Ces retraits ne suppriment jamais l’asset partagé de la médiathèque. Les ajouts et retraits sont audités.
 
 ## Localisation des restaurants

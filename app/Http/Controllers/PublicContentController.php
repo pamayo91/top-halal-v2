@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, CommuneDirectory, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, CommuneDirectory, EditorialSidebar, GeographicPageResolver, HomepageSettings, NearbyCityService, PublicRestaurantSearch};
 use App\Services\ContributionIdentityService;
 
 class PublicContentController extends Controller
@@ -31,6 +31,7 @@ class PublicContentController extends Controller
     public function home(): View
     {
         return view('public.home', [
+            'homepage' => app(HomepageSettings::class)->get(),
             'featuredRestaurants' => $this->search->orderByRecent($this->search->published())->limit(6)->get(),
             'cities' => $this->topCities(),
             'categories' => Category::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(10)->get(),

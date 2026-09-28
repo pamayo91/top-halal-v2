@@ -2,6 +2,12 @@
 
 ## 2026-09-28
 
+- Added a dedicated, cached Filament homepage-content screen backed by the `homepage` setting; Blade remains responsible for the fixed SSR composition, search and CTA route.
+- Added concise configurable homepage SEO, hero, guide, editorial, transparency, four fixed trust-card and restaurant-submission CTA copy, with no page-builder controls.
+- Removed the audited V2-only legacy WordPress `Home` page (`legacy_wp_id` 12755) and its obsolete content-media association through a guarded forward migration; `/home` is retained as an application-managed 301 to `/`.
+
+## 2026-09-28
+
 - Added the shared Articles/Pages `Code source` RichEditor action with immediate visual↔HTML synchronization, server-side reuse of the editorial sanitizer, and regression coverage for supported links and dangerous HTML.
 
 - Listings restaurants : le cadre média responsive de l’annuaire est désormais partagé par les pages géographiques, de spécialité, de service et de facette ville. Chaque vignette réserve la même hauteur, y compris sans image ; les ratios sources sont recadrés en `cover` sans déformation ni décalage de carte.
