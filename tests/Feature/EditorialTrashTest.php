@@ -42,6 +42,16 @@ class EditorialTrashTest extends TestCase
         app(EditorialTrash::class)->trash($this->article('article-invalid-'.random_int(1000, 9999)), 301);
     }
 
+    public function test_302_is_preserved_after_force_deletion(): void
+    {
+        $page = $this->page('page-302-'.random_int(1000, 9999));
+        app(EditorialTrash::class)->trash($page, 302, '/temporary-target');
+        app(EditorialTrash::class)->forceDelete(Page::withTrashed()->findOrFail($page->id));
+
+        $this->assertDatabaseMissing('pages', ['id' => $page->id]);
+        $this->assertDatabaseHas('redirect_rules', ['related_type' => 'page', 'related_id' => $page->id, 'status_code' => 302, 'is_active' => 1, 'destination' => '/temporary-target']);
+    }
+
     public function test_unpublished_content_does_not_create_an_seo_rule(): void
     {
         $article = $this->article('article-brouillon-'.random_int(1000, 9999), ['status' => 'draft']);
