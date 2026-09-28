@@ -24,7 +24,7 @@ class EditorialRichEditor extends RichEditor
                 ->iconAlias('forms:components.rich-editor.toolbar.link'),
             RichEditorTool::make('sourceCode')
                 ->label('Code source')
-                ->action(arguments: '{ html: $getEditor()?.getHTML() ?? "" }')
+                ->action(arguments: '{ html: $getEditor()?.getHTML() ?? null }')
                 ->icon('heroicon-o-code-bracket')
                 ->iconAlias('forms:components.rich-editor.toolbar.source-code'),
         ]);
