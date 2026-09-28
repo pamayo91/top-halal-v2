@@ -1,5 +1,16 @@
 import { expect, test } from '@playwright/test';
 
+test('home guide media uses one fixed frame', async ({ page }, testInfo) => {
+  await page.goto('/');
+
+  const media = page.locator('.home-guide-grid .article-card .card-image');
+  await expect(media.first()).toBeVisible();
+  await expect(media.first()).toHaveCSS('height', testInfo.project.name === 'mobile-chromium' ? '220px' : '210px');
+
+  const heights = await media.evaluateAll(nodes => nodes.map(node => Math.round(node.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
+});
+
 for (const device of ['desktop', 'mobile']) {
   test(`public directory journey is clean on ${device}`, async ({ page }) => {
     const errors: string[] = []; const failed: string[] = []; const legacy: string[] = []; const externalFonts: string[] = [];

@@ -26,6 +26,20 @@ class PublicFrontendTest extends TestCase
 {
     use DatabaseMigrations;
 
+    public function test_home_guide_uses_its_fixed_media_grid(): void
+    {
+        Article::create([
+            'legacy_wp_id' => 7999,
+            'original_title' => 'Article accueil',
+            'title' => 'Article accueil',
+            'slug' => 'article-accueil',
+            'legacy_url' => '/article-accueil',
+            'status' => 'published',
+        ]);
+
+        $this->get('/')->assertOk()->assertSee('<div class="article-grid home-guide-grid">', false);
+    }
+
     public function test_blog_starts_with_its_article_grid_without_public_category_navigation(): void
     {
         $category = EditorialCategory::create(['legacy_term_id' => 8001, 'name' => 'Blog', 'slug' => 'blog']);

@@ -16,6 +16,8 @@ Latest public restaurant-search state correction: location is a persistent, norm
 
 Latest nearby-search correction: « Autour de moi » is now an actual server-side 30 km radius, bounding-box prefiltered then ordered by exact distance. It never falls back outside the radius. Desktop specialty/service checkboxes apply immediately with minimal progressive JS; the mobile drawer keeps its grouped CTA, and the primary search submits those same checked filters.
 
+Latest homepage guide-media correction: the editorial cards on the homepage now reserve the same responsive image frame, so square, portrait and landscape sources cannot make one guide thumbnail taller than its neighbours.
+
 Latest restaurant-listing media correction: every public restaurant result grid now uses the same fixed, responsive media frame. Directory, geographic, specialty, service and city-facet cards crop their delivered image with `object-fit: cover`, and reserve the exact same space when a restaurant has no image; source image ratios can no longer misalign cards in a row.
 
 Latest public commune-search correction: the homepage and directory share an INSEE-code-backed local official commune autocomplete. Accent/case/separator normalization is deterministic, editing the visible field clears the hidden code, valid empty communes remain a `noindex,follow` directory result, and invalid text cannot fall back to Paris. SEO city pages and their sitemap policy remain independent; deployment loads the versioned reference with `communes:sync-reference`.
