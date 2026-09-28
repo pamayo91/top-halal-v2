@@ -27,7 +27,7 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
     const trustCards = await page.locator('.home-why-grid > article').evaluateAll(cards => cards.map(card => ({ height: Math.round(card.getBoundingClientRect().height), top: Math.round(card.getBoundingClientRect().top) })));
     expect(trustCards.every(card => card.height === trustCards[0].height && card.top === trustCards[0].top)).toBeTruthy();
   }
-  expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'explore', 'restaurant-editorial', 'guide', 'editorial', 'why', 'transparency', 'cta']);
+  expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'guide-intro', 'guide-cards', 'editorial', 'why', 'transparency', 'cta']);
   await expect(page.locator('[data-home-section="cta"] .home-submission-cta')).toBeVisible();
   expect(await page.locator('body').evaluate(body => body.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect(errors).toEqual([]); expect(failed).toEqual([]);
