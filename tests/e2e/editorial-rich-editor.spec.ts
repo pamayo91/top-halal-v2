@@ -40,6 +40,7 @@ test.describe('Editorial rich editor', () => {
 
     await link.click();
     await page.getByRole('button', { name: 'Lien', exact: true }).click();
+    await expect(dialog.getByLabel('URL')).toHaveValue('https://example.com');
     await expect(dialog.getByLabel('Nofollow')).toBeChecked();
     await expect(dialog.getByLabel('Sponsored')).toBeChecked();
     await expect(dialog.getByLabel('UGC')).toBeChecked();
@@ -71,18 +72,31 @@ test.describe('Editorial rich editor', () => {
     await expect(page).toHaveURL(/\/admin$/);
 
     await page.goto('/admin/articles/114/edit');
-    const editor = page.locator('.editorial-rich-editor .tiptap');
-    const links = editor.locator('a');
-    expect(await links.count()).toBeGreaterThanOrEqual(2);
+    const expectedLinks = [
+      {
+        href: 'https://pole-autoentrepreneur.com/guide/creer-son-auto-entreprise/devenir-auto-entrepreneur/',
+        name: 'devenir auto entrepreneur',
+      },
+      {
+        href: 'https://www.juniorwaterprize.fr/livreur-uber-eats-en-auto-entrepreneur/',
+        name: 'auto entrepreneur uber eats',
+      },
+    ];
 
-    for (let index = 0; index < await links.count(); index++) {
-      const link = links.nth(index);
-      const href = await link.getAttribute('href');
-      await link.click();
-      await page.getByRole('button', { name: 'Lien', exact: true }).click();
-      await expect(page.getByRole('dialog').getByLabel('URL')).toHaveValue(href!);
-      await page.keyboard.press('Escape');
+    for (const expectedLink of expectedLinks) {
+      const link = page.getByRole('link', { name: expectedLink.name, exact: true });
+      await expect(link).toHaveAttribute('href', expectedLink.href);
+      await expect(link.locator('a')).toHaveCount(0);
     }
+
+    await page.getByRole('button', { name: 'Code source', exact: true }).click();
+    const source = page.getByRole('dialog').getByLabel('HTML');
+
+    for (const expectedLink of expectedLinks) {
+      await expect(source).toHaveValue(new RegExp(`href="${expectedLink.href}"`));
+    }
+
+    await page.getByRole('dialog').getByRole('button', { name: 'Annuler', exact: true }).click();
   });
 
   test('opens and applies the shared HTML source editor without bypassing sanitization', async ({ page }) => {
