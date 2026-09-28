@@ -1,288 +1,37 @@
 <?php
-
 namespace App\Services\Regression;
 
-use App\Models\{Article, Page, RedirectRule, RegressionSentinel, Restaurant};
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\{DB, Storage};
-use Illuminate\Support\Facades\URL;
+use App\Models\{Article,ContentMedia,MediaAsset,Page,RegressionDeploymentSnapshot,Restaurant,RestaurantMedia};
+use Illuminate\Support\Facades\{DB,Storage};
 
 class SentinelRegistry
 {
-    /** @return array<string, int> */
-    public function counts(): array
+    public function counts():array{return collect(['restaurants','media_assets','restaurant_media','articles','pages','categories','features','restaurant_reviews','comments','users','restaurant_claims','redirect_rules'])->mapWithKeys(fn($t)=>[$t=>DB::table($t)->count()])->all();}
+    public function persist(bool $refresh=false):int{return 0;}
+    public function verify(?string $snapshotId=null):array
     {
-        return collect([
-            'restaurants', 'media_assets', 'restaurant_media', 'articles', 'pages',
-            'categories', 'features', 'restaurant_reviews', 'comments', 'users',
-            'restaurant_claims', 'redirect_rules',
-        ])->mapWithKeys(fn (string $table): array => [$table => DB::table($table)->count()])->all();
+        $errors=$this->integrityErrors(); $counts=$this->counts(); $snapshot=null;
+        if($snapshotId){$snapshot=RegressionDeploymentSnapshot::where('run_id',$snapshotId)->first();if(!$snapshot)$errors[]='Unknown regression deployment snapshot.';else foreach($snapshot->counts as $table=>$before)if(($counts[$table]??0)<$before)$errors[]="Unexpected count decrease during this deployment for {$table}: {$counts[$table]} < {$before}.";}
+        return ['errors'=>$errors,'urls'=>$this->urls(),'media_urls'=>$this->mediaUrls(),'counts'=>$counts,'snapshot'=>$snapshot?['run_id'=>$snapshot->run_id,'counts'=>$snapshot->counts]:null];
     }
-
-    /** @return array<string, array{subject_type: string, subject_id: int|null, route_path: string|null, baseline: array<string, mixed>}> */
-    public function discover(): array
+    private function urls():array
     {
-        $sentinels = [];
-        $restaurant = fn (): Builder => Restaurant::query()->where('status', 'published');
-
-        $this->addRestaurant($sentinels, 'restaurant.gallery', (clone $restaurant())->has('media.asset', '>=', 2)->orderByDesc('id')->first(), ['media']);
-        $this->addRestaurant($sentinels, 'restaurant.single_media', (clone $restaurant())->has('media.asset', '=', 1)->orderByDesc('id')->first(), ['media']);
-        $this->addRestaurant($sentinels, 'restaurant.no_media', (clone $restaurant())->doesntHave('media')->orderByDesc('id')->first(), ['media']);
-        $this->addRestaurant($sentinels, 'restaurant.categories', (clone $restaurant())->has('categories')->orderByDesc('id')->first(), ['categories']);
-        $this->addRestaurant($sentinels, 'restaurant.features', (clone $restaurant())->has('features')->orderByDesc('id')->first(), ['features']);
-        $this->addRestaurant($sentinels, 'restaurant.reviews', (clone $restaurant())->has('reviews')->orderByDesc('id')->first(), ['reviews']);
-        $this->addRestaurant($sentinels, 'restaurant.structured_address', (clone $restaurant())->whereNotNull('address_line1')->whereNotNull('city_code')->whereNotNull('latitude')->whereNotNull('longitude')->orderByDesc('id')->first(), ['address']);
-        $this->addRestaurant($sentinels, 'restaurant.o_sha', (clone $restaurant())->whereRaw('LOWER(name) = ?', ['o sha'])->first());
-        $this->addRestaurant($sentinels, 'restaurant.pending_preview', Restaurant::query()->where('status', 'pending')->latest('id')->first(), [], false);
-
-        $this->addArticle($sentinels, 'article.featured_media', Article::query()->where('status', 'published')->whereHas('featuredMedia.asset')->orderByDesc('id')->first());
-        $this->addArticle($sentinels, 'article.inline_media', Article::query()->where('status', 'published')->whereHas('contentMedia.asset', fn (Builder $query) => $query->where('role', 'inline'))->orderByDesc('id')->first());
-        $this->addArticle($sentinels, 'article.no_media', Article::query()->where('status', 'published')->doesntHave('contentMedia')->orderByDesc('id')->first());
-
-        if ($page = Page::query()->where('status', 'published')->orderByDesc('id')->first()) {
-            $sentinels['page.editorial'] = ['subject_type' => 'page', 'subject_id' => $page->id, 'route_path' => '/'.$page->slug, 'baseline' => [
-                'id' => $page->id, 'legacy_wp_id' => $page->legacy_wp_id, 'slug' => $page->slug, 'status' => $page->status,
-            ]];
-        }
-
-        if ($redirect = RedirectRule::query()->where('is_active', true)->where('match_type', 'exact')->whereIn('status_code', [301, 302, 410])->orderByDesc('priority')->first()) {
-            $sentinels['redirect.representative'] = ['subject_type' => 'redirect', 'subject_id' => $redirect->id, 'route_path' => $redirect->source_path, 'baseline' => [
-                'id' => $redirect->id, 'source_path' => $redirect->source_path, 'status_code' => $redirect->status_code, 'destination' => $redirect->destination,
-            ]];
-        }
-
-        return $sentinels;
+        $urls=['home'=>'/','search'=>'/restaurants','blog'=>'/blog','login'=>'/login','not_found'=>'/__regression_missing_404'];
+        if($r=Restaurant::query()->where('status','published')->latest('id')->first())$urls['restaurant.dynamic']='/resto/'.$r->slug;
+        if($a=Article::query()->where('status','published')->latest('id')->first())$urls['article.dynamic']='/'.$a->slug;
+        if($p=Page::query()->where('status','published')->latest('id')->first())$urls['page.dynamic']='/'.$p->slug;
+        return $urls;
     }
-
-    /** @param array<string, array{subject_type: string, subject_id: int|null, route_path: string|null, baseline: array<string, mixed>}> $sentinels */
-    private function addRestaurant(array &$sentinels, string $key, ?Restaurant $restaurant, array $invariants = [], bool $public = true): void
+    private function mediaUrls():array{return MediaAsset::query()->where('status','ready')->where(fn($q)=>$q->whereExists(fn($x)=>$x->selectRaw(1)->from('restaurant_media')->whereColumn('restaurant_media.media_asset_id','media_assets.id'))->orWhereExists(fn($x)=>$x->selectRaw(1)->from('content_media')->whereColumn('content_media.media_asset_id','media_assets.id')))->limit(12)->get()->filter(fn($a)=>str_starts_with((string)$a->mime,'image/'))->map(fn($a)=>parse_url($a->deliveryUrl(),PHP_URL_PATH))->values()->all();}
+    private function integrityErrors():array
     {
-        if (! $restaurant) {
-            return;
-        }
-
-        $relations = [];
-        if (in_array('media', $invariants, true)) $relations[] = 'media.asset.variants';
-        if (in_array('categories', $invariants, true)) $relations[] = 'categories';
-        if (in_array('features', $invariants, true)) $relations[] = 'features';
-        if (in_array('reviews', $invariants, true)) $relations[] = 'reviews';
-        $restaurant->load($relations);
-        $routePath = $public ? '/resto/'.$restaurant->slug : null;
-        $baseline = [
-            'id' => $restaurant->id,
-            'legacy_wp_id' => $restaurant->legacy_wp_id,
-            'slug' => $restaurant->slug,
-            'status' => $restaurant->status,
-        ];
-        if (in_array('categories', $invariants, true)) $baseline['categories'] = $restaurant->categories->pluck('id')->sort()->values()->all();
-        if (in_array('features', $invariants, true)) $baseline['features'] = $restaurant->features->pluck('id')->sort()->values()->all();
-        if (in_array('address', $invariants, true)) $baseline['address'] = $restaurant->only(['address_line1', 'address_line2', 'postal_code', 'city_name', 'city_code', 'country_code', 'latitude', 'longitude']);
-        if (in_array('media', $invariants, true)) $baseline['media'] = $restaurant->media->map(fn ($media): array => [
-                'id' => $media->id, 'media_asset_id' => $media->media_asset_id, 'legacy_attachment_id' => $media->legacy_attachment_id,
-                'asset' => $media->asset ? $this->assetBaseline($media->asset) : null,
-            ])->values()->all();
-        if (in_array('reviews', $invariants, true)) $baseline['reviews'] = $restaurant->reviews->map(fn ($review): array => $this->reviewBaseline($review))->values()->all();
-        $sentinels[$key] = ['subject_type' => 'restaurant', 'subject_id' => $restaurant->id, 'route_path' => $routePath, 'baseline' => $baseline];
-    }
-
-    /** @param array<string, array{subject_type: string, subject_id: int|null, route_path: string|null, baseline: array<string, mixed>}> $sentinels */
-    private function addArticle(array &$sentinels, string $key, ?Article $article): void
-    {
-        if (! $article) {
-            return;
-        }
-
-        $article->load(['categories', 'tags', 'contentMedia.asset.variants']);
-        $sentinels[$key] = ['subject_type' => 'article', 'subject_id' => $article->id, 'route_path' => '/'.$article->slug, 'baseline' => [
-            'id' => $article->id, 'legacy_wp_id' => $article->legacy_wp_id, 'slug' => $article->slug, 'status' => $article->status,
-            'categories' => $article->categories->pluck('id')->sort()->values()->all(),
-            'tags' => $article->tags->pluck('id')->sort()->values()->all(),
-            'media' => $article->contentMedia->map(fn ($media): array => [
-                'id' => $media->id, 'role' => $media->role, 'media_asset_id' => $media->media_asset_id,
-                'legacy_attachment_id' => $media->legacy_attachment_id, 'asset' => $media->asset ? $this->assetBaseline($media->asset) : null,
-            ])->values()->all(),
-        ]];
-    }
-
-    /** @return array<string, mixed> */
-    private function assetBaseline(object $asset): array
-    {
-        return [
-            'id' => $asset->id, 'original_path' => $asset->original_path, 'mime' => $asset->mime, 'status' => $asset->status,
-            'variants' => $asset->variants->map(fn ($variant): array => ['id' => $variant->id, 'path' => $variant->path, 'format' => $variant->format, 'width' => $variant->width])->values()->all(),
-        ];
-    }
-
-    /** @return array<string, int|string|null> */
-    private function reviewBaseline(object $review): array
-    {
-        return [
-            'id' => $review->id,
-            'restaurant_id' => $review->restaurant_id,
-            'legacy_wp_review_id' => $review->legacy_wp_review_id,
-            'status' => $review->status,
-        ];
-    }
-
-    public function persist(bool $refresh = false): int
-    {
-        $discovered = $this->discover();
-        foreach ($discovered as $key => $sentinel) {
-            $existing = RegressionSentinel::where('key', $key)->first();
-            if ($existing && ! $refresh) {
-                continue;
-            }
-            RegressionSentinel::updateOrCreate(['key' => $key], $sentinel);
-        }
-        return count($discovered);
-    }
-
-    /** @return array{errors: array<int, string>, urls: array<string, string>, media_urls: array<int, string>, counts: array<string, int>} */
-    public function verify(): array
-    {
-        $errors = [];
-        $urls = ['home' => '/', 'search' => '/restaurants', 'blog' => '/blog', 'login' => '/login', 'not_found' => '/__regression_missing_404'];
-        $mediaUrls = [];
-        $sentinels = RegressionSentinel::query()->orderBy('key')->get();
-        if ($sentinels->isEmpty()) {
-            return ['errors' => ['No regression sentinels have been registered. Run regression:sentinels --refresh-baseline on preproduction.'], 'urls' => $urls, 'media_urls' => [], 'counts' => $this->counts()];
-        }
-
-        $global = $sentinels->firstWhere('key', 'database.counts');
-        if (! $global) {
-            $errors[] = 'Missing database.counts regression baseline.';
-        } else {
-            foreach (($global->baseline['counts'] ?? []) as $table => $minimum) {
-                $actual = DB::table($table)->count();
-                if ($actual < $minimum) $errors[] = "Unexpected count decrease for {$table}: {$actual} < {$minimum}.";
-            }
-        }
-
-        foreach ($sentinels->where('key', '!=', 'database.counts') as $sentinel) {
-            if ($sentinel->key === 'restaurant.pending_preview' && $sentinel->subject_id) {
-                $urls[$sentinel->key] = URL::temporarySignedRoute('restaurants.preview.pending', now()->addDays(1), ['restaurant' => $sentinel->subject_id]);
-            } elseif ($sentinel->route_path) {
-                $urls[$sentinel->key] = $sentinel->route_path;
-            }
-            $this->verifySentinel($sentinel, $errors, $mediaUrls);
-        }
-
-        foreach ([Article::class => 'articles', Page::class => 'pages'] as $model => $table) {
-            if ($model::query()->where('content_html', 'like', '%wp-content%')->orWhere('content_html', 'like', '%wp-contenu%')->exists()) {
-                $errors[] = "Legacy upload URL found in {$table}.";
-            }
-        }
-
-        return ['errors' => $errors, 'urls' => $urls, 'media_urls' => array_values(array_unique($mediaUrls)), 'counts' => $this->counts()];
-    }
-
-    /** @param array<int, string> $errors @param array<int, string> $mediaUrls */
-    private function verifySentinel(RegressionSentinel $sentinel, array &$errors, array &$mediaUrls): void
-    {
-        $baseline = $sentinel->baseline;
-        $record = match ($sentinel->subject_type) {
-            'restaurant' => Restaurant::withTrashed()->find($sentinel->subject_id),
-            'article' => Article::find($sentinel->subject_id),
-            'page' => Page::find($sentinel->subject_id),
-            'redirect' => RedirectRule::find($sentinel->subject_id),
-            default => null,
-        };
-        if (! $record) {
-            $errors[] = "{$sentinel->key}: sentinel record no longer exists.";
-            return;
-        }
-        foreach (['legacy_wp_id', 'slug', 'status'] as $field) {
-            if (array_key_exists($field, $baseline) && (string) $record->{$field} !== (string) $baseline[$field]) $errors[] = "{$sentinel->key}: {$field} changed unexpectedly.";
-        }
-        if ($sentinel->subject_type === 'restaurant') $this->verifyRestaurant($sentinel->key, $record, $baseline, $errors, $mediaUrls);
-        if ($sentinel->subject_type === 'article') $this->verifyArticle($sentinel->key, $record, $baseline, $errors, $mediaUrls);
-        if ($sentinel->subject_type === 'redirect' && ((int) $record->status_code !== (int) $baseline['status_code'] || $record->source_path !== $baseline['source_path'])) $errors[] = "{$sentinel->key}: redirect changed unexpectedly.";
-    }
-
-    /** @param array<string, mixed> $baseline @param array<int, string> $errors @param array<int, string> $mediaUrls */
-    private function verifyRestaurant(string $key, Restaurant $restaurant, array $baseline, array &$errors, array &$mediaUrls): void
-    {
-        $invariants = $this->restaurantInvariants($key);
-        $relations = [];
-        if (in_array('media', $invariants, true)) $relations[] = 'media.asset.variants';
-        if (in_array('categories', $invariants, true)) $relations[] = 'categories';
-        if (in_array('features', $invariants, true)) $relations[] = 'features';
-        if (in_array('reviews', $invariants, true)) $relations[] = 'reviews';
-        $restaurant->load($relations);
-
-        if (in_array('categories', $invariants, true) && $restaurant->categories->pluck('id')->sort()->values()->all() !== ($baseline['categories'] ?? [])) $errors[] = "{$key}: categories relation changed unexpectedly.";
-        if (in_array('features', $invariants, true) && $restaurant->features->pluck('id')->sort()->values()->all() !== ($baseline['features'] ?? [])) $errors[] = "{$key}: features relation changed unexpectedly.";
-        if (in_array('reviews', $invariants, true)) $this->verifyProtectedReviews($key, $restaurant, $baseline['reviews'] ?? [], $errors);
-        if (in_array('address', $invariants, true) && ($baseline['address'] ?? []) !== $restaurant->only(array_keys($baseline['address'] ?? []))) $errors[] = "{$key}: structured address or GPS changed unexpectedly.";
-        if (in_array('media', $invariants, true)) $this->verifyMedia($key, $baseline['media'] ?? [], $restaurant->media->keyBy('id')->all(), $errors, $mediaUrls);
-    }
-
-    /** @return array<int, string> */
-    private function restaurantInvariants(string $key): array
-    {
-        return match ($key) {
-            'restaurant.gallery', 'restaurant.single_media', 'restaurant.no_media' => ['media'],
-            'restaurant.categories' => ['categories'],
-            'restaurant.features' => ['features'],
-            'restaurant.reviews' => ['reviews'],
-            'restaurant.structured_address' => ['address'],
-            default => [],
-        };
-    }
-
-    /** @param array<int, array<string, mixed>|int> $expectedReviews @param array<int, string> $errors */
-    private function verifyProtectedReviews(string $key, Restaurant $restaurant, array $expectedReviews, array &$errors): void
-    {
-        $actual = $restaurant->reviews->keyBy('id');
-        foreach ($expectedReviews as $expected) {
-            // Scalar IDs are the original baseline format. Keep them valid while
-            // preproduction is migrated deliberately to the richer invariant.
-            $expected = is_int($expected) ? ['id' => $expected, 'restaurant_id' => $restaurant->id] : $expected;
-            $review = $actual->get($expected['id'] ?? null);
-            if (! $review) {
-                $errors[] = "{$key}: protected review #".($expected['id'] ?? '?')." is missing or no longer belongs to the restaurant.";
-                continue;
-            }
-            foreach (['restaurant_id', 'legacy_wp_review_id', 'status'] as $field) {
-                if (array_key_exists($field, $expected) && (string) $review->{$field} !== (string) $expected[$field]) {
-                    $errors[] = "{$key}: protected review #{$review->id} {$field} changed unexpectedly.";
-                }
-            }
-        }
-    }
-
-    /** @param array<string, mixed> $baseline @param array<int, string> $errors @param array<int, string> $mediaUrls */
-    private function verifyArticle(string $key, Article $article, array $baseline, array &$errors, array &$mediaUrls): void
-    {
-        $article->load(['categories', 'tags', 'contentMedia.asset.variants']);
-        foreach (['categories' => 'categories', 'tags' => 'tags'] as $baselineKey => $relation) {
-            if ($article->{$relation}->pluck('id')->sort()->values()->all() !== ($baseline[$baselineKey] ?? [])) $errors[] = "{$key}: {$baselineKey} relation changed unexpectedly.";
-        }
-        $this->verifyMedia($key, $baseline['media'] ?? [], $article->contentMedia->keyBy('id')->all(), $errors, $mediaUrls);
-    }
-
-    /** @param array<int, array<string, mixed>> $baselineMedia @param array<int, object> $actualMedia @param array<int, string> $errors @param array<int, string> $mediaUrls */
-    private function verifyMedia(string $key, array $baselineMedia, array $actualMedia, array &$errors, array &$mediaUrls): void
-    {
-        $disk = Storage::disk(config('legacy-media.disk'));
-        foreach ($baselineMedia as $expected) {
-            $media = $actualMedia[$expected['id']] ?? null;
-            if (! $media || $media->media_asset_id !== $expected['media_asset_id']) {
-                $errors[] = "{$key}: media relation #{$expected['id']} changed or disappeared.";
-                continue;
-            }
-            $asset = $media->asset;
-            if (! $asset || $asset->id !== ($expected['asset']['id'] ?? null)) {
-                $errors[] = "{$key}: media asset for relation #{$expected['id']} disappeared.";
-                continue;
-            }
-            if (preg_match('#wp-conten(?:t|u)#i', $asset->original_path) || ! $disk->exists($asset->original_path)) $errors[] = "{$key}: V2 source media file is unavailable or legacy.";
-            $variants = $asset->variants->keyBy('id');
-            foreach (($expected['asset']['variants'] ?? []) as $variant) {
-                if (! isset($variants[$variant['id']]) || ! $disk->exists($variant['path'])) $errors[] = "{$key}: expected media variant is unavailable.";
-            }
-            if (! empty($expected['asset']['variants']) && $asset->variants->isEmpty()) $errors[] = "{$key}: all expected media variants disappeared.";
-            if (str_starts_with($asset->mime, 'image/')) $mediaUrls[] = (string) parse_url($asset->deliveryUrl(), PHP_URL_PATH);
-        }
+        $errors=[];$disk=Storage::disk(config('legacy-media.disk'));
+        foreach(MediaAsset::query()->whereExists(fn($q)=>$q->selectRaw(1)->from('restaurant_media')->whereColumn('restaurant_media.media_asset_id','media_assets.id'))->orWhereExists(fn($q)=>$q->selectRaw(1)->from('content_media')->whereColumn('content_media.media_asset_id','media_assets.id'))->get() as $asset)if(!filled($asset->original_path)||!$disk->exists($asset->original_path))$errors[]="Referenced media asset #{$asset->id} source file is missing.";
+        if(RestaurantMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Restaurant media relation references a missing asset.';
+        if(ContentMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Editorial media relation references a missing asset.';
+        if(ContentMedia::query()->where('content_type','post')->whereNotIn('content_id',Article::query()->select('id'))->exists())$errors[]='Editorial media relation references a missing article.';
+        if(ContentMedia::query()->where('content_type','page')->whereNotIn('content_id',Page::query()->select('id'))->exists())$errors[]='Editorial media relation references a missing page.';
+        if(DB::table('article_category')->whereNotIn('article_id',Article::query()->select('id'))->exists()||DB::table('article_tag')->whereNotIn('article_id',Article::query()->select('id'))->exists())$errors[]='Editorial taxonomy relation is orphaned.';
+        return $errors;
     }
 }

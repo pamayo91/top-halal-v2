@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-09-28 — D043 — Gate de régression par snapshot de déploiement
+
+Les données métier de préproduction sont modifiables depuis le BO et ne sont jamais des fixtures immuables. La gate compare les compteurs post-déploiement au snapshot explicitement pris avant ce déploiement et vérifie des invariants dynamiques (relations orphelines, assets référencés, stockage V2). Les surfaces navigateur sélectionnent un contenu publié pendant le run. Aucune baseline métier permanente ou refresh quotidien n’est requis.
+
 ## 2026-09-28
 
 ### D042 — Suppression éditoriale réversible et règle SEO liée

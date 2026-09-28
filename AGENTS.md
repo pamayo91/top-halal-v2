@@ -11,6 +11,10 @@ Rebuild https://top-halal.fr from scratch. WordPress is a legacy data source onl
 - Redis may be installed for cache/queues if server audit confirms it is appropriate.
 - Preproduction is the primary integration environment.
 
+## Windows local environment 
+do not treat missing local PHP/Composer as a blocker. PHP/Laravel tests must use the project's approved preproduction SSH/PHP 8.4 workflow when PHP is unavailable locally. Do not attempt to substitute or skip required tests because the Windows workstation lacks PHP.
+
+
 ## Non-negotiable product / SEO rules
 - Preserve current URLs whenever possible.
 - Historical redirects from `legacy/redirects.htaccess` must be migrated into an application-managed redirect system, except domain/protocol/infrastructure rules that belong in Apache.
@@ -61,6 +65,7 @@ Every completed feature requires appropriate automated tests.
 ## NON-REGRESSION GATE
 - For every significant functional change, run targeted tests during development and the complete regression suite before marking the work DONE.
 - `composer test:regression` is the mandatory preproduction gate. It verifies PHP sentinel coverage, database integrity, V2 media/storage, Playwright public sentinels, HTTP 500s, browser console/network failures and Laravel exceptions generated during the run.
+- The regression gate must never pin real mutable business records as permanent fixtures. Capture `regression:snapshot` immediately before deployment and pass its run ID to the post-deployment gate; compare only changes made during that deployment, while retaining dynamic orphan/media/storage integrity checks.
 - A new HTTP 500, lost media, unexpected lost relationship, unexpected count decrease, failed Playwright regression or new Laravel exception blocks DONE.
 - Never repair data artificially, rerun a global migration, recreate relations/media, or change a valid fixture merely to make a regression test pass. Diagnose and correct the root cause in code first; restore data only afterwards when necessary.
 - The regression suite protects the existing application as well as the changed feature. It is never optional because a change appears isolated.

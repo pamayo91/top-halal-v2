@@ -2,6 +2,8 @@
 
 ## 2026-09-28
 
+- Replaced mutable-business regression sentinels with deployment snapshots, dynamic integrity checks and dynamically selected public browser surfaces.
+
 - Accueil : les cartes du Guide réservent désormais un cadre image responsive uniforme ; les sources carrées, portrait ou paysage restent alignées par recadrage `cover`.
 
 - Added a dedicated, cached Filament homepage-content screen backed by the `homepage` setting; Blade remains responsible for the fixed SSR composition, search and CTA route.

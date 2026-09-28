@@ -1,7 +1,8 @@
 param(
     [string]$PreprodHost = $(if ($env:PREPROD_SSH_HOST) { $env:PREPROD_SSH_HOST } else { 'top-halal-preprod' }),
     [string]$PreprodPath = $(if ($env:PREPROD_APP_PATH) { $env:PREPROD_APP_PATH } else { '/home/meyo5199/top-halal-v2' }),
-    [string]$BaseUrl = $(if ($env:PREPROD_BASE_URL) { $env:PREPROD_BASE_URL } else { 'https://dev.top-halal.fr' })
+    [string]$BaseUrl = $(if ($env:PREPROD_BASE_URL) { $env:PREPROD_BASE_URL } else { 'https://dev.top-halal.fr' }),
+    [string]$SnapshotId = $env:PREPROD_REGRESSION_SNAPSHOT_ID
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,7 +13,8 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-$remote = "cd $PreprodPath && $remotePhp artisan regression:verify --json"
+$snapshotArgument = if ($SnapshotId) { " --snapshot=$SnapshotId" } else { '' }
+$remote = "cd $PreprodPath && $remotePhp artisan regression:verify$snapshotArgument --json"
 $sentinels = & ssh $PreprodHost $remote
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

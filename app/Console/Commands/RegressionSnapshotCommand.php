@@ -1,0 +1,4 @@
+<?php
+namespace App\Console\Commands;
+use App\Models\RegressionDeploymentSnapshot; use App\Services\Regression\SentinelRegistry; use Illuminate\Console\Command; use Illuminate\Support\Str;
+class RegressionSnapshotCommand extends Command { protected $signature='regression:snapshot {--json : Emit JSON only}'; protected $description='Captures the V2 counts immediately before a preproduction deployment.'; public function handle(SentinelRegistry $registry):int{$snapshot=RegressionDeploymentSnapshot::create(['run_id'=>(string)Str::uuid(),'git_revision'=>trim((string)@shell_exec('git rev-parse HEAD'))?:null,'counts'=>$registry->counts(),'captured_at'=>now()]);$payload=['run_id'=>$snapshot->run_id,'counts'=>$snapshot->counts,'captured_at'=>$snapshot->captured_at->toIso8601String()];if($this->option('json'))$this->output->write(json_encode($payload,JSON_THROW_ON_ERROR));else $this->info('Regression snapshot: '.$snapshot->run_id);return self::SUCCESS;} }
