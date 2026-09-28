@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-28 — Refonte visuelle de l’accueil
+
+La homepage conserve ses contenus, leur ordre, ses routes, son moteur de recherche, ses grilles et son CTA administrable. La présentation Blade/CSS est désormais éditoriale et rythmée : hero vert à relief statique, alternance de fonds, panneaux d’exploration, textes en grille, guide magazine, cartes de confiance et CTA de fin contrasté. Aucun JavaScript, framework ou ressource distante n’est ajouté ; la sentinelle Playwright vérifie l’ordre des zones, le CTA et l’absence de débordement horizontal. La compilation et la validation préproduction restent à effectuer avec le runtime et la gate du serveur.
+
 ## 2026-09-28 — Gate de régression à snapshot
 
 Les anciennes sentinelles liées à des Articles, Pages, Restaurants, médias et redirections métier sont retirées : elles empêchaient une suppression BO légitime. La gate vérifie désormais les relations et fichiers V2 de manière dynamique, puis compare les compteurs post-déploiement au snapshot explicitement capturé juste avant le déploiement. L’article `magie-bonus-sans-depot-2026` reste en corbeille ; aucune donnée n’est restaurée.

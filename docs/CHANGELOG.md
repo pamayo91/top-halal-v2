@@ -2,6 +2,8 @@
 
 ## 2026-09-28
 
+- Refonte visuelle de l’accueil sans changement éditorial ni métier : hero et CTA plus profonds, alternance de plans, panneaux ville/spécialité, mise en page éditoriale à deux colonnes, guide magazine et quatre cartes de confiance. Le rendu reste Blade SSR, sans JavaScript ou dépendance supplémentaire ; la sentinelle Playwright contrôle l’ordre des sections, le CTA et l’absence de débordement.
+
 - Replaced mutable-business regression sentinels with deployment snapshots, dynamic integrity checks and dynamically selected public browser surfaces.
 
 - Accueil : les cartes du Guide réservent désormais un cadre image responsive uniforme ; les sources carrées, portrait ou paysage restent alignées par recadrage `cover`.
