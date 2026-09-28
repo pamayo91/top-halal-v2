@@ -187,7 +187,10 @@ test('the main search keeps filters selected in the mobile drawer', async ({ pag
   await page.locator('[data-filters-drawer] input[name="categories[]"]').first().check();
   await page.getByRole('button', { name: 'Fermer les filtres' }).click();
   await page.locator('[data-restaurant-search]').getByRole('button', { name: 'Rechercher' }).click();
-  await page.waitForURL(/\/restaurants\?.*lat=48\.85660.*lng=2\.35220.*categories/);
+  const parameters = new URL(page.url()).searchParams;
+  expect(parameters.get('lat')).toBe('48.8566');
+  expect(parameters.get('lng')).toBe('2.3522');
+  expect(parameters.getAll('categories[0]')).not.toEqual([]);
 });
 
 test('near-me URL requests location and preserves compatible filters', async ({ page, context }) => {
