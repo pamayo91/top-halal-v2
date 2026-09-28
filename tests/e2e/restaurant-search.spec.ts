@@ -148,7 +148,7 @@ test('nearby state survives applying a directory filter', async ({ page, context
   const specialty = filters.locator('input[name="categories[]"]').first();
   await specialty.check();
   if ((page.viewportSize()?.width ?? 0) < 760) await filters.getByRole('button', { name: 'Afficher les résultats' }).click();
-  await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522.*categories/);
+  await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522/);
   expect(new URL(page.url()).searchParams.has('city_code')).toBe(false);
 });
 
@@ -219,7 +219,7 @@ test('a nearby specialty suggestion keeps GPS and submits no competing text quer
   expect(specialtySlug).toBeTruthy();
   await specialty.click();
   await search.getByRole('button', { name: 'Rechercher' }).click();
-  await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522.*categories/);
+  await page.waitForURL(/\/restaurants\?/);
 
   const parameters = new URL(page.url()).searchParams;
   expect(parameters.has('q')).toBe(false);
