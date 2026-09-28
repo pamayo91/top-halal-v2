@@ -26,7 +26,7 @@ class CommuneDirectory
             ->orderBy('normalized_name')
             ->orderBy('city_code')
             ->limit($limit * 3)
-            ->get(['city_code', 'city_name', 'department_code']);
+            ->get(['city_code', 'city_name', 'department_code', 'normalized_name']);
         $duplicates = $matches->countBy(fn (CommuneReference $commune): string => $commune->normalized_name);
 
         return $matches->take($limit)->map(function (CommuneReference $commune) use ($duplicates): object {
