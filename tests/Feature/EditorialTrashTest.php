@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\{Article, Page, RedirectRule};
 use App\Services\EditorialTrash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -50,11 +51,14 @@ class EditorialTrashTest extends TestCase
 
     private function article(string $slug, array $extra = []): Article
     {
-        return Article::withoutEvents(fn (): Article => Article::create(array_merge(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published'], $extra)));
+        $attributes = array_merge(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published'], $extra);
+        $id = DB::table('articles')->insertGetId($attributes + ['created_at' => now(), 'updated_at' => now()]);
+        return Article::findOrFail($id);
     }
 
     private function page(string $slug): Page
     {
-        return Page::withoutEvents(fn (): Page => Page::create(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published']));
+        $id = DB::table('pages')->insertGetId(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published', 'created_at' => now(), 'updated_at' => now()]);
+        return Page::findOrFail($id);
     }
 }
