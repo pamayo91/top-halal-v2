@@ -13,7 +13,7 @@ test('homepage keeps its ordered SSR content and search', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Le halal au quotidien, et bien plus encore' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Des informations pour mieux choisir' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Ajouter un restaurant' }).last()).toHaveAttribute('href', /\/ajouter-un-restaurant$/);
-  await expect(page.locator('body')).toEvaluate(body => body.scrollWidth <= window.innerWidth);
+  expect(await page.locator('body').evaluate(body => body.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect(errors).toEqual([]); expect(failed).toEqual([]);
 });
 
