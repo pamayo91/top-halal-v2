@@ -2,7 +2,7 @@
 
 ## 2026-09-28 — Homepage administrable
 
-La homepage reste la route dédiée `/` et son template Blade SSR conserve entièrement sa composition, son moteur de recherche, ses cartes et son CTA. Le nouveau module Filament `Contenu > Page d'accueil` stocke les textes et SEO dans le réglage mis en cache `homepage`, avec invalidation ciblée. La migration retire uniquement la Page V2 legacy `Home` (`legacy_wp_id` 12755, slug `home`) et son association média orpheline ; elle ajoute la 301 applicative `/home` → `/`.
+La homepage reste la route dédiée `/` et son template Blade SSR conserve entièrement sa composition, son moteur de recherche, ses cartes et son CTA. Le nouveau module Filament `Contenu > Page d'accueil` stocke les textes et SEO dans le réglage mis en cache `homepage`, avec invalidation ciblée. La migration retire uniquement la Page V2 legacy `Home` (`legacy_wp_id` 12755, slug `home`) et son association média orpheline ; elle ajoute la 301 applicative `/home` → `/`. La baseline de comptage de régression est ajustée de 90 à 89 Pages uniquement lorsque cette baseline précise est présente : il s’agit de l’unique baisse attendue et auditée.
 
 ## 2026-09-28 — Corbeille éditoriale en cours
 

@@ -5,6 +5,7 @@
 - Added a dedicated, cached Filament homepage-content screen backed by the `homepage` setting; Blade remains responsible for the fixed SSR composition, search and CTA route.
 - Added concise configurable homepage SEO, hero, guide, editorial, transparency, four fixed trust-card and restaurant-submission CTA copy, with no page-builder controls.
 - Removed the audited V2-only legacy WordPress `Home` page (`legacy_wp_id` 12755) and its obsolete content-media association through a guarded forward migration; `/home` is retained as an application-managed 301 to `/`.
+- Recorded that single approved Page-count decrease in the regression baseline without refreshing or weakening unrelated sentinels.
 
 ## 2026-09-28
 
