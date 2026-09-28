@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-28 — Finition densité de l’accueil
+
+Le bloc « Restaurants récemment ajoutés » expose désormais jusqu’à huit entrées publiées, en quatre colonnes sur desktop, deux sur tablette et une sur mobile. Cartes, chevauchement du hero, panneaux, grilles éditoriales, bande verte, confiance, transparence et CTA ont été recalibrés pour une densité plus raffinée sans toucher aux textes, à l’ordre, aux routes, aux comportements ou au JavaScript. Les validations préproduction restent à exécuter après déploiement.
+
 ## 2026-09-28 — Refonte visuelle de l’accueil
 
 La homepage conserve ses contenus, leur ordre, ses routes, son moteur de recherche, ses grilles et son CTA administrable. La présentation Blade/CSS est désormais éditoriale et rythmée : hero vert à relief statique, alternance de fonds, panneaux d’exploration, textes en grille, guide magazine, cartes de confiance et CTA de fin contrasté. Aucun JavaScript, framework ou ressource distante n’est ajouté ; la sentinelle Playwright vérifie l’ordre des zones, le CTA et l’absence de débordement horizontal. Compilation Vite, contrôle visuel navigateur, tests homepage desktop/mobile et gate complète de régression préproduction sont validés.

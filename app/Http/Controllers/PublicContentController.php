@@ -32,7 +32,7 @@ class PublicContentController extends Controller
     {
         return view('public.home', [
             'homepage' => app(HomepageSettings::class)->get(),
-            'featuredRestaurants' => $this->search->orderByRecent($this->search->published())->limit(6)->get(),
+            'featuredRestaurants' => $this->search->orderByRecent($this->search->published())->limit(8)->get(),
             'cities' => $this->topCities(),
             'categories' => Category::whereHas('restaurants', fn (Builder $q) => $q->where('status', 'published'))->orderBy('name')->limit(10)->get(),
             'articles' => Article::with(['categories', 'featuredMedia.asset.variants', 'contentMedia.asset.variants'])->where('status', 'published')->orderByDesc('published_at')->orderByDesc('legacy_published_at')->limit(3)->get(),

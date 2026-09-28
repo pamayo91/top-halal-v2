@@ -24,6 +24,24 @@ class PublicRestaurantSearchTest extends TestCase
         $this->getJson('/restaurants/recherche/villes?q=par')->assertOk()->assertJsonPath('cities.0.city_code', '75056');
     }
 
+    public function test_homepage_shows_the_eight_most_recent_published_restaurants(): void
+    {
+        foreach (range(1, 9) as $number) {
+            Restaurant::create([
+                'legacy_wp_id' => 800 + $number,
+                'name' => "Accueil récent {$number}",
+                'slug' => "accueil-recent-{$number}",
+                'status' => 'published',
+                'legacy_published_at' => "2026-01-{$number} 10:00:00",
+            ]);
+        }
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSeeInOrder(['Accueil récent 9', 'Accueil récent 8', 'Accueil récent 7', 'Accueil récent 6', 'Accueil récent 5', 'Accueil récent 4', 'Accueil récent 3', 'Accueil récent 2'])
+            ->assertDontSee('Accueil récent 1');
+    }
+
     public function test_suggestions_return_real_specialties_and_prioritize_selected_city_restaurants(): void
     {
         $this->commune('75056', 'Paris', '75');
