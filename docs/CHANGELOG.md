@@ -3,6 +3,7 @@
 ## 2026-09-28
 
 - Finition visuelle de l’accueil : les restaurants récents affichent jusqu’à huit cartes SSR, en grille 4/2/1 selon le viewport, avec médias et contenu plus compacts. Les superpositions, panneaux, blocs éditoriaux, cartes de confiance, transparence et CTA gagnent en rythme, espace et contraste sans modifier les contenus, routes ou comportements.
+- Préproduction : 18 tests PHP ciblés (107 assertions), Playwright homepage desktop/mobile et gate de régression à snapshot passent sans erreur console/réseau ni exception Laravel.
 
 - Refonte visuelle de l’accueil sans changement éditorial ni métier : hero et CTA plus profonds, alternance de plans, panneaux ville/spécialité, mise en page éditoriale à deux colonnes, guide magazine et quatre cartes de confiance. Le rendu reste Blade SSR, sans JavaScript ou dépendance supplémentaire ; la sentinelle Playwright contrôle l’ordre des sections, le CTA et l’absence de débordement.
 - Préproduction : Vite, Playwright homepage desktop/mobile et la gate de régression à snapshot passent ; aucun écart d’intégrité, erreur navigateur/réseau ou nouvelle exception Laravel.

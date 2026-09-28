@@ -2,7 +2,7 @@
 
 ## 2026-09-28 — Finition densité de l’accueil
 
-Le bloc « Restaurants récemment ajoutés » expose désormais jusqu’à huit entrées publiées, en quatre colonnes sur desktop, deux sur tablette et une sur mobile. Cartes, chevauchement du hero, panneaux, grilles éditoriales, bande verte, confiance, transparence et CTA ont été recalibrés pour une densité plus raffinée sans toucher aux textes, à l’ordre, aux routes, aux comportements ou au JavaScript. Les validations préproduction restent à exécuter après déploiement.
+Le bloc « Restaurants récemment ajoutés » expose désormais jusqu’à huit entrées publiées, en quatre colonnes sur desktop, deux sur tablette et une sur mobile. Cartes, chevauchement du hero, panneaux, grilles éditoriales, bande verte, confiance, transparence et CTA ont été recalibrés pour une densité plus raffinée sans toucher aux textes, à l’ordre, aux routes, aux comportements ou au JavaScript. Compilation Vite, test PHP ciblé, Playwright homepage desktop/mobile et gate complète préproduction sont validés.
 
 ## 2026-09-28 — Refonte visuelle de l’accueil
 
