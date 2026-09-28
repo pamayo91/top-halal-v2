@@ -98,7 +98,7 @@ class PublicRestaurantSearchTest extends TestCase
         $this->get('/restaurants/recherche?city_code=94028')->assertRedirect('/restaurants?city_code=94028');
         $this->get('/restaurants?city_code=94028')->assertOk()->assertSee('0 restaurant halal')->assertSee('Aucun restaurant halal référencé à Créteil pour le moment.')->assertDontSee('Paris publié')->assertSee('noindex,follow', false);
         $this->get('/restaurants/recherche?location=Ville+inexistante')->assertRedirect('/restaurants?location_error=1');
-        $this->get('/restaurants?city_code=not-a-city')->assertOk()->assertSee("Nous n'avons pas trouvé cette ville")->assertDontSee('Paris publié');
+        $this->get('/restaurants?city_code=not-a-city')->assertOk()->assertSee("Nous n'avons pas trouvé cette ville", false)->assertDontSee('Paris publié');
     }
 
     public function test_commune_normalization_accepts_case_spaces_hyphens_and_homonyms(): void
