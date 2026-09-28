@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\{CommuneReference, RedirectRule, Restaurant};
+use App\Models\{CommuneReference, Feature, RedirectRule, Restaurant};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -47,6 +47,37 @@ class PublicRestaurantSearchTest extends TestCase
         $this->get('/restos/paris')->assertOk()->assertSee('Burger Paris');
         $this->get('/restaurants/recherche?city_code=75056&categories[]=burger')->assertRedirect('/restaurants?city_code=75056&categories%5B0%5D=burger');
         $this->get('/restaurants?city_code=75056&categories[]=burger')->assertOk()->assertSee('Burger Paris')->assertSee('noindex,follow', false);
+    }
+
+    public function test_filters_keep_nearby_coordinates_and_nearby_overrides_a_stale_city_constraint(): void
+    {
+        $this->commune('75056', 'Paris', '75');
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 201, 'name' => 'Burger']);
+        $terrace = Feature::firstOrCreate(['slug' => 'terrasse'], ['legacy_term_id' => 202, 'name' => 'Terrasse']);
+        $near = Restaurant::create(['legacy_wp_id' => 201, 'name' => 'Burger proche', 'slug' => 'burger-proche', 'status' => 'published', 'city_name' => 'Lyon', 'city_code' => '69123', 'latitude' => 48.8567, 'longitude' => 2.3523]);
+        $far = Restaurant::create(['legacy_wp_id' => 202, 'name' => 'Burger sans GPS', 'slug' => 'burger-sans-gps', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111']);
+        $near->categories()->attach($burger); $near->features()->attach($terrace);
+        $far->categories()->attach($burger); $far->features()->attach($terrace);
+
+        $response = $this->get('/restaurants?city_code=75056&lat=48.8566&lng=2.3522&categories[]=burger&features[]=terrasse');
+
+        $response->assertOk()->assertSee('Burger proche')->assertDontSee('Burger sans GPS')
+            ->assertSee('name="lat" value="48.8566"', false)->assertSee('name="lng" value="2.3522"', false)
+            ->assertDontSee('name="city_code" value="75056"', false);
+    }
+
+    public function test_city_landing_exposes_shared_filters_and_keeps_its_city_when_filtering(): void
+    {
+        $this->commune('75056', 'Paris', '75');
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 203, 'name' => 'Burger']);
+        $paris = Restaurant::create(['legacy_wp_id' => 203, 'name' => 'Burger Paris', 'slug' => 'burger-paris-landing', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111']);
+        $elsewhere = Restaurant::create(['legacy_wp_id' => 204, 'name' => 'Burger Lyon', 'slug' => 'burger-lyon-landing', 'status' => 'published', 'city_name' => 'Lyon', 'city_code' => '69123']);
+        $paris->categories()->attach($burger); $elsewhere->categories()->attach($burger);
+
+        $this->get('/restos/paris')->assertOk()->assertSee('data-filters-drawer', false)
+            ->assertSee('value="Paris"', false)->assertSee('name="city_code" value="75056"', false);
+        $this->get('/restaurants?city_code=75056&categories[]=burger')->assertOk()
+            ->assertSee('Burger Paris')->assertDontSee('Burger Lyon')->assertSee('noindex,follow', false);
     }
 
     public function test_search_routes_are_not_intercepted_by_a_legacy_redirect_rule(): void

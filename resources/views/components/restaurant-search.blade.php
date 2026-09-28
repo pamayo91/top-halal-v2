@@ -1,4 +1,4 @@
-@props(['cities' => collect(), 'compact' => false, 'id' => null, 'selectedCity' => '', 'selectedCityCode' => '', 'query' => ''])
+@props(['cities' => collect(), 'compact' => false, 'id' => null, 'selectedCity' => '', 'selectedCityCode' => '', 'query' => '', 'searchState' => null])
 @php($searchId = $id ?: 'restaurant-search-'.uniqid())
 <form class="restaurant-search {{ $compact ? 'restaurant-search-compact' : '' }}" data-restaurant-search action="{{ route('restaurants.search') }}" method="get" data-cities-url="{{ route('restaurants.search.cities') }}" data-suggestions-url="{{ route('restaurants.search.suggestions') }}" data-near-me-url="{{ route('restaurants.near-me') }}">
     <div class="restaurant-search-field location-field">
@@ -16,6 +16,11 @@
         <input data-category-input type="hidden" name="categories[]" disabled>
         <div id="{{ $searchId }}-suggestions" class="search-popover" data-suggestions-list role="listbox" hidden></div>
     </div>
+    @if($searchState)
+        @foreach($searchState['categories'] as $slug)<input type="hidden" name="categories[]" value="{{ $slug }}">@endforeach
+        @foreach($searchState['features'] as $slug)<input type="hidden" name="features[]" value="{{ $slug }}">@endforeach
+        @if($searchState['nearby'])<input data-nearby-state type="hidden" name="lat" value="{{ $searchState['lat'] }}"><input data-nearby-state type="hidden" name="lng" value="{{ $searchState['lng'] }}">@endif
+    @endif
     <button class="button" type="submit">Rechercher</button>
     <p class="search-message" data-search-message role="status" hidden></p>
 </form>

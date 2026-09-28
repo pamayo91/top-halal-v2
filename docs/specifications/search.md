@@ -7,6 +7,7 @@
 - `city_name` ne sert qu'au libellé. Les homonymes indiquent leur département, et la recherche normalise accents, casse, espaces, tirets et apostrophes usuelles de façon déterministe côté serveur.
 - Les catégories et services utilisent les relations V2 ; plusieurs choix sont combinés de façon restrictive.
 - La pagination conserve les filtres mais reste non indexable au-delà de la première page.
+- L’état de recherche est normalisé avant la requête : `localisation + spécialités + services + texte + pagination`. La localisation reste active quand un autre critère change. Une ville (`city_code`) et la proximité (`lat`/`lng`) sont mutuellement exclusives : le choix explicite d’« Autour de moi » retire la ville, et la sélection explicite d’une ville retire les coordonnées.
 - « Autour de moi » demande explicitement la géolocalisation navigateur après clic, transmet les coordonnées par POST puis redirige vers une URL de résultat. Aucune demande de position n’est faite au chargement.
 - La distance est calculée côté MariaDB avec les coordonnées réellement renseignées ; les restaurants sans coordonnées ne sont pas présentés dans ce résultat.
 
@@ -27,3 +28,5 @@ Toutes ces grilles de résultats utilisent le même cadre média responsive : la
 Les suggestions, limitées et déclenchées après deux caractères, distinguent toutes les spécialités V2 et les restaurants publiés. Une spécialité est donc proposée dès sa création, même avant d’être associée à une fiche publiée. Les restaurants de la ville sélectionnée sont proposés en premier, sans exclure les autres villes. La sélection explicite d’un restaurant ouvre directement sa fiche.
 
 « Autour de moi » ne demande la position qu’après le clic volontaire correspondant. Refus, indisponibilité et délai affichent « Impossible d’obtenir votre position. Choisissez une ville. » sans empêcher une recherche par ville. Les recherches et combinaisons de filtres restent sur `/restaurants` en `noindex,follow`; elles ne créent aucune nouvelle landing page SEO ou facette indexable.
+
+Les landings ville `/restos/{ville}` conservent H1, contenu, fil d’Ariane, canonical et stratégie d’indexation. Elles affichent aussi le composant SSR commun de recherche et les mêmes filtres. Une combinaison filtrée rejoint `/restaurants?city_code=…&…` en `noindex,follow`, sans ouvrir de facette SEO implicite ; la landing non filtrée reste canonique selon sa règle existante.

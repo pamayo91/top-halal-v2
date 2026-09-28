@@ -40,30 +40,31 @@ class PublicContentController extends Controller
 
     public function index(Request $request): View
     {
-        $cityCode = trim((string) $request->input('city_code'));
+        $searchState = $this->search->state($request);
+        $cityCode = $searchState['city_code'] ?? '';
         $selectedCity = $cityCode === '' ? null : $this->communes->find($cityCode);
         $locationError = $request->boolean('location_error') || ($cityCode !== '' && $selectedCity === null);
 
         return view('public.restaurants.index', [
-            'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
+            'restaurants' => $this->search->apply($this->search->published(), $request, $searchState)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
             'selectedCity' => $selectedCity,
             'locationError' => $locationError,
-            'activeFilterCount' => count((array) $request->input('categories', [])) + count((array) $request->input('features', [])),
-            'hasFilters' => $request->filled('q') || $request->filled('ville') || $request->filled('city_code') || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
+            'searchState' => $searchState,
+            'activeFilterCount' => count($searchState['categories']) + count($searchState['features']),
+            'hasFilters' => $searchState['q'] !== '' || $searchState['city_code'] !== null || $searchState['ville'] !== null || $searchState['categories'] !== [] || $searchState['features'] !== [] || $searchState['nearby'],
         ]);
     }
 
     public function search(Request $request): RedirectResponse
     {
-        $cityCode = trim((string) $request->query('city_code'));
+        $state = $this->search->state($request);
+        $cityCode = $state['city_code'] ?? '';
         $location = trim((string) $request->query('location'));
-        $legacyCity = trim((string) $request->query('ville'));
-        $query = trim((string) $request->query('q'));
-        $categories = array_values(array_filter((array) $request->query('categories', []), 'is_string'));
-        $features = array_values(array_filter((array) $request->query('features', []), 'is_string'));
+        $legacyCity = $state['ville'] ?? '';
+        $query = $state['q']; $categories = $state['categories']; $features = $state['features'];
         $commune = $cityCode === '' ? null : $this->communes->find($cityCode);
-        if (($cityCode !== '' && $commune === null) || ($location !== '' && $commune === null)) {
+        if (($cityCode !== '' && $commune === null) || ($location !== '' && $commune === null && ! $state['nearby'])) {
             return redirect()->route('restaurants.index', array_filter(['q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null, 'location_error' => 1]));
         }
         $cityPage = $commune !== null ? $this->cities->cityForCode($commune->city_code) : ($legacyCity === '' ? null : $this->cities->cityForSlug($legacyCity));
@@ -80,7 +81,9 @@ class PublicContentController extends Controller
             }
         }
         if ($cityPage !== null && $query === '' && $categories === [] && $features === []) return redirect()->to(route('cities.show', $cityPage->slug));
-        return redirect()->route('restaurants.index', array_filter(['city_code' => $commune?->city_code, 'ville' => $commune === null ? ($legacyCity ?: null) : null, 'q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null]));
+        $state['city_code'] = $commune?->city_code;
+        $state['ville'] = $commune === null ? ($legacyCity ?: null) : null;
+        return redirect()->route('restaurants.index', $this->search->queryParameters($state));
     }
 
     public function nearMe(Request $request): RedirectResponse
@@ -149,6 +152,7 @@ class PublicContentController extends Controller
                 city: $city,
                 citySpecialties: $this->citySpecialties->openedForCity($city),
                 cityServices: $this->cityServices->openedForCity($city),
+                searchState: ['q' => '', 'city_code' => $city->city_code, 'ville' => null, 'categories' => [], 'features' => [], 'lat' => null, 'lng' => null, 'nearby' => false],
             );
         }
 
@@ -301,7 +305,7 @@ class PublicContentController extends Controller
             ->values();
     }
 
-    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = [], mixed $nearbyCities = null, ?object $city = null, mixed $citySpecialties = null, mixed $cityServices = null): Response
+    private function geographicListing(object $term, string $kind, mixed $restaurants, bool $open, ?object $citySeo = null, array $breadcrumbs = [], mixed $nearbyCities = null, ?object $city = null, mixed $citySpecialties = null, mixed $cityServices = null, ?array $searchState = null): Response
     {
         $name = $term->name;
         $title = $citySeo?->config?->seo_title ?: match ($kind) {
@@ -311,7 +315,7 @@ class PublicContentController extends Controller
         };
         $description = $citySeo?->config?->seo_description ?: "Découvrez {$restaurants->total()} restaurants halal en {$name}.";
 
-        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description', 'nearbyCities', 'city', 'citySpecialties', 'cityServices'));
+        return response()->view('public.taxonomy', compact('term', 'kind', 'restaurants', 'open', 'citySeo', 'breadcrumbs', 'title', 'description', 'nearbyCities', 'city', 'citySpecialties', 'cityServices', 'searchState'));
     }
 
     /** @return list<array{label:string,url:?string}> */

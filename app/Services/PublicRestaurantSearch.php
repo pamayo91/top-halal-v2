@@ -10,37 +10,45 @@ use Illuminate\Support\Str;
 
 class PublicRestaurantSearch
 {
-    public function __construct(private readonly CityPageResolver $cities, private readonly CommuneDirectory $communes) {}
+    public function __construct(private readonly CityPageResolver $cities, private readonly CommuneDirectory $communes, private readonly RestaurantSearchState $state) {}
 
     public function published(): Builder
     {
         return Restaurant::where('status', 'published')->with(['categories', 'features', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]);
     }
 
-    public function apply(Builder $query, Request $request): Builder
+    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool}|null $state */
+    public function apply(Builder $query, Request $request, ?array $state = null): Builder
     {
-        if ($text = trim((string) $request->input('q'))) {
+        $state ??= $this->state->from($request);
+        if ($text = $state['q']) {
             $escaped = addcslashes(Str::lower($text), '%_\\');
             $query->where(fn (Builder $search) => $search->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orWhereRaw('LOWER(city_name) LIKE ?', ["%{$escaped}%"]));
         }
-        if ($cityCode = trim((string) $request->input('city_code'))) {
+        if ($cityCode = $state['city_code']) {
             $commune = $this->communes->find($cityCode);
             $query->when($commune !== null, fn (Builder $cities) => $cities->whereIn('city_code', $commune->source_city_codes), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
-        } elseif ($legacyCity = trim((string) $request->input('ville'))) {
+        } elseif ($legacyCity = $state['ville']) {
             // Compatibility for existing result URLs; new forms always submit city_code.
             $cityPage = $this->cities->cityForSlug($legacyCity);
             $query->when($cityPage !== null, fn (Builder $cities) => $cities->whereIn('city_code', $cityPage->source_city_codes), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
         }
-        foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
-        foreach (array_filter((array) $request->input('features', []), 'is_string') as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
-        if ($request->filled(['lat', 'lng'])) {
-            $lat = (float) $request->input('lat'); $lng = (float) $request->input('lng');
+        foreach ($state['categories'] as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
+        foreach ($state['features'] as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
+        if ($state['nearby']) {
+            $lat = $state['lat']; $lng = $state['lng'];
             $clamp = DB::connection()->getDriverName() === 'sqlite' ? 'min' : 'least';
             $distance = "(6371 * acos({$clamp}(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))";
             $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km');
         } else $this->orderByRecent($query);
         return $query;
     }
+
+    /** @return array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool} */
+    public function state(Request $request): array { return $this->state->from($request); }
+
+    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool} $state */
+    public function queryParameters(array $state): array { return $this->state->query($state); }
 
     /** Apply the one canonical default order to every non-proximity public listing. */
     public function orderByRecent(Builder $query): Builder

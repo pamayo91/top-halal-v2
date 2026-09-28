@@ -135,6 +135,35 @@ test('near me sends mocked coordinates only after the voluntary choice', async (
   await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522/);
 });
 
+test('nearby state survives applying a directory filter', async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });
+  await page.goto('/');
+  const search = page.locator('[data-restaurant-search]').first();
+  await search.getByLabel('Localisation').focus();
+  await search.getByRole('button', { name: 'Autour de moi' }).click();
+  await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522/);
+  const filters = page.locator('[data-filters-drawer]');
+  if ((page.viewportSize()?.width ?? 0) < 760) await page.getByRole('button', { name: /Filtres/ }).click();
+  const specialty = filters.locator('input[name="categories[]"]').first();
+  await specialty.check();
+  await filters.getByRole('button', { name: 'Appliquer les filtres' }).click();
+  await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522.*categories/);
+  expect(new URL(page.url()).searchParams.has('city_code')).toBe(false);
+});
+
+test('city landing shares filters and keeps Paris when applying one', async ({ page }) => {
+  await page.goto('/restos/paris');
+  const search = page.locator('[data-restaurant-search]');
+  await expect(search.getByLabel('Localisation')).toHaveValue('Paris');
+  const filters = page.locator('[data-filters-drawer]');
+  await expect(filters).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) < 760) await page.getByRole('button', { name: /Filtres/ }).click();
+  await filters.locator('input[name="categories[]"]').first().check();
+  await filters.getByRole('button', { name: 'Appliquer les filtres' }).click();
+  await page.waitForURL(/\/restaurants\?.*city_code=75056.*categories/);
+});
+
 test('near-me URL requests location and preserves compatible filters', async ({ page, context }) => {
   await context.grantPermissions(['geolocation']);
   await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });

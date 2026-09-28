@@ -534,3 +534,9 @@
 - Les communes sans restaurant ouvrent un résultat `noindex,follow` à zéro résultat ; les textes non résolus et les modifications manuelles ne peuvent plus reprendre Paris silencieusement.
 - Tous les listings publics hors proximité sont désormais classés par date canonique de publication, y compris les pages géographiques et de taxonomie.
 
+# 2026-09-28 — État de recherche restaurant persistant
+
+- Normalisation commune de l’état : ville INSEE et proximité GPS exclusives, spécialités/services/texte/pagination conservent la localisation active.
+- Les filtres SSR retransmettent les coordonnées GPS ; le changement explicite de ville désactive les coordonnées précédentes et « Autour de moi » retire le code ville.
+- Les landings ville réutilisent le moteur SSR de recherche/filtres tout en conservant leur SEO ; une combinaison filtrée retourne au répertoire `noindex,follow`.
+
