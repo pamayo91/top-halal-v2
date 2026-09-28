@@ -165,16 +165,22 @@ test('city landing shares filters and keeps Paris when applying one', async ({ p
 });
 
 test('a specialty suggestion is exactly the Paris manual specialty filter without a competing text query', async ({ page }) => {
-  await page.goto('/restaurants?city_code=75056&categories%5B%5D=pizzeria');
-  const manualCount = (await page.locator('[data-results-count]').textContent())?.trim();
-  expect(manualCount).toBeTruthy();
-
   await page.goto('/restos/paris');
   const search = page.locator('[data-restaurant-search]');
   const query = search.getByLabel('Spécialité ou nom de restaurant');
   await query.fill('pizz');
+  const specialty = search.getByRole('option', { name: 'Pizzeria', exact: true });
+  const specialtySlug = await specialty.getAttribute('data-category');
+  expect(specialtySlug).toBeTruthy();
+
+  await page.goto(`/restaurants?city_code=75056&categories%5B%5D=${encodeURIComponent(specialtySlug ?? '')}`);
+  const manualCount = (await page.locator('[data-results-count]').textContent())?.trim();
+  expect(manualCount).toBeTruthy();
+
+  await page.goto('/restos/paris');
+  await query.fill('pizz');
   await expect(search.locator('[data-suggestions-list]')).toBeVisible();
-  await search.getByRole('option', { name: 'Pizzeria', exact: true }).click();
+  await specialty.click();
   await expect(query).toHaveValue('Pizzeria');
   await expect(query).not.toHaveAttribute('name', 'q');
   await search.getByRole('button', { name: 'Rechercher' }).click();
@@ -182,9 +188,9 @@ test('a specialty suggestion is exactly the Paris manual specialty filter withou
 
   const parameters = new URL(page.url()).searchParams;
   expect(parameters.has('q')).toBe(false);
-  expect(parameters.getAll('categories[0]')).toContain('pizzeria');
+  expect(parameters.getAll('categories[0]')).toContain(specialtySlug);
   await expect(page.locator('[data-results-count]')).toHaveText(manualCount ?? '');
-  await expect(page.locator('[data-directory-filter-form] input[name="categories[]"][value="pizzeria"]')).toBeChecked();
+  await expect(page.locator(`[data-directory-filter-form] input[name="categories[]"][value="${specialtySlug}"]`)).toBeChecked();
 });
 
 test('free text and an edit after a specialty suggestion submit text only', async ({ page }) => {
@@ -200,7 +206,7 @@ test('free text and an edit after a specialty suggestion submit text only', asyn
 
   const parameters = new URL(page.url()).searchParams;
   expect(parameters.get('q')).toBe('Quick');
-  expect(parameters.getAll('categories[0]')).not.toContain('pizzeria');
+  expect(parameters.getAll('categories[0]')).toEqual([]);
 });
 
 test('nearby results are limited to thirty kilometres and sorted by distance', async ({ page, context }) => {
