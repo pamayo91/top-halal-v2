@@ -48,8 +48,8 @@ class EditorialTrash
             $rule = RedirectRule::query()->where('origin', 'editorial_deletion')->where('related_type', $this->type($content))->where('related_id', $content->getKey())->where('is_active', true)->latest('id')->first();
             $manualConflict = RedirectRule::query()->where('source_path', $source)->where('match_type', 'exact')->whereNull('query_pattern')->where('is_active', true)->when($rule, fn ($query) => $query->whereKeyNot($rule->getKey()))->exists();
             if ($manualConflict) throw ValidationException::withMessages(['record' => 'Impossible de restaurer ce contenu : une autre règle active possède déjà cette URL. La règle manuelle n’a pas été modifiée.']);
-            if ($rule) $rule->update(['is_active' => false]);
             $content->restore();
+            if ($rule) $rule->update(['is_active' => false]);
             app(AdminAudit::class)->record($this->type($content).'.restored', $content, ['redirect_rule_id' => $rule?->id, 'redirect_rule_deactivated' => $rule !== null]);
         });
     }
