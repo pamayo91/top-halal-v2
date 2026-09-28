@@ -2,7 +2,7 @@
 
 ## 2026-09-28 — Corrections UI ciblées de l’accueil
 
-Le hero et le CTA ont été compactés. Les panneaux Ville/Spécialité affichent jusqu’à dix liens équilibrés et leurs SVG locaux dédiés. Les cartes du Guide sont à nouveau matérialisées, les colonnes éditoriales sont visuellement inversées, et les quatre cartes de confiance ont une hauteur/ligne commune avec pin, cloche, étoile et check circulaire. La validation préproduction reste à exécuter après déploiement.
+Le hero et le CTA ont été compactés. Les panneaux Ville/Spécialité affichent jusqu’à dix liens équilibrés et leurs SVG locaux dédiés. Les cartes du Guide sont à nouveau matérialisées, les colonnes éditoriales sont visuellement inversées, et les quatre cartes de confiance ont une hauteur/ligne commune avec pin, cloche, étoile et check circulaire. Tests PHP ciblés, Playwright desktop/mobile, contrôle navigateur et gate complète préproduction sont validés.
 
 ## 2026-09-28 — Finition densité de l’accueil
 

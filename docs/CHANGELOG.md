@@ -3,6 +3,7 @@
 ## 2026-09-28
 
 - Corrections UI de l’accueil : hero et CTA plus compacts, dix villes maximum pour une liste équilibrée, SVG locaux de localisation/restauration, cartes Guide matérialisées, inversion visuelle des colonnes éditoriales et cartes de confiance désormais parfaitement alignées avec leurs pictogrammes définis.
+- Préproduction : 23 tests PHP ciblés (137 assertions), Playwright homepage desktop/mobile et la gate de régression à snapshot passent sans erreur console/réseau ni exception Laravel.
 
 - Finition visuelle de l’accueil : les restaurants récents affichent jusqu’à huit cartes SSR, en grille 4/2/1 selon le viewport, avec médias et contenu plus compacts. Les superpositions, panneaux, blocs éditoriaux, cartes de confiance, transparence et CTA gagnent en rythme, espace et contraste sans modifier les contenus, routes ou comportements.
 - Préproduction : 18 tests PHP ciblés (107 assertions), Playwright homepage desktop/mobile et gate de régression à snapshot passent sans erreur console/réseau ni exception Laravel.
