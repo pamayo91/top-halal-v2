@@ -31,7 +31,7 @@ class SentinelRegistry
         if(ContentMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Editorial media relation references a missing asset.';
         if(ContentMedia::query()->where('content_type','post')->whereNotIn('content_id',Article::withTrashed()->select('id'))->exists())$errors[]='Editorial media relation references a missing article.';
         if(ContentMedia::query()->where('content_type','page')->whereNotIn('content_id',Page::withTrashed()->select('id'))->exists())$errors[]='Editorial media relation references a missing page.';
-        if(DB::table('article_category')->whereNotIn('article_id',Article::query()->select('id'))->exists()||DB::table('article_tag')->whereNotIn('article_id',Article::query()->select('id'))->exists())$errors[]='Editorial taxonomy relation is orphaned.';
+        if(DB::table('article_category')->whereNotIn('article_id',Article::withTrashed()->select('id'))->exists()||DB::table('article_tag')->whereNotIn('article_id',Article::withTrashed()->select('id'))->exists())$errors[]='Editorial taxonomy relation is orphaned.';
         return $errors;
     }
 }
