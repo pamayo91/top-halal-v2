@@ -81,7 +81,9 @@ class EditorialSlugRedirects
             throw ValidationException::withMessages(['slug' => 'Ce slug est déjà utilisé par un contenu éditorial.']);
         }
 
-        if ($this->exactRulesFor($this->path($slug))->isNotEmpty()) {
+        $rules = $this->exactRulesFor($this->path($slug));
+        $ownDeletionRule = $content->trashed() && $rules->isNotEmpty() && $rules->every(fn (RedirectRule $rule): bool => $rule->is_active && $rule->origin === 'editorial_deletion' && $rule->related_type === ($content instanceof Article ? 'article' : 'page') && (int) $rule->related_id === (int) $content->getKey());
+        if ($rules->isNotEmpty() && ! $ownDeletionRule) {
             throw ValidationException::withMessages(['slug' => 'Ce slug est déjà une source de redirection. Choisissez un autre slug ou modifiez d’abord cette règle dans Redirections.']);
         }
     }
