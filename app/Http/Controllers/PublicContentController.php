@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, CommuneDirectory, EditorialSidebar, GeographicPageResolver, NearbyCityService, PublicRestaurantSearch};
 use App\Services\ContributionIdentityService;
 
 class PublicContentController extends Controller
@@ -19,6 +19,7 @@ class PublicContentController extends Controller
     public function __construct(
         private readonly PublicRestaurantSearch $search,
         private readonly CityPageResolver $cities,
+        private readonly CommuneDirectory $communes,
         private readonly CitySeoService $citySeo,
         private readonly CitySpecialtySeoService $citySpecialties,
         private readonly CityServiceSeoService $cityServices,
@@ -39,41 +40,46 @@ class PublicContentController extends Controller
 
     public function index(Request $request): View
     {
-        $cities = $this->citySeo->cities()->sortBy('city_name')->map(fn (object $city): object => (object) ['name' => $this->cityLabel($city), 'slug' => $city->slug]);
-        $selectedCity = $cities->firstWhere('slug', $request->input('ville'));
+        $cityCode = trim((string) $request->input('city_code'));
+        $selectedCity = $cityCode === '' ? null : $this->communes->find($cityCode);
+        $locationError = $request->boolean('location_error') || ($cityCode !== '' && $selectedCity === null);
 
         return view('public.restaurants.index', [
             'restaurants' => $this->search->apply($this->search->published(), $request)->paginate(12)->withQueryString(),
             'categories' => Category::orderBy('name')->get(), 'features' => Feature::orderBy('name')->get(),
-            'cities' => $cities,
             'selectedCity' => $selectedCity,
+            'locationError' => $locationError,
             'activeFilterCount' => count((array) $request->input('categories', [])) + count((array) $request->input('features', [])),
-            'hasFilters' => $request->filled(['q', 'ville']) || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
+            'hasFilters' => $request->filled('q') || $request->filled('ville') || $request->filled('city_code') || $request->filled('categories') || $request->filled('features') || $request->filled(['lat', 'lng']),
         ]);
     }
 
     public function search(Request $request): RedirectResponse
     {
-        $city = trim((string) $request->query('ville'));
+        $cityCode = trim((string) $request->query('city_code'));
+        $location = trim((string) $request->query('location'));
         $query = trim((string) $request->query('q'));
         $categories = array_values(array_filter((array) $request->query('categories', []), 'is_string'));
         $features = array_values(array_filter((array) $request->query('features', []), 'is_string'));
-        if ($city !== '' && $query === '' && count($categories) === 1 && $features === []) {
-            $cityPage = $this->cities->cityForSlug($city);
+        $commune = $cityCode === '' ? null : $this->communes->find($cityCode);
+        if (($cityCode !== '' && $commune === null) || ($location !== '' && $commune === null)) {
+            return redirect()->route('restaurants.index', array_filter(['q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null, 'location_error' => 1]));
+        }
+        $cityPage = $commune === null ? null : $this->cities->cityForCode($commune->city_code);
+        if ($commune !== null && $query === '' && count($categories) === 1 && $features === []) {
             $category = Category::where('slug', $categories[0])->first();
             if ($cityPage !== null && $category !== null && $this->citySpecialties->isOpen($cityPage, $category)) {
                 return redirect()->to($this->citySpecialties->url($cityPage, $category));
             }
         }
-        if ($city !== '' && $query === '' && $categories === [] && count($features) === 1) {
-            $cityPage = $this->cities->cityForSlug($city);
+        if ($commune !== null && $query === '' && $categories === [] && count($features) === 1) {
             $feature = Feature::where('slug', $features[0])->first();
             if ($cityPage !== null && $feature !== null && $this->cityServices->isOpen($cityPage, $feature)) {
                 return redirect()->to($this->cityServices->url($cityPage, $feature));
             }
         }
-        if ($city !== '' && $query === '' && $categories === [] && $features === []) return redirect()->route('cities.show', $city);
-        return redirect()->route('restaurants.index', array_filter(['ville' => $city ?: null, 'q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null]));
+        if ($commune !== null && $query === '' && $categories === [] && $features === [] && $cityPage !== null) return redirect()->to(route('cities.show', $cityPage->slug));
+        return redirect()->route('restaurants.index', array_filter(['city_code' => $commune?->city_code, 'q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null]));
     }
 
     public function nearMe(Request $request): RedirectResponse
@@ -289,7 +295,7 @@ class PublicContentController extends Controller
         return $this->citySeo->cities()
             ->sortByDesc('restaurants_count')
             ->take(11)
-            ->map(fn (object $city): array => ['name' => $this->cityLabel($city), 'slug' => $city->slug])
+            ->map(fn (object $city): array => ['name' => $city->city_name, 'label' => $this->cityLabel($city), 'city_code' => $city->city_code, 'slug' => $city->slug])
             ->sortByDesc(fn (array $city): bool => $city['slug'] === 'paris')
             ->values();
     }

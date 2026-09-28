@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\{RedirectRule, Restaurant};
+use App\Models\{CommuneReference, RedirectRule, Restaurant};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -13,44 +13,49 @@ class PublicRestaurantSearchTest extends TestCase
 
     public function test_directory_has_no_default_city_while_home_keeps_its_explicit_paris_shortcut(): void
     {
+        $this->commune('75056', 'Paris', '75');
         Restaurant::create(['legacy_wp_id' => 1, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         Restaurant::create(['legacy_wp_id' => 2, 'name' => 'Caché', 'slug' => 'cache', 'status' => 'pending', 'city_name' => 'Ville cachée']);
 
         $this->get('/')->assertOk()->assertSee('Localisation')->assertSee('value="Paris"', false)->assertSee('Paris publié')->assertDontSee('Ville cachée');
-        $this->get('/restaurants')->assertOk()->assertSee('placeholder="Ville ou localisation"', false)->assertDontSee('value="Paris"', false)->assertDontSee('name="ville" value="paris"', false)->assertSee('Autour de moi');
-        $this->getJson('/restaurants/recherche/villes?q=par')->assertOk()->assertJsonPath('cities.0.slug', 'paris');
+        $this->get('/restaurants')->assertOk()->assertSee('placeholder="Ville ou localisation"', false)->assertDontSee('value="Paris"', false)->assertDontSee('name="city_code" value="75056"', false)->assertSee('Autour de moi');
+        $this->getJson('/restaurants/recherche/villes?q=par')->assertOk()->assertJsonPath('cities.0.city_code', '75056');
     }
 
     public function test_suggestions_return_real_specialties_and_prioritize_selected_city_restaurants(): void
     {
+        $this->commune('75056', 'Paris', '75');
+        $this->commune('69123', 'Lyon', '69');
         $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 1, 'name' => 'Burger']);
         $paris = Restaurant::create(['legacy_wp_id' => 3, 'name' => 'Black Paris', 'slug' => 'black-paris', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         $lyon = Restaurant::create(['legacy_wp_id' => 4, 'name' => 'Black Lyon', 'slug' => 'black-lyon', 'status' => 'published', 'city_name' => 'Lyon', 'city_code' => '69381', 'country_code' => 'FR']);
         $paris->categories()->attach($burger);
         $lyon->categories()->attach($burger);
 
-        $this->getJson('/restaurants/recherche/suggestions?q=black&ville=paris')->assertOk()->assertJsonPath('restaurants.0.slug', 'black-paris');
+        $this->getJson('/restaurants/recherche/suggestions?q=black&city_code=75056')->assertOk()->assertJsonPath('restaurants.0.slug', 'black-paris');
         $this->getJson('/restaurants/recherche/suggestions?q=burg')->assertOk()->assertJsonPath('specialties.0.slug', 'burger');
     }
 
     public function test_city_only_search_uses_city_name_slug_and_other_combinations_stay_noindex_results(): void
     {
+        $this->commune('75056', 'Paris', '75');
         $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 2, 'name' => 'Burger']);
         $restaurant = Restaurant::create(['legacy_wp_id' => 5, 'name' => 'Burger Paris', 'slug' => 'burger-paris', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         $restaurant->categories()->attach($burger);
 
-        $this->get('/restaurants/recherche?ville=paris')->assertRedirect('/restos/paris');
+        $this->get('/restaurants/recherche?city_code=75056')->assertRedirect('/restos/paris');
         $this->get('/restos/paris')->assertOk()->assertSee('Burger Paris');
-        $this->get('/restaurants/recherche?ville=paris&categories[]=burger')->assertRedirect('/restaurants?ville=paris&categories%5B0%5D=burger');
-        $this->get('/restaurants?ville=paris&categories[]=burger')->assertOk()->assertSee('Burger Paris')->assertSee('noindex,follow', false);
+        $this->get('/restaurants/recherche?city_code=75056&categories[]=burger')->assertRedirect('/restaurants?city_code=75056&categories%5B0%5D=burger');
+        $this->get('/restaurants?city_code=75056&categories[]=burger')->assertOk()->assertSee('Burger Paris')->assertSee('noindex,follow', false);
     }
 
     public function test_search_routes_are_not_intercepted_by_a_legacy_redirect_rule(): void
     {
+        $this->commune('75056', 'Paris', '75');
         Restaurant::create(['legacy_wp_id' => 6, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
         RedirectRule::create(['source_path' => '/restaurants/recherche', 'match_type' => 'exact', 'destination' => '/resto/recherche', 'status_code' => 301, 'priority' => 1, 'is_active' => true]);
 
-        $this->get('/restaurants/recherche?ville=paris')->assertRedirect('/restos/paris');
+        $this->get('/restaurants/recherche?city_code=75056')->assertRedirect('/restos/paris');
     }
 
     public function test_directory_orders_restaurants_by_canonical_publication_date_and_formats_its_count(): void
@@ -81,5 +86,33 @@ class PublicRestaurantSearchTest extends TestCase
             ->assertSee('Filtres (1)')
             ->assertSee('aria-expanded="true"', false)
             ->assertSee('Voir moins');
+    }
+
+    public function test_official_empty_communes_and_invalid_text_never_fall_back_to_paris(): void
+    {
+        $this->commune('75056', 'Paris', '75');
+        $this->commune('94028', 'Créteil', '94');
+        Restaurant::create(['legacy_wp_id' => 40, 'name' => 'Paris publié', 'slug' => 'paris-publie', 'status' => 'published', 'city_name' => 'Paris', 'city_code' => '75111', 'country_code' => 'FR']);
+
+        $this->getJson('/restaurants/recherche/villes?q=Creteil')->assertOk()->assertJsonPath('cities.0.name', 'Créteil')->assertJsonPath('cities.0.city_code', '94028');
+        $this->get('/restaurants/recherche?city_code=94028')->assertRedirect('/restaurants?city_code=94028');
+        $this->get('/restaurants?city_code=94028')->assertOk()->assertSee('0 restaurant halal')->assertSee('Aucun restaurant halal référencé à Créteil pour le moment.')->assertDontSee('Paris publié')->assertSee('noindex,follow', false);
+        $this->get('/restaurants/recherche?location=Ville+inexistante')->assertRedirect('/restaurants?location_error=1');
+        $this->get('/restaurants?city_code=not-a-city')->assertOk()->assertSee("Nous n'avons pas trouvé cette ville")->assertDontSee('Paris publié');
+    }
+
+    public function test_commune_normalization_accepts_case_spaces_hyphens_and_homonyms(): void
+    {
+        $this->commune('42001', 'Saint-Étienne', '42');
+        $this->commune('93066', 'Saint-Denis', '93');
+        $this->commune('97411', 'Saint-Denis', '974');
+
+        $this->getJson('/restaurants/recherche/villes?q=SAINT ETIENNE')->assertOk()->assertJsonPath('cities.0.name', 'Saint-Étienne');
+        $this->getJson('/restaurants/recherche/villes?q=saint-denis')->assertOk()->assertJsonPath('cities.0.label', 'Saint-Denis — Seine-Saint-Denis (93)');
+    }
+
+    private function commune(string $code, string $name, string $department): void
+    {
+        CommuneReference::create(['city_code' => $code, 'city_name' => $name, 'department_code' => $department, 'normalized_name' => app(\App\Services\CommuneTextNormalizer::class)->normalize($name)]);
     }
 }

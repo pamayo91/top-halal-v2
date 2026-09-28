@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class PublicRestaurantSearch
 {
-    public function __construct(private readonly CityPageResolver $cities) {}
+    public function __construct(private readonly CityPageResolver $cities, private readonly CommuneDirectory $communes) {}
 
     public function published(): Builder
     {
@@ -23,8 +23,12 @@ class PublicRestaurantSearch
             $escaped = addcslashes(Str::lower($text), '%_\\');
             $query->where(fn (Builder $search) => $search->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orWhereRaw('LOWER(city_name) LIKE ?', ["%{$escaped}%"]));
         }
-        if ($city = trim((string) $request->input('ville'))) {
-            $cityPage = $this->cities->cityForSlug($city);
+        if ($cityCode = trim((string) $request->input('city_code'))) {
+            $commune = $this->communes->find($cityCode);
+            $query->when($commune !== null, fn (Builder $cities) => $cities->whereIn('city_code', $commune->source_city_codes), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
+        } elseif ($legacyCity = trim((string) $request->input('ville'))) {
+            // Compatibility for existing result URLs; new forms always submit city_code.
+            $cityPage = $this->cities->cityForSlug($legacyCity);
             $query->when($cityPage !== null, fn (Builder $cities) => $cities->whereIn('city_code', $cityPage->source_city_codes), fn (Builder $cities) => $cities->whereRaw('1 = 0'));
         }
         foreach (array_filter((array) $request->input('categories', []), 'is_string') as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));

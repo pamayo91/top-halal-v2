@@ -1,13 +1,13 @@
-@props(['cities' => collect(), 'compact' => false, 'id' => null, 'selectedCity' => '', 'selectedCitySlug' => '', 'query' => ''])
+@props(['cities' => collect(), 'compact' => false, 'id' => null, 'selectedCity' => '', 'selectedCityCode' => '', 'query' => ''])
 @php($searchId = $id ?: 'restaurant-search-'.uniqid())
 <form class="restaurant-search {{ $compact ? 'restaurant-search-compact' : '' }}" data-restaurant-search action="{{ route('restaurants.search') }}" method="get" data-cities-url="{{ route('restaurants.search.cities') }}" data-suggestions-url="{{ route('restaurants.search.suggestions') }}" data-near-me-url="{{ route('restaurants.near-me') }}">
     <div class="restaurant-search-field location-field">
         <label class="sr-only" for="{{ $searchId }}-location">Localisation</label>
-        <div class="search-input-wrap"><svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.25"/></svg><input id="{{ $searchId }}-location" data-location-input type="search" value="{{ $selectedCity }}" placeholder="Ville ou localisation" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="{{ $searchId }}-cities"><input data-location-value type="hidden" name="ville" value="{{ $selectedCitySlug }}"></div>
+        <div class="search-input-wrap"><svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.25"/></svg><input id="{{ $searchId }}-location" data-location-input name="location" type="search" value="{{ $selectedCity }}" placeholder="Ville ou localisation" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="{{ $searchId }}-cities"><input data-location-value type="hidden" name="city_code" value="{{ $selectedCityCode }}"></div>
         <div id="{{ $searchId }}-cities" class="search-popover" data-cities-list role="listbox" hidden>
             <button type="button" data-near-me>Autour de moi <span aria-hidden="true">›</span></button>
             <p class="search-popover-heading">Suggestions</p>
-            @foreach($cities as $city)<button type="button" role="option" data-city-name="{{ $city['name'] }}" data-city-slug="{{ $city['slug'] }}">{{ $city['name'] }}</button>@endforeach
+            @foreach($cities as $city)<button type="button" role="option" data-city-name="{{ $city['name'] }}" data-city-code="{{ $city['city_code'] }}">{{ $city['label'] ?? $city['name'] }}</button>@endforeach
         </div>
     </div>
     <div class="restaurant-search-field query-field">

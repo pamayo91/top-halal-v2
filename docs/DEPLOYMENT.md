@@ -48,6 +48,10 @@ Before running `artisan test` on preproduction, run `artisan optimize:clear` fir
 ## SEO structural deployment addition
 After approval to deploy this release to preproduction, run the explicit PHP 8.4 Artisan commands in this order: `migrate --force`, `redirects:import-htaccess`, `redirects:audit`, then application cache commands. Do not move content redirects back to Apache; only preserve the existing host/HTTPS rules. Validate representative exact, regex and query redirects plus sitemap, robots, 404 and a restaurant aggregate-rating page in Playwright before promotion.
 
+## Public commune-search reference
+
+After the `commune_references` migration, run `/opt/alt/php84/usr/bin/php artisan communes:sync-reference --no-interaction` once. It reads only the tracked local TSV and writes the local search reference; it does not access WordPress, alter restaurants or create SEO pages. A new official millésime requires the reviewed TSV update followed by `communes:sync-reference --fresh`.
+
 ## Future Automation
 Create `scripts/deploy-preprod.sh` after the server audit confirms final paths, PHP/Composer locations, Node/npm needs, worker manager and Apache setup. The script should automate the target deployment flow without embedding secrets.
 

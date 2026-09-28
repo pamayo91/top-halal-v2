@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\{Category, Restaurant};
-use App\Services\CityPageResolver;
+use App\Services\{CityPageResolver, CommuneDirectory};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,22 +11,27 @@ use Illuminate\Support\Str;
 
 class RestaurantSearchSuggestionController extends Controller
 {
-    public function __construct(private readonly CityPageResolver $cities) {}
+    public function __construct(private readonly CityPageResolver $cities, private readonly CommuneDirectory $communes) {}
 
     public function cities(Request $request): JsonResponse
     {
         $term = trim((string) $request->query('q'));
-        $normalizedTerm = Str::lower($term);
-        $cities = $this->cities->cities()
-            ->filter(fn (object $city): bool => $normalizedTerm === '' || str_contains(Str::lower($city->city_name), $normalizedTerm))
-            ->sortByDesc('restaurants_count')
-            ->take(12)
-            ->map(fn (object $city): array => [
-                'name' => $city->city_name.($city->is_ambiguous ? ' — '.$city->department['name'] : ''),
-                'slug' => $city->slug,
-                'count' => $city->restaurants_count,
+        if ($term === '') {
+            $cities = $this->cities->cities()->sortByDesc('restaurants_count')->take(12)->map(fn (object $city): array => [
+                'name' => $city->city_name,
+                'label' => $city->city_name.($city->is_ambiguous ? ' — '.$city->department['name'].' ('.$city->department['code'].')' : ''),
+                'city_code' => $city->city_code,
             ]);
-        return response()->json(['cities' => $cities->sortByDesc(fn ($city) => $city['slug'] === 'paris')->values()]);
+
+            return response()->json(['cities' => $cities->values()]);
+        }
+        $cities = $this->communes->suggest($term)->map(fn (object $city): array => [
+            'name' => $city->city_name,
+            'label' => $city->city_name.($city->is_ambiguous ? ' — '.$city->department_name.' ('.$city->department_code.')' : ''),
+            'city_code' => $city->city_code,
+        ]);
+
+        return response()->json(['cities' => $cities->values()]);
     }
 
     public function suggestions(Request $request): JsonResponse
@@ -34,7 +39,7 @@ class RestaurantSearchSuggestionController extends Controller
         $term = trim((string) $request->query('q'));
         if (Str::length($term) < 2) return response()->json(['specialties' => [], 'restaurants' => []]);
         $escaped = addcslashes(Str::lower($term), '%_\\');
-        $city = $this->cities->cityForSlug(trim((string) $request->query('ville')));
+        $city = $this->communes->find(trim((string) $request->query('city_code')));
         // A specialty remains selectable as soon as it exists in the V2
         // catalogue, including before its first published restaurant.
         $specialties = Category::query()->whereRaw('LOWER(name) LIKE ?', ["%{$escaped}%"])->orderBy('name')->limit(5)->get(['name', 'slug']);

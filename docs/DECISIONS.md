@@ -215,3 +215,7 @@ Chaque déposant d’une proposition publique qui confirme son e-mail reçoit, q
 
 Les commentaires éditoriaux sont paginés en lots de 20 fils racines, du plus récent au plus ancien. Chaque lot SSR contient tous les descendants approuvés de ses racines; le HTML expose un lien vers `?comments_page=N` et reste donc crawlable sans JavaScript. Le JavaScript intercepte seulement ce lien pour ajouter le fragment SSR. Toutes les pages de commentaires conservent la canonical de l’URL éditoriale principale. Les descendants conservent leur `parent_id` réel mais sont limités à deux niveaux visuels.
 
+# 2026-09-28 — Référentiel local de communes pour la recherche publique
+
+La recherche publique utilise un export versionné du référentiel officiel des communes, chargé dans `commune_references` avec un index sur une clé normalisée. Le code INSEE est l’identité de recherche ; les pages SEO conservent leur resolver et leur seuil propres. Ce choix évite une dépendance réseau à chaque frappe, accepte les communes sans restaurant et empêche leur création implicite dans le sitemap ou les pages SEO.
+

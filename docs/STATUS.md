@@ -1,6 +1,8 @@
 # Top-Halal V2 — Status
 
-Last updated: 2026-09-27
+Last updated: 2026-09-28
+
+Latest public commune-search correction: the homepage and directory share an INSEE-code-backed local official commune autocomplete. Accent/case/separator normalization is deterministic, editing the visible field clears the hidden code, valid empty communes remain a `noindex,follow` directory result, and invalid text cannot fall back to Paris. SEO city pages and their sitemap policy remain independent; deployment loads the versioned reference with `communes:sync-reference`.
 
 Latest editorial editor enhancement: Articles and Pages share a focused Filament RichEditor extension for link SEO. The link dialog reads and writes combinable `nofollow`, `sponsored` and `ugc` tokens alongside the native `_blank` option, preserving unrelated existing `rel` tokens and leaving untouched links alone. Its toolbar is now an opaque CSS-sticky bar below the measured administration top bar, with responsive wrapping.
 

@@ -20,6 +20,34 @@ test('two-field restaurant search works responsively', async ({ page }) => {
     }
   });
 
+test('official accent-insensitive commune selection keeps its INSEE identity and never falls back to Paris', async ({ page }) => {
+  await page.goto('/');
+  const search = page.locator('[data-restaurant-search]').first();
+  const location = search.getByLabel('Localisation');
+  await expect(location).toHaveValue('Paris');
+  await location.fill('Abergement Clemenciat');
+  await expect(search.getByRole('button', { name: /Abergement-Clémenciat/ })).toBeVisible();
+  await search.getByRole('button', { name: /Abergement-Clémenciat/ }).click();
+  await expect(search.locator('[data-location-value]')).toHaveValue('01001');
+  await search.getByRole('button', { name: 'Rechercher' }).click();
+  await page.waitForURL(/\/restaurants\?city_code=01001/);
+  await expect(page.getByText('Aucun restaurant halal référencé à L\'Abergement-Clémenciat pour le moment.')).toBeVisible();
+  await expect(page.getByText('0 restaurant halal')).toBeVisible();
+  expect(await page.locator('.restaurant-card').count()).toBe(0);
+});
+
+test('editing the default Paris text clears its city code and rejects an unknown location without navigation', async ({ page }) => {
+  await page.goto('/');
+  const search = page.locator('[data-restaurant-search]').first();
+  const location = search.getByLabel('Localisation');
+  await expect(search.locator('[data-location-value]')).toHaveValue('75056');
+  await location.fill('Ville totalement inconnue');
+  await expect(search.locator('[data-location-value]')).toHaveValue('');
+  await search.getByRole('button', { name: 'Rechercher' }).click();
+  await expect(search.getByText("Nous n'avons pas trouvé cette ville. Vérifiez l'orthographe ou sélectionnez une suggestion.")).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+});
+
 test('near me is requested only after the voluntary choice and keeps the search usable on refusal', async ({ page }) => {
   await page.goto('/');
   const search = page.locator('[data-restaurant-search]').first();

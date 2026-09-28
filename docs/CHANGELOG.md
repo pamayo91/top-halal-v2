@@ -524,3 +524,8 @@
 - Les résultats sont désormais déterministes du plus récemment publié/ajouté au plus ancien ; la sidebar est exclusivement dédiée aux spécialités/services, repliable sur desktop et disponible dans un drawer accessible sur mobile.
 - Compteur français, liens de cartes, pagination et états clavier affinés sans toucher aux routes, canonicals, noindex, facettes ou fallbacks média.
 
+# 2026-09-28 — Recherche publique des communes
+
+- L’autocomplete partagé recherche désormais toutes les communes officielles locales par code INSEE, avec tolérance aux accents et séparateurs simples.
+- Les communes sans restaurant ouvrent un résultat `noindex,follow` à zéro résultat ; les textes non résolus et les modifications manuelles ne peuvent plus reprendre Paris silencieusement.
+
