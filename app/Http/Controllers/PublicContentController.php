@@ -58,6 +58,7 @@ class PublicContentController extends Controller
     {
         $cityCode = trim((string) $request->query('city_code'));
         $location = trim((string) $request->query('location'));
+        $legacyCity = trim((string) $request->query('ville'));
         $query = trim((string) $request->query('q'));
         $categories = array_values(array_filter((array) $request->query('categories', []), 'is_string'));
         $features = array_values(array_filter((array) $request->query('features', []), 'is_string'));
@@ -65,21 +66,21 @@ class PublicContentController extends Controller
         if (($cityCode !== '' && $commune === null) || ($location !== '' && $commune === null)) {
             return redirect()->route('restaurants.index', array_filter(['q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null, 'location_error' => 1]));
         }
-        $cityPage = $commune === null ? null : $this->cities->cityForCode($commune->city_code);
-        if ($commune !== null && $query === '' && count($categories) === 1 && $features === []) {
+        $cityPage = $commune !== null ? $this->cities->cityForCode($commune->city_code) : ($legacyCity === '' ? null : $this->cities->cityForSlug($legacyCity));
+        if ($cityPage !== null && $query === '' && count($categories) === 1 && $features === []) {
             $category = Category::where('slug', $categories[0])->first();
             if ($cityPage !== null && $category !== null && $this->citySpecialties->isOpen($cityPage, $category)) {
                 return redirect()->to($this->citySpecialties->url($cityPage, $category));
             }
         }
-        if ($commune !== null && $query === '' && $categories === [] && count($features) === 1) {
+        if ($cityPage !== null && $query === '' && $categories === [] && count($features) === 1) {
             $feature = Feature::where('slug', $features[0])->first();
             if ($cityPage !== null && $feature !== null && $this->cityServices->isOpen($cityPage, $feature)) {
                 return redirect()->to($this->cityServices->url($cityPage, $feature));
             }
         }
-        if ($commune !== null && $query === '' && $categories === [] && $features === [] && $cityPage !== null) return redirect()->to(route('cities.show', $cityPage->slug));
-        return redirect()->route('restaurants.index', array_filter(['city_code' => $commune?->city_code, 'q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null]));
+        if ($cityPage !== null && $query === '' && $categories === [] && $features === []) return redirect()->to(route('cities.show', $cityPage->slug));
+        return redirect()->route('restaurants.index', array_filter(['city_code' => $commune?->city_code, 'ville' => $commune === null ? ($legacyCity ?: null) : null, 'q' => $query ?: null, 'categories' => $categories ?: null, 'features' => $features ?: null]));
     }
 
     public function nearMe(Request $request): RedirectResponse
