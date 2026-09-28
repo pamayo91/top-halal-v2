@@ -63,6 +63,28 @@ test.describe('Editorial rich editor', () => {
     expect(consoleErrors).toEqual([]);
   });
 
+  test('reads each existing link URL in the reported historical article without editing it', async ({ page }) => {
+    await page.goto('/admin');
+    await page.locator('input[type="email"]').fill(email!);
+    await page.locator('input[type="password"]').fill(password!);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/admin$/);
+
+    await page.goto('/admin/articles/114/edit');
+    const editor = page.locator('.editorial-rich-editor .tiptap');
+    const links = editor.locator('a');
+    expect(await links.count()).toBeGreaterThanOrEqual(2);
+
+    for (let index = 0; index < await links.count(); index++) {
+      const link = links.nth(index);
+      const href = await link.getAttribute('href');
+      await link.click();
+      await page.getByRole('button', { name: 'Lien', exact: true }).click();
+      await expect(page.getByRole('dialog').getByLabel('URL')).toHaveValue(href!);
+      await page.keyboard.press('Escape');
+    }
+  });
+
   test('opens and applies the shared HTML source editor without bypassing sanitization', async ({ page }) => {
     await page.goto('/admin');
     await page.locator('input[type="email"]').fill(email!);
