@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
  */
 class RestaurantSearchState
 {
-    /** @return array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool} */
+    /** @return array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool,radius_km:?int} */
     public function from(Request $request): array
     {
         $lat = $this->coordinate($request->input('lat'), -90, 90);
@@ -28,10 +28,11 @@ class RestaurantSearchState
             'lat' => $lat,
             'lng' => $lng,
             'nearby' => $nearby,
+            'radius_km' => $nearby ? $this->nearbyRadius() : null,
         ];
     }
 
-    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool} $state */
+    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool,radius_km:?int} $state */
     public function query(array $state): array
     {
         return array_filter([
@@ -50,6 +51,11 @@ class RestaurantSearchState
         if (! is_numeric($value) || (float) $value < $minimum || (float) $value > $maximum) return null;
 
         return round((float) $value, 5);
+    }
+
+    private function nearbyRadius(): int
+    {
+        return min(100, max(1, (int) config('restaurant-search.nearby_radius_km', 30)));
     }
 
     private function string(mixed $value): ?string

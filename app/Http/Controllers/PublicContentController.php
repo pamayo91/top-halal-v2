@@ -152,7 +152,7 @@ class PublicContentController extends Controller
                 city: $city,
                 citySpecialties: $this->citySpecialties->openedForCity($city),
                 cityServices: $this->cityServices->openedForCity($city),
-                searchState: ['q' => '', 'city_code' => $city->city_code, 'ville' => null, 'categories' => [], 'features' => [], 'lat' => null, 'lng' => null, 'nearby' => false],
+                searchState: ['q' => '', 'city_code' => $city->city_code, 'ville' => null, 'categories' => [], 'features' => [], 'lat' => null, 'lng' => null, 'nearby' => false, 'radius_km' => null],
             );
         }
 

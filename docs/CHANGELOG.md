@@ -540,3 +540,8 @@
 - Les filtres SSR retransmettent les coordonnées GPS ; le changement explicite de ville désactive les coordonnées précédentes et « Autour de moi » retire le code ville.
 - Les landings ville réutilisent le moteur SSR de recherche/filtres tout en conservant leur SEO ; une combinaison filtrée retourne au répertoire `noindex,follow`.
 
+# 2026-09-28 — Rayon réel et formulaire de recherche unifié
+
+- « Autour de moi » limite désormais réellement les résultats à 30 km côté serveur, après boîte englobante et avant tri exact par distance ; aucun fallback hors rayon n’est appliqué.
+- Le moteur principal synchronise les spécialités/services cochés avant soumission. Sur desktop, les cases appliquent immédiatement la recherche SSR ; le drawer mobile conserve une validation groupée accessible.
+

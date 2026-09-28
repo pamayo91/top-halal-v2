@@ -17,7 +17,7 @@ class PublicRestaurantSearch
         return Restaurant::where('status', 'published')->with(['categories', 'features', 'openingHours', 'media.asset.variants', 'outboundLinks' => fn ($q) => $q->where('is_active', true)]);
     }
 
-    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool}|null $state */
+    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool,radius_km:?int}|null $state */
     public function apply(Builder $query, Request $request, ?array $state = null): Builder
     {
         $state ??= $this->state->from($request);
@@ -36,18 +36,24 @@ class PublicRestaurantSearch
         foreach ($state['categories'] as $slug) $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $slug));
         foreach ($state['features'] as $slug) $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
         if ($state['nearby']) {
-            $lat = $state['lat']; $lng = $state['lng'];
+            $lat = $state['lat']; $lng = $state['lng']; $radius = $state['radius_km'];
             $clamp = DB::connection()->getDriverName() === 'sqlite' ? 'min' : 'least';
             $distance = "(6371 * acos({$clamp}(1, cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))))";
-            $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km');
+            $latitudeDelta = $radius / 111.045;
+            $longitudeDelta = $radius / max(0.00001, 111.045 * abs(cos(deg2rad($lat))));
+            $query->whereNotNull('latitude')->whereNotNull('longitude')->whereBetween('latitude', [-90, 90])->whereBetween('longitude', [-180, 180])
+                ->whereBetween('latitude', [$lat - $latitudeDelta, $lat + $latitudeDelta]);
+            if ($lng - $longitudeDelta >= -180 && $lng + $longitudeDelta <= 180) $query->whereBetween('longitude', [$lng - $longitudeDelta, $lng + $longitudeDelta]);
+            $query->whereRaw("{$distance} <= ?", [$lat, $lng, $lat, $radius])
+                ->select('restaurants.*')->selectRaw("{$distance} as distance_km", [$lat, $lng, $lat])->orderBy('distance_km');
         } else $this->orderByRecent($query);
         return $query;
     }
 
-    /** @return array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool} */
+    /** @return array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool,radius_km:?int} */
     public function state(Request $request): array { return $this->state->from($request); }
 
-    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool} $state */
+    /** @param array{q:string,city_code:?string,ville:?string,categories:list<string>,features:list<string>,lat:?float,lng:?float,nearby:bool,radius_km:?int} $state */
     public function queryParameters(array $state): array { return $this->state->query($state); }
 
     /** Apply the one canonical default order to every non-proximity public listing. */

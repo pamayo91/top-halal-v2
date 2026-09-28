@@ -147,7 +147,7 @@ test('nearby state survives applying a directory filter', async ({ page, context
   if ((page.viewportSize()?.width ?? 0) < 760) await page.getByRole('button', { name: /Filtres/ }).click();
   const specialty = filters.locator('input[name="categories[]"]').first();
   await specialty.check();
-  await filters.getByRole('button', { name: 'Appliquer les filtres' }).click();
+  if ((page.viewportSize()?.width ?? 0) < 760) await filters.getByRole('button', { name: 'Afficher les résultats' }).click();
   await page.waitForURL(/\/restaurants\?.*lat=48\.8566.*lng=2\.3522.*categories/);
   expect(new URL(page.url()).searchParams.has('city_code')).toBe(false);
 });
@@ -160,8 +160,34 @@ test('city landing shares filters and keeps Paris when applying one', async ({ p
   if ((page.viewportSize()?.width ?? 0) < 760) await page.getByRole('button', { name: /Filtres/ }).click();
   await expect(filters).toBeVisible();
   await filters.locator('input[name="categories[]"]').first().check();
-  await filters.getByRole('button', { name: 'Appliquer les filtres' }).click();
+  if ((page.viewportSize()?.width ?? 0) < 760) await filters.getByRole('button', { name: 'Afficher les résultats' }).click();
   await page.waitForURL(/\/restaurants\?.*city_code=75056.*categories/);
+});
+
+test('nearby results are limited to thirty kilometres and sorted by distance', async ({ page, context }) => {
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });
+  await page.goto('/restaurants?near_me=1');
+  await page.waitForURL(/\/restaurants\?.*lat=48\.85660.*lng=2\.35220/);
+  await expect(page.locator('[data-results-count]')).not.toContainText('7 780');
+  const distances = await page.locator('.restaurant-card .muted').allTextContents();
+  const kilometres = distances.filter(text => text.startsWith('À ')).map(text => Number(text.replace(',', '.').match(/[\d.]+/)?.[0] ?? 999));
+  expect(kilometres.length).toBeGreaterThan(0);
+  expect(kilometres.every(value => value <= 30)).toBe(true);
+  expect(kilometres.every((value, index) => index === 0 || kilometres[index - 1] <= value)).toBe(true);
+});
+
+test('the main search keeps filters selected in the mobile drawer', async ({ page, context }) => {
+  test.skip((page.viewportSize()?.width ?? 0) >= 760, 'The desktop checkbox applies immediately.');
+  await context.grantPermissions(['geolocation']);
+  await context.setGeolocation({ latitude: 48.8566, longitude: 2.3522 });
+  await page.goto('/restaurants?near_me=1');
+  await page.waitForURL(/\/restaurants\?.*lat=48\.85660.*lng=2\.35220/);
+  await page.getByRole('button', { name: /Filtres/ }).click();
+  await page.locator('[data-filters-drawer] input[name="categories[]"]').first().check();
+  await page.getByRole('button', { name: 'Fermer les filtres' }).click();
+  await page.locator('[data-restaurant-search]').getByRole('button', { name: 'Rechercher' }).click();
+  await page.waitForURL(/\/restaurants\?.*lat=48\.85660.*lng=2\.35220.*categories/);
 });
 
 test('near-me URL requests location and preserves compatible filters', async ({ page, context }) => {

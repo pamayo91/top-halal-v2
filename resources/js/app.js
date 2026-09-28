@@ -121,6 +121,11 @@ if (filtersDrawer && filtersTrigger) {
         setExpanded(toggle.getAttribute('aria-expanded') === 'true' || hasHiddenSelection);
         toggle.addEventListener('click', () => setExpanded(toggle.getAttribute('aria-expanded') !== 'true'));
     });
+    const filterForm = filtersDrawer.querySelector('[data-directory-filter-form]');
+    filterForm?.addEventListener('change', event => {
+        if (! event.target.matches('input[type="checkbox"]') || ! window.matchMedia('(min-width: 761px)').matches) return;
+        filterForm.requestSubmit();
+    });
 }
 
 if (submission) {
@@ -381,6 +386,15 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     const location = form.querySelector('[data-location-input]'); const cityValue = form.querySelector('[data-location-value]');
     const query = form.querySelector('[data-query-input]'); const category = form.querySelector('[data-category-input]');
     const cities = form.querySelector('[data-cities-list]'); const suggestions = form.querySelector('[data-suggestions-list]'); const message = form.querySelector('[data-search-message]');
+    const synchronizeDirectoryFilters = () => {
+        const directory = document.querySelector('[data-directory-filter-form]');
+        if (! directory) return;
+        form.querySelectorAll('[data-search-filter-state]').forEach(input => input.remove());
+        directory.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+            const input = document.createElement('input'); input.type = 'hidden'; input.name = checkbox.name; input.value = checkbox.value; input.dataset.searchFilterState = '';
+            form.append(input);
+        });
+    };
     let cityTimer; let queryTimer; let selectedRestaurant = null; let active = -1;
     const buttons = container => [...container.querySelectorAll('button:not([disabled])')];
     const close = container => { container.hidden = true; active = -1; };
@@ -404,11 +418,11 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     location.addEventListener('focus', () => loadCities()); location.addEventListener('input', () => { clearNearbyState(); cityValue.value = ''; message.hidden = true; clearTimeout(cityTimer); cityTimer = setTimeout(() => loadCities(location.value), 180); });
     query.addEventListener('focus', () => close(cities));
     document.addEventListener('pointerdown', event => { if (!form.contains(event.target)) close(cities); });
-    cities.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.matches('[data-near-me]')) { if (!navigator.geolocation) return showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); button.disabled = true; navigator.geolocation.getCurrentPosition(({ coords }) => { const params = new URLSearchParams(new FormData(form)); params.delete('city_code'); params.delete('location'); params.delete('ville'); params.delete('lat'); params.delete('lng'); params.set('lat', coords.latitude); params.set('lng', coords.longitude); window.location.assign(`${form.action.replace('/recherche', '')}?${params.toString()}`); }, () => { button.disabled = false; showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }); return; } chooseCity(button.dataset.cityName, button.dataset.cityCode); });
+    cities.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.matches('[data-near-me]')) { if (!navigator.geolocation) return showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); button.disabled = true; navigator.geolocation.getCurrentPosition(({ coords }) => { synchronizeDirectoryFilters(); const params = new URLSearchParams(new FormData(form)); params.delete('city_code'); params.delete('location'); params.delete('ville'); params.delete('lat'); params.delete('lng'); params.set('lat', coords.latitude); params.set('lng', coords.longitude); window.location.assign(`${form.action.replace('/recherche', '')}?${params.toString()}`); }, () => { button.disabled = false; showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }); return; } chooseCity(button.dataset.cityName, button.dataset.cityCode); });
     query.addEventListener('input', () => { selectedRestaurant = null; category.disabled = true; clearTimeout(queryTimer); queryTimer = setTimeout(loadSuggestions, 220); });
     suggestions.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.dataset.category) { category.value = button.dataset.category; category.disabled = false; query.value = button.textContent; close(suggestions); return; } if (button.dataset.restaurant) { selectedRestaurant = button.dataset.restaurant; query.value = button.childNodes[0].textContent; close(suggestions); } });
     [location, query].forEach(input => input.addEventListener('keydown', event => { const container = input === location ? cities : suggestions; const options = buttons(container); if (event.key === 'Escape') { close(container); return; } if (!options.length || container.hidden) return; if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); active = (active + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length; options[active].focus(); } }));
-    form.addEventListener('submit', event => { if (selectedRestaurant) { event.preventDefault(); window.location.assign(`/resto/${encodeURIComponent(selectedRestaurant)}`); return; } const nearby = [...form.querySelectorAll('[data-nearby-state]')].some(input => !input.disabled); if (location.value.trim() !== '' && cityValue.value === '' && !nearby) { event.preventDefault(); showMessage("Nous n'avons pas trouvé cette ville. Vérifiez l'orthographe ou sélectionnez une suggestion."); } });
+    form.addEventListener('submit', event => { synchronizeDirectoryFilters(); if (selectedRestaurant) { event.preventDefault(); window.location.assign(`/resto/${encodeURIComponent(selectedRestaurant)}`); return; } const nearby = [...form.querySelectorAll('[data-nearby-state]')].some(input => !input.disabled); if (location.value.trim() !== '' && cityValue.value === '' && !nearby) { event.preventDefault(); showMessage("Nous n'avons pas trouvé cette ville. Vérifiez l'orthographe ou sélectionnez une suggestion."); } });
 });
 
 const nearMeUrl = new URL(window.location.href);

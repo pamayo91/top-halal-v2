@@ -17,8 +17,8 @@
         <div id="{{ $searchId }}-suggestions" class="search-popover" data-suggestions-list role="listbox" hidden></div>
     </div>
     @if($searchState)
-        @foreach($searchState['categories'] as $slug)<input type="hidden" name="categories[]" value="{{ $slug }}">@endforeach
-        @foreach($searchState['features'] as $slug)<input type="hidden" name="features[]" value="{{ $slug }}">@endforeach
+        @foreach($searchState['categories'] as $slug)<input data-search-filter-state type="hidden" name="categories[]" value="{{ $slug }}">@endforeach
+        @foreach($searchState['features'] as $slug)<input data-search-filter-state type="hidden" name="features[]" value="{{ $slug }}">@endforeach
         @if($searchState['nearby'])<input data-nearby-state type="hidden" name="lat" value="{{ $searchState['lat'] }}"><input data-nearby-state type="hidden" name="lng" value="{{ $searchState['lng'] }}">@endif
     @endif
     <button class="button" type="submit">Rechercher</button>

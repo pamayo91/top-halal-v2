@@ -66,6 +66,37 @@ class PublicRestaurantSearchTest extends TestCase
             ->assertDontSee('name="city_code" value="75056"', false);
     }
 
+    public function test_nearby_search_limits_results_to_its_fixed_thirty_kilometre_radius_and_orders_by_distance(): void
+    {
+        config()->set('restaurant-search.nearby_radius_km', 30);
+        $near = $this->nearbyRestaurant(301, 'À cinq km', 48.9016);
+        $edge = $this->nearbyRestaurant(302, 'À vingt-neuf km', 49.1176);
+        $outside = $this->nearbyRestaurant(303, 'À trente-et-un km', 49.1356);
+
+        $this->get('/restaurants?lat=48.8566&lng=2.3522')
+            ->assertOk()->assertSeeInOrder([$near->name, $edge->name])->assertDontSee($outside->name)
+            ->assertSee('2 restaurants autour de vous');
+    }
+
+    public function test_nearby_search_has_a_real_empty_state_without_a_global_or_paris_fallback(): void
+    {
+        $outside = $this->nearbyRestaurant(304, 'Uniquement hors rayon', 49.1356);
+
+        $this->get('/restaurants?lat=48.8566&lng=2.3522')
+            ->assertOk()->assertSee('Aucun restaurant halal trouvé autour de vous dans un rayon de 30 km.')
+            ->assertDontSee($outside->name)->assertSee('0 restaurant autour de vous');
+    }
+
+    public function test_main_search_submission_retains_city_and_sidebar_filters(): void
+    {
+        $this->commune('75056', 'Paris', '75');
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 305, 'name' => 'Burger']);
+        $terrace = Feature::firstOrCreate(['slug' => 'terrasse'], ['legacy_term_id' => 306, 'name' => 'Terrasse']);
+
+        $this->get('/restaurants/recherche?city_code=75056&q=grill&categories[]=burger&features[]=terrasse')
+            ->assertRedirect('/restaurants?q=grill&city_code=75056&categories%5B0%5D=burger&features%5B0%5D=terrasse');
+    }
+
     public function test_city_landing_exposes_shared_filters_and_keeps_its_city_when_filtering(): void
     {
         $this->commune('75056', 'Paris', '75');
@@ -159,5 +190,10 @@ class PublicRestaurantSearchTest extends TestCase
     private function commune(string $code, string $name, string $department): void
     {
         CommuneReference::create(['city_code' => $code, 'city_name' => $name, 'department_code' => $department, 'normalized_name' => app(\App\Services\CommuneTextNormalizer::class)->normalize($name)]);
+    }
+
+    private function nearbyRestaurant(int $legacyId, string $name, float $latitude): Restaurant
+    {
+        return Restaurant::create(['legacy_wp_id' => $legacyId, 'name' => $name, 'slug' => str($name)->slug()->append('-'.$legacyId), 'status' => 'published', 'city_name' => 'Test', 'city_code' => '99999', 'latitude' => $latitude, 'longitude' => 2.3522]);
     }
 }
