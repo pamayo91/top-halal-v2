@@ -3,6 +3,7 @@
 ## 2026-09-28
 
 - Refonte visuelle de l’accueil sans changement éditorial ni métier : hero et CTA plus profonds, alternance de plans, panneaux ville/spécialité, mise en page éditoriale à deux colonnes, guide magazine et quatre cartes de confiance. Le rendu reste Blade SSR, sans JavaScript ou dépendance supplémentaire ; la sentinelle Playwright contrôle l’ordre des sections, le CTA et l’absence de débordement.
+- Préproduction : Vite, Playwright homepage desktop/mobile et la gate de régression à snapshot passent ; aucun écart d’intégrité, erreur navigateur/réseau ou nouvelle exception Laravel.
 
 - Replaced mutable-business regression sentinels with deployment snapshots, dynamic integrity checks and dynamically selected public browser surfaces.
 

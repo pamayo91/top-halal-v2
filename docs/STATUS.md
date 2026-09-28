@@ -2,7 +2,7 @@
 
 ## 2026-09-28 — Refonte visuelle de l’accueil
 
-La homepage conserve ses contenus, leur ordre, ses routes, son moteur de recherche, ses grilles et son CTA administrable. La présentation Blade/CSS est désormais éditoriale et rythmée : hero vert à relief statique, alternance de fonds, panneaux d’exploration, textes en grille, guide magazine, cartes de confiance et CTA de fin contrasté. Aucun JavaScript, framework ou ressource distante n’est ajouté ; la sentinelle Playwright vérifie l’ordre des zones, le CTA et l’absence de débordement horizontal. La compilation et la validation préproduction restent à effectuer avec le runtime et la gate du serveur.
+La homepage conserve ses contenus, leur ordre, ses routes, son moteur de recherche, ses grilles et son CTA administrable. La présentation Blade/CSS est désormais éditoriale et rythmée : hero vert à relief statique, alternance de fonds, panneaux d’exploration, textes en grille, guide magazine, cartes de confiance et CTA de fin contrasté. Aucun JavaScript, framework ou ressource distante n’est ajouté ; la sentinelle Playwright vérifie l’ordre des zones, le CTA et l’absence de débordement horizontal. Compilation Vite, contrôle visuel navigateur, tests homepage desktop/mobile et gate complète de régression préproduction sont validés.
 
 ## 2026-09-28 — Gate de régression à snapshot
 
