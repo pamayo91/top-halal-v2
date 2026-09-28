@@ -29,8 +29,8 @@ class SentinelRegistry
         foreach(MediaAsset::query()->whereExists(fn($q)=>$q->selectRaw(1)->from('restaurant_media')->whereColumn('restaurant_media.media_asset_id','media_assets.id'))->orWhereExists(fn($q)=>$q->selectRaw(1)->from('content_media')->whereColumn('content_media.media_asset_id','media_assets.id'))->get() as $asset)if(!filled($asset->original_path)||!$disk->exists($asset->original_path))$errors[]="Referenced media asset #{$asset->id} source file is missing.";
         if(RestaurantMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Restaurant media relation references a missing asset.';
         if(ContentMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Editorial media relation references a missing asset.';
-        if(ContentMedia::query()->where('content_type','post')->whereNotIn('content_id',Article::query()->select('id'))->exists())$errors[]='Editorial media relation references a missing article.';
-        if(ContentMedia::query()->where('content_type','page')->whereNotIn('content_id',Page::query()->select('id'))->exists())$errors[]='Editorial media relation references a missing page.';
+        if(ContentMedia::query()->where('content_type','post')->whereNotIn('content_id',Article::withTrashed()->select('id'))->exists())$errors[]='Editorial media relation references a missing article.';
+        if(ContentMedia::query()->where('content_type','page')->whereNotIn('content_id',Page::withTrashed()->select('id'))->exists())$errors[]='Editorial media relation references a missing page.';
         if(DB::table('article_category')->whereNotIn('article_id',Article::query()->select('id'))->exists()||DB::table('article_tag')->whereNotIn('article_id',Article::query()->select('id'))->exists())$errors[]='Editorial taxonomy relation is orphaned.';
         return $errors;
     }
