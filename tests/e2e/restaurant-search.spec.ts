@@ -157,8 +157,8 @@ test('city landing shares filters and keeps Paris when applying one', async ({ p
   const search = page.locator('[data-restaurant-search]');
   await expect(search.getByLabel('Localisation')).toHaveValue('Paris');
   const filters = page.locator('[data-filters-drawer]');
-  await expect(filters).toBeVisible();
   if ((page.viewportSize()?.width ?? 0) < 760) await page.getByRole('button', { name: /Filtres/ }).click();
+  await expect(filters).toBeVisible();
   await filters.locator('input[name="categories[]"]').first().check();
   await filters.getByRole('button', { name: 'Appliquer les filtres' }).click();
   await page.waitForURL(/\/restaurants\?.*city_code=75056.*categories/);
