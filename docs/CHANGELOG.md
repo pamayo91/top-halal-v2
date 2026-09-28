@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-28
+
+- Listings restaurants : le cadre média responsive de l’annuaire est désormais partagé par les pages géographiques, de spécialité, de service et de facette ville. Chaque vignette réserve la même hauteur, y compris sans image ; les ratios sources sont recadrés en `cover` sans déformation ni décalage de carte.
+
 ## 2026-09-27
 
 - Éditeur éditorial : Articles et Pages partagent désormais une extension légère du RichEditor Filament. La boîte de dialogue des liens gère `nofollow`, `sponsored`, `ugc` et `_blank`, relit les attributs d’un lien existant et préserve les jetons `rel` non SEO. La barre d’outils est sticky sous le header réellement mesuré, opaque et adaptée aux petites largeurs ; le sanitizer protège explicitement la conservation des attributs SEO et de `target`.

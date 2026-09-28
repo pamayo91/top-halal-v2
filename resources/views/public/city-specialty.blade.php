@@ -9,7 +9,7 @@
     <section class="section shell">
         @if(filled($facet->content_top))<div class="city-seo-content">{!! $facet->content_top !!}</div>@endif
         <p class="results-count">{{ $restaurants->total() }} résultat{{ $restaurants->total() > 1 ? 's' : '' }}</p>
-        <div class="cards-grid">
+        <div class="cards-grid restaurant-listing-grid">
             @forelse($restaurants as $restaurant)<x-restaurant-card :restaurant="$restaurant" />
             @empty <div class="empty-state"><h2>Aucune adresse disponible.</h2><a class="button" href="{{ route('cities.show', $city->slug) }}">Voir les restaurants de {{ $city->city_name }}</a></div>
             @endforelse

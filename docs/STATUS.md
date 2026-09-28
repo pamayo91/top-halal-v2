@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-28
 
+Latest restaurant-listing media correction: every public restaurant result grid now uses the same fixed, responsive media frame. Directory, geographic, specialty, service and city-facet cards crop their delivered image with `object-fit: cover`, and reserve the exact same space when a restaurant has no image; source image ratios can no longer misalign cards in a row.
+
 Latest public commune-search correction: the homepage and directory share an INSEE-code-backed local official commune autocomplete. Accent/case/separator normalization is deterministic, editing the visible field clears the hidden code, valid empty communes remain a `noindex,follow` directory result, and invalid text cannot fall back to Paris. SEO city pages and their sitemap policy remain independent; deployment loads the versioned reference with `communes:sync-reference`.
 
 Latest restaurant-listing ordering correction: every public restaurant listing except the intentional distance-based « Autour de moi » flow now uses the same deterministic canonical recency order (`legacy_published_at`, then V2 `created_at`, then ID), including geographic and taxonomy/facet pages.

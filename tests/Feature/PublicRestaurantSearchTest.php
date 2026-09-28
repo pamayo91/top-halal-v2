@@ -76,7 +76,10 @@ class PublicRestaurantSearchTest extends TestCase
         $older->categories()->attach($burger);
         $newer->categories()->attach($burger);
 
-        $this->get('/specialites/burger')->assertOk()->assertSeeInOrder([$newer->name, $older->name]);
+        $this->get('/specialites/burger')
+            ->assertOk()
+            ->assertSeeInOrder([$newer->name, $older->name])
+            ->assertSee('cards-grid restaurant-listing-grid', false);
     }
 
     public function test_directory_sidebar_contains_only_taxonomy_filters_and_expands_for_an_active_value_after_the_initial_eight(): void

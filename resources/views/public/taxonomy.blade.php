@@ -13,7 +13,7 @@
     <section class="section shell">
         @if(filled($cityPage?->config?->content_top))<div class="city-seo-content">{!! $cityPage->config->content_top !!}</div>@endif
         <p class="results-count">{{ $restaurants->total() }} résultat{{ $restaurants->total() > 1 ? 's' : '' }}</p>
-        <div class="cards-grid">
+        <div class="cards-grid restaurant-listing-grid">
             @forelse($restaurants as $restaurant)
                 <x-restaurant-card :restaurant="$restaurant" />
             @empty

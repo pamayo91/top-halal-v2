@@ -1,5 +1,17 @@
 import { expect, test } from '@playwright/test';
 
+test('public restaurant listing media uses one fixed frame', async ({ page }, testInfo) => {
+  const response = await page.goto('/restos/bouches-du-rhone');
+  expect(response?.status()).toBe(200);
+
+  const media = page.locator('.restaurant-listing-grid .restaurant-card .card-image');
+  await expect(media.first()).toBeVisible();
+  await expect(media.first()).toHaveCSS('height', testInfo.project.name === 'mobile-chromium' ? '220px' : '210px');
+
+  const heights = await media.evaluateAll(nodes => nodes.map(node => Math.round(node.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
+});
+
 async function breadcrumbNames(page: import('@playwright/test').Page): Promise<string[]> {
   return page.locator('script[type="application/ld+json"]').evaluateAll((scripts) => scripts
     .map((script) => JSON.parse(script.textContent || '{}'))
