@@ -36,4 +36,22 @@ class ContentSanitizerTest extends TestCase
         $this->assertSame($html, $result['html']);
         $this->assertSame([], $result['removed']);
     }
+
+    public function test_it_preserves_supported_link_shapes_used_by_the_rich_editor(): void
+    {
+        $html = '<p>Voici un <a href="/devenir-auto-entrepreneur-restauration">lien <strong>interne</strong></a> et <a href="https://example.com">un lien externe</a>.</p>';
+
+        $result = app(ContentSanitizer::class)->sanitize($html);
+
+        $this->assertSame($html, $result['html']);
+        $this->assertSame([], $result['removed']);
+    }
+
+    public function test_source_html_uses_the_same_dangerous_markup_rules_as_visual_editor_content(): void
+    {
+        $result = app(ContentSanitizer::class)->sanitize('<p>OK</p><script>alert(1)</script><a href="javascript:alert(1)" onclick="alert(1)">Lien</a>');
+
+        $this->assertSame('<p>OK</p><a>Lien</a>', $result['html']);
+        $this->assertSame(['script'], $result['removed']);
+    }
 }

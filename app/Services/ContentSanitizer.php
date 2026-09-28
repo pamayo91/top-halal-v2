@@ -19,7 +19,7 @@ class ContentSanitizer
         }
         $html = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $html);
         $html = preg_replace('/\son\w+\s*=\s*(["\']).*?\1/i', '', $html);
-        $html = preg_replace('/\s(?:href|src)\s*=\s*(["\'])\s*javascript:[^\1]*\1/i', '', $html);
+        $html = preg_replace('/\s(?:href|src)\s*=\s*(["\'])\s*javascript:[^"\']*\1/i', '', $html);
 
         return ['html' => trim($html), 'removed' => $removed];
     }

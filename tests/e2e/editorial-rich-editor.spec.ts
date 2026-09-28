@@ -62,4 +62,34 @@ test.describe('Editorial rich editor', () => {
 
     expect(consoleErrors).toEqual([]);
   });
+
+  test('opens and applies the shared HTML source editor without bypassing sanitization', async ({ page }) => {
+    await page.goto('/admin');
+    await page.locator('input[type="email"]').fill(email!);
+    await page.locator('input[type="password"]').fill(password!);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/admin$/);
+
+    await page.goto('/admin/articles/create');
+    await page.getByRole('textbox', { name: 'Title*', exact: true }).fill(`Source HTML ${Date.now()}`);
+    const editor = page.locator('.editorial-rich-editor .tiptap');
+    await editor.click();
+    await page.keyboard.insertText('État initial');
+
+    await page.getByRole('button', { name: 'Code source', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    const source = dialog.getByLabel('HTML');
+    await expect(source).toHaveValue(/État initial/);
+    await dialog.getByRole('button', { name: 'Annuler', exact: true }).click();
+    await expect(editor).toContainText('État initial');
+
+    await page.getByRole('button', { name: 'Code source', exact: true }).click();
+    await dialog.getByLabel('HTML').fill('<p>HTML appliqué</p><script>alert(1)</script>');
+    await dialog.getByRole('button', { name: 'Appliquer', exact: true }).click();
+    await expect(editor).toContainText('HTML appliqué');
+    await expect(editor).not.toContainText('alert(1)');
+
+    await page.goto('/admin/pages/create');
+    await expect(page.getByRole('button', { name: 'Code source', exact: true })).toBeVisible();
+  });
 });

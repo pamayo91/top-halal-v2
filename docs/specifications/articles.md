@@ -6,6 +6,8 @@ Approved public comments are displayed from newest to oldest.
 
 The back-office RichEditor supports legitimate nested editorial lists. Livewire accepts property paths up to 20 levels deep for this content; its other payload limits remain in force. Articles and Pages share the editorial RichEditor extension: its link dialogue supports combinable `nofollow`, `sponsored` and `ugc` `rel` tokens, plus the native `_blank` option. Existing non-SEO `rel` tokens are retained when a link is edited, while no automatic rewrite is applied to untouched legacy links. The toolbar is CSS-sticky below the measured Filament top bar, with an opaque surface and responsive wrapping.
 
+Articles and Pages also share the `Code source` toolbar action. It opens the current unsaved TipTap HTML in a monospace textarea; `Annuler` leaves the editor unchanged and `Appliquer` replaces the editor immediately through the same `ContentSanitizer` used at save time. The action therefore cannot introduce scripts, event handlers or `javascript:` URLs that the normal editorial save path would reject.
+
 Les catégories et tags éditoriaux migrés restent des métadonnées internes/de-conciliation et peuvent alimenter le petit libellé non cliquable d’une carte d’article. Le listing public `/blog` ne rend aucune navigation ni filtre de catégories ; il présente directement sa grille d’articles. Les données et relations de taxonomie ne sont pas supprimées pour cette règle de présentation.
 
 ## Pages

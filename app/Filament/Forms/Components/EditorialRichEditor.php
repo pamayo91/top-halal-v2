@@ -22,6 +22,11 @@ class EditorialRichEditor extends RichEditor
                 ->toggle()
                 ->icon(Heroicon::Link)
                 ->iconAlias('forms:components.rich-editor.toolbar.link'),
+            RichEditorTool::make('sourceCode')
+                ->label('Code source')
+                ->action(arguments: '{ html: $getEditor()?.getHTML() ?? "" }')
+                ->icon('heroicon-o-code-bracket')
+                ->iconAlias('forms:components.rich-editor.toolbar.source-code'),
         ]);
     }
 
@@ -31,6 +36,7 @@ class EditorialRichEditor extends RichEditor
         return [
             ...array_filter(parent::getDefaultActions(), static fn (Action $action): bool => $action->getName() !== 'link'),
             EditorialLinkAction::make(),
+            EditorialHtmlSourceAction::make(),
         ];
     }
 }
