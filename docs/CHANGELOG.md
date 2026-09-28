@@ -3,6 +3,7 @@
 ## 2026-09-28
 
 - Réorganisation stricte de l’accueil : l’explication restaurant précède Explorer, l’introduction Guide précède ses cartes, et le hero, la transparence et le CTA sont rendus plus compacts sans modifier le contenu ni les comportements.
+- Préproduction : 23 tests PHP ciblés (137 assertions), Playwright homepage desktop/mobile et gate de régression à snapshot verts, sans erreur console/réseau ni exception Laravel.
 
 - Corrections UI de l’accueil : hero et CTA plus compacts, dix villes maximum pour une liste équilibrée, SVG locaux de localisation/restauration, cartes Guide matérialisées, inversion visuelle des colonnes éditoriales et cartes de confiance désormais parfaitement alignées avec leurs pictogrammes définis.
 - Préproduction : 23 tests PHP ciblés (137 assertions), Playwright homepage desktop/mobile et la gate de régression à snapshot passent sans erreur console/réseau ni exception Laravel.

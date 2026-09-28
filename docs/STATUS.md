@@ -2,7 +2,7 @@
 
 ## 2026-09-28 — Ordre et proportions de l’accueil
 
-L’accueil suit désormais l’ordre éditorial demandé : explication restaurant avant Explorer, puis introduction Guide avant ses cartes. Le hero, le bloc transparence et le CTA sont compactés, tandis que les icônes Explorer sont alignées en tête de titre. La validation préproduction reste à exécuter après déploiement.
+L’accueil suit désormais l’ordre éditorial demandé : explication restaurant avant Explorer, puis introduction Guide avant ses cartes. Le hero, le bloc transparence et le CTA sont compactés, tandis que les icônes Explorer sont alignées en tête de titre. Tests PHP ciblés, Playwright desktop/mobile, contrôle navigateur et gate complète préproduction sont validés.
 
 ## 2026-09-28 — Corrections UI ciblées de l’accueil
 
