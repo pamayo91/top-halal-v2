@@ -26,7 +26,10 @@ class SentinelRegistry
     private function integrityErrors():array
     {
         $errors=[];$disk=Storage::disk(config('legacy-media.disk'));
-        foreach(MediaAsset::query()->whereExists(fn($q)=>$q->selectRaw(1)->from('restaurant_media')->whereColumn('restaurant_media.media_asset_id','media_assets.id'))->orWhereExists(fn($q)=>$q->selectRaw(1)->from('content_media')->whereColumn('content_media.media_asset_id','media_assets.id'))->get() as $asset)if(!filled($asset->original_path)||!$disk->exists($asset->original_path))$errors[]="Referenced media asset #{$asset->id} source file is missing.";
+        foreach(MediaAsset::query()->with('variants')->whereExists(fn($q)=>$q->selectRaw(1)->from('restaurant_media')->whereColumn('restaurant_media.media_asset_id','media_assets.id'))->orWhereExists(fn($q)=>$q->selectRaw(1)->from('content_media')->whereColumn('content_media.media_asset_id','media_assets.id'))->get() as $asset){
+            if(!filled($asset->original_path)||!$disk->exists($asset->original_path))$errors[]="Referenced media asset #{$asset->id} source file is missing.";
+            foreach($asset->variants as $variant)if(!filled($variant->path)||!$disk->exists($variant->path))$errors[]="Referenced media asset #{$asset->id} variant #{$variant->id} file is missing.";
+        }
         if(RestaurantMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Restaurant media relation references a missing asset.';
         if(ContentMedia::query()->whereNotNull('media_asset_id')->whereDoesntHave('asset')->exists())$errors[]='Editorial media relation references a missing asset.';
         if(ContentMedia::query()->where('content_type','post')->whereNotIn('content_id',Article::withTrashed()->select('id'))->exists())$errors[]='Editorial media relation references a missing article.';
