@@ -35,7 +35,7 @@ class EditorialTrashTest extends TestCase
 
         $page = $this->page('page-410-'.random_int(1000, 9999));
         app(EditorialTrash::class)->trash($page, 410);
-        $this->assertSame(410, (int) RedirectRule::where('related_id', $page->id)->value('status_code'));
+        $this->assertSame(410, (int) RedirectRule::where('related_type', 'page')->where('related_id', $page->id)->value('status_code'));
 
         $this->expectException(ValidationException::class);
         app(EditorialTrash::class)->trash($this->article('article-invalid-'.random_int(1000, 9999)), 301);
@@ -50,11 +50,11 @@ class EditorialTrashTest extends TestCase
 
     private function article(string $slug, array $extra = []): Article
     {
-        return Article::create(array_merge(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published'], $extra));
+        return Article::withoutEvents(fn (): Article => Article::create(array_merge(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published'], $extra)));
     }
 
     private function page(string $slug): Page
     {
-        return Page::create(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published']);
+        return Page::withoutEvents(fn (): Page => Page::create(['legacy_wp_id' => random_int(100000, 999999), 'original_title' => $slug, 'title' => $slug, 'slug' => $slug, 'legacy_url' => '/'.$slug, 'status' => 'published']));
     }
 }
