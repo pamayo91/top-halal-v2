@@ -39,7 +39,7 @@ class RedirectResolver
             }
             foreach ($queryMatches ?? [] as $key => $value) if (is_int($key)) $destination = str_replace('%'.$key, $value, $destination);
             if ($rule['preserve_query'] && $query !== '') $destination .= (str_contains($destination, '?') ? '&' : '?').$query;
-            if ($this->normalisePath($destination) === $path && ! $query) continue;
+            if (in_array((int) $rule['status_code'], [301, 302], true) && $this->normalisePath($destination) === $path && ! $query) continue;
 
             RedirectRule::whereKey($rule['id'])->increment('hit_count', 1, ['last_hit_at' => now()]);
             return ['destination' => $destination, 'status' => $rule['status_code']];

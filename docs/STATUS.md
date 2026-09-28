@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-28 — Corbeille éditoriale en cours
+
+La structure de la corbeille Articles/Pages et le service partagé de suppression SEO sont implémentés localement : soft delete, restauration, suppression définitive auditée, règles liées `editorial_deletion`, et réponses terminales 404/410. Les tests PHP et la validation préproduction restent à exécuter avec le workflow SSH PHP 8.4 ; aucune donnée legacy ou production n’a été modifiée.
+
 Last updated: 2026-09-28
 
 Latest public specialty-autocomplete correction: selecting a specialty now submits only its V2 category filter, never the visible specialty label as a competing free-text query. Free text remains `q`; editing after a specialty selection invalidates only that automatic category. City/GPS state, sidebar filters, direct restaurant navigation and SEO behaviour are unchanged.

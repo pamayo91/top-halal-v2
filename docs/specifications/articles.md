@@ -36,3 +36,7 @@ Sur desktop, un sommaire réellement long conserve sa liste SSR complète en hau
 ## Inline legacy media debt
 
 During the controlled editorial pilot, direct `top-halal.fr/wp-content` and `top-halal.fr/wp-contenu` inline images are removed from stored V2 HTML rather than being rendered from WordPress. `legacy:audit-inline-media` records the legacy source URL/path, content type and ID, ordinal position, nearby context and resolved attachment ID when available. This is a media-reconciliation backlog only: no physical file is copied in this phase.
+
+## Corbeille éditoriale
+
+Articles et Pages utilisent `SoftDeletes` et une corbeille Filament dédiée. Lorsqu’un contenu publié est déplacé vers la corbeille, l’administrateur choisit le comportement de son ancienne URL : 301/302 avec destination, ou 404/410 sans destination. La règle automatique est identifiée par `origin=editorial_deletion`, `related_type` et `related_id`. Une restauration désactive uniquement cette règle automatique après vérification des collisions de slug et des règles concurrentes ; une suppression définitive conserve la règle SEO. Les brouillons jamais publiés n’obtiennent aucune règle.

@@ -1,5 +1,11 @@
 # Architectural & Product Decisions
 
+## 2026-09-28
+
+### D042 — Suppression éditoriale réversible et règle SEO liée
+
+Articles et Pages sont supprimables uniquement par soft delete depuis une corbeille dédiée. Une URL publique supprimée reçoit une règle centrale choisie par l’administrateur (301/302 avec destination, ou 404/410 terminal sans destination), liée explicitement au contenu supprimé. La restauration désactive seulement cette règle automatique après contrôles de slug et de conflit ; la suppression définitive conserve la règle afin de préserver le comportement SEO historique. Les brouillons jamais publiés n’en créent pas.
+
 ## 2026-09-19
 
 ### D041 — Avis : propriété effective et identité publique ne se déduisent pas du droit d’édition ou du nom de compte

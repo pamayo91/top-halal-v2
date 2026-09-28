@@ -38,6 +38,8 @@ Suggested fields:
 - Exact rules always precede regex rules; regex rules retain `.htaccess` line order. Path captures use `$1…`; query captures use `%1…`. Each rule explicitly preserves or drops query strings.
 - The cache is invalidated on rule create/update/delete. `redirects:import-htaccess` imports the inventory deterministically and reports the three Apache-owned infrastructure rules; `redirects:audit` reports duplicates, conflicts, loops and chains.
 - A 410 is a terminal response reserved for an explicitly justified technical/legal removal. The business default remains: exact equivalent, relevant parent/city/category, semantic equivalent, then 301 to `/`.
+- 301 and 302 are destination responses. 404 and 410 are terminal responses with no destination; the resolver renders the corresponding real HTTP error page. RedirectRule model validation clears/rejects destinations accordingly.
+- Editorial deletion rules use `origin=editorial_deletion` plus a related content type/ID. Restoration deactivates only that exact automatic rule; force deletion leaves it active.
 
 ## Administration
 Search, create, edit, disable/delete, test a URL, import htaccess/CSV, export CSV, show hits/last hit. The row-level `Supprimer` action is confirmation-protected, invalidates the redirect cache and creates an administrative audit entry.

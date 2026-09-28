@@ -21,8 +21,10 @@ class ResolveLegacyRedirect
         ) return $next($request);
         $resolved = app(RedirectResolver::class)->resolve($request);
         if (! $resolved) return $next($request);
-        return $resolved['status'] === 410
-            ? response()->view('errors.410', [], 410)
-            : redirect($resolved['destination'], $resolved['status']);
+        return match ((int) $resolved['status']) {
+            404 => response()->view('errors.404', [], 404),
+            410 => response()->view('errors.410', [], 410),
+            default => redirect($resolved['destination'], $resolved['status']),
+        };
     }
 }

@@ -68,11 +68,11 @@ class EditorialSlugRedirects
 
     private function assertSlugIsAvailable(Article|Page $content, string $slug): void
     {
-        $duplicate = Article::query()
+        $duplicate = Article::query()->withTrashed()
             ->where('slug', $slug)
             ->when($content instanceof Article && $content->exists, fn ($query) => $query->whereKeyNot($content->getKey()))
             ->exists()
-            || Page::query()
+            || Page::query()->withTrashed()
                 ->where('slug', $slug)
                 ->when($content instanceof Page && $content->exists, fn ($query) => $query->whereKeyNot($content->getKey()))
                 ->exists();

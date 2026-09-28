@@ -550,3 +550,7 @@
 - Une suggestion de spécialité active désormais uniquement `categories[]` : son libellé reste affichable dans le champ, sans devenir simultanément une recherche texte `q`.
 - Une saisie libre conserve `q` sans inventer de spécialité ; toute retouche après une sélection annule précisément la spécialité automatique, sans effacer les filtres de sidebar choisis volontairement.
 
+# 2026-09-28
+
+- Added audited Article and Page trash flows with restore, force-delete and SEO-aware 301/302/404/410 behavior.
+- Extended terminal redirect handling so 404 and 410 produce real error responses without destinations.
