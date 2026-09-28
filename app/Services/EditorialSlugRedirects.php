@@ -82,7 +82,7 @@ class EditorialSlugRedirects
         }
 
         $rules = $this->exactRulesFor($this->path($slug));
-        $ownDeletionRule = $content->trashed() && $rules->isNotEmpty() && $rules->every(fn (RedirectRule $rule): bool => $rule->is_active && $rule->origin === 'editorial_deletion' && $rule->related_type === ($content instanceof Article ? 'article' : 'page') && (int) $rule->related_id === (int) $content->getKey());
+        $ownDeletionRule = ($content->trashed() || filled($content->getOriginal('deleted_at'))) && $rules->isNotEmpty() && $rules->every(fn (RedirectRule $rule): bool => $rule->is_active && $rule->origin === 'editorial_deletion' && $rule->related_type === ($content instanceof Article ? 'article' : 'page') && (int) $rule->related_id === (int) $content->getKey());
         if ($rules->isNotEmpty() && ! $ownDeletionRule) {
             throw ValidationException::withMessages(['slug' => 'Ce slug est déjà une source de redirection. Choisissez un autre slug ou modifiez d’abord cette règle dans Redirections.']);
         }
