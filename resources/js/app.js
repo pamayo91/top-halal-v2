@@ -231,7 +231,7 @@ if (submission) {
         field.focus({ preventScroll: true });
         field.scrollIntoView({ behavior: 'smooth', block: 'center' });
         field.reportValidity();
-        window.setTimeout(() => field.focus({ preventScroll: true }), 0);
+        window.setTimeout(() => field.focus({ preventScroll: true }), 50);
     };
 
     const validateStep = step => {
