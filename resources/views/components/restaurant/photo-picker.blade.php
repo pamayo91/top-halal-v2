@@ -23,7 +23,7 @@
     class="restaurant-photo-picker restaurant-photo-picker--{{ $presentation }} restaurant-photo-picker--{{ $kind }}"
     data-photo-picker
     data-photo-max-files="{{ $maxFiles }}"
-    data-photo-min-width="800"
+    data-photo-min-width="300"
     data-photo-max-bytes="10485760"
     data-photo-reorderable="{{ $reorderable ? 'true' : 'false' }}"
     data-photo-remove-label="{{ $removeLabel }}"

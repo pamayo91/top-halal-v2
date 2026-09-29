@@ -97,7 +97,7 @@
                             name="cover_photo"
                             label="Photo de couverture"
                             button-label="Choisir la photo de couverture"
-                            help="JPEG, PNG ou WebP, 800 px de large minimum, 10 Mo maximum."
+                            help="JPEG, PNG ou WebP, 300 px de large minimum, 10 Mo maximum."
                             :max-files="1"
                             :required="true"
                             kind="cover"

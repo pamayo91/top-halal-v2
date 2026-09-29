@@ -29,7 +29,7 @@ const initializePicker = picker => {
     const count = picker.querySelector('[data-photo-selection-count]');
     const errors = picker.querySelector('[data-photo-picker-errors]');
     const maxFiles = Number(picker.dataset.photoMaxFiles || 10);
-    const minWidth = Number(picker.dataset.photoMinWidth || 800);
+    const minWidth = Number(picker.dataset.photoMinWidth || 300);
     const maxBytes = Number(picker.dataset.photoMaxBytes || 10485760);
     const reorderable = picker.dataset.photoReorderable === 'true';
     const presentation = picker.dataset.photoPresentation || 'public';

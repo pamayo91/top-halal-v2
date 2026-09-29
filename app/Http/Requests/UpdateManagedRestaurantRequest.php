@@ -39,7 +39,7 @@ class UpdateManagedRestaurantRequest extends FormRequest
             'latitude' => ['nullable', 'required_if:map_moved,1', 'numeric', 'between:41,52'],
             'longitude' => ['nullable', 'required_if:map_moved,1', 'numeric', 'between:-5.5,10'],
             'new_photos' => ['nullable', 'array', 'max:10'],
-            'new_photos.*' => ['file', 'image', 'dimensions:min_width=800', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
+            'new_photos.*' => ['file', 'image', 'dimensions:min_width=300', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             'remove_media_ids' => ['nullable', 'array'],
             'remove_media_ids.*' => ['integer', 'distinct'],
             'media_order' => ['nullable', 'array'],

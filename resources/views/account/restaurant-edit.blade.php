@@ -93,7 +93,7 @@
                             id="new-photos"
                             name="new_photos[]"
                             label="Ajouter des photos"
-                            help="JPEG, PNG ou WebP · 800 px minimum · 10 Mo maximum"
+                            help="JPEG, PNG ou WebP · 300 px minimum · 10 Mo maximum"
                             help-secondary="10 photos maximum · Envoi uniquement à l’enregistrement"
                             :max-files="10"
                             presentation="owner"

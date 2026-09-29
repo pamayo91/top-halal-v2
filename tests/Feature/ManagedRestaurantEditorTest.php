@@ -189,13 +189,13 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertSame('account@example.test', $restaurant->fresh()->contact_email);
     }
 
-    public function test_a_manager_cannot_bypass_the_existing_photo_dimensions_rule(): void
+    public function test_a_manager_cannot_bypass_the_300_pixel_photo_dimensions_rule(): void
     {
         [$manager, $restaurant] = $this->representedRestaurant('depositor');
 
         $this->actingAs($manager)->put(route('owner.restaurants.update', $restaurant), [
             'name' => $restaurant->name,
-            'new_photos' => [UploadedFile::fake()->image('trop-petite.jpg', 799, 600)],
+            'new_photos' => [UploadedFile::fake()->image('trop-petite.jpg', 299, 600)],
         ])->assertSessionHasErrors('new_photos.0');
 
         $this->assertCount(0, $restaurant->media()->where('role', '!=', 'fallback_thumbnail')->get());
@@ -243,7 +243,7 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertStringContainsString('name="remove_media_ids[]" value="'.$cover->id.'" disabled data-owner-media-remove-input', $html);
         $this->assertStringContainsString('Suppression prévue · Cette photo sera retirée à l’enregistrement', $html);
         $this->assertStringContainsString('>Annuler</button>', $html);
-        $this->assertStringContainsString('JPEG, PNG ou WebP · 800 px minimum · 10 Mo maximum', $html);
+        $this->assertStringContainsString('JPEG, PNG ou WebP · 300 px minimum · 10 Mo maximum', $html);
         $this->assertStringContainsString('10 photos maximum · Envoi uniquement à l’enregistrement', $html);
         $this->assertMatchesRegularExpression('/data-media-id="'.$cover->id.'".*?data-owner-media-up\s+hidden.*?data-owner-media-down\s*>(?!<)/s', $html);
         $this->assertMatchesRegularExpression('/data-media-id="'.$gallery->id.'".*?data-owner-media-up\s*>(?!<).*?data-owner-media-down\s+hidden/s', $html);

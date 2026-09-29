@@ -355,7 +355,7 @@ test('public restaurant contribution presents and manages step-four photos on de
   await expect(page.getByText('3 photos sélectionnées.')).toBeVisible();
   await expect.poll(() => page.locator('[data-gallery-input]').evaluate((input: HTMLInputElement) => [...input.files ?? []].map(file => file.name))).toEqual(['galerie-un.png', 'galerie-deux.png', 'galerie-trois.png']);
   await page.locator('[data-gallery-input]').setInputFiles(tooNarrowPhoto);
-  await expect(page.locator('[data-gallery-input]').locator('..').locator('[data-photo-picker-errors]')).toContainText('Cette image fait moins de 800 px de large.');
+  await expect(page.locator('[data-gallery-input]').locator('..').locator('[data-photo-picker-errors]')).toContainText('Cette image fait moins de 300 px de large.');
   await expect(gallery.getByRole('listitem')).toHaveCount(3);
   await gallery.getByRole('button', { name: 'Monter' }).nth(1).click();
   await expect(gallery.getByRole('listitem').first()).toContainText('galerie-deux.png');

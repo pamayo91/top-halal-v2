@@ -74,7 +74,7 @@ test.describe('Éditeur de fiche gérée', () => {
     await expect.poll(() => input.evaluate((element: HTMLInputElement) => [...element.files ?? []].map(file => file.name))).toEqual(['photo-un.png', 'photo-deux.png', 'photo-trois.png']);
 
     await input.setInputFiles(tooNarrowPhoto);
-    await expect(picker.locator('[data-photo-picker-errors]')).toContainText('Cette image fait moins de 800 px de large.');
+    await expect(picker.locator('[data-photo-picker-errors]')).toContainText('Cette image fait moins de 300 px de large.');
     await expect(picker.locator('[data-new-photo-card]')).toHaveCount(3);
     await picker.getByRole('button', { name: 'Retirer' }).first().click();
     await expect(picker.locator('[data-new-photo-card]')).toHaveCount(2);

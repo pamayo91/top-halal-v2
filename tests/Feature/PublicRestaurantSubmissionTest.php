@@ -41,6 +41,7 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertSee('Ajoutez une belle photo de couverture du restaurant.')
             ->assertSee('Photos complémentaires (10 maximum)')
             ->assertSee('Vous pourrez retirer ou réorganiser les photos avant l’envoi.')
+            ->assertSee('JPEG, PNG ou WebP, 300 px de large minimum, 10 Mo maximum.')
             ->assertDontSee('Les photos sont privées jusqu’à la modération.')
             ->assertDontSee('Photos complémentaires (facultatives, 10 maximum)')
             ->assertSee('Votre adresse exacte n’apparaît pas ? Sélectionnez l’adresse la plus proche proposée, puis ajustez précisément la position du restaurant sur la carte.')
@@ -110,15 +111,15 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertSessionHasErrors('email');
     }
 
-    public function test_it_rejects_cover_and_gallery_images_narrower_than_800_pixels(): void
+    public function test_it_rejects_cover_and_gallery_images_narrower_than_300_pixels(): void
     {
         $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload([
-            'cover_photo' => UploadedFile::fake()->image('couverture-trop-petite.jpg', 799, 600),
+            'cover_photo' => UploadedFile::fake()->image('couverture-trop-petite.jpg', 299, 600),
         ]))->assertRedirect(route('restaurant-submissions.create'))
             ->assertSessionHasErrors('cover_photo');
 
         $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload([
-            'gallery_photos' => [UploadedFile::fake()->image('galerie-trop-petite.jpg', 799, 600)],
+            'gallery_photos' => [UploadedFile::fake()->image('galerie-trop-petite.jpg', 299, 600)],
         ]))->assertRedirect(route('restaurant-submissions.create'))
             ->assertSessionHasErrors('gallery_photos.0');
 
@@ -137,6 +138,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->post(route('restaurant-submissions.store'), $this->payload([
             'categories' => [$category->id],
             'features' => [$feature->id],
+            'cover_photo' => UploadedFile::fake()->image('couverture-limite.jpg', 300, 600),
             'website_url' => 'https://example.test/menu',
             'description' => 'Cuisine libanaise préparée sur place.',
         ]))->assertRedirect(route('restaurant-submissions.thanks'));

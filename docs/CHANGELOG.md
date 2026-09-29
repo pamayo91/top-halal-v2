@@ -2,6 +2,8 @@
 
 ## 2026-09-29
 
+- Médias restaurant : la largeur minimale des images envoyées passe de 800 px à 300 px pour la couverture, la galerie et l’éditeur restaurateur ; les validations navigateur et serveur restent cohérentes.
+
 - Ajout public de restaurant : une erreur d’horaires à l’étape 3 est désormais rendue en français près du jour concerné, avec mise en évidence et focus ; les états d’horaires masqués ne peuvent conserver aucune invalidité bloquante. La suite Playwright couvre le parcours étape 3 invalide, la reprise conditionnelle et le passage valide desktop/mobile.
 
 - Added per-Article and per-Page comment availability, preserving historical comments while removing public contribution controls and rejecting direct submissions when closed.
