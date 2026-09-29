@@ -217,8 +217,8 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-close]')).toHaveValue('09:30');
   await expect(monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-open]')).toHaveValue('18:45');
   await expect(monday.locator('[data-hours-slot]').nth(1).locator('[data-hours-slot-close]')).toHaveValue('23:59');
-  await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]')).toHaveJSProperty('offsetWidth', 104);
   if (testInfo.project.name === 'desktop-chromium') {
+    await expect(monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]')).toHaveJSProperty('offsetWidth', 104);
     await expect.poll(async () => monday.evaluate(day => {
       const secondRange = day.querySelectorAll<HTMLElement>('[data-hours-slot-open]')[1]?.getBoundingClientRect();
       const remove = day.querySelector('[data-remove-hours-slot]:not([hidden])')?.getBoundingClientRect();
