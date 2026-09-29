@@ -21,7 +21,7 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
   const restaurantCards = page.locator('.home-restaurant-grid > .restaurant-card');
   await expect(restaurantCards).toHaveCount(8);
   await expect(page.locator('.home-explore-panel').first().locator('.link-list > li')).toHaveCount(10);
-  await expect(page.locator('.home-explore-title svg')).toHaveCount(2);
+  await expect(page.locator('.home-explore-icon svg')).toHaveCount(2);
   if (testInfo.project.name === 'desktop-chromium') expect((await page.locator('.home-restaurant-grid').evaluate(grid => getComputedStyle(grid).gridTemplateColumns.split(' ').length))).toBe(4);
   if (testInfo.project.name === 'desktop-chromium') {
     const trustCards = await page.locator('.home-why-grid > article').evaluateAll(cards => cards.map(card => ({ height: Math.round(card.getBoundingClientRect().height), top: Math.round(card.getBoundingClientRect().top) })));
