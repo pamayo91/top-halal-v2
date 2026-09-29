@@ -29,6 +29,20 @@ async function fillRestaurantAndAddress(page: import('@playwright/test').Page, s
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
 }
 
+async function reachStepThree(page: import('@playwright/test').Page, suffix: string) {
+  await page.goto('/ajouter-un-restaurant');
+  await page.locator('[data-restaurant-name]').fill(`Restaurant étape trois ${suffix}`);
+  await page.getByLabel('Viande halal').check();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByLabel('Adresse du restaurant').fill('46 Boulevard du Temple Paris');
+  await expect(page.locator('[data-address-results] button').first()).toBeVisible();
+  await page.locator('[data-address-results] button').first().click();
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
+  await page.locator('[name="categories[]"]').first().check();
+  await page.locator('[name="features[]"]').first().check();
+}
+
 async function expectCopyControlWithoutOverlap(page: import('@playwright/test').Page) {
   await expect.poll(() => page.locator('[data-copy-hours]').evaluate(button => {
     const buttonRect = button.getBoundingClientRect();
@@ -62,6 +76,46 @@ test('public restaurant contribution requires a suggested address and never expo
   await expect(page.getByLabel('Code INSEE')).toHaveCount(0);
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'L’adresse' })).toBeVisible();
+});
+
+test('public restaurant contribution explains, focuses and recovers an invalid step-three schedule', async ({ page }, testInfo) => {
+  const failures: string[] = [];
+  page.on('console', message => { if (message.type() === 'error') failures.push(message.text()); });
+  page.on('requestfailed', request => failures.push(`${request.method()} ${request.url()}`));
+  await reachStepThree(page, `horaires-invalides-${testInfo.project.name}-${crypto.randomUUID()}`);
+
+  const monday = page.locator('[data-hours-day="monday"]');
+  const open = monday.locator('[data-hours-slot-open]').first();
+  const close = monday.locator('[data-hours-slot-close]').first();
+  await page.getByLabel('État Lundi').selectOption('slots');
+  await open.fill('18:00');
+  await close.fill('12:00');
+  await page.getByRole('button', { name: 'Continuer' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
+  await expect(monday.locator('[data-hours-error]')).toHaveText('La fermeture doit être postérieure à l’ouverture.');
+  await expect(monday.locator('[data-hours-error]')).toBeVisible();
+  await expect(monday).toHaveClass(/is-invalid/);
+  await expect(close).toHaveAttribute('aria-invalid', 'true');
+  await expect.poll(() => close.evaluate(input => document.activeElement === input)).toBe(true);
+
+  await page.getByLabel('État Lundi').selectOption('closed');
+  await expect(monday.locator('[data-hours-slots]')).toBeHidden();
+  await expect(close).not.toHaveAttribute('required', '');
+  await expect(close).not.toHaveAttribute('aria-invalid', 'true');
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
+  expect(failures).toEqual([]);
+});
+
+test('public restaurant contribution advances from a valid step three', async ({ page }, testInfo) => {
+  await reachStepThree(page, `horaires-valides-${testInfo.project.name}-${crypto.randomUUID()}`);
+  const monday = page.locator('[data-hours-day="monday"]');
+  await page.getByLabel('État Lundi').selectOption('slots');
+  await monday.locator('[data-hours-slot-open]').fill('12:00');
+  await monday.locator('[data-hours-slot-close]').fill('14:00');
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
 });
 
 test('public restaurant contribution restores one correctly sized map after returning from step 3', async ({ page }, testInfo) => {

@@ -2,6 +2,8 @@
 
 ## 2026-09-29
 
+- Ajout public de restaurant : une erreur d’horaires à l’étape 3 est désormais rendue en français près du jour concerné, avec mise en évidence et focus ; les états d’horaires masqués ne peuvent conserver aucune invalidité bloquante. La suite Playwright couvre le parcours étape 3 invalide, la reprise conditionnelle et le passage valide desktop/mobile.
+
 - Added per-Article and per-Page comment availability, preserving historical comments while removing public contribution controls and rejecting direct submissions when closed.
 - Styled public editorial HTML tables only, with collapsed token-based borders, padded cells, distinct headers and contained mobile horizontal scrolling.
 - Refined editorial tables with rounded upper corners while retaining light internal separators, and hide the entire closed comments block when it has no published thread to render.

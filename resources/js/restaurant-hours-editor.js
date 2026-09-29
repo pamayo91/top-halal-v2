@@ -2,6 +2,22 @@ const dayRows = editor => [...editor.querySelectorAll('[data-hours-day]')];
 
 const slotTemplate = row => row.querySelector('[data-hours-slot-template]');
 
+const setRowError = (row, message = '') => {
+    const error = row.querySelector('[data-hours-error]');
+    row.classList.toggle('is-invalid', Boolean(message));
+    if (!error) return;
+    error.textContent = message;
+    error.hidden = !message;
+};
+
+const clearRowValidation = row => {
+    row.querySelectorAll('input[type="time"]').forEach(input => {
+        input.setCustomValidity('');
+        input.removeAttribute('aria-invalid');
+    });
+    setRowError(row);
+};
+
 const renumberSlots = (row, index) => {
     row.querySelectorAll('[data-hours-slot]').forEach((slot, slotIndex) => {
         const id = slot.querySelector('[data-hours-slot-id]');
@@ -39,21 +55,22 @@ const syncRow = (editor, row, focus = false) => {
         const remove = slot.querySelector('[data-remove-hours-slot]');
         if (remove) remove.hidden = slotIndex === 0;
     });
+    if (!isSlots) clearRowValidation(row);
     renumberSlots(row, index);
 };
 
-const validationMessage = row => {
-    if (row.querySelector('[data-hours-status]').value !== 'slots') return '';
+const validationState = row => {
+    if (row.querySelector('[data-hours-status]').value !== 'slots') return { message: '', input: null };
     let previousClose = null;
     for (const slot of row.querySelectorAll('[data-hours-slot]')) {
         const open = slot.querySelector('[data-hours-slot-open]');
         const close = slot.querySelector('[data-hours-slot-close]');
-        if (!open.value || !close.value) continue;
-        if (close.value <= open.value) return 'La fermeture doit être postérieure à l’ouverture.';
-        if (previousClose && open.value <= previousClose) return 'Chaque plage doit commencer après la précédente.';
+        if (!open.value || !close.value) return { message: 'Indiquez les deux heures de la plage.', input: !open.value ? open : close };
+        if (close.value <= open.value) return { message: 'La fermeture doit être postérieure à l’ouverture.', input: close };
+        if (previousClose && open.value <= previousClose) return { message: 'Chaque plage doit commencer après la précédente.', input: open };
         previousClose = close.value;
     }
-    return '';
+    return { message: '', input: null };
 };
 
 export const validateRestaurantHoursEditors = scope => {
@@ -63,10 +80,12 @@ export const validateRestaurantHoursEditors = scope => {
         : [...(scope.querySelectorAll?.('[data-hours-editor]') || [])];
     editors.forEach(editor => {
         dayRows(editor).forEach(row => {
-            const message = validationMessage(row);
-            row.querySelectorAll('[data-hours-slot-close]').forEach(input => input.setCustomValidity(''));
-            if (message) {
-                row.querySelectorAll('[data-hours-slot-close]').item(row.querySelectorAll('[data-hours-slot-close]').length - 1)?.setCustomValidity(message);
+            clearRowValidation(row);
+            const { message, input } = validationState(row);
+            if (message && input) {
+                input.setCustomValidity(message);
+                input.setAttribute('aria-invalid', 'true');
+                setRowError(row, message);
                 valid = false;
             }
         });

@@ -50,6 +50,11 @@ const validateTaxonomyRequirements = scope => {
         const selected = syncTaxonomyRequirement(group);
         const error = group.querySelector('[data-taxonomy-error]');
         if (error) error.hidden = selected;
+        group.classList.toggle('is-invalid', !selected);
+        const firstOption = group.querySelector('input[type="checkbox"]');
+        if (firstOption) {
+            if (selected) firstOption.removeAttribute('aria-invalid'); else firstOption.setAttribute('aria-invalid', 'true');
+        }
         valid = selected && valid;
     });
     return valid;
@@ -220,6 +225,14 @@ if (submission) {
         return validateTaxonomyRequirements(form);
     };
 
+    const revealFirstError = section => {
+        const field = section.querySelector('[aria-invalid="true"], :invalid');
+        if (!field) return;
+        field.focus({ preventScroll: true });
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        field.reportValidity();
+    };
+
     const validateStep = step => {
         const section = steps[step - 1];
         if (step === 5) syncSiretValidation(true);
@@ -229,8 +242,14 @@ if (submission) {
             coverInput.setCustomValidity('');
             return false;
         }
-        if (section.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return false;
-        if (section.querySelector('[data-hours-editor]') && !validateRestaurantHoursEditors(section)) return false;
+        if (section.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) {
+            revealFirstError(section);
+            return false;
+        }
+        if (section.querySelector('[data-hours-editor]') && !validateRestaurantHoursEditors(section)) {
+            revealFirstError(section);
+            return false;
+        }
         for (const field of section.querySelectorAll('input, select, textarea')) {
             if (field.type === 'hidden' || field.disabled || !field.willValidate) continue;
             if (!field.reportValidity()) return false;
@@ -292,7 +311,6 @@ if (submission) {
         button.hidden = false;
         button.addEventListener('click', async () => {
             if (button.hasAttribute('data-previous')) { setStep(currentStep - 1); return; }
-            if (button.closest('[data-submission-step]')?.querySelector('[data-taxonomy-group]') && !validateTaxonomy()) return;
             if (!validateStep(currentStep)) return;
             if (currentStep === 1) await refreshDuplicates(nameDuplicates, false);
             if (currentStep === 2) await refreshDuplicates(addressDuplicates, true);

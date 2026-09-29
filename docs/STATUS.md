@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Validation explicite de l’étape 3 d’ajout public
+
+Une plage horaire invalide à l’étape 3 du formulaire public n’interrompt plus silencieusement le parcours : le jour et le champ concernés sont signalés, le message français est rendu au plus près et le premier champ invalide reçoit le focus. Une plage cachée par les états `Fermé` ou `Ouvert 24h/24` efface toute invalidité client résiduelle et ne bloque jamais l’étape suivante. La validation Laravel existante reste la source de vérité ; la couverture Playwright desktop/mobile protège le blocage, le focus, la reprise et le passage valide vers l’étape 4.
+
 ## 2026-09-29 — Tables éditoriales et fermeture des commentaires
 
 Les tableaux HTML des Articles et Pages sont désormais stylés exclusivement dans `.prose`, avec bordures discrètes, cellules espacées verticalement de 18 px, contenu aligné en haut, en-têtes gras sur vert très pâle dérivé du token `--green`, coins supérieurs arrondis et défilement horizontal contenu sur mobile. Les Articles et Pages disposent du réglage Filament `Autoriser les commentaires`, rétrocompatible et actif par défaut. Une fermeture conserve intégralement les commentaires existants, masque tous les formulaires/CTA de contribution et bloque aussi les POST directs ou différés côté serveur ; sans commentaire publié, le bloc est absent intégralement.

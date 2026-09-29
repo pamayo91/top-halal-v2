@@ -38,6 +38,8 @@
                 @endforeach
                 <button class="hours-slot-action" type="button" data-add-hours-slot>+ Ajouter une plage</button>
             </div>
+            @php($dayError = collect($errors->get("hours.{$loop->index}.*"))->flatten()->first() ?? '')
+            <p class="field-error" data-hours-error role="alert" @if($dayError === '') hidden @endif>{{ $dayError }}</p>
             <template data-hours-slot-template><div class="hours-slot-row" data-hours-slot><input type="hidden" data-hours-slot-id disabled><label>De <input type="time" data-hours-slot-open></label><label>à <input type="time" data-hours-slot-close></label><button class="hours-slot-action" type="button" data-remove-hours-slot>Supprimer cette plage</button></div></template>
         </div>
     @endforeach
