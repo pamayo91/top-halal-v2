@@ -18,6 +18,14 @@ test('desktop navigation is SSR, has no search control, and keeps the account CT
   await expect(header.locator('input[type="search"], [aria-label*="recherche" i], [aria-label*="search" i]')).toHaveCount(0);
   await expect(page.locator('.site-footer')).toBeVisible();
   await expect(page.locator('.site-footer').getByRole('link', { name: 'Restaurants' })).toBeVisible();
+  const footerBottom = page.locator('.footer-bottom');
+  await expect(footerBottom.locator('.footer-copyright')).toBeVisible();
+  await expect(footerBottom).toHaveCSS('justify-content', 'space-between');
+  const legalLinks = footerBottom.locator('.footer-legal .nav-menu-list');
+  if (await legalLinks.count()) {
+    await expect(legalLinks).toHaveCSS('display', 'flex');
+    await expect(legalLinks).toHaveCSS('flex-wrap', 'wrap');
+  }
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });
 
@@ -37,6 +45,12 @@ test('mobile navigation opens, closes with Escape, and does not overflow horizon
   await expect(page.locator('#mobile-nav')).toBeHidden();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await expect(page.locator('.site-footer')).toBeVisible();
+  await expect(page.locator('.footer-bottom .footer-copyright')).toBeVisible();
+  const legalLinks = page.locator('.footer-bottom .footer-legal .nav-menu-list');
+  if (await legalLinks.count()) {
+    await expect(legalLinks).toHaveCSS('display', 'flex');
+    await expect(legalLinks).toHaveCSS('flex-wrap', 'wrap');
+  }
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });
 

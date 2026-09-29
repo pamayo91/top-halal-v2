@@ -2,6 +2,8 @@
 
 ## 2026-09-29
 
+- Footer : le copyright configurable est désormais à gauche de la barre basse ; le menu légal existant reste administrable et s’affiche à droite en liens horizontaux avec retour à la ligne mobile.
+
 - Accueil mobile : CTA final légèrement agrandi, avec un titre équilibré sur deux lignes par CSS.
 - Accueil mobile : retrait des séparateurs des listes Explorer et CTA final légèrement agrandi pour une lecture plus confortable.
 - Accueil : adaptation mobile dédiée, avec rails tactiles CSS sans JavaScript, icônes bornées et sections compactes sans débordement global.

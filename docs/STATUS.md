@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Liens légaux du footer
+
+Le menu légal existant reste entièrement administrable via Navigation : plusieurs éléments, ordre, activation et destinations sont conservés dans `menus` / `menu_items`. Le bas du footer rend désormais le copyright à gauche et les liens légaux à droite, horizontalement avec retour à la ligne responsive, sans JavaScript ni changement des autres colonnes.
+
 ## 2026-09-29 — CTA mobile final
 
 Le CTA final mobile gagne une respiration verticale supplémentaire et un titre équilibré sur deux lignes, sans modifier le contenu administrable ni les règles desktop.

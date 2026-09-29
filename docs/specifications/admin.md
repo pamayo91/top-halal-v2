@@ -51,6 +51,8 @@ Un menu contient des éléments racine et, au maximum, un niveau de sous-menu. L
 
 Le rendu public est SSR, chargé en une requête relationnelle par menu et mis en cache. Une modification de menu, d’élément ou de réglage Header/Footer invalide immédiatement ce cache. Le header ne comporte ni recherche ni loupe ; le même menu alimente desktop et mobile, avec exceptions de visibilité. Le menu mobile et les sous-menus gardent des boutons, des états `aria-expanded` / `aria-controls` et une fermeture Escape légère.
 
+Le menu `footer_legal` est générique : ses éléments administrables portent libellé, destination, activation et ordre, exactement comme les autres menus. Dans le bas du footer, le copyright configurable est à gauche ; sur desktop, les liens légaux sont à droite, sur une même ligne lorsque l’espace le permet, puis reviennent naturellement à la ligne sur écran étroit.
+
 ## E-mails et Contact
 
 `Emails > Configuration` centralise uniquement les paramètres SMTP : le transport est toujours SMTP et le secret reste chiffré, non lisible dans le BO et jamais journalisé. Son action « Envoyer un e-mail de test » emploie SMTP de façon synchrone et sans job Laravel : le BO confirme l’acceptation par le serveur SMTP ou affiche l’erreur assainie, également écrite dans `storage/logs/laravel.log`. `Emails > Templates` édite uniquement l’objet, du texte sûr et le CTA des types déclarés par le registre. `Emails > Historique` expose les tentatives transactionnelles mises en file, sans contenu sensible. `Contact > Messages` permet de consulter et modérer les messages persistés ; `Contact > Réglages` définit le destinataire unique et l’accusé de réception.

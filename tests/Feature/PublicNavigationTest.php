@@ -76,4 +76,20 @@ class PublicNavigationTest extends TestCase
         $this->get('/blog')->assertOk()->assertSee('class="nav-item is-active" href="/blog"', false);
         $this->get('/specialites/cuisine-active')->assertOk()->assertSee('class="nav-item nav-parent is-active"', false)->assertSee('class="is-active"', false)->assertSee('/specialites/cuisine-active', false);
     }
+
+    public function test_footer_renders_ordered_legal_links_after_the_left_aligned_copyright(): void
+    {
+        $legal = Menu::where('location', 'footer_legal')->firstOrFail();
+        MenuItem::where('menu_id', $legal->id)->delete();
+        MenuItem::create(['menu_id' => $legal->id, 'label' => 'Politique de confidentialité', 'link_type' => 'internal_url', 'url' => '/confidentialite', 'sort_order' => 2]);
+        MenuItem::create(['menu_id' => $legal->id, 'label' => 'Mentions légales', 'link_type' => 'internal_url', 'url' => '/mentions-legales', 'sort_order' => 1]);
+
+        $this->get('/')->assertOk()
+            ->assertSeeInOrder(['footer-copyright', '© Top-Halal', 'footer-legal', 'Mentions légales', 'Politique de confidentialité'])
+            ->assertSee('class="footer-legal" aria-label="Liens légaux"', false);
+
+        $css = file_get_contents(resource_path('css/app.css'));
+        $this->assertStringContainsString('.footer-bottom .footer-legal .nav-menu-list{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.35rem 1rem}', $css);
+        $this->assertStringContainsString('@media(max-width:760px){.footer-legal{margin-left:0}.footer-bottom .footer-legal .nav-menu-list{justify-content:flex-start}}', $css);
+    }
 }
