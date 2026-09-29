@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Adaptation mobile de l’accueil
+
+L’accueil mobile dispose maintenant de règles propres : rails CSS horizontaux pour les restaurants et le Guide, panneaux Explorer empilés et compacts, bande éditoriale en une colonne, grille de confiance 2 × 2 et bandeaux information/CTA resserrés. Toutes les icônes de l’accueil reçoivent des dimensions explicites ; aucun SVG ne peut occuper une largeur intrinsèque disproportionnée.
+
 ## 2026-09-29 — Resserrement desktop de l’accueil
 
 Le rythme vertical desktop est recalibré : hero, explication restaurant, panneaux Explorer, bande éditoriale, Guide, confiance, transparence et CTA conservent leur hiérarchie tout en supprimant les espaces inutiles. Les trois emplacements média en attente sont neutres, sans illustration provisoire ni nouvel asset.

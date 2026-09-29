@@ -27,6 +27,15 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
     const trustCards = await page.locator('.home-why-grid > article').evaluateAll(cards => cards.map(card => ({ height: Math.round(card.getBoundingClientRect().height), top: Math.round(card.getBoundingClientRect().top) })));
     expect(trustCards.every(card => card.height === trustCards[0].height && card.top === trustCards[0].top)).toBeTruthy();
   }
+  if (testInfo.project.name === 'mobile-chromium') {
+    await expect(page.locator('.home-restaurants .home-restaurant-grid')).toHaveCount(1);
+    expect(await page.locator('.home-restaurants .home-restaurant-grid').evaluate(grid => grid.scrollWidth > grid.clientWidth)).toBeTruthy();
+    expect(await page.locator('.home-guide-cards .home-guide-grid').evaluate(grid => grid.scrollWidth > grid.clientWidth)).toBeTruthy();
+    const iconSizes = await page.locator('.home-explore-icon svg, .home-why-icon svg, .home-transparency-icon svg').evaluateAll(icons => icons.map(icon => {
+      const bounds = icon.getBoundingClientRect(); return { width: bounds.width, height: bounds.height };
+    }));
+    expect(iconSizes.every(icon => icon.width <= 20 && icon.height <= 20)).toBeTruthy();
+  }
   expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'editorial', 'guide-intro', 'guide-cards', 'why', 'transparency', 'cta']);
   await expect(page.locator('.home-explore-panel')).toHaveCount(2);
   await expect(page.locator('.home-explore-panel .home-explore-icon')).toHaveCount(2);

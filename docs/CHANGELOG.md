@@ -2,6 +2,7 @@
 
 ## 2026-09-29
 
+- Accueil : adaptation mobile dédiée, avec rails tactiles CSS sans JavaScript, icônes bornées et sections compactes sans débordement global.
 - Accueil : resserrement ciblé des espacements desktop et retrait des illustrations provisoires des trois emplacements média en attente d’assets validés.
 - Accueil : finalisation de la direction desktop avec panneaux Explorer, cartes de confiance pastel et bandeaux information/CTA compacts, sans modifier les routes, données ou comportements.
 - Accueil : la bande « Le halal au quotidien » précède désormais l’introduction et les cartes du Guide conformément à l’ordre éditorial validé.
