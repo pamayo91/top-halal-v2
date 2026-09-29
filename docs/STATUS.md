@@ -2,7 +2,7 @@
 
 ## 2026-09-29 — Tables éditoriales et fermeture des commentaires
 
-Les tableaux HTML des Articles et Pages sont désormais stylés exclusivement dans `.prose`, avec bordures discrètes, cellules espacées verticalement de 18 px, contenu aligné en haut, en-têtes gras légèrement teintés, coins supérieurs arrondis et défilement horizontal contenu sur mobile. Les Articles et Pages disposent du réglage Filament `Autoriser les commentaires`, rétrocompatible et actif par défaut. Une fermeture conserve intégralement les commentaires existants, masque tous les formulaires/CTA de contribution et bloque aussi les POST directs ou différés côté serveur ; sans commentaire publié, le bloc est absent intégralement.
+Les tableaux HTML des Articles et Pages sont désormais stylés exclusivement dans `.prose`, avec bordures discrètes, cellules espacées verticalement de 18 px, contenu aligné en haut, en-têtes gras sur vert très pâle dérivé du token `--green`, coins supérieurs arrondis et défilement horizontal contenu sur mobile. Les Articles et Pages disposent du réglage Filament `Autoriser les commentaires`, rétrocompatible et actif par défaut. Une fermeture conserve intégralement les commentaires existants, masque tous les formulaires/CTA de contribution et bloque aussi les POST directs ou différés côté serveur ; sans commentaire publié, le bloc est absent intégralement.
 
 ## 2026-09-29 — Liens légaux du footer
 

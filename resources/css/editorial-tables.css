@@ -19,7 +19,7 @@
 }
 
 .prose th {
-    background: var(--cream);
+    background: color-mix(in srgb, var(--green) 10%, #fff);
     color: var(--ink);
     font-weight: 700;
 }
