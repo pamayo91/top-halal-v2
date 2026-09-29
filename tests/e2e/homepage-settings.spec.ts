@@ -21,13 +21,17 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
   const restaurantCards = page.locator('.home-restaurant-grid > .restaurant-card');
   await expect(restaurantCards).toHaveCount(8);
   await expect(page.locator('.home-explore-panel').first().locator('.link-list > li')).toHaveCount(10);
-  await expect(page.locator('.home-explore-title svg')).toHaveCount(2);
+  await expect(page.locator('.home-explore-icon svg')).toHaveCount(2);
   if (testInfo.project.name === 'desktop-chromium') expect((await page.locator('.home-restaurant-grid').evaluate(grid => getComputedStyle(grid).gridTemplateColumns.split(' ').length))).toBe(4);
   if (testInfo.project.name === 'desktop-chromium') {
     const trustCards = await page.locator('.home-why-grid > article').evaluateAll(cards => cards.map(card => ({ height: Math.round(card.getBoundingClientRect().height), top: Math.round(card.getBoundingClientRect().top) })));
     expect(trustCards.every(card => card.height === trustCards[0].height && card.top === trustCards[0].top)).toBeTruthy();
   }
-  expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'guide-intro', 'guide-cards', 'editorial', 'why', 'transparency', 'cta']);
+  expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'editorial', 'guide-intro', 'guide-cards', 'why', 'transparency', 'cta']);
+  await expect(page.locator('.home-explore-panel')).toHaveCount(2);
+  await expect(page.locator('.home-explore-panel .home-explore-icon')).toHaveCount(2);
+  await expect(page.locator('.home-why-grid > article')).toHaveCount(4);
+  await expect(page.locator('.home-transparency-banner')).toBeVisible();
   await expect(page.locator('[data-home-section="cta"] .home-submission-cta')).toBeVisible();
   expect(await page.locator('body').evaluate(body => body.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect(errors).toEqual([]); expect(failed).toEqual([]);
