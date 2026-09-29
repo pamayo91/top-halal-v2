@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Ordre public des plages horaires
+
+Les plages d’un même jour sont désormais chargées et rendues selon leur numéro de créneau (`slot`), indépendamment de l’ordre de retour de MariaDB. Une régression couvre l’insertion inversée de `13:30–02:00` puis `11:30–12:30` et garantit l’affichage public dans l’ordre attendu.
+
 ## 2026-09-29 — Horaires de nuit et chevauchements
 
 Les créneaux `11:30–00:00` et `11:30–02:00` sont désormais valides dans l’ajout public, l’éditeur déposant et le back-office. Les chevauchements sont conservés sans blocage ; seules des heures d’ouverture et de fermeture identiques restent invalides. La règle commune navigateur/Laravel garantit le même résultat sur les trois surfaces.

@@ -2,6 +2,8 @@
 
 ## 2026-09-29
 
+- Horaires publics : les plages d’une journée sont désormais affichées dans l’ordre de leurs créneaux enregistrés, même si leur insertion ou leur retour SQL est inversé.
+
 - Horaires restaurant : les créneaux qui ferment après minuit, dont `11:30–00:00`, et les chevauchements sont acceptés dans les parcours public, déposant et administrateur ; seules deux heures identiques restent refusées.
 
 - Médias restaurant : la largeur minimale des images envoyées passe de 800 px à 300 px pour la couverture, la galerie et l’éditeur restaurateur ; les validations navigateur et serveur restent cohérentes.

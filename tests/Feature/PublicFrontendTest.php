@@ -314,18 +314,15 @@ class PublicFrontendTest extends TestCase
     public function test_restaurant_detail_renders_validated_opening_hours(): void
     {
         $restaurant = Restaurant::create(['legacy_wp_id' => 425, 'name' => 'Horaires test', 'slug' => 'horaires-test', 'status' => 'published']);
-        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'opens_at' => '11:15', 'closes_at' => '14:30', 'legacy_key' => 'web-monday-lunch']);
-        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'opens_at' => '18:00', 'closes_at' => '22:30', 'legacy_key' => 'web-monday-dinner']);
+        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '13:30', 'closes_at' => '02:00', 'legacy_key' => 'web-monday-dinner']);
+        RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '11:30', 'closes_at' => '12:30', 'legacy_key' => 'web-monday-lunch']);
         RestaurantOpeningHour::create(['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'is_closed' => true, 'legacy_key' => 'web-sunday-closed']);
 
         $this->get('/resto/horaires-test')
             ->assertOk()
             ->assertSee('Horaires')
             ->assertSee('Lundi')
-            ->assertSee('11:15')
-            ->assertSee('14:30')
-            ->assertSee('18:00')
-            ->assertSee('22:30')
+            ->assertSeeInOrder(['11:30–12:30', '13:30–02:00'])
             ->assertSee('Dimanche')
             ->assertSee('Fermé');
     }

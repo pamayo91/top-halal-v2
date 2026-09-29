@@ -64,7 +64,7 @@ class Restaurant extends Model
 
     public function categories(): BelongsToMany { return $this->belongsToMany(Category::class, 'restaurant_category'); }
     public function features(): BelongsToMany { return $this->belongsToMany(Feature::class, 'restaurant_feature'); }
-    public function openingHours(): HasMany { return $this->hasMany(RestaurantOpeningHour::class); }
+    public function openingHours(): HasMany { return $this->hasMany(RestaurantOpeningHour::class)->orderBy('slot'); }
     public function media(): HasMany { return $this->hasMany(RestaurantMedia::class)->orderBy('sort_order'); }
     public function reviews(): HasMany { return $this->hasMany(RestaurantReview::class); }
     public function claims(): HasMany { return $this->hasMany(RestaurantClaim::class); }
