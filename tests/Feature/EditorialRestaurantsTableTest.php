@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Restaurant;
 use App\Services\ContentSanitizer;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class EditorialRestaurantsTableTest extends TestCase
@@ -117,7 +118,7 @@ class EditorialRestaurantsTableTest extends TestCase
             'legacy_wp_id' => random_int(1, 999999999),
             'original_title' => 'Article tableau restaurants',
             'title' => 'Article tableau restaurants',
-            'slug' => 'article-tableau-'.str()->random(10),
+            'slug' => 'article-tableau-'.Str::lower(Str::random(10)),
             'legacy_url' => '/article-tableau',
             'content_html' => $content,
             'status' => 'published',
@@ -129,7 +130,7 @@ class EditorialRestaurantsTableTest extends TestCase
         return Restaurant::create($attributes + [
             'legacy_wp_id' => random_int(1, 999999999),
             'name' => 'Restaurant de test',
-            'slug' => 'restaurant-'.str()->random(10),
+            'slug' => 'restaurant-'.Str::lower(Str::random(10)),
             'status' => 'published',
             'address' => 'Adresse legacy',
             'address_line1' => '10 rue du Test',
