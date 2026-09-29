@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Resserrement desktop de l’accueil
+
+Le rythme vertical desktop est recalibré : hero, explication restaurant, panneaux Explorer, bande éditoriale, Guide, confiance, transparence et CTA conservent leur hiérarchie tout en supprimant les espaces inutiles. Les trois emplacements média en attente sont neutres, sans illustration provisoire ni nouvel asset.
+
 ## 2026-09-29 — Finition desktop de l’accueil
 
 La composition desktop adopte des cartes restaurants plus compactes, une zone texte/média préparée pour l’explication, deux panneaux Explorer parallèles avec illustrations CSS locales, une bande éditoriale avant le Guide, quatre cartes de confiance pastel, puis des bandeaux transparence et CTA compacts. Le rendu reste Blade SSR, sans script ou ressource externe ; les règles mobile existantes sont préservées.

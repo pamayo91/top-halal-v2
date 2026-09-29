@@ -30,6 +30,8 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
   expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'editorial', 'guide-intro', 'guide-cards', 'why', 'transparency', 'cta']);
   await expect(page.locator('.home-explore-panel')).toHaveCount(2);
   await expect(page.locator('.home-explore-panel .home-explore-icon')).toHaveCount(2);
+  await expect(page.locator('.home-explore-media-slot')).toHaveCount(2);
+  await expect(page.locator('.home-explore-illustration')).toHaveCount(0);
   await expect(page.locator('.home-why-grid > article')).toHaveCount(4);
   await expect(page.locator('.home-transparency-banner')).toBeVisible();
   await expect(page.locator('[data-home-section="cta"] .home-submission-cta')).toBeVisible();
