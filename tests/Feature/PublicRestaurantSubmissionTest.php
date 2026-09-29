@@ -170,7 +170,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
     }
 
-    public function test_it_persists_mixed_opening_states_and_two_ordered_slots(): void
+    public function test_it_persists_mixed_opening_states_with_overnight_and_overlapping_slots(): void
     {
         $asset = MediaAsset::create(['original_path' => 'media/originals/hours.jpg', 'mime' => 'image/jpeg', 'width' => 800, 'height' => 600, 'bytes' => 100, 'checksum' => str_repeat('c', 64), 'status' => 'ready']);
         $ingestor = Mockery::mock(MediaIngestor::class);
@@ -179,15 +179,15 @@ class PublicRestaurantSubmissionTest extends TestCase
 
         $hours = [];
         foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) $hours[$day] = ['day' => $day, 'status' => 'closed'];
-        $hours['monday'] = ['day' => 'monday', 'status' => 'slots', 'slots' => [['opens_at' => '10:00', 'closes_at' => '14:00'], ['opens_at' => '18:00', 'closes_at' => '22:00']]];
+        $hours['monday'] = ['day' => 'monday', 'status' => 'slots', 'slots' => [['opens_at' => '11:30', 'closes_at' => '00:00'], ['opens_at' => '11:30', 'closes_at' => '02:00']]];
         $hours['tuesday'] = ['day' => 'tuesday', 'status' => 'all_day'];
 
         $this->post(route('restaurant-submissions.store'), $this->payload(['hours' => $hours]))->assertRedirect(route('restaurant-submissions.thanks'));
 
         $restaurant = Restaurant::firstOrFail();
         $this->assertCount(8, $restaurant->openingHours);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '10:00', 'closes_at' => '14:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '18:00', 'closes_at' => '22:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '11:30', 'closes_at' => '00:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '11:30', 'closes_at' => '02:00', 'is_closed' => 0, 'is_open_24_hours' => 0]);
         $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'tuesday', 'slot' => 1, 'is_closed' => 0, 'is_open_24_hours' => 1]);
         $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'slot' => 1, 'is_closed' => 1, 'is_open_24_hours' => 0]);
     }

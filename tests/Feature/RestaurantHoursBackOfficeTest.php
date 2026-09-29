@@ -33,8 +33,8 @@ class RestaurantHoursBackOfficeTest extends TestCase
 
         $hours[0]['slots'] = [
             ['id' => $monday->id, 'opens_at' => '10:30', 'closes_at' => '14:30'],
-            ['id' => $mondayEvening->id, 'opens_at' => '18:30', 'closes_at' => '23:30'],
-            ['opens_at' => '23:40', 'closes_at' => '23:50'],
+            ['id' => $mondayEvening->id, 'opens_at' => '18:30', 'closes_at' => '00:00'],
+            ['opens_at' => '18:45', 'closes_at' => '02:00'],
         ];
         $hours[6]['status'] = 'closed';
 
@@ -53,18 +53,17 @@ class RestaurantHoursBackOfficeTest extends TestCase
         $stored = $restaurant->fresh()->openingHours()->orderBy('day')->orderBy('slot')->get();
         $this->assertCount(9, $stored);
         $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $monday->id, 'opens_at' => '10:30', 'closes_at' => '14:30', 'legacy_key' => 'legacy:monday:1']);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $mondayEvening->id, 'opens_at' => '18:30', 'closes_at' => '23:30', 'legacy_key' => 'legacy:monday:2']);
-        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 3, 'opens_at' => '23:40', 'closes_at' => '23:50', 'legacy_key' => 'admin:monday:3']);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['id' => $mondayEvening->id, 'opens_at' => '18:30', 'closes_at' => '00:00', 'legacy_key' => 'legacy:monday:2']);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 3, 'opens_at' => '18:45', 'closes_at' => '02:00', 'legacy_key' => 'admin:monday:3']);
         $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'sunday', 'slot' => 1, 'is_closed' => true]);
     }
 
-    public function test_hours_editor_rejects_overlapping_slots(): void
+    public function test_hours_editor_rejects_a_slot_with_identical_opening_and_closing_times(): void
     {
         $input = app(RestaurantHours::class)->editorState(collect());
         $input[0]['status'] = 'slots';
         $input[0]['slots'] = [
-            ['opens_at' => '10:00', 'closes_at' => '14:00'],
-            ['opens_at' => '13:30', 'closes_at' => '18:00'],
+            ['opens_at' => '10:00', 'closes_at' => '10:00'],
         ];
 
         $this->expectException(\Illuminate\Validation\ValidationException::class);

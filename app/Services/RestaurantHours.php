@@ -121,7 +121,6 @@ class RestaurantHours
                 $errors["$path.slots"] = 'Ajoutez au moins une plage horaire.';
                 continue;
             }
-            $previousClose = null;
             $slotNumber = 0;
             foreach ($slots as $slotIndex => $slot) {
                 $slotNumber++;
@@ -131,15 +130,10 @@ class RestaurantHours
                     $errors["$path.slots.$slotIndex.opens_at"] = 'Indiquez les deux heures de la plage.';
                     continue;
                 }
-                if ($close <= $open) {
-                    $errors["$path.slots.$slotIndex.closes_at"] = 'La fermeture doit être postérieure à l’ouverture.';
+                if ($close === $open) {
+                    $errors["$path.slots.$slotIndex.closes_at"] = 'L’ouverture et la fermeture ne peuvent pas être identiques.';
                     continue;
                 }
-                if ($previousClose !== null && $open <= $previousClose) {
-                    $errors["$path.slots.$slotIndex.opens_at"] = 'Chaque plage doit commencer après la précédente.';
-                    continue;
-                }
-                $previousClose = $close;
                 $rows[] = $this->row($slot['id'] ?? null, $day, $slotNumber, false, false, $open, $close, $source);
             }
         }

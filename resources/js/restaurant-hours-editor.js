@@ -61,14 +61,11 @@ const syncRow = (editor, row, focus = false) => {
 
 const validationState = row => {
     if (row.querySelector('[data-hours-status]').value !== 'slots') return { message: '', input: null };
-    let previousClose = null;
     for (const slot of row.querySelectorAll('[data-hours-slot]')) {
         const open = slot.querySelector('[data-hours-slot-open]');
         const close = slot.querySelector('[data-hours-slot-close]');
         if (!open.value || !close.value) return { message: 'Indiquez les deux heures de la plage.', input: !open.value ? open : close };
-        if (close.value <= open.value) return { message: 'La fermeture doit être postérieure à l’ouverture.', input: close };
-        if (previousClose && open.value <= previousClose) return { message: 'Chaque plage doit commencer après la précédente.', input: open };
-        previousClose = close.value;
+        if (close.value === open.value) return { message: 'L’ouverture et la fermeture ne peuvent pas être identiques.', input: close };
     }
     return { message: '', input: null };
 };

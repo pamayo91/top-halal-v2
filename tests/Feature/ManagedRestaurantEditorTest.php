@@ -189,6 +189,25 @@ class ManagedRestaurantEditorTest extends TestCase
         $this->assertSame('account@example.test', $restaurant->fresh()->contact_email);
     }
 
+    public function test_a_depositor_can_save_overnight_and_overlapping_hours(): void
+    {
+        [$depositor, $restaurant] = $this->representedRestaurant('depositor');
+        $hours = app(RestaurantHours::class)->editorState(collect());
+        $hours[0]['status'] = 'slots';
+        $hours[0]['slots'] = [
+            ['opens_at' => '11:30', 'closes_at' => '00:00'],
+            ['opens_at' => '11:30', 'closes_at' => '02:00'],
+        ];
+
+        $this->actingAs($depositor)->put(route('owner.restaurants.update', $restaurant), [
+            'name' => $restaurant->name,
+            'hours' => $hours,
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 1, 'opens_at' => '11:30', 'closes_at' => '00:00']);
+        $this->assertDatabaseHas('restaurant_opening_hours', ['restaurant_id' => $restaurant->id, 'day' => 'monday', 'slot' => 2, 'opens_at' => '11:30', 'closes_at' => '02:00']);
+    }
+
     public function test_a_manager_cannot_bypass_the_300_pixel_photo_dimensions_rule(): void
     {
         [$manager, $restaurant] = $this->representedRestaurant('depositor');

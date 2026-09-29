@@ -2,6 +2,8 @@
 
 ## 2026-09-29
 
+- Horaires restaurant : les créneaux qui ferment après minuit, dont `11:30–00:00`, et les chevauchements sont acceptés dans les parcours public, déposant et administrateur ; seules deux heures identiques restent refusées.
+
 - Médias restaurant : la largeur minimale des images envoyées passe de 800 px à 300 px pour la couverture, la galerie et l’éditeur restaurateur ; les validations navigateur et serveur restent cohérentes.
 
 - Ajout public de restaurant : une erreur d’horaires à l’étape 3 est désormais rendue en français près du jour concerné, avec mise en évidence et focus ; les états d’horaires masqués ne peuvent conserver aucune invalidité bloquante. La suite Playwright couvre le parcours étape 3 invalide, la reprise conditionnelle et le passage valide desktop/mobile.

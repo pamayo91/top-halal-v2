@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Horaires de nuit et chevauchements
+
+Les créneaux `11:30–00:00` et `11:30–02:00` sont désormais valides dans l’ajout public, l’éditeur déposant et le back-office. Les chevauchements sont conservés sans blocage ; seules des heures d’ouverture et de fermeture identiques restent invalides. La règle commune navigateur/Laravel garantit le même résultat sur les trois surfaces.
+
 ## 2026-09-29 — Largeur minimale des images restaurant
 
 Les formulaires public et restaurateur acceptent désormais les JPEG, PNG et WebP à partir de 300 px de large. La même limite est appliquée par le sélecteur navigateur partagé et par les validations Laravel de couverture, galerie et éditeur restaurateur.

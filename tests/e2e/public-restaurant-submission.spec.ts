@@ -89,11 +89,11 @@ test('public restaurant contribution explains, focuses and recovers an invalid s
   const close = monday.locator('[data-hours-slot-close]').first();
   await page.getByLabel('État Lundi').selectOption('slots');
   await open.fill('18:00');
-  await close.fill('12:00');
+  await close.fill('18:00');
   await page.getByRole('button', { name: 'Continuer' }).click();
 
   await expect(page.getByRole('heading', { name: 'Les informations utiles' })).toBeVisible();
-  await expect(monday.locator('[data-hours-error]')).toHaveText('La fermeture doit être postérieure à l’ouverture.');
+  await expect(monday.locator('[data-hours-error]')).toHaveText('L’ouverture et la fermeture ne peuvent pas être identiques.');
   await expect(monday.locator('[data-hours-error]')).toBeVisible();
   await expect(monday).toHaveClass(/is-invalid/);
   await expect(close).toHaveAttribute('aria-invalid', 'true');
@@ -112,8 +112,8 @@ test('public restaurant contribution advances from a valid step three', async ({
   await reachStepThree(page, `horaires-valides-${testInfo.project.name}-${crypto.randomUUID()}`);
   const monday = page.locator('[data-hours-day="monday"]');
   await page.getByLabel('État Lundi').selectOption('slots');
-  await monday.locator('[data-hours-slot-open]').fill('12:00');
-  await monday.locator('[data-hours-slot-close]').fill('14:00');
+  await monday.locator('[data-hours-slot-open]').fill('11:30');
+  await monday.locator('[data-hours-slot-close]').fill('00:00');
   await page.getByRole('button', { name: 'Continuer' }).click();
   await expect(page.getByRole('heading', { name: 'Les photos' })).toBeVisible();
 });

@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-09-29 — D044 — Les horaires de nuit et chevauchants restent littéraux
+
+Les horaires saisis conservent les heures indiquées par le contributeur ou l’administrateur. Une fermeture antérieure à l’ouverture désigne une fermeture après minuit, y compris `00:00`, sans suffixe de présentation ajouté. Les plages qui se chevauchent ne sont pas corrigées ni rejetées ; seule une plage dont les deux heures sont identiques est vide et reste invalide. Cette règle est centralisée dans `RestaurantHours` et s’applique au formulaire public, à l’éditeur déposant et à Filament.
+
 ## 2026-09-28 — D043 — Gate de régression par snapshot de déploiement
 
 Les données métier de préproduction sont modifiables depuis le BO et ne sont jamais des fixtures immuables. La gate compare les compteurs post-déploiement au snapshot explicitement pris avant ce déploiement et vérifie des invariants dynamiques (relations orphelines, assets référencés, stockage V2). Les surfaces navigateur sélectionnent un contenu publié pendant le run. Aucune baseline métier permanente ou refresh quotidien n’est requis.
