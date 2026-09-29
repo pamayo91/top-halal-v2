@@ -55,6 +55,7 @@ class EditorialContentRenderer
     /** @return list<int> */
     private function ids(string $attributes): array
     {
+        $attributes = html_entity_decode($attributes, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         if (! preg_match('/\bids\s*=\s*(["\'])(.*?)\1/iu', $attributes, $match)) return [];
 
         $ids = [];

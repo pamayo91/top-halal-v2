@@ -3,6 +3,7 @@
 ## 2026-09-29
 
 - Articles : ajout du shortcode SSR `[restaurants_table ids="1,2,3"]`, résolu par le pipeline éditorial existant avec IDs positifs dédupliqués et ordonnés, données restaurant courantes, exclusion des fiches non publiées/supprimées et rendu accessible desktop/mobile sans JavaScript.
+- Articles : le shortcode accepte aussi les guillemets encodés en `&quot;` par le RichEditor.
 
 - Horaires publics : les plages d’une journée sont désormais affichées dans l’ordre de leurs créneaux enregistrés, même si leur insertion ou leur retour SQL est inversé.
 

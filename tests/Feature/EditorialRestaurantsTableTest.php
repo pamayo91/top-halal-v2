@@ -112,6 +112,17 @@ class EditorialRestaurantsTableTest extends TestCase
         $this->assertSame($shortcode, app(ContentSanitizer::class)->sanitize($shortcode)['html']);
     }
 
+    public function test_shortcode_with_html_encoded_editor_quotes_is_rendered(): void
+    {
+        $restaurant = $this->restaurant();
+        $article = $this->article('<p>[restaurants_table ids=&quot;'.$restaurant->id.'&quot;]</p>');
+
+        $this->get('/'.$article->slug)
+            ->assertOk()
+            ->assertSee($restaurant->name)
+            ->assertDontSee('[restaurants_table', false);
+    }
+
     private function article(string $content): Article
     {
         return Article::create([
