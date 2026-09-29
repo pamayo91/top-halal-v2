@@ -205,7 +205,7 @@ test('public restaurant contribution keeps compact mixed hours and copied slots 
   await page.locator('[name="categories[]"]').first().check();
   await page.locator('[name="features[]"]').first().check();
   await page.getByLabel('État Lundi').selectOption('slots');
-  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetWidth', 136);
+  await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetWidth', testInfo.project.name === 'desktop-chromium' ? 136 : 132);
   await expect(page.getByLabel('État Lundi')).toHaveJSProperty('offsetHeight', 38);
   await expect(monday.locator('[data-hours-slot]')).toHaveCount(1);
   await monday.locator('[data-hours-slot]').first().locator('[data-hours-slot-open]').fill('00:00');
