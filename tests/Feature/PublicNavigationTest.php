@@ -91,5 +91,8 @@ class PublicNavigationTest extends TestCase
         $css = file_get_contents(resource_path('css/app.css'));
         $this->assertStringContainsString('.footer-bottom .footer-legal .nav-menu-list{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.35rem 1rem}', $css);
         $this->assertStringContainsString('@media(max-width:760px){.footer-legal{margin-left:0}.footer-bottom .footer-legal .nav-menu-list{justify-content:flex-start}}', $css);
+        $this->assertStringContainsString('.footer-bottom .footer-legal .nav-menu-list a{color:inherit;font:inherit;font-weight:400;text-decoration:none}', $css);
+        $this->assertStringContainsString('.footer-bottom .footer-legal .nav-menu-list a:hover{text-decoration:underline;text-underline-offset:3px}', $css);
+        $this->assertStringContainsString('.footer-bottom .footer-legal .nav-menu-list a:focus-visible{outline:2px solid currentColor;outline-offset:3px;text-decoration:underline;text-underline-offset:3px}', $css);
     }
 }

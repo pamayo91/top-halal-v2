@@ -25,6 +25,9 @@ test('desktop navigation is SSR, has no search control, and keeps the account CT
   if (await legalLinks.count()) {
     await expect(legalLinks).toHaveCSS('display', 'flex');
     await expect(legalLinks).toHaveCSS('flex-wrap', 'wrap');
+    const legalLink = legalLinks.getByRole('link').first();
+    await expect(legalLink).toHaveCSS('font-weight', '400');
+    await expect(legalLink).toHaveCSS('text-decoration-line', 'none');
   }
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });
@@ -50,6 +53,9 @@ test('mobile navigation opens, closes with Escape, and does not overflow horizon
   if (await legalLinks.count()) {
     await expect(legalLinks).toHaveCSS('display', 'flex');
     await expect(legalLinks).toHaveCSS('flex-wrap', 'wrap');
+    const legalLink = legalLinks.getByRole('link').first();
+    await expect(legalLink).toHaveCSS('font-weight', '400');
+    await expect(legalLink).toHaveCSS('text-decoration-line', 'none');
   }
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });

@@ -3,6 +3,7 @@
 ## 2026-09-29
 
 - Footer : le copyright configurable est désormais à gauche de la barre basse ; le menu légal existant reste administrable et s’affiche à droite en liens horizontaux avec retour à la ligne mobile.
+- Footer : les liens légaux de la barre basse ont désormais la même hiérarchie typographique que le copyright, avec soulignement réservé au survol et au focus visible.
 
 - Accueil mobile : CTA final légèrement agrandi, avec un titre équilibré sur deux lignes par CSS.
 - Accueil mobile : retrait des séparateurs des listes Explorer et CTA final légèrement agrandi pour une lecture plus confortable.

@@ -83,3 +83,8 @@ html,body{min-height:100%;background-color:var(--page-background);background-ima
 .footer-copyright{margin:0}
 .footer-legal{margin-left:auto}
 @media(max-width:760px){.footer-legal{margin-left:0}.footer-bottom .footer-legal .nav-menu-list{justify-content:flex-start}}
+
+/* Legal links share the quiet typography of the copyright; emphasis is reserved for interaction. */
+.footer-bottom .footer-legal .nav-menu-list a{color:inherit;font:inherit;font-weight:400;text-decoration:none}
+.footer-bottom .footer-legal .nav-menu-list a:hover{text-decoration:underline;text-underline-offset:3px}
+.footer-bottom .footer-legal .nav-menu-list a:focus-visible{outline:2px solid currentColor;outline-offset:3px;text-decoration:underline;text-underline-offset:3px}

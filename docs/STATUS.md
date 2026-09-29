@@ -2,7 +2,7 @@
 
 ## 2026-09-29 — Liens légaux du footer
 
-Le menu légal existant reste entièrement administrable via Navigation : plusieurs éléments, ordre, activation et destinations sont conservés dans `menus` / `menu_items`. Le bas du footer rend désormais le copyright à gauche et les liens légaux à droite, horizontalement avec retour à la ligne responsive, sans JavaScript ni changement des autres colonnes.
+Le menu légal existant reste entièrement administrable via Navigation : plusieurs éléments, ordre, activation et destinations sont conservés dans `menus` / `menu_items`. Le bas du footer rend désormais le copyright à gauche et les liens légaux à droite, horizontalement avec retour à la ligne responsive, sans JavaScript ni changement des autres colonnes. Les liens légaux reprennent sa hiérarchie typographique (graisse 400, couleur et taille), sans soulignement hors interaction, tout en gardant hover/focus-visible accessibles.
 
 ## 2026-09-29 — CTA mobile final
 
