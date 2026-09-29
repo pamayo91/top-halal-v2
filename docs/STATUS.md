@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — CTA mobile final
+
+Le CTA final mobile gagne une respiration verticale supplémentaire et un titre équilibré sur deux lignes, sans modifier le contenu administrable ni les règles desktop.
+
 ## 2026-09-29 — Finition mobile Explorer et CTA
 
 Les listes Explorer mobile ne portent plus de séparateur visuel ; les liens conservent seulement un espacement régulier. Le CTA final mobile reçoit un padding et des respirations internes légèrement augmentés, sans changer sa structure éditable ni le desktop.

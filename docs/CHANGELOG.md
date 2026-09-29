@@ -2,6 +2,7 @@
 
 ## 2026-09-29
 
+- Accueil mobile : CTA final légèrement agrandi, avec un titre équilibré sur deux lignes par CSS.
 - Accueil mobile : retrait des séparateurs des listes Explorer et CTA final légèrement agrandi pour une lecture plus confortable.
 - Accueil : adaptation mobile dédiée, avec rails tactiles CSS sans JavaScript, icônes bornées et sections compactes sans débordement global.
 - Accueil : resserrement ciblé des espacements desktop et retrait des illustrations provisoires des trois emplacements média en attente d’assets validés.

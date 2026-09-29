@@ -41,6 +41,12 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
       page.locator('.home-submission-cta').evaluate(element => element.getBoundingClientRect().height),
     ]);
     expect(cta).toBeGreaterThanOrEqual(transparency * .7);
+    const titleLines = await page.locator('.home-submission-cta h2').evaluate(element => {
+      const style = getComputedStyle(element);
+      return element.getBoundingClientRect().height / Number.parseFloat(style.lineHeight);
+    });
+    expect(titleLines).toBeGreaterThanOrEqual(1.9);
+    expect(titleLines).toBeLessThan(2.2);
   }
   expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'editorial', 'guide-intro', 'guide-cards', 'why', 'transparency', 'cta']);
   await expect(page.locator('.home-explore-panel')).toHaveCount(2);
