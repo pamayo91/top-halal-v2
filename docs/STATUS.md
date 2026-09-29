@@ -6,6 +6,8 @@ Le pipeline SSR éditorial existant résout désormais `[restaurants_table ids="
 
 Les guillemets transformés en entités HTML (`&quot;`) par le RichEditor sont désormais décodés avant validation des IDs : un shortcode enregistré depuis l’éditeur conserve donc son rendu dynamique.
 
+Le tableau de restaurants utilise désormais des cellules de données neutres (sans colonne verte ni coin interne arrondi) comme les tableaux éditoriaux existants. Ses liens de fiches restent sobres et ne se soulignent qu’au survol ou au focus clavier.
+
 ## 2026-09-29 — Ordre public des plages horaires
 
 Les plages d’un même jour sont désormais chargées et rendues selon leur numéro de créneau (`slot`), indépendamment de l’ordre de retour de MariaDB. Une régression couvre l’insertion inversée de `13:30–02:00` puis `11:30–12:30` et garantit l’affichage public dans l’ordre attendu.

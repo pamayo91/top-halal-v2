@@ -13,7 +13,7 @@
         <tbody>
             @foreach($restaurants as $restaurant)
                 <tr>
-                    <th scope="row"><a href="{{ route('restaurants.show', $restaurant->slug) }}">{{ $restaurant->name }}</a></th>
+                    <td><a href="{{ route('restaurants.show', $restaurant->slug) }}">{{ $restaurant->name }}</a></td>
                     <td>{{ $restaurant->city_name }}</td>
                     <td>{{ $addresses->structuredLine($restaurant) }}</td>
                     <td>Halal ✓</td>
