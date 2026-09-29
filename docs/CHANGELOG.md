@@ -2,6 +2,11 @@
 
 ## 2026-09-29
 
+- Added per-Article and per-Page comment availability, preserving historical comments while removing public contribution controls and rejecting direct submissions when closed.
+- Styled public editorial HTML tables only, with collapsed token-based borders, padded cells, distinct headers and contained mobile horizontal scrolling.
+
+## 2026-09-29
+
 - Footer : le copyright configurable est désormais à gauche de la barre basse ; le menu légal existant reste administrable et s’affiche à droite en liens horizontaux avec retour à la ligne mobile.
 - Footer : les liens légaux de la barre basse ont désormais la même hiérarchie typographique que le copyright, avec soulignement réservé au survol et au focus visible.
 

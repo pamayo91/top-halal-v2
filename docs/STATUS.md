@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Tables éditoriales et fermeture des commentaires
+
+Les tableaux HTML des Articles et Pages sont désormais stylés exclusivement dans `.prose`, avec bordures discrètes, cellules espacées, en-têtes légèrement distingués et défilement horizontal contenu sur mobile. Les Articles et Pages disposent du réglage Filament `Autoriser les commentaires`, rétrocompatible et actif par défaut. Une fermeture conserve intégralement les commentaires existants, masque tous les formulaires/CTA de contribution et bloque aussi les POST directs ou différés côté serveur.
+
 ## 2026-09-29 — Liens légaux du footer
 
 Le menu légal existant reste entièrement administrable via Navigation : plusieurs éléments, ordre, activation et destinations sont conservés dans `menus` / `menu_items`. Le bas du footer rend désormais le copyright à gauche et les liens légaux à droite, horizontalement avec retour à la ligne responsive, sans JavaScript ni changement des autres colonnes. Les liens légaux reprennent sa hiérarchie typographique (graisse 400, couleur et taille), sans soulignement hors interaction, tout en gardant hover/focus-visible accessibles.

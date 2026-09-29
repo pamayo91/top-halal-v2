@@ -7,7 +7,10 @@ class EditorialSidebarFields
 {
     public static function section(string $statePath = 'editorial_sidebar_overrides', string $title = 'Sidebar éditoriale'): Section
     {
-        return Section::make($title)->description('Les valeurs ajoutées remplacent seulement le bloc global correspondant. Les identifiants manuels sont séparés par des virgules.')->schema([Repeater::make($statePath.'.blocks')->label('Overrides de blocs')->reorderable()->collapsed()->schema(self::blockFields())->defaultItems(0)]);
+        return Section::make($title)->description('Les valeurs ajoutées remplacent seulement le bloc global correspondant. Les identifiants manuels sont séparés par des virgules.')->schema([
+            Toggle::make('comments_enabled')->label('Autoriser les commentaires')->default(true)->helperText('Désactiver cette option empêche les nouveaux commentaires. Les commentaires existants restent visibles.'),
+            Repeater::make($statePath.'.blocks')->label('Overrides de blocs')->reorderable()->collapsed()->schema(self::blockFields())->defaultItems(0),
+        ]);
     }
     public static function blockFields(): array
     {

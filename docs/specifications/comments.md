@@ -12,6 +12,8 @@
 - The validated pilot IDs are `2,3,6,7,8,417,556,600,601,2425`; it is deliberately not a bulk migration.
 
 ## New comments
+Articles and Pages may close new comments independently through `comments_enabled` (default true). Closing a content never changes or hides its historical comments; it hides every contribution form and direct submissions receive HTTP 403. The same check is repeated when a deferred e-mail verification attempts to create the pending comment.
+
 Fields: author name, email, content; optional authenticated user relationship.
 - Moderated workflow: pending -> approved/rejected/spam.
 - A new or unproven comment author first creates a `contribution_verifications` record, not a comment. It carries a hashed random token, temporary signed URL, 24-hour expiry and the exact article/page/payload. Only one successful click atomically creates/reuses the `User`, marks its e-mail verified and creates the comment as `pending` with `user_id`.

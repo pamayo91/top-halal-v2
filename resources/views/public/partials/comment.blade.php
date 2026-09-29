@@ -3,7 +3,7 @@
     @if($isReply && $replyTo)<p class="comment-in-reply-to">En réponse à {{ $replyTo->author_name }}</p>@endif
     <p>{{ $comment->content }}</p>
     <p class="muted"><time datetime="{{ $comment->created_at->toDateString() }}">Publié le {{ $comment->created_at->translatedFormat('j F Y') }}</time></p>
-    <details class="comment-reply-form" data-reply-details>
+    @if($content->comments_enabled)<details class="comment-reply-form" data-reply-details>
         <summary aria-label="Répondre à {{ $comment->author_name }}">Répondre</summary>
         <form class="stack-form" method="post" action="{{ route('editorial.comments.store', $content->slug) }}">
             @csrf
@@ -15,7 +15,7 @@
             <input class="hp" name="website" tabindex="-1" autocomplete="off">
             <div class="comment-reply-actions"><button class="button button-small">Envoyer pour modération</button><button class="link-button" type="button" data-reply-cancel>Annuler</button></div>
         </form>
-    </details>
+    </details>@endif
 </article>
 @foreach($comment->children as $child)
     @include('public.partials.comment', ['comment' => $child, 'content' => $content, 'isReply' => true, 'replyTo' => $comment])

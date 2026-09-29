@@ -24,6 +24,7 @@ class ContributionIdentityService
     /** @return array{verified: bool, verification: ?ContributionVerification} */
     public function submitComment(Request $request, Article|Page $content, array $data): array
     {
+        $this->assertCommentsEnabled($content);
         $this->assertCommentParent($content, $data['parent_id'] ?? null);
 
         return $this->submit($request, 'comment', $content instanceof Article ? 'article' : 'page', $content->id, $data);
@@ -235,6 +236,7 @@ class ContributionIdentityService
             default => abort(404),
         };
         $content = $model::query()->whereKey($targetId)->where('status', 'published')->firstOrFail();
+        $this->assertCommentsEnabled($content);
         $parentId = $data['parent_id'] ?? null;
         $this->assertCommentParent($content, $parentId);
 
@@ -323,5 +325,10 @@ class ContributionIdentityService
         if (! $valid) {
             throw ValidationException::withMessages(['parent_id' => 'Le commentaire auquel vous répondez n’est plus disponible.']);
         }
+    }
+
+    private function assertCommentsEnabled(Article|Page $content): void
+    {
+        abort_unless($content->comments_enabled, 403, 'Les nouveaux commentaires sont fermés pour ce contenu.');
     }
 }
