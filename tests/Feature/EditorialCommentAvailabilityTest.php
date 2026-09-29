@@ -42,6 +42,18 @@ class EditorialCommentAvailabilityTest extends TestCase
         $this->assertDatabaseCount('comments', 1);
     }
 
+    public function test_a_closed_content_with_no_published_comments_hides_the_entire_comments_section(): void
+    {
+        $article = $this->article(false);
+
+        $this->get('/article-commentaires')
+            ->assertOk()
+            ->assertDontSee('id="commentaires"', false)
+            ->assertDontSee('Commentaires (0)')
+            ->assertDontSee('Pas encore de commentaire.')
+            ->assertDontSee('Laisser un commentaire');
+    }
+
     private function article(bool $commentsEnabled): Article
     {
         return Article::create(['legacy_wp_id' => 8911, 'original_title' => 'Article discussion', 'title' => 'Article discussion', 'slug' => 'article-commentaires', 'legacy_url' => '/article-commentaires', 'status' => 'published', 'comments_enabled' => $commentsEnabled]);

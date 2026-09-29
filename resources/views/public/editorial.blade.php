@@ -8,7 +8,7 @@
         <x-editorial-sidebar :content="$content" :sidebar="$sidebar" :is-article="$isArticle" placement="mobile-top" />
         @if($featuredAsset)<figure class="article-featured-media"><img src="{{ $featuredAsset->deliveryUrl() }}" width="{{ $featuredAsset->width }}" height="{{ $featuredAsset->height }}" fetchpriority="high" alt="{{ $featuredAsset->alt_text ?: $content->title }}"></figure>@endif
         <div class="prose">{!! $sidebar['html'] !!}</div>
-        <section class="comments" id="commentaires">
+        @if($content->comments_enabled || $commentThreads->isNotEmpty())<section class="comments" id="commentaires">
             <h2>Commentaires ({{ $visibleCommentsCount }})</h2>
             @if(session('comment_submitted'))<p class="flash" role="status">Merci, votre commentaire sera publié après modération.</p>@elseif(session('contribution_verification_sent'))<p class="flash" role="status">Vérifiez votre adresse e-mail pour envoyer votre commentaire à la modération.</p>@endif
             <div id="comment-threads" data-comment-threads>@forelse($commentThreads as $comment)@include('public.partials.comment', ['comment' => $comment, 'content' => $content, 'isReply' => false, 'replyTo' => null])@empty <p>Pas encore de commentaire.</p>@endforelse</div>
@@ -16,7 +16,7 @@
             @if($content->comments_enabled)
                 <details><summary>Laisser un commentaire</summary><form class="stack-form" method="post" action="{{ route('editorial.comments.store', $content->slug) }}">@csrf<label>Nom <input name="name" required value="{{ old('name', auth()->user()?->name) }}"></label>@guest<label>E-mail <input name="email" type="email" required value="{{ old('email') }}"></label>@endguest<label>Commentaire <textarea name="content" required maxlength="2000">{{ old('content') }}</textarea></label><input class="hp" name="website" tabindex="-1" autocomplete="off"><button class="button">Envoyer pour modération</button></form></details>
             @endif
-        </section>
+        </section>@endif
         <x-editorial-sidebar :content="$content" :sidebar="$sidebar" :is-article="$isArticle" placement="mobile-bottom" />
     </div>
     @if($sidebar['enabled'])<x-editorial-sidebar :content="$content" :sidebar="$sidebar" :is-article="$isArticle" />@endif

@@ -4,9 +4,9 @@
 Store clean HTML/content structure, title/slug/excerpt/status/author/media/SEO metadata/publication dates and source type (`manual`, `ai`, `imported`).
 Approved public comments are displayed from newest to oldest.
 
-Les tableaux HTML présents dans le contenu public des Articles et Pages sont ciblés uniquement sous `.prose` : bordures fines repliées, cellules espacées et en-têtes légèrement distincts via les tokens existants. Sur mobile, les tableaux larges défilent horizontalement dans leur propre conteneur sans élargir la page.
+Les tableaux HTML présents dans le contenu public des Articles et Pages sont ciblés uniquement sous `.prose` : bordures fines séparées, cellules espacées, séparateurs internes et deux coins supérieurs arrondis via les tokens existants. Sur mobile, les tableaux larges défilent horizontalement dans leur propre conteneur sans élargir la page.
 
-Chaque Article et Page possède le booléen `comments_enabled`, activé par défaut. Lorsqu’il est fermé, les commentaires publiés restent rendus, mais tous les CTA et formulaires de nouvelle contribution (y compris les réponses) disparaissent ; le serveur refuse aussi toute soumission directe ou contribution différée.
+Chaque Article et Page possède le booléen `comments_enabled`, activé par défaut. Lorsqu’il est fermé, les commentaires publiés restent rendus, mais tous les CTA et formulaires de nouvelle contribution (y compris les réponses) disparaissent ; le serveur refuse aussi toute soumission directe ou contribution différée. Si aucun commentaire publié n’est rendu, le bloc commentaires entier est absent.
 
 The back-office RichEditor supports legitimate nested editorial lists. Livewire accepts property paths up to 20 levels deep for this content; its other payload limits remain in force. Articles and Pages share the editorial RichEditor extension: its link dialogue supports combinable `nofollow`, `sponsored` and `ugc` `rel` tokens, plus the native `_blank` option. Existing non-SEO `rel` tokens are retained when a link is edited, while no automatic rewrite is applied to untouched legacy links. The toolbar is CSS-sticky below the measured Filament top bar, with an opaque surface and responsive wrapping.
 
