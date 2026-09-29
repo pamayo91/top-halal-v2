@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-29
+
+- Accueil : finalisation de la direction desktop avec panneaux Explorer, cartes de confiance pastel et bandeaux information/CTA compacts, sans modifier les routes, données ou comportements.
+- Accueil : la bande « Le halal au quotidien » précède désormais l’introduction et les cartes du Guide conformément à l’ordre éditorial validé.
+
 ## 2026-09-28
 
 - Réorganisation stricte de l’accueil : l’explication restaurant précède Explorer, l’introduction Guide précède ses cartes, et le hero, la transparence et le CTA sont rendus plus compacts sans modifier le contenu ni les comportements.

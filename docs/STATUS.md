@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Finition desktop de l’accueil
+
+La composition desktop adopte des cartes restaurants plus compactes, une zone texte/média préparée pour l’explication, deux panneaux Explorer parallèles avec illustrations CSS locales, une bande éditoriale avant le Guide, quatre cartes de confiance pastel, puis des bandeaux transparence et CTA compacts. Le rendu reste Blade SSR, sans script ou ressource externe ; les règles mobile existantes sont préservées.
+
 ## 2026-09-28 — Ordre et proportions de l’accueil
 
 L’accueil suit désormais l’ordre éditorial demandé : explication restaurant avant Explorer, puis introduction Guide avant ses cartes. Le hero, le bloc transparence et le CTA sont compactés, tandis que les icônes Explorer sont alignées en tête de titre. Tests PHP ciblés, Playwright desktop/mobile, contrôle navigateur et gate complète préproduction sont validés.
