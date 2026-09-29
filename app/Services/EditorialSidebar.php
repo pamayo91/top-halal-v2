@@ -12,6 +12,8 @@ class EditorialSidebar
 {
     public const TYPES = ['toc', 'search', 'restaurants', 'articles', 'correction', 'near_me', 'featured', 'explore', 'share', 'contact'];
 
+    public function __construct(private readonly EditorialContentRenderer $contentRenderer) {}
+
     /** @return array{enabled: bool, blocks: array<int, array<string, mixed>>, html: string, toc: array<int, array<string, mixed>>} */
     public function for(Article|Page $content): array
     {
@@ -19,7 +21,8 @@ class EditorialSidebar
         $enabled = $content->editorial_sidebar_enabled;
         $enabled = $enabled === null ? $content instanceof Article : (bool) $enabled;
         $blocks = $this->merge($this->global($kind), (array) ($content->editorial_sidebar_overrides ?? []));
-        [$html, $toc] = $this->headings((string) $content->content_html);
+        $rendered = $this->contentRenderer->render((string) $content->content_html);
+        [$html, $toc] = $this->headings($rendered['html']);
 
         return compact('enabled', 'blocks', 'html', 'toc');
     }

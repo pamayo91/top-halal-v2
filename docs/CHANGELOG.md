@@ -2,6 +2,8 @@
 
 ## 2026-09-29
 
+- Articles : ajout du shortcode SSR `[restaurants_table ids="1,2,3"]`, résolu par le pipeline éditorial existant avec IDs positifs dédupliqués et ordonnés, données restaurant courantes, exclusion des fiches non publiées/supprimées et rendu accessible desktop/mobile sans JavaScript.
+
 - Horaires publics : les plages d’une journée sont désormais affichées dans l’ordre de leurs créneaux enregistrés, même si leur insertion ou leur retour SQL est inversé.
 
 - Horaires restaurant : les créneaux qui ferment après minuit, dont `11:30–00:00`, et les chevauchements sont acceptés dans les parcours public, déposant et administrateur ; seules deux heures identiques restent refusées.

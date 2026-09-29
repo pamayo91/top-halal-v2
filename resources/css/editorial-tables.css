@@ -50,3 +50,68 @@
         -webkit-overflow-scrolling: touch;
     }
 }
+
+.editorial-restaurants-table {
+    margin: 1.5rem 0;
+}
+
+.editorial-restaurants-table table {
+    width: 100%;
+    margin: 0;
+}
+
+.editorial-restaurants-table tbody th {
+    font-weight: 700;
+}
+
+.editorial-restaurants-table-mobile {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    .prose .editorial-restaurants-table table {
+        display: none;
+    }
+
+    .editorial-restaurants-table-mobile {
+        display: grid;
+        gap: .75rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .editorial-restaurants-table-mobile li {
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .editorial-restaurants-table-mobile > li > a {
+        display: inline-block;
+        font-weight: 700;
+    }
+
+    .editorial-restaurants-table-mobile dl {
+        display: grid;
+        gap: .45rem;
+        margin: .75rem 0 0;
+    }
+
+    .editorial-restaurants-table-mobile dl > div {
+        display: grid;
+        grid-template-columns: 6.5rem minmax(0, 1fr);
+        gap: .75rem;
+    }
+
+    .editorial-restaurants-table-mobile dt {
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+    .editorial-restaurants-table-mobile dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+}

@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Tableau restaurants dynamique dans les articles
+
+Le pipeline SSR éditorial existant résout désormais `[restaurants_table ids="1,2,3"]` sans second moteur de parsing. Les IDs V2 positifs sont dédupliqués en conservant l’ordre, les lignes correspondent seulement aux restaurants publiés non supprimés, et chaque rendu lit les données courantes (nom, ville, adresse structurée et URL interne). Les IDs invalides, inconnus ou non publics disparaissent sans remplacement; un résultat vide ne rend rien. Le desktop utilise un tableau accessible à quatre colonnes et le mobile des cartes compactes sans scroll horizontal.
+
 ## 2026-09-29 — Ordre public des plages horaires
 
 Les plages d’un même jour sont désormais chargées et rendues selon leur numéro de créneau (`slot`), indépendamment de l’ordre de retour de MariaDB. Une régression couvre l’insertion inversée de `13:30–02:00` puis `11:30–12:30` et garantit l’affichage public dans l’ordre attendu.
