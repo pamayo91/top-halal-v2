@@ -35,6 +35,12 @@ test('homepage keeps its ordered SSR content and search', async ({ page }, testI
       const bounds = icon.getBoundingClientRect(); return { width: bounds.width, height: bounds.height };
     }));
     expect(iconSizes.every(icon => icon.width <= 20 && icon.height <= 20)).toBeTruthy();
+    expect(await page.locator('.home-explore-panel .link-list a').evaluateAll(links => links.every(link => getComputedStyle(link).borderBottomWidth === '0px'))).toBeTruthy();
+    const [transparency, cta] = await Promise.all([
+      page.locator('.home-transparency-banner').evaluate(element => element.getBoundingClientRect().height),
+      page.locator('.home-submission-cta').evaluate(element => element.getBoundingClientRect().height),
+    ]);
+    expect(cta).toBeGreaterThanOrEqual(transparency * .7);
   }
   expect(await page.locator('[data-home-section]').evaluateAll(sections => sections.map(section => section.getAttribute('data-home-section')))).toEqual(['hero', 'restaurants', 'restaurant-editorial', 'explore', 'editorial', 'guide-intro', 'guide-cards', 'why', 'transparency', 'cta']);
   await expect(page.locator('.home-explore-panel')).toHaveCount(2);

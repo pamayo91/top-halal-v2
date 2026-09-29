@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-29 — Finition mobile Explorer et CTA
+
+Les listes Explorer mobile ne portent plus de séparateur visuel ; les liens conservent seulement un espacement régulier. Le CTA final mobile reçoit un padding et des respirations internes légèrement augmentés, sans changer sa structure éditable ni le desktop.
+
 ## 2026-09-29 — Adaptation mobile de l’accueil
 
 L’accueil mobile dispose maintenant de règles propres : rails CSS horizontaux pour les restaurants et le Guide, panneaux Explorer empilés et compacts, bande éditoriale en une colonne, grille de confiance 2 × 2 et bandeaux information/CTA resserrés. Toutes les icônes de l’accueil reçoivent des dimensions explicites ; aucun SVG ne peut occuper une largeur intrinsèque disproportionnée.

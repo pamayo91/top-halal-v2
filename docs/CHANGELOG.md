@@ -2,6 +2,7 @@
 
 ## 2026-09-29
 
+- Accueil mobile : retrait des séparateurs des listes Explorer et CTA final légèrement agrandi pour une lecture plus confortable.
 - Accueil : adaptation mobile dédiée, avec rails tactiles CSS sans JavaScript, icônes bornées et sections compactes sans débordement global.
 - Accueil : resserrement ciblé des espacements desktop et retrait des illustrations provisoires des trois emplacements média en attente d’assets validés.
 - Accueil : finalisation de la direction desktop avec panneaux Explorer, cartes de confiance pastel et bandeaux information/CTA compacts, sans modifier les routes, données ou comportements.
