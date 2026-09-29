@@ -11,7 +11,7 @@
 
 .prose th,
 .prose td {
-    padding: .7rem .85rem;
+    padding: 18px .85rem;
     border-right: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     text-align: left;

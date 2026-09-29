@@ -4,7 +4,7 @@
 Store clean HTML/content structure, title/slug/excerpt/status/author/media/SEO metadata/publication dates and source type (`manual`, `ai`, `imported`).
 Approved public comments are displayed from newest to oldest.
 
-Les tableaux HTML présents dans le contenu public des Articles et Pages sont ciblés uniquement sous `.prose` : bordures fines séparées, cellules espacées, séparateurs internes et deux coins supérieurs arrondis via les tokens existants. Sur mobile, les tableaux larges défilent horizontalement dans leur propre conteneur sans élargir la page.
+Les tableaux HTML présents dans le contenu public des Articles et Pages sont ciblés uniquement sous `.prose` : bordures fines séparées, cellules espacées (18 px verticalement), séparateurs internes, en-têtes gras au fond `--cream` discret et deux coins supérieurs arrondis via les tokens existants. Le contenu des cellules est aligné en haut. Sur mobile, les tableaux larges défilent horizontalement dans leur propre conteneur sans élargir la page.
 
 Chaque Article et Page possède le booléen `comments_enabled`, activé par défaut. Lorsqu’il est fermé, les commentaires publiés restent rendus, mais tous les CTA et formulaires de nouvelle contribution (y compris les réponses) disparaissent ; le serveur refuse aussi toute soumission directe ou contribution différée. Si aucun commentaire publié n’est rendu, le bloc commentaires entier est absent.
 
