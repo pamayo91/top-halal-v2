@@ -6,7 +6,7 @@
 - Styled public editorial HTML tables only, with collapsed token-based borders, padded cells, distinct headers and contained mobile horizontal scrolling.
 - Refined editorial tables with rounded upper corners while retaining light internal separators, and hide the entire closed comments block when it has no published thread to render.
 - Adjusted editorial table cell vertical padding to 18 px while retaining the existing token-based header tint, bold header text, top alignment and contained mobile scrolling.
-- Increased the visible-but-subtle editorial table header contrast with a pale `--green` token mix.
+- Increased the visible-but-subtle editorial table header contrast with a 14% pale `--green` token mix.
 
 ## 2026-09-29
 
