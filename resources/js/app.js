@@ -226,7 +226,7 @@ if (submission) {
     };
 
     const revealFirstError = section => {
-        const field = section.querySelector('[aria-invalid="true"], :invalid');
+        const field = section.querySelector('input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"], input:invalid, select:invalid, textarea:invalid');
         if (!field) return;
         field.focus({ preventScroll: true });
         field.scrollIntoView({ behavior: 'smooth', block: 'center' });
