@@ -14,7 +14,14 @@ document.querySelectorAll('[data-quick-restaurants-map]').forEach((container) =>
 
     const bounds = [];
     points.forEach((point) => {
-        const marker = L.marker([point.latitude, point.longitude]).addTo(map);
+        const marker = L.marker([point.latitude, point.longitude], {
+            icon: L.divIcon({
+                className: 'quick-map-marker',
+                html: '<span aria-hidden="true"></span>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+            }),
+        }).addTo(map);
         marker.bindPopup(`<a href="${point.url}">${escapeHtml(point.name)}</a>${point.city ? `<br><span>${escapeHtml(point.city)}</span>` : ''}`);
         bounds.push([point.latitude, point.longitude]);
     });
