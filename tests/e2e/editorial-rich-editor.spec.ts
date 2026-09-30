@@ -128,4 +128,20 @@ test.describe('Editorial rich editor', () => {
     await page.goto('/admin/pages/create');
     await expect(page.getByRole('button', { name: 'Code source', exact: true })).toBeVisible();
   });
+
+  test('shows existing V2 editorial images in the Quick halal page editor', async ({ page }) => {
+    await page.goto('/admin');
+    await page.locator('input[type="email"]').fill(email!);
+    await page.locator('input[type="password"]').fill(password!);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/admin$/);
+
+    await page.goto('/admin/pages/11/edit');
+    const image = page.locator('.editorial-rich-editor .tiptap img').first();
+
+    await expect(image).toBeVisible();
+    await expect(image).toHaveAttribute('src', /\/media\/\d+\/v\/[a-f0-9]{64}/);
+    await expect(image).toHaveJSProperty('complete', true);
+    expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+  });
 });
