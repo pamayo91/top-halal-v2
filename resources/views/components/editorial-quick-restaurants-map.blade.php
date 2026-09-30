@@ -15,6 +15,6 @@
                 @endforeach
             </ul>
         @endif
-        <a class="editorial-quick-map-all-cities" href="{{ route('restaurants.index') }}">Voir toutes les villes <span aria-hidden="true">→</span></a>
+        <a class="editorial-quick-map-all-cities" href="{{ route('restaurants.index', ['q' => 'Quick']) }}">Voir tous les Quick halal <span aria-hidden="true">→</span></a>
     </div>
 </section>

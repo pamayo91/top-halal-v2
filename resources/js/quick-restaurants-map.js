@@ -1,5 +1,15 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import quickHalalMarkerUrl from '../images/markers/quick-halal-marker.png';
+
+const quickHalalMarker = L.icon({
+    iconUrl: quickHalalMarkerUrl,
+    iconSize: [32, 44],
+    iconAnchor: [16, 44],
+    popupAnchor: [0, -42],
+    className: 'quick-map-marker',
+    alt: '',
+});
 
 document.querySelectorAll('[data-quick-restaurants-map]').forEach((container) => {
     if (container.dataset.initialized) return;
@@ -15,12 +25,7 @@ document.querySelectorAll('[data-quick-restaurants-map]').forEach((container) =>
     const bounds = [];
     points.forEach((point) => {
         const marker = L.marker([point.latitude, point.longitude], {
-            icon: L.divIcon({
-                className: 'quick-map-marker',
-                html: '<span aria-hidden="true"></span>',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10],
-            }),
+            icon: quickHalalMarker,
         }).addTo(map);
         marker.bindPopup(`<a href="${point.url}">${escapeHtml(point.name)}</a>${point.city ? `<br><span>${escapeHtml(point.city)}</span>` : ''}`);
         bounds.push([point.latitude, point.longitude]);

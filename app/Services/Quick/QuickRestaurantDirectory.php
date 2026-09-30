@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class QuickRestaurantDirectory
 {
+    private const SEARCH_QUERY = 'Quick';
+
     public function __construct(private readonly CityPageResolver $cities) {}
 
     /** @return Builder<Restaurant> */
@@ -50,7 +52,10 @@ class QuickRestaurantDirectory
                 $cities[$code] ??= [
                     'name' => $city->city_name,
                     'count' => 0,
-                    'url' => route('cities.show', $city->slug),
+                    'url' => route('restaurants.index', [
+                        'q' => self::SEARCH_QUERY,
+                        'city_code' => $city->city_code,
+                    ]),
                 ];
                 $cities[$code]['count']++;
             }

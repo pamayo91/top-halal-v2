@@ -39,6 +39,9 @@ class EditorialQuickRestaurantsMapTest extends TestCase
             ['name' => 'Lille', 'count' => 1],
         ], collect($data['cities'])->map(fn (array $city) => ['name' => $city['name'], 'count' => $city['count']])->all());
         $this->assertCount(6, $data['points']);
+        $this->assertSame(route('restaurants.index', ['q' => 'Quick', 'city_code' => '69123']), $data['cities'][0]['url']);
+        $this->assertSame(route('restaurants.index', ['q' => 'Quick', 'city_code' => '13055']), $data['cities'][1]['url']);
+        $this->assertSame(route('restaurants.index', ['q' => 'Quick', 'city_code' => '75056']), $data['cities'][2]['url']);
         $this->assertNotContains('Quick dans le nom seulement', collect($data['points'])->pluck('name')->all());
         $this->assertNotContains('En attente', collect($data['points'])->pluck('name')->all());
         $this->assertNotContains('Supprimé', collect($data['points'])->pluck('name')->all());
@@ -67,8 +70,10 @@ class EditorialQuickRestaurantsMapTest extends TestCase
             ->assertSee('Lyon')
             ->assertSee('1 restaurant')
             ->assertSee('Lille')
-            ->assertSee('Voir toutes les villes')
-            ->assertSee(route('cities.show', 'lyon'), false)
+            ->assertSee('Voir tous les Quick halal')
+            ->assertSee('q=Quick&amp;city_code=69123', false)
+            ->assertSee(route('restaurants.index', ['q' => 'Quick']), false)
+            ->assertDontSee(route('cities.show', 'lyon'), false)
             ->assertDontSee('[quick_restaurants_map]', false);
     }
 

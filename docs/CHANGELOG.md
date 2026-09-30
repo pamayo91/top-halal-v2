@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-30
+
+- Carte Quick : remplacement du marqueur provisoire par le PNG Quick Halal local transparent et optimisé, compilé par Vite avec ancrage sur la pointe. Les liens des principales villes et le CTA utilisent désormais l’annuaire public existant filtré sur `q=Quick` (et `city_code` pour une ville), qui reste `noindex,follow`; aucune landing SEO ni donnée métier n’est créée.
+
 ## 2026-09-29
 
 - Articles : ajout du shortcode SSR `[restaurants_table ids="1,2,3"]`, résolu par le pipeline éditorial existant avec IDs positifs dédupliqués et ordonnés, données restaurant courantes, exclusion des fiches non publiées/supprimées et rendu accessible desktop/mobile sans JavaScript.
