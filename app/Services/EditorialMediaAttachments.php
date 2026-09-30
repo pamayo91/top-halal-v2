@@ -44,7 +44,7 @@ class EditorialMediaAttachments
         }
     }
 
-    public function render(string $html): string
+    public function forEditor(string $html): string
     {
         return preg_replace_callback('/<img\b([^>]*)\bdata-id=(["\'])(\d+)\2([^>]*)>/i', function (array $match): string {
             $url = $this->url($match[3]);
@@ -56,7 +56,12 @@ class EditorialMediaAttachments
             $attributes = trim($match[1].$match[4]);
             $attributes = preg_replace('/\bsrc=(["\']).*?\1\s*/i', '', $attributes) ?? $attributes;
 
-            return '<img src="'.e($url).'"'.($attributes === '' ? '' : ' '.$attributes).'>';
+            return '<img src="'.e($url).'" data-id="'.$match[3].'"'.($attributes === '' ? '' : ' '.$attributes).'>';
         }, $html) ?? $html;
+    }
+
+    public function render(string $html): string
+    {
+        return preg_replace('/\sdata-id=(["\'])\d+\1/i', '', $this->forEditor($html)) ?? $html;
     }
 }
