@@ -39,9 +39,9 @@ class EditorialQuickRestaurantsMapTest extends TestCase
             ['name' => 'Lille', 'count' => 1],
         ], collect($data['cities'])->map(fn (array $city) => ['name' => $city['name'], 'count' => $city['count']])->all());
         $this->assertCount(6, $data['points']);
-        $this->assertDoesNotContain('Quick dans le nom seulement', collect($data['points'])->pluck('name')->all());
-        $this->assertDoesNotContain('En attente', collect($data['points'])->pluck('name')->all());
-        $this->assertDoesNotContain('Supprimé', collect($data['points'])->pluck('name')->all());
+        $this->assertNotContains('Quick dans le nom seulement', collect($data['points'])->pluck('name')->all());
+        $this->assertNotContains('En attente', collect($data['points'])->pluck('name')->all());
+        $this->assertNotContains('Supprimé', collect($data['points'])->pluck('name')->all());
     }
 
     public function test_the_editorial_token_renders_an_accessible_server_rendered_map_and_city_panel(): void
