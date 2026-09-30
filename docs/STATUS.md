@@ -2,7 +2,7 @@
 
 ## 2026-09-30 — Images ajoutées dans l’éditeur éditorial
 
-L’image ajoutée à la Page Quick halal utilisait le stockage public générique de Filament, dont l’URL répondait 403 en préproduction. Les Articles et Pages envoient désormais les JPEG/PNG/WebP (10 Mo) vers le pipeline média V2 : URL versionnée par checksum, original contrôlé et variantes locales. Chaque média inséré est lié à `content_media` lors de la sauvegarde. L’image déjà cassée n’est pas remplacée automatiquement, faute de source V2 valide ; elle peut être supprimée puis ajoutée à nouveau depuis l’éditeur après déploiement.
+L’image ajoutée à la Page Quick halal utilisait le stockage public générique de Filament, dont l’URL répondait 403 en préproduction. Les Articles et Pages envoient désormais les JPEG/PNG/WebP (10 Mo) vers le pipeline média V2 : URL versionnée par checksum, original contrôlé et variantes locales. Le rendu SSR convertit les `data-id` générés par RichEditor en URL V2 publique et chaque média inséré est lié à `content_media` lors de la sauvegarde.
 
 ## 2026-09-30 — FAQ éditoriale SSR réutilisable et rythme des H2
 

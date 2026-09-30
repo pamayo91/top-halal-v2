@@ -17,6 +17,7 @@ class EditorialContentRenderer
     /** @return array{html: string, quick_map: bool, faqs: list<array{question: string, answer: string}>} */
     public function render(string $html): array
     {
+        $html = app(EditorialMediaAttachments::class)->render($html);
         $tables = [];
         $quickMaps = 0;
         $faqs = [];
