@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-30 — Carte dynamique Quick dans la page éditoriale
+
+Le moteur SSR éditorial reconnaît désormais `[quick_restaurants_map]`. Il réutilise Leaflet, les tuiles et les contrôles de zoom existants, et ne charge son module que sur les contenus qui portent ce token. Les 198 Quick V2 sont sélectionnés par leur namespace persistant issu de la synchronisation, jamais par une recherche sur le nom ; seuls les publiés non supprimés apparaissent. La liste « Principales villes » est SSR, limitée à cinq entrées, et agrège les communes via le resolver INSEE existant (arrondissements de Paris/Lyon/Marseille inclus). Les restaurants sans GPS restent comptés sans casser la carte ; sans Quick public, le bloc disparaît.
+
 ## 2026-09-29 — Tableau restaurants dynamique dans les articles
 
 Le pipeline SSR éditorial existant résout désormais `[restaurants_table ids="1,2,3"]` sans second moteur de parsing. Les IDs V2 positifs sont dédupliqués en conservant l’ordre, les lignes correspondent seulement aux restaurants publiés non supprimés, et chaque rendu lit les données courantes (nom, ville, adresse structurée et URL interne). Les IDs invalides, inconnus ou non publics disparaissent sans remplacement; un résultat vide ne rend rien. Le desktop utilise un tableau accessible à quatre colonnes et le mobile des cartes compactes sans scroll horizontal.

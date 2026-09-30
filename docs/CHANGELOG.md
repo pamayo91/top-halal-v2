@@ -504,6 +504,8 @@
 
 ## Unreleased
 
+- Added the reusable SSR Quick map/editorial-city panel, backed exclusively by the persisted V2 Quick namespace and canonical INSEE city resolution. Leaflet is loaded only on token-bearing content; the public city list remains available without JavaScript.
+
 - Corrected the restaurant-directory filter visibility regression: extras are now genuinely hidden in the first SSR paint, toggle visibly on desktop/mobile, and a selected item after position eight renders expanded immediately.
 
 - Review e-mail confirmation now returns visitors to the relevant restaurant `#avis` anchor, with an accessible pending-verification or post-confirmation status and anchor-safe scroll positioning. The review-specific confirmation page uses precise e-mail/moderation wording and a server-derived restaurant CTA; consumed and unavailable links are handled without creating a duplicate or misleadingly implying a new confirmation.
