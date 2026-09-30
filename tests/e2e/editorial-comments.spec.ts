@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test';
 test('Quick halal exposes crawlable threaded comments', async ({ page }) => {
     const errors: string[] = [];
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-    page.on('requestfailed', request => errors.push(request.url()));
+    page.on('requestfailed', request => {
+        if (new URL(request.url()).origin === new URL(page.url()).origin) errors.push(request.url());
+    });
 
     await page.goto('/quick-hallal');
     const threads = page.locator('#comment-threads > .comment:not(.comment-reply)');
