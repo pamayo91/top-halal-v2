@@ -9,7 +9,9 @@ test('Quick map is usable', async ({ page }) => {
   await page.goto('/quick-hallal');
   const block = page.locator('.editorial-quick-map');
   await expect(block).toBeVisible();
-  await expect(block.locator('[data-quick-restaurants-map]')).toBeVisible();
+  const map = block.locator('[data-quick-restaurants-map]');
+  await expect(map).toHaveClass(/leaflet-container/);
+  await expect(map.locator('.leaflet-marker-icon').first()).toBeVisible();
   await expect(block.getByRole('heading', { name: 'Principales villes' })).toBeVisible();
   await expect(block.getByRole('link', { name: /Voir toutes les villes/ })).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
