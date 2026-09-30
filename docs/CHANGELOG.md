@@ -1,5 +1,7 @@
 # Changelog
 
+- Éditorial : ajout du shortcode générique `[faq]` / `[question title="…"]` pour un accordéon SSR natif, accessible et compact, avec JSON-LD `FAQPage` généré depuis les mêmes questions/réponses. Les H2 du seul flux `.prose` Articles/Pages disposent désormais d’une respiration verticale renforcée et responsive.
+
 ## 2026-09-30
 
 - Carte Quick : remplacement du marqueur provisoire par le PNG Quick Halal local transparent et optimisé, compilé par Vite avec ancrage sur la pointe. Les liens des principales villes et le CTA utilisent désormais l’annuaire public existant filtré sur `q=Quick` (et `city_code` pour une ville), qui reste `noindex,follow`; aucune landing SEO ni donnée métier n’est créée.

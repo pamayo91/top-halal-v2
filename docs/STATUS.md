@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-30 — FAQ éditoriale SSR réutilisable et rythme des H2
+
+Le contenu éditorial commun Articles/Pages distingue désormais les H2 principaux par un espacement vertical ciblé, sans affecter sidebar, cartes, formulaires ni composants. Le token `[faq]` rend une FAQ SSR compacte avec `<details>/<summary>`, support clavier et sans JavaScript ; les réponses restent le contenu éditorial source, passent par le sanitizer et alimentent le seul `FAQPage` JSON-LD. La Page Quick halal emploie ce mécanisme avec ses sept couples question/réponse existants.
+
 ## 2026-09-30 — Carte dynamique Quick dans la page éditoriale
 
 Le moteur SSR éditorial reconnaît désormais `[quick_restaurants_map]`. Il réutilise Leaflet, les tuiles et les contrôles de zoom existants, et ne charge son module que sur les contenus qui portent ce token. Les 198 Quick V2 sont sélectionnés par leur namespace persistant issu de la synchronisation, jamais par une recherche sur le nom ; seuls les publiés non supprimés apparaissent. Le marqueur vert provisoire est remplacé par l’asset Quick Halal local, transparent et optimisé, chargé via Vite avec une ancre sur sa pointe. La liste « Principales villes » est SSR, limitée à cinq entrées, agrège les communes via le resolver INSEE existant (arrondissements de Paris/Lyon/Marseille inclus) et mène désormais à l’annuaire existant déjà filtré `q=Quick` + `city_code`; le CTA liste tous les Quick. Les restaurants sans GPS restent comptés sans casser la carte ; sans Quick public, le bloc disparaît.

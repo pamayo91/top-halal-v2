@@ -14,7 +14,7 @@ class EditorialSidebar
 
     public function __construct(private readonly EditorialContentRenderer $contentRenderer) {}
 
-    /** @return array{enabled: bool, blocks: array<int, array<string, mixed>>, html: string, toc: array<int, array<string, mixed>>, quick_map: bool} */
+    /** @return array{enabled: bool, blocks: array<int, array<string, mixed>>, html: string, toc: array<int, array<string, mixed>>, quick_map: bool, faqs: list<array{question: string, answer: string}>} */
     public function for(Article|Page $content): array
     {
         $kind = $content instanceof Article ? 'articles' : 'pages';
@@ -24,8 +24,9 @@ class EditorialSidebar
         $rendered = $this->contentRenderer->render((string) $content->content_html);
         [$html, $toc] = $this->headings($rendered['html']);
         $quickMap = $rendered['quick_map'];
+        $faqs = $rendered['faqs'];
 
-        return compact('enabled', 'blocks', 'html', 'toc', 'quickMap');
+        return compact('enabled', 'blocks', 'html', 'toc', 'quickMap', 'faqs');
     }
 
     /** @return array<int, array<string, mixed>> */

@@ -14,11 +14,13 @@ use App\Services\Quick\QuickRestaurantDirectory;
  */
 class EditorialContentRenderer
 {
-    /** @return array{html: string, quick_map: bool} */
+    /** @return array{html: string, quick_map: bool, faqs: list<array{question: string, answer: string}>} */
     public function render(string $html): array
     {
         $tables = [];
         $quickMaps = 0;
+        $faqs = [];
+        $faqBlocks = [];
         $html = preg_replace_callback(
             '/(?:<p>\s*)?\[restaurants_table\b(?=[^\]]*\])([^\]]*)\](?:\s*<\/p>)?/iu',
             function (array $match) use (&$tables): string {
@@ -41,7 +43,24 @@ class EditorialContentRenderer
         ) ?? $html;
         $html = preg_replace('/\[quick_restaurants_map[^\]<\r\n]*(?:\]|(?=<)|$)/iu', '', $html) ?? $html;
 
-        if ($tables === [] && $quickMaps === 0) return ['html' => $html, 'quick_map' => false];
+        $html = preg_replace_callback(
+            '/(?:<p>\s*)?\[faq\](.*?)\[\/faq\](?:\s*<\/p>)?/isu',
+            function (array $match) use (&$faqs, &$faqBlocks): string {
+                $questions = $this->faqQuestions($match[1]);
+                if ($questions === []) return '';
+
+                $faqs = [...$faqs, ...$questions];
+                $faqBlocks[] = $questions;
+
+                return '<!-- editorial-faq-'.(count($faqBlocks) - 1).' -->';
+            },
+            $html,
+        ) ?? $html;
+        // Editorial syntax is never shown when an author leaves a FAQ incomplete.
+        $html = preg_replace('/\[\/?faq\b[^\]<\r\n]*(?:\]|(?=<)|$)/iu', '', $html) ?? $html;
+        $html = preg_replace('/\[\/?question\b[^\]<\r\n]*(?:\]|(?=<)|$)/iu', '', $html) ?? $html;
+
+        if ($tables === [] && $quickMaps === 0 && $faqs === []) return ['html' => $html, 'quick_map' => false, 'faqs' => []];
 
         $restaurants = collect();
         if ($tables !== []) {
@@ -71,7 +90,34 @@ class EditorialContentRenderer
             }
         }
 
-        return ['html' => $html, 'quick_map' => $quickMaps > 0 && $map !== null];
+        foreach ($faqBlocks as $index => $questions) {
+            $html = str_replace(
+                '<!-- editorial-faq-'.$index.' -->',
+                view('components.editorial-faq', compact('questions'))->render(),
+                $html,
+            );
+        }
+
+        return ['html' => $html, 'quick_map' => $quickMaps > 0 && $map !== null, 'faqs' => $faqs];
+    }
+
+    /** @return list<array{question: string, answer: string}> */
+    private function faqQuestions(string $content): array
+    {
+        preg_match_all('/\[question\b([^\]]*)\](.*?)\[\/question\]/isu', $content, $matches, PREG_SET_ORDER);
+
+        $questions = [];
+        foreach ($matches as $match) {
+            $attributes = html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if (! preg_match('/\btitle\s*=\s*(["\'])(.*?)\1/isu', $attributes, $title)) continue;
+
+            $question = trim($title[2]);
+            $answer = app(ContentSanitizer::class)->sanitize(trim($match[2]))['html'];
+            if ($question === '' || $answer === '') continue;
+            $questions[] = ['question' => $question, 'answer' => $answer];
+        }
+
+        return $questions;
     }
 
     /** @return list<int> */
