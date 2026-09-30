@@ -26,6 +26,16 @@ class EditorialMediaAttachmentsTest extends TestCase
         $this->assertNull(app(EditorialMediaAttachments::class)->url($asset->id));
     }
 
+    public function test_editorial_renderer_turns_a_valid_editor_image_id_into_a_v2_url(): void
+    {
+        $asset = $this->asset('d');
+
+        $html = app(EditorialMediaAttachments::class)->render('<p><img data-id="'.$asset->id.'" alt="Photo de test"></p>');
+
+        $this->assertSame('<p><img src="'.$asset->deliveryUrl().'" alt="Photo de test"></p>', $html);
+        $this->assertSame('', app(EditorialMediaAttachments::class)->render('<img data-id="999999">'));
+    }
+
     public function test_saving_articles_and_pages_links_their_v2_inline_images(): void
     {
         $articleAsset = $this->asset('b');
@@ -38,7 +48,7 @@ class EditorialMediaAttachmentsTest extends TestCase
             'slug' => 'article-image',
             'legacy_url' => '/article-image',
             'status' => 'draft',
-            'content_html' => '<p><img src="'.$articleAsset->deliveryUrl().'"></p>',
+            'content_html' => '<p><img data-id="'.$articleAsset->id.'"></p>',
         ]);
         $page = Page::create([
             'legacy_wp_id' => 92,
@@ -47,7 +57,7 @@ class EditorialMediaAttachmentsTest extends TestCase
             'slug' => 'page-image',
             'legacy_url' => '/page-image',
             'status' => 'draft',
-            'content_html' => '<p><img src="'.$pageAsset->deliveryUrl(480).'"></p>',
+            'content_html' => '<p><img data-id="'.$pageAsset->id.'"></p>',
         ]);
 
         $this->assertDatabaseHas('content_media', ['content_type' => 'post', 'content_id' => $article->id, 'media_asset_id' => $articleAsset->id, 'role' => 'inline']);

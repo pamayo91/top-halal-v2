@@ -31,7 +31,7 @@ class EditorialMediaAttachments
 
     public function sync(Model $content, string $type): void
     {
-        preg_match_all('#/media/(\d+)/v/[a-f0-9]{64}(?:/\d+)?#', (string) $content->content_html, $matches);
+        preg_match_all('#(?:/media/|\bdata-id=["\'])(\d+)(?:/v/[a-f0-9]{64}(?:/\d+)?)?#', (string) $content->content_html, $matches);
         $assetIds = collect($matches[1] ?? [])->map(static fn (string $id): int => (int) $id)->filter()->unique();
 
         foreach (MediaAsset::query()->whereIn('id', $assetIds)->whereIn('mime', MediaAsset::RESTAURANT_IMAGE_MIMES)->pluck('id') as $assetId) {
@@ -42,5 +42,21 @@ class EditorialMediaAttachments
                 'role' => 'inline',
             ]);
         }
+    }
+
+    public function render(string $html): string
+    {
+        return preg_replace_callback('/<img\b([^>]*)\bdata-id=(["\'])(\d+)\2([^>]*)>/i', function (array $match): string {
+            $url = $this->url($match[3]);
+
+            if ($url === null) {
+                return '';
+            }
+
+            $attributes = trim($match[1].$match[4]);
+            $attributes = preg_replace('/\bsrc=(["\']).*?\1\s*/i', '', $attributes) ?? $attributes;
+
+            return '<img src="'.e($url).'"'.($attributes === '' ? '' : ' '.$attributes).'>';
+        }, $html) ?? $html;
     }
 }
