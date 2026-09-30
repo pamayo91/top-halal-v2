@@ -30,8 +30,10 @@ class EditorialMediaAttachmentsTest extends TestCase
     {
         $asset = $this->asset('d');
 
-        $html = app(EditorialMediaAttachments::class)->render('<p><img data-id="'.$asset->id.'" alt="Photo de test"></p>');
+        $editorHtml = app(EditorialMediaAttachments::class)->forEditor('<p><img data-id="'.$asset->id.'" alt="Photo de test"></p>');
+        $html = app(EditorialMediaAttachments::class)->render($editorHtml);
 
+        $this->assertSame('<p><img src="'.$asset->deliveryUrl().'" data-id="'.$asset->id.'" alt="Photo de test"></p>', $editorHtml);
         $this->assertSame('<p><img src="'.$asset->deliveryUrl().'" alt="Photo de test"></p>', $html);
         $this->assertSame('', app(EditorialMediaAttachments::class)->render('<img data-id="999999">'));
     }
