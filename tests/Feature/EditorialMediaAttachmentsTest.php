@@ -56,6 +56,10 @@ class EditorialMediaAttachmentsTest extends TestCase
         $article->save();
 
         $this->assertSame(1, ContentMedia::query()->where('content_type', 'post')->where('content_id', $article->id)->where('media_asset_id', $articleAsset->id)->count());
+
+        // The historical down migration restores a non-null legacy ID; keep
+        // this isolated test database empty before DatabaseMigrations rolls it back.
+        ContentMedia::query()->delete();
     }
 
     private function asset(string $checksumCharacter): MediaAsset
