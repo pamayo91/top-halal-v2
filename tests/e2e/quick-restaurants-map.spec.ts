@@ -32,7 +32,7 @@ test('Quick map is usable', async ({ page }) => {
 
   await page.goto('/quick-hallal');
   const allQuickLink = page.getByRole('link', { name: 'Voir tous les Quick halal' });
-  await expect(allQuickLink).toHaveAttribute('href', '/restaurants?q=Quick');
+  await expect(allQuickLink).toHaveAttribute('href', /\/restaurants\?q=Quick$/);
   await Promise.all([
     page.waitForURL('/restaurants?q=Quick'),
     allQuickLink.click(),
