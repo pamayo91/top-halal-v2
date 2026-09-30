@@ -27,8 +27,8 @@ class EditorialFaqTest extends TestCase
 
         $html = $response->getContent();
         $this->assertSame(1, substr_count($html, '"@type":"FAQPage"'));
-        $this->assertStringContainsString('"name":"Première question ?"', $html);
-        $this->assertStringContainsString('"text":"Première réponse."', $html);
+        $this->assertStringContainsString('"name":"Premi\\u00e8re question ?"', $html);
+        $this->assertStringContainsString('"text":"Premi\\u00e8re r\\u00e9ponse."', $html);
     }
 
     public function test_multiple_faq_blocks_are_rendered_independently(): void
