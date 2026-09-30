@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\EditorialSlugRedirects;
+use App\Services\EditorialMediaAttachments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -16,6 +17,7 @@ class Page extends Model
     {
         static::saving(fn (self $page) => app(EditorialSlugRedirects::class)->assertCanSave($page));
         static::saved(fn (self $page) => app(EditorialSlugRedirects::class)->createForChangedSlug($page));
+        static::saved(fn (self $page) => app(EditorialMediaAttachments::class)->sync($page, 'page'));
     }
 
     protected function casts(): array

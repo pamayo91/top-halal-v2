@@ -6,12 +6,23 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\RichEditor\RichEditorTool;
 use Filament\Support\Icons\Heroicon;
+use App\Services\EditorialMediaAttachments;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class EditorialRichEditor extends RichEditor
 {
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Editorial images must use V2's checksum-backed media delivery, never
+        // Filament's generic public storage URLs (which are not public on V2).
+        $this
+            ->fileAttachmentsAcceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+            ->fileAttachmentsMaxSize(10240)
+            ->saveUploadedFileAttachmentUsing(fn (TemporaryUploadedFile $file): int => app(EditorialMediaAttachments::class)->upload($file)->id)
+            ->getFileAttachmentUrlUsing(fn (mixed $id): ?string => app(EditorialMediaAttachments::class)->url($id))
+            ->preventFileAttachmentPathTampering();
 
         // This replaces only Filament's link trigger; all other editor tools,
         // extensions and stored HTML behaviour remain native.

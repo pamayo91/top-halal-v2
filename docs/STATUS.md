@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-09-30 — Images ajoutées dans l’éditeur éditorial
+
+L’image ajoutée à la Page Quick halal utilisait le stockage public générique de Filament, dont l’URL répondait 403 en préproduction. Les Articles et Pages envoient désormais les JPEG/PNG/WebP (10 Mo) vers le pipeline média V2 : URL versionnée par checksum, original contrôlé et variantes locales. Chaque média inséré est lié à `content_media` lors de la sauvegarde. L’image déjà cassée n’est pas remplacée automatiquement, faute de source V2 valide ; elle peut être supprimée puis ajoutée à nouveau depuis l’éditeur après déploiement.
+
 ## 2026-09-30 — FAQ éditoriale SSR réutilisable et rythme des H2
 
 Le contenu éditorial commun Articles/Pages distingue désormais les H2 principaux par un espacement vertical ciblé, sans affecter sidebar, cartes, formulaires ni composants. Le token `[faq]` rend une FAQ SSR compacte avec `<details>/<summary>`, support clavier et sans JavaScript ; les réponses restent le contenu éditorial source, passent par le sanitizer et alimentent le seul `FAQPage` JSON-LD. La Page Quick halal emploie ce mécanisme avec ses sept couples question/réponse existants.

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\EditorialSlugRedirects;
+use App\Services\EditorialMediaAttachments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -18,6 +19,7 @@ class Article extends Model
     {
         static::saving(fn (self $article) => app(EditorialSlugRedirects::class)->assertCanSave($article));
         static::saved(fn (self $article) => app(EditorialSlugRedirects::class)->createForChangedSlug($article));
+        static::saved(fn (self $article) => app(EditorialMediaAttachments::class)->sync($article, 'post'));
     }
 
     protected function casts(): array
