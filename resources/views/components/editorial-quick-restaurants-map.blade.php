@@ -1,11 +1,3 @@
-@once
-    @push('head')
-        @if (! app()->environment('testing'))
-            @vite('resources/js/quick-restaurants-map.js')
-        @endif
-    @endpush
-@endonce
-
 <section class="editorial-quick-map" aria-labelledby="quick-map-title">
     <div class="editorial-quick-map-canvas" data-quick-restaurants-map
         data-points='@json($points)'

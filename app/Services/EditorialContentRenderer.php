@@ -14,7 +14,7 @@ use App\Services\Quick\QuickRestaurantDirectory;
  */
 class EditorialContentRenderer
 {
-    /** @return array{html: string} */
+    /** @return array{html: string, quick_map: bool} */
     public function render(string $html): array
     {
         $tables = [];
@@ -41,7 +41,7 @@ class EditorialContentRenderer
         ) ?? $html;
         $html = preg_replace('/\[quick_restaurants_map[^\]<\r\n]*(?:\]|(?=<)|$)/iu', '', $html) ?? $html;
 
-        if ($tables === [] && $quickMaps === 0) return compact('html');
+        if ($tables === [] && $quickMaps === 0) return ['html' => $html, 'quick_map' => false];
 
         $restaurants = collect();
         if ($tables !== []) {
@@ -71,7 +71,7 @@ class EditorialContentRenderer
             }
         }
 
-        return compact('html');
+        return ['html' => $html, 'quick_map' => $quickMaps > 0 && $map !== null];
     }
 
     /** @return list<int> */

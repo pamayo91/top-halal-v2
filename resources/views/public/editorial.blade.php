@@ -1,6 +1,6 @@
 @php($featuredAsset = $isArticle ? $content->featuredMedia?->asset : null)
 @php($schema = ['@context' => 'https://schema.org', '@type' => $isArticle ? 'Article' : 'WebPage', 'headline' => $content->title, 'datePublished' => optional($content->legacy_published_at)->toIso8601String(), ...($featuredAsset ? ['image' => $featuredAsset->deliveryUrl()] : [])])
-<x-layouts.app title="{{ $content->seo_title ?: $content->title }} | Top Halal" description="{{ $content->seo_description }}" canonical="{{ route('editorial.show', $content->slug) }}" robots="{{ $content->seo_robots ?: 'index,follow' }}" :admin-edit-url="$adminEditUrl"><x-slot:head><script type="application/ld+json">@json($schema)</script></x-slot:head>
+<x-layouts.app title="{{ $content->seo_title ?: $content->title }} | Top Halal" description="{{ $content->seo_description }}" canonical="{{ route('editorial.show', $content->slug) }}" robots="{{ $content->seo_robots ?: 'index,follow' }}" :admin-edit-url="$adminEditUrl"><x-slot:head><script type="application/ld+json">@json($schema)</script>@if($sidebar['quickMap'] && ! app()->environment('testing')) @vite('resources/js/quick-restaurants-map.js') @endif</x-slot:head>
 <article class="editorial shell {{ $sidebar['enabled'] ? 'editorial-with-sidebar' : '' }}">
     <div class="editorial-main">
         <nav class="breadcrumbs" aria-label="Fil d’Ariane"><a href="{{ route('home') }}">Accueil</a>@if($isArticle)<span>/</span><a href="{{ route('blog.index') }}">Le guide</a>@endif<span>/</span><span aria-current="page">{{ $content->title }}</span></nav>

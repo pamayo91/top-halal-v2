@@ -14,7 +14,7 @@ class EditorialSidebar
 
     public function __construct(private readonly EditorialContentRenderer $contentRenderer) {}
 
-    /** @return array{enabled: bool, blocks: array<int, array<string, mixed>>, html: string, toc: array<int, array<string, mixed>>} */
+    /** @return array{enabled: bool, blocks: array<int, array<string, mixed>>, html: string, toc: array<int, array<string, mixed>>, quick_map: bool} */
     public function for(Article|Page $content): array
     {
         $kind = $content instanceof Article ? 'articles' : 'pages';
@@ -23,8 +23,9 @@ class EditorialSidebar
         $blocks = $this->merge($this->global($kind), (array) ($content->editorial_sidebar_overrides ?? []));
         $rendered = $this->contentRenderer->render((string) $content->content_html);
         [$html, $toc] = $this->headings($rendered['html']);
+        $quickMap = $rendered['quick_map'];
 
-        return compact('enabled', 'blocks', 'html', 'toc');
+        return compact('enabled', 'blocks', 'html', 'toc', 'quickMap');
     }
 
     /** @return array<int, array<string, mixed>> */
