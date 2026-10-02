@@ -269,9 +269,17 @@
     .site-header .mobile-menu-list .nav-item::after { display: none; }
     .site-header .mobile-menu-list .nav-item.is-active { color: var(--green-dark); }
     .site-header .mobile-menu-list .nav-parent {
+        display: grid;
         grid-column: 1 / -1;
-        justify-content: space-between;
+        grid-template-columns: minmax(0, 1fr) 44px;
+        grid-template-areas: 'label chevron';
+        justify-content: normal;
         justify-self: stretch;
+    }
+
+    .site-header .mobile-menu-list .nav-parent .nav-submenu-chevron {
+        grid-area: chevron;
+        justify-self: center;
     }
 
     .site-header .mobile-menu-list .submenu-toggle {

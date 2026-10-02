@@ -2,7 +2,7 @@
 
 ## 2026-10-02 — Chevron mobile sans séparateur vertical
 
-Le bouton de sous-menu mobile conserve sa zone tactile, son focus et son comportement, mais n’a plus de bordure gauche : les parents liés comme Restaurants et Blog affichent seulement leur libellé et leur chevron. La sentinelle Playwright contrôle les états normal, survol, focus et ouvert à 320, 390 et 430 px.
+Le bouton de sous-menu mobile conserve sa zone tactile, son focus et son comportement, mais n’a plus de bordure gauche : les parents liés comme Restaurants et Blog affichent seulement leur libellé et leur chevron. Les parents sans URL utilisent désormais la même colonne tactile de 44 px afin que leur chevron reste exactement aligné. La sentinelle Playwright contrôle les états normal, survol, focus et ouvert à 320, 390 et 430 px.
 
 ## 2026-10-02 — Indicateur générique des sous-menus
 
