@@ -395,7 +395,7 @@ mobileSubmenuGroups.forEach(group => group.toggles.forEach(toggle => toggle.addE
 const desktopSubmenuGroups = [...document.querySelectorAll('.main-nav .has-submenu')].map(createSubmenuGroup);
 let lastDesktopSubmenuToggle = null;
 desktopSubmenuGroups.forEach(group => {
-    let pointerActivation = false;
+    let lastPointerDownAt = 0;
     group.toggles.forEach(toggle => toggle.addEventListener('click', () => {
         const open = !group.isOpen();
         group.setOpen(open);
@@ -403,12 +403,9 @@ desktopSubmenuGroups.forEach(group => {
     }));
     const owner = group.toggles[0]?.closest('.has-submenu');
     if (owner) {
-        owner.addEventListener('pointerdown', () => {
-            pointerActivation = true;
-            window.setTimeout(() => { pointerActivation = false; }, 0);
-        });
+        owner.addEventListener('pointerdown', () => { lastPointerDownAt = performance.now(); });
         owner.addEventListener('focusin', () => {
-            if (! pointerActivation) group.setOpen(true);
+            if (performance.now() - lastPointerDownAt > 250) group.setOpen(true);
         });
         owner.addEventListener('focusout', () => requestAnimationFrame(() => {
             if (! owner.contains(document.activeElement) && ! owner.matches(':hover')) group.setOpen(false);
