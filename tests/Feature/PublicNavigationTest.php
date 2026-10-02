@@ -54,6 +54,21 @@ class PublicNavigationTest extends TestCase
         MenuItem::create(['menu_id' => $menu->id, 'label' => 'Dangereux', 'link_type' => 'internal_url', 'url' => 'javascript:alert(1)']);
     }
 
+    public function test_a_linked_mobile_parent_keeps_its_destination_and_a_separate_submenu_control(): void
+    {
+        $menu = Menu::where('location', 'header_main')->firstOrFail();
+        MenuItem::where('menu_id', $menu->id)->delete();
+        $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Blog', 'link_type' => 'internal_url', 'url' => '/blog']);
+        MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Actualités', 'link_type' => 'internal_url', 'url' => '/actualites']);
+
+        $this->get('/')->assertOk()
+            ->assertSee('id="mobile-submenu-'.$parent->id.'"', false)
+            ->assertSee('href="/blog"', false)
+            ->assertSee('data-submenu-label="Blog"', false)
+            ->assertSee('aria-label="Ouvrir le sous-menu Blog"', false)
+            ->assertSee('href="/actualites"', false);
+    }
+
     public function test_a_menu_item_cannot_be_nested_below_a_second_level_item(): void
     {
         $menu = Menu::where('location', 'header_main')->firstOrFail();

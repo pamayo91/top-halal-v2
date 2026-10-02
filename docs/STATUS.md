@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-02 — Panneau de navigation mobile compact
+
+La navigation mobile garde les entrées administrables et leurs vrais liens SSR : un parent lié conserve sa destination à gauche, tandis qu’un bouton chevron distinct déplie ses enfants. Le panneau blanc est superposé sous un header sticky, protège le contenu avec un backdrop léger, limite sa hauteur au viewport et défile en interne. Hamburger/X, `aria-expanded`, libellés accessibles, focus, Escape, verrouillage du défilement de fond et fermeture après activation d’un lien sont gérés par un JavaScript local sans dépendance ; le desktop reste inchangé. Les sentinelles couvrent l’ouverture, sous-menu, destinations parent/enfant, fermeture exclusive et absence d’erreurs navigateur.
+
 ## 2026-10-02 — Autocomplete public au-dessus du hero
 
 Le menu partagé Localisation / Spécialité ou restaurant n’est plus découpé par le hero de l’accueil : le clipping est réservé à une couche décorative, tandis que la recherche utilise un contexte d’empilement local au-dessus de la section suivante. Le composant et les flux de recherche restent inchangés ; la sentinelle Playwright vérifie qu’une suggestion située sous la limite du hero reçoit effectivement le clic.

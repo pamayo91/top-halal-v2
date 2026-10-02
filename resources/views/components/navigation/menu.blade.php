@@ -13,7 +13,7 @@
             <span class="nav-item nav-item-static{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}"><span class="nav-label">{{ $item['label'] }}</span></span>
         @endif
         @if($hasChildren)
-            @if($item['url'])<button class="submenu-toggle" type="button" data-submenu-toggle aria-label="Ouvrir le sous-menu {{ $item['label'] }}" aria-expanded="false" aria-controls="{{ $panelId }}"></button>@endif
+            @if($item['url'])<button class="submenu-toggle" type="button" data-submenu-toggle data-submenu-label="{{ $item['label'] }}" aria-label="Ouvrir le sous-menu {{ $item['label'] }}" aria-expanded="false" aria-controls="{{ $panelId }}"><span aria-hidden="true"></span></button>@endif
             <ul id="{{ $panelId }}" class="submenu" hidden>
                 @foreach($item['children'] as $child)
                     <li>@if($child['url'])<a class="{{ $child['is_active'] ? 'is-active' : '' }}" href="{{ $child['url'] }}" @if($child['target_blank']) target="_blank" rel="noopener noreferrer{{ $child['nofollow'] ? ' nofollow' : '' }}" @elseif($child['nofollow']) rel="nofollow" @endif>{{ $child['label'] }}</a>@else<span class="{{ $child['is_active'] ? 'is-active' : '' }}">{{ $child['label'] }}</span>@endif</li>

@@ -94,6 +94,209 @@
 
 .site-header .submenu-toggle { display: inline-flex; align-items: center; justify-content: center; }
 
+/* The compact trigger and layered panel are deliberately mobile-only; desktop keeps its validated menu. */
+@media (max-width: 760px) {
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+    }
+
+    .site-header .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        margin-left: auto;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #fff;
+        color: var(--ink);
+    }
+
+    .site-header .menu-toggle:hover { color: var(--green-dark); }
+
+    .site-header .menu-toggle:focus-visible,
+    .site-header .mobile-nav-backdrop:focus-visible {
+        outline: 3px solid rgb(35 129 81 / 35%);
+        outline-offset: 3px;
+    }
+
+    .site-header .menu-toggle-icon,
+    .site-header .menu-toggle-icon::before,
+    .site-header .menu-toggle-icon::after {
+        display: block;
+        width: 20px;
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+        content: '';
+        transition: transform .14s ease, background-color .14s ease;
+    }
+
+    .site-header .menu-toggle-icon { position: relative; }
+    .site-header .menu-toggle-icon::before,
+    .site-header .menu-toggle-icon::after { position: absolute; left: 0; }
+    .site-header .menu-toggle-icon::before { top: -6px; }
+    .site-header .menu-toggle-icon::after { top: 6px; }
+    .site-header .menu-toggle[aria-expanded='true'] .menu-toggle-icon { background: transparent; }
+    .site-header .menu-toggle[aria-expanded='true'] .menu-toggle-icon::before { transform: translateY(6px) rotate(45deg); }
+    .site-header .menu-toggle[aria-expanded='true'] .menu-toggle-icon::after { transform: translateY(-6px) rotate(-45deg); }
+
+    .site-header .mobile-nav-backdrop {
+        position: fixed;
+        top: 69px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        border: 0;
+        background: rgb(22 35 31 / 18%);
+        cursor: default;
+    }
+
+    .site-header .mobile-nav {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        z-index: 2;
+        display: block;
+        width: 100%;
+        max-width: none;
+        max-height: calc(100dvh - 69px);
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        background: #fff;
+        box-shadow: 0 12px 28px rgb(22 35 31 / 12%);
+    }
+
+    .site-header .mobile-nav[hidden] { display: none; }
+
+    .site-header .mobile-nav-panel {
+        display: grid;
+        gap: .7rem;
+        width: min(1120px, calc(100% - 2rem));
+        padding: .55rem 0 1rem;
+    }
+
+    .site-header .mobile-menu-list {
+        display: grid;
+        gap: 0;
+        width: 100%;
+    }
+
+    .site-header .mobile-menu-list > li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 44px;
+        gap: 0;
+        align-items: center;
+        border-bottom: 1px solid #e5ebe7;
+    }
+
+    .site-header .mobile-menu-list .nav-item {
+        display: flex;
+        grid-column: 1;
+        grid-template-columns: none;
+        align-items: center;
+        width: 100%;
+        min-height: 44px;
+        padding: .5rem 0;
+        color: var(--ink);
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .site-header .mobile-menu-list .nav-item::before,
+    .site-header .mobile-menu-list .nav-item::after { display: none; }
+    .site-header .mobile-menu-list .nav-item.is-active { color: var(--green-dark); }
+    .site-header .mobile-menu-list .nav-parent { justify-self: stretch; }
+
+    .site-header .mobile-menu-list .submenu-toggle {
+        grid-column: 2;
+        width: 44px;
+        min-height: 44px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-left: 1px solid #edf1ee;
+        border-radius: 0;
+        background: transparent;
+        color: var(--green-dark);
+    }
+
+    .site-header .mobile-menu-list .submenu-toggle span {
+        width: 9px;
+        height: 9px;
+        margin-top: -4px;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(45deg);
+        transition: transform .14s ease, margin .14s ease;
+    }
+
+    .site-header .mobile-menu-list .submenu-toggle[aria-expanded='true'] span {
+        margin-top: 4px;
+        transform: rotate(225deg);
+    }
+
+    .site-header .mobile-menu-list .submenu-toggle:focus-visible,
+    .site-header .mobile-menu-list .submenu a:focus-visible {
+        outline: 3px solid rgb(35 129 81 / 30%);
+        outline-offset: -3px;
+    }
+
+    .site-header .mobile-menu-list .submenu {
+        display: grid;
+        grid-column: 1 / -1;
+        gap: 0;
+        min-width: 0;
+        margin: 0 0 .45rem;
+        padding: .2rem .7rem;
+        border: 0;
+        border-radius: 8px;
+        background: #f4faf6;
+        box-shadow: none;
+    }
+
+    .site-header .mobile-menu-list .submenu[hidden] { display: none; }
+    .site-header .mobile-menu-list .submenu li + li { margin-top: 0; }
+
+    .site-header .mobile-menu-list .submenu a,
+    .site-header .mobile-menu-list .submenu span {
+        display: flex;
+        align-items: center;
+        min-height: 40px;
+        padding: .35rem .15rem;
+        color: var(--ink);
+        font-size: .94rem;
+        font-weight: 500;
+        line-height: 1.35;
+        text-decoration: none;
+    }
+
+    .site-header .mobile-menu-list .submenu a:hover { color: var(--green-dark); }
+
+    .site-header .mobile-nav-panel > .button {
+        width: 100%;
+        min-height: 42px;
+        margin: 0;
+        padding-block: .45rem;
+    }
+
+    .site-header .mobile-nav-panel > .mobile-menu-list + .button { margin-top: .35rem; }
+    .site-header .mobile-nav-panel > .button-secondary { border-color: #dbe5de; }
+
+    html.mobile-menu-open,
+    body.mobile-menu-open { overflow: hidden; }
+}
+
 /* Desktop only: a compact, full-width menu panel without a gap below the header. */
 .site-header .nav-menu-list .submenu {
     top: 100%;

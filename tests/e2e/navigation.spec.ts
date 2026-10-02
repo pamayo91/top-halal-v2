@@ -60,6 +60,68 @@ test('mobile navigation opens, closes with Escape, and does not overflow horizon
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });
 
+test('mobile navigation exposes linked submenus through independent chevrons', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile-only submenu interaction.');
+  const errors: string[] = []; const failures: string[] = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('requestfailed', request => failures.push(request.url()));
+
+  await page.goto('/');
+  const menuToggle = page.locator('.menu-toggle');
+  await menuToggle.click();
+  await expect(menuToggle).toHaveAttribute('aria-label', 'Fermer le menu');
+  await expect(page.locator('body')).toHaveClass(/mobile-menu-open/);
+
+  const owner = page.locator('#mobile-nav .has-submenu:has(> a)').first();
+  const parentLink = owner.locator(':scope > a.nav-item');
+  const submenuToggle = owner.locator(':scope > button.submenu-toggle');
+  const submenu = owner.locator(':scope > .submenu');
+  await expect(parentLink).toHaveAttribute('href', /\S+/);
+  await expect(submenuToggle).toHaveAttribute('aria-expanded', 'false');
+  await submenuToggle.focus();
+  await submenuToggle.press('Enter');
+  await expect(submenuToggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(submenu).toBeVisible();
+  await expect(submenu.getByRole('link').first()).toBeVisible();
+
+  const otherOwner = page.locator('#mobile-nav .has-submenu').nth(1);
+  if (await otherOwner.count()) {
+    const otherToggle = otherOwner.locator(':scope > [data-submenu-toggle]').first();
+    await otherToggle.click();
+    await expect(submenu).toBeHidden();
+    await expect(otherOwner.locator(':scope > .submenu')).toBeVisible();
+  }
+
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#mobile-nav')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#mobile-nav')).toBeHidden();
+  await expect(menuToggle).toBeFocused();
+  await expect(page.locator('body')).not.toHaveClass(/mobile-menu-open/);
+  expect(errors).toEqual([]); expect(failures).toEqual([]);
+});
+
+test('mobile submenu parent and child destinations remain independently navigable SSR links', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile-only linked submenu destinations.');
+
+  await page.goto('/');
+  await page.locator('.menu-toggle').click();
+  const owner = page.locator('#mobile-nav .has-submenu:has(> a)').first();
+  const parentLink = owner.locator(':scope > a.nav-item');
+  const parentHref = await parentLink.getAttribute('href');
+  expect(parentHref).toBeTruthy();
+  await Promise.all([page.waitForURL(new RegExp(`${parentHref!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)), parentLink.click()]);
+
+  await page.goto('/');
+  await page.locator('.menu-toggle').click();
+  const childOwner = page.locator('#mobile-nav .has-submenu:has(> a)').first();
+  await childOwner.locator(':scope > button.submenu-toggle').click();
+  const child = childOwner.locator(':scope > .submenu a').first();
+  const childHref = await child.getAttribute('href');
+  expect(childHref).toBeTruthy();
+  await Promise.all([page.waitForURL(new RegExp(`${childHref!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)), child.click()]);
+});
+
 test('navigation back office groups Menus, Header and Footer without browser errors', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop-chromium' || !adminEmail || !adminPassword, 'Dedicated preproduction administrator required.');
   const errors: string[] = []; const failures: string[] = [];
