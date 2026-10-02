@@ -110,6 +110,7 @@ test('mobile submenu chevrons have no vertical divider at compact widths or inte
     await page.locator('.menu-toggle').click();
 
     const toggle = page.locator('#mobile-nav .has-submenu:has(> a) > button.submenu-toggle').first();
+    const noLinkChevron = page.locator('#mobile-nav .has-submenu > button.nav-parent .nav-submenu-chevron').first();
     const borderLeft = async () => toggle.evaluate(element => {
       const style = getComputedStyle(element);
       return { width: style.borderLeftWidth, style: style.borderLeftStyle, color: style.borderLeftColor };
@@ -123,6 +124,14 @@ test('mobile submenu chevrons have no vertical divider at compact widths or inte
     await toggle.press('Enter');
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(await borderLeft()).toMatchObject({ width: '0px', style: 'none' });
+    const chevronCenters = await page.locator('#mobile-nav .has-submenu .nav-submenu-chevron').evaluateAll(elements =>
+      elements.map(element => {
+        const box = element.getBoundingClientRect();
+        return box.left + (box.width / 2);
+      }),
+    );
+    expect(Math.abs(chevronCenters[0] - chevronCenters[2])).toBeLessThan(1);
+    await expect(noLinkChevron).toBeVisible();
   }
 });
 

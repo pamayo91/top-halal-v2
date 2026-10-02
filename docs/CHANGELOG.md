@@ -1,6 +1,6 @@
 # Changelog
 
-- Navigation mobile : suppression du séparateur vertical parasite à gauche des chevrons de sous-menu, sans modifier la zone tactile, le focus ni le comportement des dropdowns.
+- Navigation mobile : suppression du séparateur vertical parasite à gauche des chevrons de sous-menu et alignement des chevrons intégrés dans la même colonne tactile de 44 px, sans modifier le focus ni le comportement des dropdowns.
 
 - Navigation : tout parent ayant des enfants visibles rend désormais un chevron générique, sur desktop et mobile. Les parents sans destination, dont Vie Pratique, intègrent cet indicateur à leur contrôle existant ; les liens parents gardent leur destination et leur déclencheur de sous-menu séparé.
 
