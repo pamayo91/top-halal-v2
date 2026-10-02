@@ -1,5 +1,7 @@
 # Changelog
 
+- Recherche publique : le menu autocomplete partagé peut désormais se superposer aux sections suivant le hero de l’accueil. Le clipping des ornements du hero est conservé dans une couche décorative dédiée ; la recherche reste un overlay visible et cliquable, sans modifier ses requêtes ni ses destinations. Une sentinelle Playwright vérifie un élément de localisation situé sous la limite du hero.
+
 - Éditorial : ajout du shortcode générique `[faq]` / `[question title="…"]` pour un accordéon SSR natif, accessible et compact, avec JSON-LD `FAQPage` généré depuis les mêmes questions/réponses. Les H2 du seul flux `.prose` Articles/Pages disposent désormais d’une respiration verticale renforcée et responsive.
 
 ## 2026-09-30

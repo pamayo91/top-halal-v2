@@ -20,6 +20,38 @@ test('two-field restaurant search works responsively', async ({ page }) => {
     }
   });
 
+test('homepage autocomplete remains clickable above the overlapping restaurant section', async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 760, 'The homepage section overlap is desktop-only.');
+
+  await page.goto('/');
+  const search = page.locator('[data-restaurant-search]').first();
+  const location = search.getByLabel('Localisation');
+  await location.focus();
+
+  const popover = search.locator('[data-cities-list]');
+  const lastCity = popover.locator('[data-city-name]').last();
+  await expect(lastCity).toBeAttached();
+  await popover.evaluate(element => { element.scrollTop = element.scrollHeight; });
+  await expect(lastCity).toBeVisible();
+
+  const evidence = await lastCity.evaluate(element => {
+    const button = element as HTMLElement;
+    const hero = document.querySelector<HTMLElement>('.home-hero');
+    const rectangle = button.getBoundingClientRect();
+    const hit = document.elementFromPoint(rectangle.left + (rectangle.width / 2), rectangle.top + (rectangle.height / 2));
+
+    return {
+      extendsHero: rectangle.bottom > (hero?.getBoundingClientRect().bottom ?? Number.POSITIVE_INFINITY),
+      receivesPointerEvents: hit === button || hit?.closest('[data-city-name]') === button,
+    };
+  });
+
+  expect(evidence.extendsHero).toBe(true);
+  expect(evidence.receivesPointerEvents).toBe(true);
+  await lastCity.click();
+  await expect(location).toHaveValue(await lastCity.getAttribute('data-city-name') ?? '');
+});
+
 test('official accent-insensitive commune selection keeps its INSEE identity and never falls back to Paris', async ({ page }) => {
   await page.goto('/');
   const search = page.locator('[data-restaurant-search]').first();

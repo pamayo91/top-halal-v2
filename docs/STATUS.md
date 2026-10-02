@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-02 — Autocomplete public au-dessus du hero
+
+Le menu partagé Localisation / Spécialité ou restaurant n’est plus découpé par le hero de l’accueil : le clipping est réservé à une couche décorative, tandis que la recherche utilise un contexte d’empilement local au-dessus de la section suivante. Le composant et les flux de recherche restent inchangés ; la sentinelle Playwright vérifie qu’une suggestion située sous la limite du hero reçoit effectivement le clic.
+
 ## 2026-09-30 — Images ajoutées dans l’éditeur éditorial
 
 L’image ajoutée à la Page Quick halal utilisait le stockage public générique de Filament, dont l’URL répondait 403 en préproduction. Les Articles et Pages envoient désormais les JPEG/PNG/WebP (10 Mo) vers le pipeline média V2 : URL versionnée par checksum, original contrôlé et variantes locales. Le BO convertit les `data-id` générés par RichEditor en `src` V2 pour l’aperçu, puis le rendu SSR retire l’identifiant interne et conserve cette URL publique. Chaque média inséré est lié à `content_media` lors de la sauvegarde.
