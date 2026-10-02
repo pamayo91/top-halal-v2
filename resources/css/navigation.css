@@ -96,6 +96,8 @@
 
 /* Every visible submenu receives the same small disclosure mark; the template emits it only when children exist. */
 @media (min-width: 761px) {
+    .site-header .nav-menu-list .submenu[hidden] { display: none !important; }
+
     .site-header .nav-menu-list .submenu-toggle {
         width: 1rem;
         min-width: 1rem;
