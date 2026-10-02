@@ -92,6 +92,12 @@ test('every visible desktop submenu parent exposes a compact chevron, including 
   const practicalPanel = practicalOwner.locator(':scope > .submenu');
   await expect(practicalParent).toBeVisible();
   await expect(practicalParent.locator('.nav-submenu-chevron')).toBeVisible();
+  await practicalParent.click();
+  await expect(practicalParent).toHaveAttribute('aria-expanded', 'true');
+  await expect(practicalPanel).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(practicalPanel).toBeHidden();
+
   await practicalParent.focus();
   await expect(practicalParent).toHaveAttribute('aria-expanded', 'true');
   await expect(practicalPanel).toBeVisible();
