@@ -49,7 +49,7 @@ class PublicNavigationTest extends TestCase
         $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Cuisines', 'link_type' => 'none']);
         MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Burger', 'link_type' => 'external_url', 'url' => 'https://example.test', 'target_blank' => true, 'nofollow' => true]);
 
-        $this->get('/')->assertOk()->assertSee('aria-controls="desktop-submenu-', false)->assertSee('class="nav-item nav-parent"', false)->assertDontSee('nav-chevron', false)->assertDontSee('href="#"', false)->assertSee('noopener noreferrer nofollow', false);
+        $this->get('/')->assertOk()->assertSee('aria-controls="desktop-submenu-', false)->assertSee('class="nav-item nav-parent"', false)->assertSee('class="nav-submenu-chevron"', false)->assertDontSee('href="#"', false)->assertSee('noopener noreferrer nofollow', false);
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         MenuItem::create(['menu_id' => $menu->id, 'label' => 'Dangereux', 'link_type' => 'internal_url', 'url' => 'javascript:alert(1)']);
     }
@@ -66,7 +66,31 @@ class PublicNavigationTest extends TestCase
             ->assertSee('href="/blog"', false)
             ->assertSee('data-submenu-label="Blog"', false)
             ->assertSee('aria-label="Ouvrir le sous-menu Blog"', false)
+            ->assertSee('class="submenu-toggle" type="button" data-submenu-toggle data-submenu-label="Blog" aria-label="Ouvrir le sous-menu Blog" aria-expanded="false" aria-controls="mobile-submenu-'.$parent->id.'"><span class="nav-submenu-chevron"', false)
             ->assertSee('href="/actualites"', false);
+    }
+
+    public function test_only_parents_with_visible_children_render_a_submenu_chevron(): void
+    {
+        $menu = Menu::where('location', 'header_main')->firstOrFail();
+        MenuItem::where('menu_id', $menu->id)->delete();
+        $visibleParent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Vie Pratique', 'link_type' => 'none', 'sort_order' => 1]);
+        MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $visibleParent->id, 'label' => 'Horaires', 'link_type' => 'internal_url', 'url' => '/horaires', 'sort_order' => 1]);
+        $hiddenParent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Parent masqué', 'link_type' => 'none', 'sort_order' => 2]);
+        MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $hiddenParent->id, 'label' => 'Enfant masqué', 'link_type' => 'internal_url', 'url' => '/masque', 'visible_desktop' => false, 'visible_mobile' => false]);
+        MenuItem::create(['menu_id' => $menu->id, 'label' => 'Sans enfants', 'link_type' => 'none', 'sort_order' => 3]);
+
+        $desktopItems = app(PublicNavigation::class)->header()['menu']['items'];
+        $mobileItems = app(PublicNavigation::class)->header()['mobile_menu']['items'];
+        $this->assertCount(1, $desktopItems[0]['children']);
+        $this->assertSame([], $desktopItems[1]['children']);
+        $this->assertCount(1, $mobileItems[0]['children']);
+        $this->assertSame([], $mobileItems[1]['children']);
+
+        $markup = $this->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('<button class="nav-item nav-parent" data-nav-label="Vie Pratique" type="button" data-submenu-toggle aria-expanded="false" aria-controls="desktop-submenu-'.$visibleParent->id.'"><span class="nav-label">Vie Pratique</span><span class="nav-submenu-chevron" aria-hidden="true"></span></button>', $markup);
+        $this->assertStringContainsString('<span class="nav-item nav-item-static" data-nav-label="Parent masqué"><span class="nav-label">Parent masqué</span></span>', $markup);
+        $this->assertStringContainsString('<span class="nav-item nav-item-static" data-nav-label="Sans enfants"><span class="nav-label">Sans enfants</span></span>', $markup);
     }
 
     public function test_a_menu_item_cannot_be_nested_below_a_second_level_item(): void

@@ -8,12 +8,12 @@
         @if($item['url'])
             <a class="nav-item{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}" href="{{ $item['url'] }}" @if($item['target_blank']) target="_blank" rel="noopener noreferrer{{ $item['nofollow'] ? ' nofollow' : '' }}" @elseif($item['nofollow']) rel="nofollow" @endif><span class="nav-label">{{ $item['label'] }}</span></a>
         @elseif($hasChildren)
-            <button class="nav-item nav-parent{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}" type="button" data-submenu-toggle aria-expanded="false" aria-controls="{{ $panelId }}"><span class="nav-label">{{ $item['label'] }}</span></button>
+            <button class="nav-item nav-parent{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}" type="button" data-submenu-toggle aria-expanded="false" aria-controls="{{ $panelId }}"><span class="nav-label">{{ $item['label'] }}</span><span class="nav-submenu-chevron" aria-hidden="true"></span></button>
         @else
             <span class="nav-item nav-item-static{{ $item['is_active'] ? ' is-active' : '' }}" data-nav-label="{{ $item['label'] }}"><span class="nav-label">{{ $item['label'] }}</span></span>
         @endif
         @if($hasChildren)
-            @if($item['url'])<button class="submenu-toggle" type="button" data-submenu-toggle data-submenu-label="{{ $item['label'] }}" aria-label="Ouvrir le sous-menu {{ $item['label'] }}" aria-expanded="false" aria-controls="{{ $panelId }}"><span aria-hidden="true"></span></button>@endif
+            @if($item['url'])<button class="submenu-toggle" type="button" data-submenu-toggle data-submenu-label="{{ $item['label'] }}" aria-label="Ouvrir le sous-menu {{ $item['label'] }}" aria-expanded="false" aria-controls="{{ $panelId }}"><span class="nav-submenu-chevron" aria-hidden="true"></span></button>@endif
             <ul id="{{ $panelId }}" class="submenu" hidden>
                 @foreach($item['children'] as $child)
                     <li>@if($child['url'])<a class="{{ $child['is_active'] ? 'is-active' : '' }}" href="{{ $child['url'] }}" @if($child['target_blank']) target="_blank" rel="noopener noreferrer{{ $child['nofollow'] ? ' nofollow' : '' }}" @elseif($child['nofollow']) rel="nofollow" @endif>{{ $child['label'] }}</a>@else<span class="{{ $child['is_active'] ? 'is-active' : '' }}">{{ $child['label'] }}</span>@endif</li>

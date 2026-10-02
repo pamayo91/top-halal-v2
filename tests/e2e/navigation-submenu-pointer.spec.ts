@@ -79,6 +79,46 @@ test('mobile no-link parent opens on tap and closes with Escape while retaining 
   await expect(parent).toBeFocused();
 });
 
+test('every visible desktop submenu parent exposes a compact chevron, including Vie Pratique', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop submenu indicator regression.');
+
+  await page.goto('/');
+  const linkedOwner = page.locator('.main-nav .has-submenu').filter({ has: page.locator('a.nav-item') }).first();
+  await expect(linkedOwner.locator(':scope > a.nav-item')).toHaveAttribute('href', /\S+/);
+  await expect(linkedOwner.locator(':scope > button.submenu-toggle .nav-submenu-chevron')).toBeVisible();
+
+  const practicalOwner = page.locator('.main-nav .has-submenu').filter({ hasText: 'Vie Pratique' }).first();
+  const practicalParent = practicalOwner.locator(':scope > button.nav-parent');
+  const practicalPanel = practicalOwner.locator(':scope > .submenu');
+  await expect(practicalParent).toBeVisible();
+  await expect(practicalParent.locator('.nav-submenu-chevron')).toBeVisible();
+  await practicalParent.focus();
+  await practicalParent.press('Enter');
+  await expect(practicalParent).toHaveAttribute('aria-expanded', 'true');
+  await expect(practicalPanel).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(practicalPanel).toBeHidden();
+  await expect(practicalParent).toBeFocused();
+});
+
+test('Vie Pratique keeps a visible mobile disclosure chevron and keyboard submenu flow', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile Vie Pratique disclosure regression.');
+
+  await page.goto('/');
+  await page.locator('.menu-toggle').click();
+  const practicalOwner = page.locator('#mobile-nav .has-submenu').filter({ hasText: 'Vie Pratique' }).first();
+  const practicalParent = practicalOwner.locator(':scope > button.nav-parent');
+  const practicalPanel = practicalOwner.locator(':scope > .submenu');
+  await expect(practicalParent.locator('.nav-submenu-chevron')).toBeVisible();
+  await practicalParent.focus();
+  await practicalParent.press('Enter');
+  await expect(practicalParent).toHaveAttribute('aria-expanded', 'true');
+  await expect(practicalPanel.getByRole('link').first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(practicalPanel).toBeHidden();
+  await expect(practicalParent).toBeFocused();
+});
+
 test('header states have an obvious stable visual hierarchy', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop-chromium', 'Desktop visual state assertions.');
 
