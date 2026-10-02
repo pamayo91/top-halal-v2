@@ -94,6 +94,56 @@
 
 .site-header .submenu-toggle { display: inline-flex; align-items: center; justify-content: center; }
 
+/* Every visible submenu receives the same small disclosure mark; the template emits it only when children exist. */
+@media (min-width: 761px) {
+    .site-header .nav-menu-list .submenu-toggle {
+        width: 1rem;
+        min-width: 1rem;
+        min-height: 1.5rem;
+        margin-left: -.1rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--ink);
+    }
+
+    .site-header .nav-menu-list .nav-parent {
+        grid-template-columns: max-content .8rem;
+        grid-template-areas: 'label chevron';
+        column-gap: .28rem;
+    }
+
+    .site-header .nav-menu-list .nav-parent .nav-submenu-chevron { grid-area: chevron; }
+
+    .site-header .nav-menu-list .has-submenu:hover > .submenu-toggle,
+    .site-header .nav-menu-list .has-submenu:focus-within > .submenu-toggle { color: var(--green-dark); }
+
+    .site-header .nav-menu-list .nav-submenu-chevron {
+        display: block;
+        width: 7px;
+        height: 7px;
+        margin-top: -.2rem;
+        border-right: 1.75px solid currentColor;
+        border-bottom: 1.75px solid currentColor;
+        transform: rotate(45deg);
+        transition: transform .14s ease, margin .14s ease;
+    }
+
+    .site-header .nav-menu-list .has-submenu:hover > .submenu-toggle .nav-submenu-chevron,
+    .site-header .nav-menu-list .has-submenu:focus-within > .submenu-toggle .nav-submenu-chevron,
+    .site-header .nav-menu-list .nav-parent[aria-expanded='true'] .nav-submenu-chevron,
+    .site-header .nav-menu-list .submenu-toggle[aria-expanded='true'] .nav-submenu-chevron {
+        margin-top: .2rem;
+        transform: rotate(225deg);
+    }
+
+    .site-header .nav-menu-list .submenu-toggle:focus-visible {
+        outline: 3px solid rgb(35 129 81 / 30%);
+        outline-offset: 2px;
+        border-radius: 3px;
+    }
+}
+
 /* The compact trigger and layered panel are deliberately mobile-only; desktop keeps its validated menu. */
 @media (max-width: 760px) {
     .site-header {
@@ -216,7 +266,11 @@
     .site-header .mobile-menu-list .nav-item::before,
     .site-header .mobile-menu-list .nav-item::after { display: none; }
     .site-header .mobile-menu-list .nav-item.is-active { color: var(--green-dark); }
-    .site-header .mobile-menu-list .nav-parent { justify-self: stretch; }
+    .site-header .mobile-menu-list .nav-parent {
+        grid-column: 1 / -1;
+        justify-content: space-between;
+        justify-self: stretch;
+    }
 
     .site-header .mobile-menu-list .submenu-toggle {
         grid-column: 2;
@@ -231,7 +285,9 @@
         color: var(--green-dark);
     }
 
-    .site-header .mobile-menu-list .submenu-toggle span {
+    .site-header .mobile-menu-list .submenu-toggle .nav-submenu-chevron,
+    .site-header .mobile-menu-list .nav-parent .nav-submenu-chevron {
+        display: block;
         width: 9px;
         height: 9px;
         margin-top: -4px;
@@ -241,7 +297,8 @@
         transition: transform .14s ease, margin .14s ease;
     }
 
-    .site-header .mobile-menu-list .submenu-toggle[aria-expanded='true'] span {
+    .site-header .mobile-menu-list .submenu-toggle[aria-expanded='true'] .nav-submenu-chevron,
+    .site-header .mobile-menu-list .nav-parent[aria-expanded='true'] .nav-submenu-chevron {
         margin-top: 4px;
         transform: rotate(225deg);
     }

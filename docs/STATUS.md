@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-02 — Indicateur générique des sous-menus
+
+Chaque parent dont l’arbre public contient au moins un enfant visible rend maintenant un chevron, sur desktop comme mobile. Le markup ne dépend d’aucun libellé : l’arbre déjà filtré par surface (desktop/mobile) reste l’unique source de vérité. Les parents sans URL, notamment Vie Pratique, affichent l’indicateur dans leur contrôle existant ; les parents liés conservent leur lien et leur déclencheur indépendant. Les tests couvrent le parent visible, le parent sans enfant, les enfants masqués et Vie Pratique.
+
 ## 2026-10-02 — Panneau de navigation mobile compact
 
 La navigation mobile garde les entrées administrables et leurs vrais liens SSR : un parent lié conserve sa destination à gauche, tandis qu’un bouton chevron distinct déplie ses enfants. Le panneau blanc est superposé sous un header sticky, protège le contenu avec un backdrop léger, limite sa hauteur au viewport et défile en interne. Hamburger/X, `aria-expanded`, libellés accessibles, focus, Escape, verrouillage du défilement de fond et fermeture après activation d’un lien sont gérés par un JavaScript local sans dépendance ; le desktop reste inchangé. Les sentinelles couvrent l’ouverture, sous-menu, destinations parent/enfant, fermeture exclusive et absence d’erreurs navigateur.
