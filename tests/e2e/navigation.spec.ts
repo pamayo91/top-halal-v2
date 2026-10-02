@@ -132,6 +132,10 @@ test('mobile submenu chevrons have no vertical divider at compact widths or inte
     );
     expect(Math.abs(chevronCenters[0] - chevronCenters[2])).toBeLessThan(1);
     await expect(noLinkChevron).toBeVisible();
+    const labelLefts = await page.locator('#mobile-nav .has-submenu > .nav-item .nav-label').evaluateAll(elements =>
+      elements.map(element => element.getBoundingClientRect().left),
+    );
+    expect(Math.abs(labelLefts[0] - labelLefts[2])).toBeLessThan(1);
   }
 });
 
