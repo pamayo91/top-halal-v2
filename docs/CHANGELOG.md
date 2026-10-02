@@ -1,5 +1,7 @@
 # Changelog
 
+- Navigation mobile : refonte en panneau superposé compact sous un header sticky, avec hamburger/X, backdrop léger, hauteur bornée au viewport, scroll interne et verrouillage du contenu arrière. Les parents de sous-menus gardent leur lien SSR et un chevron-bouton indépendant, libellé et synchronisé avec `aria-expanded`; les enfants restent des liens SSR. Les sentinelles Playwright couvrent les ouvertures/fermetures, le clavier, les destinations parent/enfant, l’exclusivité des sous-menus et le desktop inchangé.
+
 - Recherche publique : le menu autocomplete partagé peut désormais se superposer aux sections suivant le hero de l’accueil. Le clipping des ornements du hero est conservé dans une couche décorative dédiée ; la recherche reste un overlay visible et cliquable, sans modifier ses requêtes ni ses destinations. Une sentinelle Playwright vérifie un élément de localisation situé sous la limite du hero.
 
 - Éditorial : ajout du shortcode générique `[faq]` / `[question title="…"]` pour un accordéon SSR natif, accessible et compact, avec JSON-LD `FAQPage` généré depuis les mêmes questions/réponses. Les H2 du seul flux `.prose` Articles/Pages disposent désormais d’une respiration verticale renforcée et responsive.
