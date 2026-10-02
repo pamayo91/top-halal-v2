@@ -98,6 +98,7 @@ test('every visible desktop submenu parent exposes a compact chevron, including 
   await page.keyboard.press('Escape');
   await expect(practicalPanel).toBeHidden();
 
+  await page.keyboard.press('Tab');
   await practicalParent.focus();
   await expect(practicalParent).toHaveAttribute('aria-expanded', 'true');
   await expect(practicalPanel).toBeVisible();
