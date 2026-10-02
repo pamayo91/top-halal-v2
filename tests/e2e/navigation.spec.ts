@@ -101,6 +101,31 @@ test('mobile navigation exposes linked submenus through independent chevrons', a
   expect(errors).toEqual([]); expect(failures).toEqual([]);
 });
 
+test('mobile submenu chevrons have no vertical divider at compact widths or interactive states', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile-only submenu visual regression.');
+
+  for (const width of [320, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+    await page.locator('.menu-toggle').click();
+
+    const toggle = page.locator('#mobile-nav .has-submenu:has(> a) > button.submenu-toggle').first();
+    const borderLeft = async () => toggle.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { width: style.borderLeftWidth, style: style.borderLeftStyle, color: style.borderLeftColor };
+    });
+
+    expect(await borderLeft()).toMatchObject({ width: '0px', style: 'none' });
+    await toggle.hover();
+    expect(await borderLeft()).toMatchObject({ width: '0px', style: 'none' });
+    await toggle.focus();
+    expect(await borderLeft()).toMatchObject({ width: '0px', style: 'none' });
+    await toggle.press('Enter');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(await borderLeft()).toMatchObject({ width: '0px', style: 'none' });
+  }
+});
+
 test('mobile submenu parent and child destinations remain independently navigable SSR links', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile-only linked submenu destinations.');
 
