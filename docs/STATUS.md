@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-02 — Chevron mobile sans séparateur vertical
+
+Le bouton de sous-menu mobile conserve sa zone tactile, son focus et son comportement, mais n’a plus de bordure gauche : les parents liés comme Restaurants et Blog affichent seulement leur libellé et leur chevron. La sentinelle Playwright contrôle les états normal, survol, focus et ouvert à 320, 390 et 430 px.
+
 ## 2026-10-02 — Indicateur générique des sous-menus
 
 Chaque parent dont l’arbre public contient au moins un enfant visible rend maintenant un chevron, sur desktop comme mobile. Le markup ne dépend d’aucun libellé : l’arbre déjà filtré par surface (desktop/mobile) reste l’unique source de vérité. Les parents sans URL, notamment Vie Pratique, affichent l’indicateur dans leur contrôle existant ; les parents liés conservent leur lien et leur déclencheur indépendant. Les tests couvrent le parent visible, le parent sans enfant, les enfants masqués et Vie Pratique.

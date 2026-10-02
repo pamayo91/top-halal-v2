@@ -1,5 +1,7 @@
 # Changelog
 
+- Navigation mobile : suppression du séparateur vertical parasite à gauche des chevrons de sous-menu, sans modifier la zone tactile, le focus ni le comportement des dropdowns.
+
 - Navigation : tout parent ayant des enfants visibles rend désormais un chevron générique, sur desktop et mobile. Les parents sans destination, dont Vie Pratique, intègrent cet indicateur à leur contrôle existant ; les liens parents gardent leur destination et leur déclencheur de sous-menu séparé.
 
 - Navigation mobile : refonte en panneau superposé compact sous un header sticky, avec hamburger/X, backdrop léger, hauteur bornée au viewport, scroll interne et verrouillage du contenu arrière. Les parents de sous-menus gardent leur lien SSR et un chevron-bouton indépendant, libellé et synchronisé avec `aria-expanded`; les enfants restent des liens SSR. Les sentinelles Playwright couvrent les ouvertures/fermetures, le clavier, les destinations parent/enfant, l’exclusivité des sous-menus et le desktop inchangé.

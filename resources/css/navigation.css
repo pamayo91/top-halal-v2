@@ -281,7 +281,7 @@
         margin: 0;
         padding: 0;
         border: 0;
-        border-left: 1px solid #edf1ee;
+        border-left: 0;
         border-radius: 0;
         background: transparent;
         color: var(--green-dark);
