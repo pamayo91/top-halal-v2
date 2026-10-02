@@ -29,6 +29,7 @@ test('homepage autocomplete remains clickable above the overlapping restaurant s
   await location.focus();
 
   const popover = search.locator('[data-cities-list]');
+  await expect(popover).toBeVisible();
   const lastCity = popover.locator('[data-city-name]').last();
   await expect(lastCity).toBeAttached();
   await popover.evaluate(element => { element.scrollTop = element.scrollHeight; });
