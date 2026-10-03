@@ -26,6 +26,10 @@ test('editorial share buttons preserve their destinations and accessible visual 
     await expect(link).toHaveCSS('border-top-width', '0px');
     await expect(link.locator('svg')).toHaveAttribute('aria-hidden', 'true');
   }
+  await expect(facebook.locator('svg')).toHaveCSS('width', '20px');
+  await expect(x.locator('svg')).toHaveCSS('width', '16px');
+  await expect(email.locator('svg')).toHaveCSS('width', '20px');
+  await expect(email.locator('rect')).toHaveAttribute('stroke-width', '2.35');
 
   expect(new URL((await facebook.getAttribute('href'))!).searchParams.get('u')).toBe(sharedUrl);
   expect(new URL((await x.getAttribute('href'))!).searchParams.get('url')).toBe(sharedUrl);
