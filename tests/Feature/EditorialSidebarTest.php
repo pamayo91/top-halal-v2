@@ -74,6 +74,7 @@ class EditorialSidebarTest extends TestCase
             ->assertSee('aria-label="Partager sur Facebook"', false)
             ->assertSee('aria-label="Partager sur X"', false)
             ->assertSee('aria-label="Partager par e-mail"', false)
+            ->assertSee('target="_blank" rel="noopener noreferrer"', false)
             ->assertSee('https://www.facebook.com/sharer/sharer.php?u='.urlencode($url), false)
             ->assertSee('https://twitter.com/intent/tweet?url='.urlencode($url), false)
             ->assertSee('mailto:?subject='.rawurlencode($article->title), false)
