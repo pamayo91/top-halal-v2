@@ -16,6 +16,10 @@ class RestaurantRemovalRequestController extends Controller
             return redirect()->route('owner.restaurants.management-unavailable', $restaurant);
         }
 
+        if ($restaurant->status === 'archived') {
+            return $this->alreadyArchived();
+        }
+
         return view('account.restaurant-removal-request', compact('restaurant'));
     }
 
@@ -23,6 +27,10 @@ class RestaurantRemovalRequestController extends Controller
     {
         if (! $request->user()->can('manage', $restaurant)) {
             return redirect()->route('owner.restaurants.management-unavailable', $restaurant);
+        }
+
+        if ($restaurant->status === 'archived') {
+            return $this->alreadyArchived();
         }
 
         $data = $request->validate([
@@ -35,6 +43,10 @@ class RestaurantRemovalRequestController extends Controller
 
             if (! $request->user()->can('manage', $locked)) {
                 abort(403);
+            }
+
+            if ($locked->status === 'archived') {
+                abort(409, 'Cette fiche a déjà été supprimée.');
             }
 
             abort_if(
@@ -57,5 +69,10 @@ class RestaurantRemovalRequestController extends Controller
         $mailer->notifyTeam($removalRequest);
 
         return redirect()->route('account.dashboard')->with('status', 'Votre demande de suppression a bien été envoyée.');
+    }
+
+    private function alreadyArchived(): RedirectResponse
+    {
+        return redirect()->route('account.dashboard')->with('status', 'Cette fiche a déjà été supprimée.');
     }
 }

@@ -182,6 +182,25 @@ class RestaurantRemovalRequestTest extends TestCase
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail): bool => $mail->templateKey === 'restaurant_removal_request_approved');
     }
 
+    public function test_archived_restaurant_cannot_receive_another_removal_request(): void
+    {
+        $restaurant = $this->restaurant();
+        $owner = $this->owner($restaurant);
+        $restaurant->update(['status' => 'archived']);
+
+        $this->actingAs($owner)
+            ->get(route('owner.restaurants.removal.create', $restaurant))
+            ->assertRedirect(route('account.dashboard'))
+            ->assertSessionHas('status', 'Cette fiche a déjà été supprimée.');
+
+        $this->actingAs($owner)
+            ->post(route('owner.restaurants.removal.store', $restaurant), ['reason' => 'closed'])
+            ->assertRedirect(route('account.dashboard'))
+            ->assertSessionHas('status', 'Cette fiche a déjà été supprimée.');
+
+        $this->assertDatabaseCount('restaurant_removal_requests', 0);
+    }
+
     public function test_rejection_preserves_the_restaurant_and_queues_one_email_with_the_admin_note(): void
     {
         Mail::fake();

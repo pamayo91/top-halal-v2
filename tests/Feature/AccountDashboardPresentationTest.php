@@ -43,6 +43,8 @@ class AccountDashboardPresentationTest extends TestCase
             ->assertSeeText('Déposant')
             ->assertSeeText('Modifier la fiche')
             ->assertSeeText('Voir la fiche')
+            ->assertSeeText('Fiche supprimée')
+            ->assertDontSee(route('owner.restaurants.removal.create', $historical))
             ->assertDontSeeText('Ancienne fiche')
             ->assertDontSeeText('restaurant_owner');
     }
