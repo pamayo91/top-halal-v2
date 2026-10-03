@@ -227,7 +227,7 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->fakeSubmissionIngestor('authenticated-depositor-one');
         $this->actingAs($depositor)->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Le Jasmin des Dunes']))->assertRedirect();
         $this->fakeSubmissionIngestor('authenticated-depositor-two');
-        $this->actingAs($depositor)->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Bistro Zèbre Quartz']))->assertRedirect();
+        $this->actingAs($depositor)->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Bistro Zèbre Quartz', 'phone' => '0198765432']))->assertRedirect();
 
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseCount('restaurant_submissions', 2);
