@@ -2,7 +2,7 @@
 
 ## 2026-10-03 — Identité des dépôts de restaurant authentifiés
 
-À l’étape 5, une session authentifiée remplace le champ e-mail éditable par l’adresse non modifiable du compte et une brève indication de suivi. Le serveur exclut toute adresse fournie par POST, utilise exclusivement l’e-mail et le `user_id` de session, rattache chaque nouveau dépôt au même compte et ne crée ni utilisateur, ni activation, ni claim pour un simple déposant. La soumission passe directement à `pending_admin_review`, avec les notifications métier de confirmation et de revue, sans e-mail de vérification. Les visiteurs, l’ownership déclaré et le cycle publication/refus existants restent inchangés.
+À l’étape 5, une session authentifiée remplace le champ e-mail éditable par l’adresse non modifiable du compte et une brève indication de suivi. Le serveur exclut toute adresse fournie par POST, utilise exclusivement l’e-mail et le `user_id` de session, rattache chaque nouveau dépôt au même compte et ne crée ni utilisateur, ni activation, ni claim pour un simple déposant. La soumission passe directement à `pending_admin_review` et ne déclenche aucun e-mail au déposant déjà authentifié (ni vérification, ni confirmation, ni activation) ; seule l’alerte de revue opérationnelle reste envoyée. Les visiteurs, l’ownership déclaré et le cycle publication/refus existants restent inchangés.
 
 ## 2026-10-03 — Icônes du bloc Partager éditorial
 
