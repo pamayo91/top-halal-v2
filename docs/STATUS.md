@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-03 — Chevauchement Hero / restaurants de l’accueil
+
+Le Hero avait reçu un `z-index: 1` global au commit `64442ed` pour laisser passer les suggestions de recherche au-dessus de la première section. Comme celle-ci remonte volontairement avec une marge négative, le fond du Hero recouvrait aussi son haut et tronquait « À découvrir ». La carte restaurants est maintenant au-dessus hors interaction ; le Hero remonte seulement avec `:focus-within`, le temps où les suggestions doivent être cliquables. Le chevauchement, les dimensions et les espacements sont inchangés.
+
 ## 2026-10-03 — Demande de suppression après archivage
 
 Une fiche archivée après acceptation d’une demande affiche désormais l’état terminal « Fiche supprimée » dans Mon compte, au lieu de réactiver le lien de demande. Les accès directs GET et POST sont également refusés sans créer de nouvelle demande ; la vérification transactionnelle protège enfin la course entre l’affichage et l’envoi. Les 15 scénarios PHP ciblés (91 assertions) passent dans un worktree préproduction isolé sous PHP 8.4.

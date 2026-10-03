@@ -20,10 +20,26 @@ test('two-field restaurant search works responsively', async ({ page }) => {
     }
   });
 
-test('homepage autocomplete remains clickable above the overlapping restaurant section', async ({ page }) => {
+test('homepage overlap keeps the restaurant header visible and autocomplete clickable', async ({ page }) => {
   test.skip((page.viewportSize()?.width ?? 0) < 760, 'The homepage section overlap is desktop-only.');
 
   await page.goto('/');
+  const restaurants = page.locator('[data-home-section="restaurants"]');
+  const eyebrow = restaurants.locator('.eyebrow');
+  const overlap = await eyebrow.evaluate(element => {
+    const hero = document.querySelector<HTMLElement>('.home-hero');
+    const rectangle = element.getBoundingClientRect();
+    const hit = document.elementFromPoint(rectangle.left + 1, rectangle.top + 1);
+
+    return {
+      overlapsHero: rectangle.top < (hero?.getBoundingClientRect().bottom ?? Number.NEGATIVE_INFINITY),
+      isAboveHero: hit?.closest('[data-home-section="restaurants"]') !== null,
+    };
+  });
+
+  expect(overlap.overlapsHero).toBe(true);
+  expect(overlap.isAboveHero).toBe(true);
+
   const search = page.locator('[data-restaurant-search]').first();
   const location = search.getByLabel('Localisation');
   await location.focus();

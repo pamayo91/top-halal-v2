@@ -2,6 +2,8 @@
 
 ## 2026-10-03
 
+- Accueil : correction de la superposition Hero / « Restaurants récemment ajoutés ». Le Hero ne passe plus devant la carte blanche au repos ; il remonte uniquement pendant l’interaction avec la recherche afin de conserver les suggestions cliquables. Le chevauchement et les espacements existants sont préservés.
+
 - Restaurants : une fiche archivée après acceptation d’une demande de suppression affiche désormais son état terminal dans Mon compte, sans lien de nouvelle demande. Les URLs directes GET/POST sont refusées côté serveur et la transaction contrôle de nouveau cet état avant toute création.
 
 - Front public : le shell global adopte une colonne Flexbox afin que le footer se place naturellement en bas des viewports dont le contenu est court, tout en restant après les contenus longs. Aucun positionnement superposé, JavaScript, changement de design ou impact sur Filament/e-mails n’est introduit ; la gate Playwright contrôle le flux court et les pages longues sentinelles.
