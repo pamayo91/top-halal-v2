@@ -17,6 +17,7 @@ import '../css/owner-restaurant-editor.css';
 import '../css/typography.css';
 import '../css/navigation.css';
 import '../css/directory-filters.css';
+import '../css/footer-layout.css';
 import { initializeAddressSelectors } from './address-selector';
 import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
 import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';
