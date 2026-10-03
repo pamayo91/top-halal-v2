@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-03
+
+- Restaurants : une soumission faite depuis une session authentifiée masque l’e-mail à l’étape 5, prend l’adresse et le `user_id` du compte côté serveur, ignore toute valeur POST forgée et entre directement en revue Top Halal sans seconde vérification ni activation. Les visiteurs restent soumis à la vérification e-mail inchangée.
+
 - Navigation mobile : suppression du séparateur vertical parasite à gauche des chevrons de sous-menu et alignement des chevrons intégrés dans la même colonne tactile de 44 px, sans modifier le focus ni le comportement des dropdowns.
 
 - Navigation : tout parent ayant des enfants visibles rend désormais un chevron générique, sur desktop et mobile. Les parents sans destination, dont Vie Pratique, intègrent cet indicateur à leur contrôle existant ; les liens parents gardent leur destination et leur déclencheur de sous-menu séparé.

@@ -50,7 +50,10 @@ class StorePublicRestaurantSubmissionRequest extends FormRequest
             'owner_company' => ['exclude_unless:submitter_role,owner', 'required', 'string', 'max:255'],
             'owner_siret' => ['exclude_unless:submitter_role,owner', 'required', 'digits:14'],
             'owner_certified' => ['exclude_unless:submitter_role,owner', 'accepted'],
-            'email' => ['required', 'email:rfc', 'max:255'],
+            // The authenticated account is the only source of its e-mail.
+            // Excluding this input also means a forged value cannot become
+            // accidentally available to a future writer through validated().
+            'email' => [Rule::excludeIf(fn (): bool => $this->user() !== null), 'required', 'email:rfc', 'max:255'],
         ];
     }
 

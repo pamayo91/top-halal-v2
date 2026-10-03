@@ -20,6 +20,7 @@ class PublicRestaurantSubmissionController extends Controller
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
             'features' => Feature::query()->orderBy('name')->get(['id', 'name']),
             'days' => ['monday' => 'Lundi', 'tuesday' => 'Mardi', 'wednesday' => 'Mercredi', 'thursday' => 'Jeudi', 'friday' => 'Vendredi', 'saturday' => 'Samedi', 'sunday' => 'Dimanche'],
+            'authenticatedSubmitterEmail' => request()->user()?->email,
         ]);
     }
 
@@ -64,6 +65,8 @@ class PublicRestaurantSubmissionController extends Controller
     public function store(StorePublicRestaurantSubmissionRequest $request, AddressSuggestionService $suggestions, RestaurantLocationService $locations, MediaIngestor $media, RestaurantSubmissionMailer $mailer, DuplicateRestaurantDetector $duplicates): RedirectResponse
     {
         $data = $request->validated();
+        $authenticatedUser = $request->user();
+        $submitterEmail = Str::lower(trim($authenticatedUser?->email ?? $data['email']));
         try {
             $location = $this->locationData($request, $suggestions, $data);
         } catch (ValidationException $exception) {
@@ -92,8 +95,8 @@ class PublicRestaurantSubmissionController extends Controller
             'reason' => $match['reason'],
         ])->values()->all();
 
-        $token = Str::random(64);
-        $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request, $token, $duplicateDetails): Restaurant {
+        $token = $authenticatedUser ? null : Str::random(64);
+        $restaurant = DB::transaction(function () use ($data, $location, $hours, $locations, $media, $request, $token, $duplicateDetails, $authenticatedUser, $submitterEmail): Restaurant {
             $restaurant = Restaurant::create([
                 'name' => trim($data['name']),
                 'slug' => app(RestaurantSlugService::class)->generate($data['name'], $location['city_name'] ?? null, $location['postal_code'] ?? null),
@@ -102,7 +105,7 @@ class PublicRestaurantSubmissionController extends Controller
                 'has_halal_chicken' => (bool) ($data['halal_chicken'] ?? false),
                 'description' => filled($data['description'] ?? null) ? trim(strip_tags($data['description'])) : null,
                 'phone' => filled($data['phone'] ?? null) ? trim($data['phone']) : null,
-                'contact_email' => Str::lower(trim($data['email'])),
+                'contact_email' => $submitterEmail,
                 'address' => $this->displayAddress($location),
             ]);
 
@@ -140,10 +143,10 @@ class PublicRestaurantSubmissionController extends Controller
                 ]);
             }
 
-            RestaurantSubmission::create([
+            $submission = RestaurantSubmission::create([
                 'restaurant_id' => $restaurant->id,
-                'user_id' => $request->user()?->id,
-                'submitter_email' => Str::lower(trim($data['email'])),
+                'user_id' => $authenticatedUser?->id,
+                'submitter_email' => $submitterEmail,
                 'submitter_role' => $data['submitter_role'],
                 'ip_hash' => hash_hmac('sha256', (string) $request->ip(), (string) config('app.key')),
                 'submitted_at' => now(),
@@ -151,20 +154,49 @@ class PublicRestaurantSubmissionController extends Controller
                 'owner_company' => $data['owner_company'] ?? null,
                 'owner_siret' => $data['owner_siret'] ?? null,
                 'owner_certified' => $request->boolean('owner_certified'),
-                'status' => 'pending_email_verification',
+                'status' => $authenticatedUser ? 'pending_admin_review' : 'pending_email_verification',
                 'duplicate_signal' => $duplicateDetails === [] ? null : 'potential',
                 'duplicate_details' => $duplicateDetails === [] ? null : $duplicateDetails,
-                'email_verification_token' => hash('sha256', $token),
-                'email_verification_expires_at' => now()->addHours(24),
+                'email_verified_at' => $authenticatedUser ? now() : null,
+                'email_verification_token' => $token ? hash('sha256', $token) : null,
+                'email_verification_expires_at' => $token ? now()->addHours(24) : null,
             ]);
+
+            // An authenticated owner has already passed the common identity
+            // checkpoint. This is the same hand-off as e-mail verification,
+            // without manufacturing a user or a claim for a plain depositor.
+            if ($authenticatedUser && $submission->submitter_role === 'owner') {
+                RestaurantClaim::query()->firstOrCreate(
+                    ['restaurant_id' => $submission->restaurant_id, 'user_id' => $authenticatedUser->id],
+                    [
+                        'email' => $submitterEmail,
+                        'full_name' => $submission->owner_full_name ?: $authenticatedUser->name,
+                        'company' => $submission->owner_company,
+                        'siret' => $submission->owner_siret,
+                        'certified' => $submission->owner_certified,
+                        'source' => 'new_submission',
+                        'status' => 'pending_publication',
+                        'email_verified_at' => now(),
+                        'submitted_at' => now(),
+                    ],
+                );
+            }
 
             return $restaurant;
         });
 
         $submission = $restaurant->submission()->with('restaurant')->firstOrFail();
-        $mailer->verification($submission, URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHours(24), ['submission' => $submission, 'token' => $token]));
+        if ($authenticatedUser) {
+            $mailer->confirmed($submission);
+            $mailer->notifyTeamForReview($submission);
+        } else {
+            $mailer->verification($submission, URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHours(24), ['submission' => $submission, 'token' => $token]));
+        }
 
-        return redirect()->route('restaurant-submissions.thanks')->with('submitted_restaurant', $restaurant->name);
+        return redirect()->route('restaurant-submissions.thanks')->with([
+            'submitted_restaurant' => $restaurant->name,
+            'submitted_restaurant_requires_email_verification' => $authenticatedUser === null,
+        ]);
     }
 
     private function duplicateRejected(Request $request, Restaurant $candidate): RedirectResponse
@@ -183,7 +215,10 @@ class PublicRestaurantSubmissionController extends Controller
     {
         abort_unless(session()->has('submitted_restaurant'), 404);
 
-        return view('public.restaurant-submission.thanks', ['restaurantName' => session('submitted_restaurant')]);
+        return view('public.restaurant-submission.thanks', [
+            'restaurantName' => session('submitted_restaurant'),
+            'requiresEmailVerification' => session('submitted_restaurant_requires_email_verification', true),
+        ]);
     }
 
     public function verify(RestaurantSubmission $submission, string $token, RestaurantSubmissionMailer $mailer): View

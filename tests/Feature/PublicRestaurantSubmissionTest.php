@@ -49,6 +49,21 @@ class PublicRestaurantSubmissionTest extends TestCase
             ->assertSee('noindex,nofollow', false);
     }
 
+    public function test_step_five_uses_the_authenticated_account_identity_without_an_editable_email_field(): void
+    {
+        $this->get(route('restaurant-submissions.create'))
+            ->assertSee('id="submitter-email"', false)
+            ->assertSee('name="email"', false);
+
+        $user = User::factory()->create(['email' => 'deposant@example.test']);
+
+        $this->actingAs($user)->get(route('restaurant-submissions.create'))
+            ->assertSee('Soumission effectuée avec votre compte', false)
+            ->assertSee('deposant@example.test', false)
+            ->assertDontSee('id="submitter-email"', false)
+            ->assertDontSee('name="email"', false);
+    }
+
     public function test_it_rejects_manual_address_fields_without_a_geoplateforme_selection(): void
     {
         $this->from(route('restaurant-submissions.create'))->post(route('restaurant-submissions.store'), $this->payload([
@@ -168,6 +183,79 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertNotNull($submission->email_verification_token);
         $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_verification', 'recipient' => 'contributeur@example.invalid']);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+    }
+
+    public function test_an_authenticated_depositor_uses_their_server_side_identity_and_enters_admin_review_without_email_verification(): void
+    {
+        $depositor = User::factory()->create([
+            'email' => 'Compte.Deposant@example.test',
+            'password' => Hash::make('MotDePasseActif!123'),
+            'login_enabled' => true,
+            'status' => 'active',
+            'must_change_password' => false,
+        ]);
+        $before = $this->storedUserState($depositor->fresh(), ['password', 'email_verified_at', 'login_enabled', 'role', 'status', 'must_change_password']);
+        Setting::create(['key' => 'contact_settings', 'value' => ['recipient' => 'team@example.test']]);
+        $this->fakeSubmissionIngestor('authenticated-depositor');
+
+        $this->actingAs($depositor)->post(route('restaurant-submissions.store'), $this->payload([
+            'email' => 'forged@example.test',
+            'submitter_role' => 'customer',
+        ]))->assertRedirect(route('restaurant-submissions.thanks'));
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame($depositor->id, $submission->user_id);
+        $this->assertSame('compte.deposant@example.test', $submission->submitter_email);
+        $this->assertSame('pending_admin_review', $submission->status);
+        $this->assertNotNull($submission->email_verified_at);
+        $this->assertNull($submission->email_verification_token);
+        $this->assertNull($submission->email_verification_expires_at);
+        $this->assertSame('compte.deposant@example.test', $submission->restaurant->contact_email);
+        $this->assertSame($before, $this->storedUserState($depositor->fresh(), array_keys($before)));
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('restaurant_claims', 0);
+        Mail::assertNotQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
+        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_confirmed', 'recipient' => 'compte.deposant@example.test']);
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review');
+    }
+
+    public function test_multiple_authenticated_deposits_keep_the_same_user_and_do_not_create_claims(): void
+    {
+        $depositor = User::factory()->create(['email' => 'multiple@example.test']);
+
+        $this->fakeSubmissionIngestor('authenticated-depositor-one');
+        $this->actingAs($depositor)->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Restaurant déposé un']))->assertRedirect();
+        $this->fakeSubmissionIngestor('authenticated-depositor-two');
+        $this->actingAs($depositor)->post(route('restaurant-submissions.store'), $this->payload(['name' => 'Restaurant déposé deux']))->assertRedirect();
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('restaurant_submissions', 2);
+        $this->assertDatabaseCount('restaurant_claims', 0);
+        $this->assertSame([$depositor->id, $depositor->id], RestaurantSubmission::query()->orderBy('id')->pluck('user_id')->all());
+        $this->assertSame(['pending_admin_review', 'pending_admin_review'], RestaurantSubmission::query()->orderBy('id')->pluck('status')->all());
+    }
+
+    public function test_an_authenticated_owner_keeps_the_existing_new_submission_claim_handoff(): void
+    {
+        $owner = User::factory()->create(['email' => 'owner@example.test']);
+        $this->fakeSubmissionIngestor('authenticated-owner');
+
+        $this->actingAs($owner)->post(route('restaurant-submissions.store'), $this->payload([
+            'submitter_role' => 'owner',
+            'owner_full_name' => 'Amina Martin',
+            'owner_company' => 'SARL Test',
+            'owner_siret' => '73282932000074',
+            'owner_certified' => '1',
+        ]))->assertRedirect();
+
+        $submission = RestaurantSubmission::firstOrFail();
+        $this->assertSame('pending_admin_review', $submission->status);
+        $claim = RestaurantClaim::firstOrFail();
+        $this->assertSame($owner->id, $claim->user_id);
+        $this->assertSame($submission->restaurant_id, $claim->restaurant_id);
+        $this->assertSame('new_submission', $claim->source);
+        $this->assertSame('pending_publication', $claim->status);
     }
 
     public function test_it_persists_mixed_opening_states_with_overnight_and_overlapping_slots(): void
