@@ -626,3 +626,6 @@
 
 - Added audited Article and Page trash flows with restore, force-delete and SEO-aware 301/302/404/410 behavior.
 - Extended terminal redirect handling so 404 and 410 produce real error responses without destinations.
+# 2026-10-03 — Icônes de partage de la sidebar éditoriale
+
+- Remplacé les glyphes de partage Facebook, X et e-mail par leurs SVG inline locaux, avec couleurs de marque, état survol/focus inversé et focus clavier visible, sans modifier les destinations ni leur encodage.
