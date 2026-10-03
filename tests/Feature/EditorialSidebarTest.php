@@ -78,8 +78,8 @@ class EditorialSidebarTest extends TestCase
             ->assertSee('https://twitter.com/intent/tweet?url='.urlencode($url), false)
             ->assertSee('mailto:?subject='.rawurlencode($article->title), false)
             ->assertSee('body='.urlencode($url), false)
-            ->assertSee('width="20" height="20" viewBox="0 0 24 24"', false)
             ->assertSee('width="18" height="18" viewBox="0 0 24 24"', false)
+            ->assertSee('width="16" height="16" viewBox="0 0 24 24"', false)
             ->assertSee('fill="currentColor"', false)
             ->assertSee('stroke="currentColor"', false);
     }
