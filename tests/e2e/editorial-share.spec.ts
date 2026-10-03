@@ -33,6 +33,8 @@ test('editorial share buttons preserve their destinations and accessible visual 
 
   expect(new URL((await facebook.getAttribute('href'))!).searchParams.get('u')).toBe(sharedUrl);
   expect(new URL((await x.getAttribute('href'))!).searchParams.get('url')).toBe(sharedUrl);
+  await expect(facebook).toHaveAttribute('target', '_blank');
+  await expect(x).toHaveAttribute('target', '_blank');
   const emailHref = await email.getAttribute('href');
   expect(emailHref).toContain(`body=${encodeURIComponent(sharedUrl)}`);
   expect(emailHref).toContain(`subject=${encodeURIComponent((await page.locator('h1').innerText()).trim())}`);
