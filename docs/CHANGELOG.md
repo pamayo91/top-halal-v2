@@ -2,7 +2,7 @@
 
 ## 2026-10-03
 
-- Restaurants : une soumission faite depuis une session authentifiée masque l’e-mail à l’étape 5, prend l’adresse et le `user_id` du compte côté serveur, ignore toute valeur POST forgée et entre directement en revue Top Halal sans seconde vérification ni activation. Les visiteurs restent soumis à la vérification e-mail inchangée.
+- Restaurants : une soumission faite depuis une session authentifiée masque l’e-mail à l’étape 5, prend l’adresse et le `user_id` du compte côté serveur, ignore toute valeur POST forgée et entre directement en revue Top Halal sans seconde vérification ni activation. Elle n’envoie ni vérification, ni confirmation, ni activation au déposant déjà identifié ; seule l’alerte de revue opérationnelle est conservée. Les visiteurs restent soumis à la vérification e-mail inchangée.
 
 - Navigation mobile : suppression du séparateur vertical parasite à gauche des chevrons de sous-menu et alignement des chevrons intégrés dans la même colonne tactile de 44 px, sans modifier le focus ni le comportement des dropdowns.
 

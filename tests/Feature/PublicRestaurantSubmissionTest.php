@@ -215,8 +215,8 @@ class PublicRestaurantSubmissionTest extends TestCase
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseCount('restaurant_claims', 0);
         Mail::assertNotQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_verification');
-        $this->assertDatabaseHas('email_delivery_logs', ['template_key' => 'restaurant_submission_email_confirmed', 'recipient' => 'compte.deposant@example.test']);
-        Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
+        $this->assertDatabaseMissing('email_delivery_logs', ['template_key' => 'restaurant_submission_email_confirmed', 'recipient' => 'compte.deposant@example.test']);
+        Mail::assertNotQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_email_confirmed');
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'restaurant_submission_admin_review');
     }
 

@@ -187,7 +187,6 @@ class PublicRestaurantSubmissionController extends Controller
 
         $submission = $restaurant->submission()->with('restaurant')->firstOrFail();
         if ($authenticatedUser) {
-            $mailer->confirmed($submission);
             $mailer->notifyTeamForReview($submission);
         } else {
             $mailer->verification($submission, URL::temporarySignedRoute('restaurant-submissions.verify', now()->addHours(24), ['submission' => $submission, 'token' => $token]));
