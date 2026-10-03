@@ -63,6 +63,7 @@ async function expectPublicFooterFlow(page: import('@playwright/test').Page, pat
 
 test('public footer fills the available viewport after a short authentication page', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop-chromium', 'The mobile authentication composition is intentionally taller than one viewport.');
+  await page.setViewportSize({ width: 1440, height: 1200 });
   await expectPublicFooterFlow(page, '/login', true);
 });
 

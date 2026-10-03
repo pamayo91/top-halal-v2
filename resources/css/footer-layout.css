@@ -13,3 +13,9 @@ main#contenu {
 .site-footer {
     flex-shrink: 0;
 }
+
+/* These public form shells previously consumed a whole viewport inside main. */
+.auth-page,
+.owner-form-page {
+    min-height: 0;
+}
