@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-03 — Footer public au bas des viewports courts
+
+Le shell Blade public est une colonne Flexbox avec `100vh` puis `100dvh` : `main` absorbe seulement l’espace libre, et le footer ne rétrécit pas. Les contenus longs conservent leur flux normal, sans hauteur forcée, JavaScript, positionnement fixe/absolu ni modification de `/admin` ou des e-mails. La gate Playwright vérifie la connexion courte sur desktop et les sentinelles fiche restaurant/article sur desktop et mobile.
+
 ## 2026-10-03 — Identité des dépôts de restaurant authentifiés
 
 À l’étape 5, une session authentifiée remplace le champ e-mail éditable par l’adresse non modifiable du compte et une brève indication de suivi. Le serveur exclut toute adresse fournie par POST, utilise exclusivement l’e-mail et le `user_id` de session, rattache chaque nouveau dépôt au même compte et ne crée ni utilisateur, ni activation, ni claim pour un simple déposant. La soumission passe directement à `pending_admin_review` et ne déclenche aucun e-mail au déposant déjà authentifié (ni vérification, ni confirmation, ni activation) ; seule l’alerte de revue opérationnelle reste envoyée. Les visiteurs, l’ownership déclaré et le cycle publication/refus existants restent inchangés.
