@@ -57,6 +57,32 @@ class EditorialSidebarTest extends TestCase
             ->assertSee('href="#second-titre"', false);
     }
 
+    public function test_share_links_keep_their_encoded_destinations_and_render_accessible_inline_svgs(): void
+    {
+        $article = $this->article([
+            'title' => 'Article & titre',
+            'slug' => 'article-partage',
+            'editorial_sidebar_overrides' => ['blocks' => [['type' => 'share', 'enabled' => true]]],
+        ]);
+        $url = route('editorial.show', $article->slug);
+
+        $this->get($url)
+            ->assertOk()
+            ->assertSee('class="share-link share-link-facebook"', false)
+            ->assertSee('class="share-link share-link-x"', false)
+            ->assertSee('class="share-link share-link-email"', false)
+            ->assertSee('aria-label="Partager sur Facebook"', false)
+            ->assertSee('aria-label="Partager sur X"', false)
+            ->assertSee('aria-label="Partager par e-mail"', false)
+            ->assertSee('https://www.facebook.com/sharer/sharer.php?u='.urlencode($url), false)
+            ->assertSee('https://twitter.com/intent/tweet?url='.urlencode($url), false)
+            ->assertSee('mailto:?subject='.rawurlencode($article->title).'&amp;body='.urlencode($url), false)
+            ->assertSee('width="20" height="20" viewBox="0 0 24 24"', false)
+            ->assertSee('width="18" height="18" viewBox="0 0 24 24"', false)
+            ->assertSee('fill="currentColor"', false)
+            ->assertSee('stroke="currentColor"', false);
+    }
+
     private function article(array $attributes = []): Article
     {
         return Article::create(array_merge(['legacy_wp_id' => random_int(1, 999999999), 'original_title' => 'Article', 'title' => 'Article', 'slug' => 'article-'.random_int(1, 999999999), 'legacy_url' => '/article', 'status' => 'published'], $attributes));
