@@ -2,7 +2,7 @@
 
 ## 2026-10-03 — Demande de suppression après archivage
 
-Une fiche archivée après acceptation d’une demande affiche désormais l’état terminal « Fiche supprimée » dans Mon compte, au lieu de réactiver le lien de demande. Les accès directs GET et POST sont également refusés sans créer de nouvelle demande ; la vérification transactionnelle protège enfin la course entre l’affichage et l’envoi.
+Une fiche archivée après acceptation d’une demande affiche désormais l’état terminal « Fiche supprimée » dans Mon compte, au lieu de réactiver le lien de demande. Les accès directs GET et POST sont également refusés sans créer de nouvelle demande ; la vérification transactionnelle protège enfin la course entre l’affichage et l’envoi. Les 15 scénarios PHP ciblés (91 assertions) passent dans un worktree préproduction isolé sous PHP 8.4.
 
 ## 2026-10-03 — Footer public au bas des viewports courts
 
