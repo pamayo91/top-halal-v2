@@ -152,11 +152,15 @@
                             </div>
                             @error('submitter_role')<p class="field-error">{{ $message }}</p>@enderror
                         </fieldset>
-                        <label for="submitter-email">Votre e-mail</label>
-                        <input id="submitter-email" name="email" type="email" autocomplete="email" required maxlength="255" value="{{ old('email') }}">
-                        <p class="form-help" data-owner-email-help="customer" @if(old('submitter_role') === 'owner') hidden @endif>Nous utilisons votre e-mail pour le suivi. Après sa confirmation, vous recevrez aussi un lien pour activer votre espace et adapter cette fiche.</p>
-                        <p class="form-help" data-owner-email-help="owner" @unless(old('submitter_role') === 'owner') hidden @endunless>Nous utilisons votre e-mail pour le suivi. Après sa confirmation, vous recevrez aussi un lien pour activer votre espace et gérer cette fiche.</p>
-                        @error('email')<p class="field-error">{{ $message }}</p>@enderror
+                        @if($authenticatedSubmitterEmail)
+                            <p class="form-help submission-account-email"><b>Soumission effectuée avec votre compte :</b> {{ $authenticatedSubmitterEmail }}<br>Les informations de suivi seront envoyées à cette adresse.</p>
+                        @else
+                            <label for="submitter-email">Votre e-mail</label>
+                            <input id="submitter-email" name="email" type="email" autocomplete="email" required maxlength="255" value="{{ old('email') }}">
+                            <p class="form-help" data-owner-email-help="customer" @if(old('submitter_role') === 'owner') hidden @endif>Nous utilisons votre e-mail pour le suivi. Après sa confirmation, vous recevrez aussi un lien pour activer votre espace et adapter cette fiche.</p>
+                            <p class="form-help" data-owner-email-help="owner" @unless(old('submitter_role') === 'owner') hidden @endunless>Nous utilisons votre e-mail pour le suivi. Après sa confirmation, vous recevrez aussi un lien pour activer votre espace et gérer cette fiche.</p>
+                            @error('email')<p class="field-error">{{ $message }}</p>@enderror
+                        @endif
 
                         <div class="submission-actions">
                             <button class="button button-secondary" type="button" data-previous hidden>Retour</button>

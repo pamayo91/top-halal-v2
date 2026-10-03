@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+const authenticatedEmail = process.env.PREPROD_ADMIN_EMAIL;
+const authenticatedPassword = process.env.PREPROD_ADMIN_PASSWORD;
+
 const cover = {
   name: 'couverture-800px.png',
   mimeType: 'image/png',
@@ -382,6 +385,32 @@ test('public restaurant contribution submits a pending restaurant successfully',
   await expect(page.getByRole('heading', { name: 'Merci pour la soumission du restaurant !' })).toBeVisible();
   await expect(page.getByText('Vous devez d’abord confirmer votre adresse e-mail. Elle ne sera jamais publiée.')).toBeVisible();
   await expect(page.getByText('Consultez votre boîte e-mail et vérifiez également vos spams pour confirmer votre adresse. Ensuite, notre équipe pourra examiner la proposition.')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('an authenticated depositor submits from their account identity without a second e-mail verification', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-chromium' || !authenticatedEmail || !authenticatedPassword, 'Dedicated preproduction test account required.');
+  const errors: string[] = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('requestfailed', request => errors.push(`${request.method()} ${request.url()}`));
+
+  await page.goto('/login');
+  await page.locator('input[name="email"]').fill(authenticatedEmail!);
+  await page.locator('input[name="password"]').fill(authenticatedPassword!);
+  await page.getByRole('button', { name: /se connecter/i }).click();
+  await expect(page).toHaveURL(/\/account$/);
+
+  await fillRestaurantAndAddress(page, `authenticated-${crypto.randomUUID()}`);
+  await page.locator('[data-cover-input]').setInputFiles(cover);
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Soumission effectuée avec votre compte')).toBeVisible();
+  await expect(page.getByText(authenticatedEmail!, { exact: false })).toBeVisible();
+  await expect(page.locator('input[name="email"]')).toHaveCount(0);
+  await page.getByLabel('Non').check();
+  await page.getByRole('button', { name: 'Envoyer le restaurant' }).click();
+  await expect(page.getByRole('heading', { name: 'Merci pour la soumission du restaurant !' })).toBeVisible();
+  await expect(page.getByText('Votre proposition est maintenant en attente de vérification par l’équipe Top Halal.')).toBeVisible();
+  await expect(page.getByText('Vous devez d’abord confirmer votre adresse e-mail. Elle ne sera jamais publiée.')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

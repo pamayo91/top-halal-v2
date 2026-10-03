@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-03 — Identité des dépôts de restaurant authentifiés
+
+À l’étape 5, une session authentifiée remplace le champ e-mail éditable par l’adresse non modifiable du compte et une brève indication de suivi. Le serveur exclut toute adresse fournie par POST, utilise exclusivement l’e-mail et le `user_id` de session, rattache chaque nouveau dépôt au même compte et ne crée ni utilisateur, ni activation, ni claim pour un simple déposant. La soumission passe directement à `pending_admin_review`, avec les notifications métier de confirmation et de revue, sans e-mail de vérification. Les visiteurs, l’ownership déclaré et le cycle publication/refus existants restent inchangés.
+
 ## 2026-10-03 — Icônes du bloc Partager éditorial
 
 Le bloc Partager partagé par les Articles et Pages conserve strictement ses destinations Facebook, X et e-mail, ainsi que l’encodage de l’URL et du titre. Ses boutons SSR de 40 px sont des pastilles pleines homogènes : monogramme Facebook sans cercle interne, X réduit, enveloppe renforcée, micro-translation au survol et contour clavier visible.
