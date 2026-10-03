@@ -65,7 +65,9 @@
                                 @if($restaurant->status === 'published')
                                     <a class="button button-secondary" href="{{ route('restaurants.show', $restaurant->slug) }}">Voir la fiche</a>
                                 @endif
-                                @if($restaurant->pending_removal_requests_count)
+                                @if($restaurant->status === 'archived')
+                                    <span class="account-removal-pending">Fiche supprimée</span>
+                                @elseif($restaurant->pending_removal_requests_count)
                                     <span class="account-removal-pending">Demande de suppression en cours</span>
                                 @else
                                     <a class="account-removal-link" href="{{ route('owner.restaurants.removal.create', $restaurant) }}">Demander la suppression</a>

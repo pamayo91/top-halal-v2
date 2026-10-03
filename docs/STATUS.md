@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-03 — Demande de suppression après archivage
+
+Une fiche archivée après acceptation d’une demande affiche désormais l’état terminal « Fiche supprimée » dans Mon compte, au lieu de réactiver le lien de demande. Les accès directs GET et POST sont également refusés sans créer de nouvelle demande ; la vérification transactionnelle protège enfin la course entre l’affichage et l’envoi.
+
 ## 2026-10-03 — Footer public au bas des viewports courts
 
 Le shell Blade public est une colonne Flexbox avec `100vh` puis `100dvh` : `main` absorbe seulement l’espace libre, et le footer ne rétrécit pas. Les contenus longs conservent leur flux normal, sans hauteur forcée, JavaScript, positionnement fixe/absolu ni modification de `/admin` ou des e-mails. La gate Playwright vérifie la connexion courte sur desktop et les sentinelles fiche restaurant/article sur desktop et mobile.
