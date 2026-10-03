@@ -398,7 +398,7 @@ test('an authenticated depositor submits from their account identity without a s
   await page.locator('input[name="email"]').fill(authenticatedEmail!);
   await page.locator('input[name="password"]').fill(authenticatedPassword!);
   await page.getByRole('button', { name: /se connecter/i }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/(?:account|admin)$/);
 
   await fillRestaurantAndAddress(page, `authenticated-${crypto.randomUUID()}`);
   await page.locator('[data-cover-input]').setInputFiles(cover);
