@@ -629,3 +629,4 @@
 # 2026-10-03 — Icônes de partage de la sidebar éditoriale
 
 - Remplacé les glyphes de partage Facebook, X et e-mail par leurs SVG inline locaux, avec couleurs de marque, état survol/focus inversé et focus clavier visible, sans modifier les destinations ni leur encodage.
+- Uniformisé ensuite les trois actions dans des pastilles pleines de 40 px : monogramme Facebook sans cercle interne, X réduit et enveloppe renforcée.

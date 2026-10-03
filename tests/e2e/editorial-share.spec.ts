@@ -21,8 +21,9 @@ test('editorial share buttons preserve their destinations and accessible visual 
   const sharedUrl = page.url();
 
   for (const link of [facebook, x, email]) {
-    await expect(link).toHaveJSProperty('offsetWidth', 38);
-    await expect(link).toHaveJSProperty('offsetHeight', 38);
+    await expect(link).toHaveJSProperty('offsetWidth', 40);
+    await expect(link).toHaveJSProperty('offsetHeight', 40);
+    await expect(link).toHaveCSS('border-top-width', '0px');
     await expect(link.locator('svg')).toHaveAttribute('aria-hidden', 'true');
   }
 

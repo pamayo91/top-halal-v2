@@ -46,7 +46,7 @@ La présentation publique utilise une colonne éditoriale principale et une rail
 
 Les libellés des cartes de sidebar ne sont pas des titres H2 afin de préserver le plan sémantique du contenu éditorial. Dans le sommaire, seuls les H2 reçoivent une numérotation continue ; les H3 restent des liens indentés sans numéro.
 
-Le bloc Partager conserve ses trois destinations existantes (Facebook, X et e-mail) et leurs URLs encodées. Ses trois boutons circulaires SSR de 38 px utilisent des SVG inline locaux, colorés au repos (`#1877F2`, noir et `#08705A`) puis blancs sur le fond propre au service au survol et au focus clavier, sans déplacement de layout.
+Le bloc Partager conserve ses trois destinations existantes (Facebook, X et e-mail) et leurs URLs encodées. Ses trois boutons circulaires SSR de 40 px utilisent des SVG inline locaux blancs sur les fonds de marque (`#1877F2`, noir et `#08705A`), avec une micro-translation au survol et un focus clavier visible, sans déplacement de layout.
 
 Sur desktop, un sommaire réellement long conserve sa liste SSR complète en haut de lecture, limitée à 68 vh avec défilement interne si nécessaire et sans contrôle supplémentaire. Après le début de lecture, une amélioration JavaScript légère le compacte en indiquant la section en cours et un bouton `Afficher le sommaire`; ce bouton redéploie la liste. Dans cet état sticky déployé, le seul contrôle est le petit `Réduire ↑` aligné à droite du titre. Les petits sommaires et le rendu mobile gardent leur présentation existante, y compris sans JavaScript.
 ## Inline legacy media debt

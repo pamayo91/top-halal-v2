@@ -2,7 +2,7 @@
 
 ## 2026-10-03 — Icônes du bloc Partager éditorial
 
-Le bloc Partager partagé par les Articles et Pages conserve strictement ses destinations Facebook, X et e-mail, ainsi que l’encodage de l’URL et du titre. Ses boutons SSR de 38 px utilisent désormais les SVG inline locaux, leurs couleurs distinctes au repos et un état blanc sur fond de marque au survol/focus, avec un contour clavier visible.
+Le bloc Partager partagé par les Articles et Pages conserve strictement ses destinations Facebook, X et e-mail, ainsi que l’encodage de l’URL et du titre. Ses boutons SSR de 40 px sont des pastilles pleines homogènes : monogramme Facebook sans cercle interne, X réduit, enveloppe renforcée, micro-translation au survol et contour clavier visible.
 
 ## 2026-10-02 — Chevron mobile sans séparateur vertical
 
