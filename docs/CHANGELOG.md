@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-04
+
+- Accueil : stabilisation de la pile Hero / recherche / « Restaurants récemment ajoutés ». Le décor du Hero reste sous la carte chevauchante et les deux menus d’autocomplétion restent au-dessus sans `:focus-within` qui élève le Hero entier. Les menus sont exclusifs et se ferment tous les deux au clic extérieur ; dimensions et espacements inchangés.
+
 ## 2026-10-03
 
 - Accueil : correction de la superposition Hero / « Restaurants récemment ajoutés ». Le Hero ne passe plus devant la carte blanche au repos ; il remonte uniquement pendant l’interaction avec la recherche afin de conserver les suggestions cliquables. Le chevauchement et les espacements existants sont préservés.

@@ -1,8 +1,12 @@
 # Top-Halal V2 — Status
 
+## 2026-10-04 — Piles stables Hero / recherche / restaurants de l’accueil
+
+Le correctif précédent faisait monter le Hero entier via `:focus-within`. Son `isolation:isolate` en faisait alors une pile atomique face à la carte restaurants, ce qui rendait l’affichage dépendant du focus et pouvait laisser une suggestion ou la carte blanche au mauvais niveau. Le Hero et la carte partagent désormais un contexte local unique : le décor/fond reste sous la carte, la carte conserve son léger chevauchement au repos, et le contenu de recherche (dont les deux menus) reste au-dessus sans changement de pile au focus. Les deux menus se ferment aussi mutuellement et à la sortie pointeur ; aucune dimension ni marge n’est modifiée.
+
 ## 2026-10-03 — Chevauchement Hero / restaurants de l’accueil
 
-Le Hero avait reçu un `z-index: 1` global au commit `64442ed` pour laisser passer les suggestions de recherche au-dessus de la première section. Comme celle-ci remonte volontairement avec une marge négative, le fond du Hero recouvrait aussi son haut et tronquait « À découvrir ». La carte restaurants est maintenant au-dessus hors interaction ; le Hero remonte seulement avec `:focus-within`, le temps où les suggestions doivent être cliquables. Le chevauchement, les dimensions et les espacements sont inchangés.
+Le Hero avait reçu un `z-index: 1` global au commit `64442ed` pour laisser passer les suggestions de recherche au-dessus de la première section. Comme celle-ci remonte volontairement avec une marge négative, le fond du Hero recouvrait aussi son haut et tronquait « À découvrir ». Cette première correction a été remplacée le 2026-10-04 par une pile locale stable, sans élévation conditionnelle du Hero.
 
 ## 2026-10-03 — Demande de suppression après archivage
 
