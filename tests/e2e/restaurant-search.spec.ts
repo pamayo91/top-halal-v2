@@ -20,7 +20,7 @@ test('two-field restaurant search works responsively', async ({ page }) => {
     }
   });
 
-test('homepage overlap keeps the restaurant header visible and autocomplete clickable', async ({ page }) => {
+test('homepage overlap keeps the card and both autocomplete menus in their stable layers', async ({ page }) => {
   test.skip((page.viewportSize()?.width ?? 0) < 760, 'The homepage section overlap is desktop-only.');
 
   await page.goto('/');
@@ -42,13 +42,15 @@ test('homepage overlap keeps the restaurant header visible and autocomplete clic
 
   const search = page.locator('[data-restaurant-search]').first();
   const location = search.getByLabel('Localisation');
+  const query = search.getByLabel('Spécialité ou nom de restaurant');
   await location.focus();
 
-  const popover = search.locator('[data-cities-list]');
-  await expect(popover).toBeVisible();
-  const lastCity = popover.locator('[data-city-name]').last();
+  const cities = search.locator('[data-cities-list]');
+  const suggestions = search.locator('[data-suggestions-list]');
+  await expect(cities).toBeVisible();
+  const lastCity = cities.locator('[data-city-name]').last();
   await expect(lastCity).toBeAttached();
-  await popover.evaluate(element => { element.scrollTop = element.scrollHeight; });
+  await cities.evaluate(element => { element.scrollTop = element.scrollHeight; });
   await expect(lastCity).toBeVisible();
 
   const evidence = await lastCity.evaluate(element => {
@@ -65,8 +67,31 @@ test('homepage overlap keeps the restaurant header visible and autocomplete clic
 
   expect(evidence.extendsHero).toBe(true);
   expect(evidence.receivesPointerEvents).toBe(true);
-  await lastCity.click();
-  await expect(location).toHaveValue(await lastCity.getAttribute('data-city-name') ?? '');
+
+  await query.fill('burger');
+  await expect(cities).toBeHidden();
+  await expect(suggestions).toBeVisible();
+  await expect(async () => {
+    const suggestionIsClickable = await suggestions.locator('button').first().evaluate(element => {
+      const rectangle = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(rectangle.left + (rectangle.width / 2), rectangle.top + (rectangle.height / 2));
+      return hit === element || hit?.closest('[data-suggestions-list] button') === element;
+    });
+    expect(suggestionIsClickable).toBe(true);
+  }).toPass();
+
+  await location.focus();
+  await expect(suggestions).toBeHidden();
+  await expect(cities).toBeVisible();
+  await page.locator('h1').click();
+  await expect(cities).toBeHidden();
+  await expect(suggestions).toBeHidden();
+
+  const stableOverlap = await eyebrow.evaluate(element => {
+    const rectangle = element.getBoundingClientRect();
+    return document.elementFromPoint(rectangle.left + 1, rectangle.top + 1)?.closest('[data-home-section="restaurants"]') !== null;
+  });
+  expect(stableOverlap).toBe(true);
 });
 
 test('official accent-insensitive commune selection keeps its INSEE identity and never falls back to Paris', async ({ page }) => {

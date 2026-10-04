@@ -490,7 +490,7 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
     };
     let cityTimer; let queryTimer; let selectedRestaurant = null; let selectedCategory = null; let active = -1;
     const buttons = container => [...container.querySelectorAll('button:not([disabled])')];
-    const close = container => { container.hidden = true; active = -1; };
+    const close = container => { container.hidden = true; active = -1; if (container === cities) location.setAttribute('aria-expanded', 'false'); if (container === suggestions) query.setAttribute('aria-expanded', 'false'); };
     const clearNearbyState = () => form.querySelectorAll('[data-nearby-state]').forEach(input => { input.disabled = true; });
     const chooseCity = (name, cityCode) => { clearNearbyState(); location.value = name; cityValue.value = cityCode; message.hidden = true; close(cities); };
     const showMessage = text => { message.textContent = text; message.hidden = false; location.focus(); };
@@ -515,9 +515,9 @@ document.querySelectorAll('[data-restaurant-search]').forEach(form => {
         if (query.value.trim().length < 2) { close(suggestions); return; }
         try { const response = await fetch(`${form.dataset.suggestionsUrl}?q=${encodeURIComponent(query.value)}&city_code=${encodeURIComponent(cityValue.value)}`, { headers: { Accept: 'application/json' } }); if (response.ok) renderSuggestions(await response.json()); } catch (_) { /* Search remains a regular GET form. */ }
     };
-    location.addEventListener('focus', () => loadCities()); location.addEventListener('input', () => { clearNearbyState(); cityValue.value = ''; message.hidden = true; clearTimeout(cityTimer); cityTimer = setTimeout(() => loadCities(location.value), 180); });
+    location.addEventListener('focus', () => { close(suggestions); loadCities(); }); location.addEventListener('input', () => { clearNearbyState(); cityValue.value = ''; message.hidden = true; clearTimeout(cityTimer); cityTimer = setTimeout(() => loadCities(location.value), 180); });
     query.addEventListener('focus', () => close(cities));
-    document.addEventListener('pointerdown', event => { if (!form.contains(event.target)) close(cities); });
+    document.addEventListener('pointerdown', event => { if (!form.contains(event.target)) { close(cities); close(suggestions); } });
     cities.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.matches('[data-near-me]')) { if (!navigator.geolocation) return showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); button.disabled = true; navigator.geolocation.getCurrentPosition(({ coords }) => { synchronizeDirectoryFilters(); const params = new URLSearchParams(new FormData(form)); params.delete('city_code'); params.delete('location'); params.delete('ville'); params.delete('lat'); params.delete('lng'); params.set('lat', coords.latitude); params.set('lng', coords.longitude); window.location.assign(`${form.action.replace('/recherche', '')}?${params.toString()}`); }, () => { button.disabled = false; showMessage('Impossible d’obtenir votre position. Choisissez une ville.'); }, { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }); return; } chooseCity(button.dataset.cityName, button.dataset.cityCode); });
     query.addEventListener('input', () => { selectedRestaurant = null; clearSelectedCategory(); clearTimeout(queryTimer); queryTimer = setTimeout(loadSuggestions, 220); });
     suggestions.addEventListener('click', event => { const button = event.target.closest('button'); if (!button) return; if (button.dataset.category) { selectedCategory = { label: button.textContent, slug: button.dataset.category }; category.value = selectedCategory.slug; category.disabled = false; query.value = selectedCategory.label; query.removeAttribute('name'); close(suggestions); return; } if (button.dataset.restaurant) { clearSelectedCategory(); selectedRestaurant = button.dataset.restaurant; query.value = button.childNodes[0].textContent; close(suggestions); } });
