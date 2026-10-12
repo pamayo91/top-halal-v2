@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-12
+
+- Préproduction : le commit validé `b7d4661` est désormais publié normalement
+  sur `develop` après audit ciblé des 35 commits auparavant seulement présents
+  sur le serveur. Le checkout a été relu depuis GitHub et la gate complète à
+  snapshot est verte. La procédure interdit désormais de valider pour production
+  un commit absent de `origin/develop`.
+
 ## 2026-10-04
 
 - Accueil : stabilisation de la pile Hero / recherche / « Restaurants récemment ajoutés ». Le décor du Hero reste sous la carte chevauchante et les deux menus d’autocomplétion restent au-dessus sans `:focus-within` qui élève le Hero entier. Les menus sont exclusifs et se ferment tous les deux au clic extérieur ; dimensions et espacements inchangés.

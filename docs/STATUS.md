@@ -1,5 +1,18 @@
 # Top-Halal V2 — Status
 
+## 2026-10-12 — Traçabilité Git de la préproduction rétablie
+
+Le checkout préproduction validé `b7d4661` contenait 35 commits de plus que
+`origin/develop`. L'audit a établi qu'il s'agissait de 31 merges successifs de
+la branche distante et de quatre commits Top-Halal (médias éditoriaux et footer),
+sans secret, artefact sensible, blob volumineux ni différence d'arbre finale
+avec la branche distante. La branche préproduction a été poussée normalement
+en fast-forward vers GitHub, puis relue depuis `origin/develop`; les deux refs
+pointent désormais le même commit. La gate complète post-synchronisation avec
+snapshot est verte. Règle durable : une préproduction candidate à la production
+ne doit jamais contenir de commit absent de `origin/develop` ; le flux obligatoire
+est commit local, push GitHub, puis pull/déploiement préproduction.
+
 ## 2026-10-04 — Piles stables Hero / recherche / restaurants de l’accueil
 
 Le correctif précédent faisait monter le Hero entier via `:focus-within`. Son `isolation:isolate` en faisait alors une pile atomique face à la carte restaurants, ce qui rendait l’affichage dépendant du focus et pouvait laisser une suggestion ou la carte blanche au mauvais niveau. Le Hero et la carte partagent désormais un contexte local unique : le décor/fond reste sous la carte, la carte conserve son léger chevauchement au repos, et le contenu de recherche (dont les deux menus) reste au-dessus sans changement de pile au focus. Les deux menus se ferment aussi mutuellement et à la sortie pointeur ; aucune dimension ni marge n’est modifiée.

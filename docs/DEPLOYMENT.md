@@ -17,6 +17,12 @@
 - `develop`: preproduction integration branch.
 - `feature/...`: temporary branches for significant work; merge into `develop` only after validation.
 - Codex workflow: edit code, run targeted local tests, commit, push to GitHub, SSH to preproduction, pull `develop`, run deployment steps, then validate preproduction with browser/Playwright.
+- A preproduction revision considered valid for production must always be
+  reachable from `origin/develop` before validation is accepted. Never retain
+  durable development commits only in the server checkout: the mandatory order
+  is local commit, GitHub push, then preproduction pull/deployment. Before a
+  production-readiness audit, verify `git merge-base --is-ancestor HEAD
+  origin/develop` and `git rev-parse HEAD = git rev-parse origin/develop`.
 
 ## Required Manual GitHub Actions
 - Confirm whether branch protection is desired for `main` and `develop`.
