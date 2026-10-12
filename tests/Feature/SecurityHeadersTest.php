@@ -16,4 +16,11 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString("default-src 'self'", (string) $response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString("frame-ancestors 'none'", (string) $response->headers->get('Content-Security-Policy'));
     }
+
+    public function test_non_canonical_hosts_stay_noindex(): void
+    {
+        config()->set('app.url', 'https://top-halal.fr');
+
+        $this->get('https://prod-preview.top-halal.fr/')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
 }
