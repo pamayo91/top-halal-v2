@@ -659,3 +659,7 @@
 - Ajout de la couverture PHP des headers et validation navigateur préproduction sans erreur console/page sur les pages publiques représentatives.
 - Remplacement de deux liens internes absolus de préproduction dans la page publiée `quick-hallal` par des chemins relatifs ; audit final des sources applicatives et données éditoriales concernées documenté.
 - Ajout du rapport de clôture P1 avec état OPcache, candidats de nettoyage en lecture seule et métriques navigateur mesurées (sans score Lighthouse inventé).
+
+# 2026-10-12 — Nettoyage des données de test préproduction
+
+- Suppression transactionnelle, après audit, de 62 dépôts techniques `example.invalid`, de leurs 62 restaurants V2 non publiés et de leurs dépendances directes strictement techniques. Aucun utilisateur, claim, asset média partagé, donnée legacy ou donnée métier ambiguë n'a été supprimé.

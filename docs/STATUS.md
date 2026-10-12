@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-12 — Nettoyage contrôlé des dépôts techniques
+
+Après audit relationnel, 62 soumissions `example.invalid` purement techniques et leurs 62 restaurants `pending` non legacy ont été supprimés de la seule préproduction. La transaction a aussi retiré 434 horaires, 34 relations catégorie, 34 relations service, 62 liens média et 88 journaux e-mail de test. Aucun compte, claim, asset média, avis, demande de retrait, enrichissement ou donnée legacy n'était lié ; l'unique asset partagé reste conservé. Les contrôles post-opération confirment zéro soumission/adresse/journal `example.invalid` et zéro orphelin sur les relations contrôlées.
+
 ## 2026-10-12 — Clôture P1 préparation production
 
 Headers de sécurité applicatifs testés, audit OPcache, audit read-only des données de test, mesures navigateur représentatives et audit des fuites `dev.top-halal.fr` sont consignés dans `docs/generated/production-preparation-p1-2026-10-12.md`. Aucun métier n'a été supprimé : 62 soumissions `example.invalid` sont seulement qualifiées candidates. Les deux liens internes absolus de préproduction trouvés dans `quick-hallal` ont été remplacés par des chemins relatifs. OPcache reste à vérifier/activer par l'hébergement pour le SAPI web PHP 8.4 avant une vraie production.
