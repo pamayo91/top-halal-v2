@@ -663,3 +663,7 @@
 # 2026-10-12 — Nettoyage des données de test préproduction
 
 - Suppression transactionnelle, après audit, de 62 dépôts techniques `example.invalid`, de leurs 62 restaurants V2 non publiés et de leurs dépendances directes strictement techniques. Aucun utilisateur, claim, asset média partagé, donnée legacy ou donnée métier ambiguë n'a été supprimé.
+
+# 2026-10-12 — Initialisation contrôlée de la BDD production V2
+
+- Copie complète et validée de la seule BDD V2 préproduction vers la cible production initialement vide, après double confirmation explicite. Le dump ne contient pas de sélection de base source ; contrôles de schéma, compteurs, relations, médias et preview HTTPS conformes. Les jobs restent vides et le mail/worker/Cron production restent neutralisés avant cutover.

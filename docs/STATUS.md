@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-12 — Copie contrôlée de la BDD V2 vers production
+
+Après les deux confirmations explicites du propriétaire, la BDD V2 préproduction a été copiée vers la BDD production vide avec un dump transactionnel sans `--databases`, empêchant toute instruction `USE` vers la source. Les 54 tables, 71 migrations et compteurs métier sont identiques ; la vérification dynamique ne relève aucune relation ou média manquant. Les fichiers client temporaires ont été supprimés, les dumps source et cible-vide restent privés (`600`), et la preview production fonctionne en HTTPS avec e-mails neutralisés, Cron/worker désactivés et `noindex,nofollow`.
+
 ## 2026-10-12 — Nettoyage contrôlé des dépôts techniques
 
 Après audit relationnel, 62 soumissions `example.invalid` purement techniques et leurs 62 restaurants `pending` non legacy ont été supprimés de la seule préproduction. La transaction a aussi retiré 434 horaires, 34 relations catégorie, 34 relations service, 62 liens média et 88 journaux e-mail de test. Aucun compte, claim, asset média, avis, demande de retrait, enrichissement ou donnée legacy n'était lié ; l'unique asset partagé reste conservé. Les contrôles post-opération confirment zéro soumission/adresse/journal `example.invalid` et zéro orphelin sur les relations contrôlées.
