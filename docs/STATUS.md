@@ -1,5 +1,19 @@
 # Top-Halal V2 — Status
 
+## 2026-10-12 — Recette de la preview production
+
+La preview HTTPS `prod-preview.top-halal.fr` a été contrôlée sur le checkout
+production `3e59c6b`. Les sentinelles publiques Playwright (45 réussites, une
+exclusion attendue), les parcours géographiques, les relations/médias et les
+compteurs de la BDD de production sont conformes; `robots.txt` et
+`X-Robots-Tag` maintiennent l'instance en `noindex,nofollow`, les e-mails sont
+neutralisés et Cron/worker restent désactivés. Les mesures navigateur mobile à
+contexte frais donnent un LCP de 472–684 ms et un CLS nul sur les cinq pages
+représentatives testées. Réserve à lever avant le cutover : le formulaire
+Filament de connexion admin ne déclenche pas de requête Livewire dans le
+navigateur automatisé avec le compte dédié; aucun compte ni donnée métier n'a
+été modifié pendant ce diagnostic.
+
 ## 2026-10-12 — Copie contrôlée de la BDD V2 vers production
 
 Après les deux confirmations explicites du propriétaire, la BDD V2 préproduction a été copiée vers la BDD production vide avec un dump transactionnel sans `--databases`, empêchant toute instruction `USE` vers la source. Les 54 tables, 71 migrations et compteurs métier sont identiques ; la vérification dynamique ne relève aucune relation ou média manquant. Les fichiers client temporaires ont été supprimés, les dumps source et cible-vide restent privés (`600`), et la preview production fonctionne en HTTPS avec e-mails neutralisés, Cron/worker désactivés et `noindex,nofollow`.

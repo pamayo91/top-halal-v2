@@ -2,6 +2,12 @@
 
 ## 2026-10-12
 
+- Preview production : recette publique complète et contrôles d'intégrité de
+  la copie V2 validés. La preview reste isolée (`noindex,nofollow`, e-mails
+  neutralisés, Cron/worker inactifs). Un diagnostic Filament reste requis pour
+  la soumission de connexion BO automatisée, qui ne lance aucune requête
+  Livewire dans ce contexte; aucune donnée n'a été créée ou modifiée.
+
 - Préproduction : le commit validé `b7d4661` est désormais publié normalement
   sur `develop` après audit ciblé des 35 commits auparavant seulement présents
   sur le serveur. Le checkout a été relu depuis GitHub et la gate complète à
