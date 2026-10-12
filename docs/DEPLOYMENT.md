@@ -80,7 +80,7 @@ Create `scripts/deploy-preprod.sh` after the server audit confirms final paths, 
 - PHP 8.4 binary: `/opt/alt/php84/usr/bin/php`.
 - Composer works when invoked explicitly with PHP 8.4: `/opt/alt/php84/usr/bin/php /usr/local/bin/composer`.
 - Required PHP 8.4 extensions for Laravel bootstrap are enabled.
-- `opcache` is still missing from PHP 8.4 and should be enabled before performance validation.
+- Le module `opcache.so` est présent pour PHP 8.4, mais il n'est pas chargé par le CLI (`php -m`/`php -i`). Le compte de déploiement ne peut pas confirmer ni modifier le SAPI web : activer/vérifier OPcache auprès de l'hébergement avant une mise en production, sans tenter une activation CLI isolée.
 - Composer 2.10.2 and Git 2.48.2 are available.
 - MariaDB client is 11.4.13.
 - Node/npm are not available in SSH PATH.

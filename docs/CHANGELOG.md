@@ -652,3 +652,10 @@
 
 - Remplacé les glyphes de partage Facebook, X et e-mail par leurs SVG inline locaux, avec couleurs de marque, état survol/focus inversé et focus clavier visible, sans modifier les destinations ni leur encodage.
 - Uniformisé ensuite les trois actions dans des pastilles pleines de 40 px : monogramme Facebook sans cercle interne, X réduit et enveloppe renforcée.
+
+# 2026-10-12 — Préparation production : headers et audits P1
+
+- Ajout d'un middleware de headers de sécurité : CSP adaptée au public/à l'administration, `nosniff`, politique de referrer stricte et permissions navigateur réduites. HSTS est réservé à l'environnement Laravel `production` servi en HTTPS.
+- Ajout de la couverture PHP des headers et validation navigateur préproduction sans erreur console/page sur les pages publiques représentatives.
+- Remplacement de deux liens internes absolus de préproduction dans la page publiée `quick-hallal` par des chemins relatifs ; audit final des sources applicatives et données éditoriales concernées documenté.
+- Ajout du rapport de clôture P1 avec état OPcache, candidats de nettoyage en lecture seule et métriques navigateur mesurées (sans score Lighthouse inventé).

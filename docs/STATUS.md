@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-12 — Clôture P1 préparation production
+
+Headers de sécurité applicatifs testés, audit OPcache, audit read-only des données de test, mesures navigateur représentatives et audit des fuites `dev.top-halal.fr` sont consignés dans `docs/generated/production-preparation-p1-2026-10-12.md`. Aucun métier n'a été supprimé : 62 soumissions `example.invalid` sont seulement qualifiées candidates. Les deux liens internes absolus de préproduction trouvés dans `quick-hallal` ont été remplacés par des chemins relatifs. OPcache reste à vérifier/activer par l'hébergement pour le SAPI web PHP 8.4 avant une vraie production.
+
 ## 2026-10-12 — Traçabilité Git de la préproduction rétablie
 
 Le checkout préproduction validé `b7d4661` contenait 35 commits de plus que
