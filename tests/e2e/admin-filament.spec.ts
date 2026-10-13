@@ -49,6 +49,23 @@ test.describe('Filament administration', () => {
     expect(networkErrors).toEqual([]);
   });
 
+  test('admin session logs out and authenticates again with the dedicated test account', async ({ page }) => {
+    const login = async () => {
+      await page.goto('/admin');
+      await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+      await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/admin$/);
+    };
+
+    await login();
+    await page.getByRole('button', { name: 'Menu utilisateur' }).click();
+    await page.getByRole('button', { name: 'Déconnexion' }).click();
+    await expect(page).toHaveURL(/\/admin\/login$/);
+    await login();
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
+  });
+
   test('review and comment detail dialogs show historical dates', async ({ page }) => {
     await page.goto('/admin');
     await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
