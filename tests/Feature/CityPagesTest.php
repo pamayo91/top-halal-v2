@@ -45,7 +45,9 @@ class CityPagesTest extends TestCase
         }
         $this->published(200, 'Restaurant autre ville', 'Aubagne', '13005');
 
-        $this->get('/restos/paris?page=2')->assertOk()->assertSee('noindex,follow', false);
+        $this->get('/restos/paris?page=2')->assertOk()
+            ->assertSee('content="index,follow"', false)
+            ->assertSee('rel="canonical" href="'.route('cities.show', 'paris').'?page=2"', false);
         $this->get('/restos/inexistante')->assertNotFound();
         $this->get('/restos/legacy-only')->assertNotFound();
     }

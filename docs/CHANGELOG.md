@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Corrected public indexable collection pagination SEO: page 1 keeps the clean canonical and pages 2+ are indexable with their own `?page=N` canonical. The shared rule excludes arbitrary query parameters, while filtered/search surfaces remain `noindex,follow`; sitemap policy is unchanged.
+
 ## 2026-10-04
 
 - Accueil : stabilisation de la pile Hero / recherche / « Restaurants récemment ajoutés ». Le décor du Hero reste sous la carte chevauchante et les deux menus d’autocomplétion restent au-dessus sans `:focus-within` qui élève le Hero entier. Les menus sont exclusifs et se ferment tous les deux au clic extérieur ; dimensions et espacements inchangés.

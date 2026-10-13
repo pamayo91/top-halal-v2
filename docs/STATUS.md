@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — SEO des collections paginées
+
+Les collections publiques déjà indexables (annuaire, guide, taxonomies géographiques/de spécialité/de service et facettes SEO ouvertes) distinguent désormais chaque page de pagination : page 1 a une canonical propre, les pages suivantes sont `index,follow` et ont une canonical auto-référente limitée à `?page=N`. La règle est centralisée dans `PublicPaginationSeo`; les paramètres de tracking et les filtres/recherches restent exclus des canonicals. Les surfaces délibérément `noindex,follow` ne sont jamais ouvertes par la pagination. Le sitemap n’est pas modifié.
+
 ## 2026-10-04 — Piles stables Hero / recherche / restaurants de l’accueil
 
 Le correctif précédent faisait monter le Hero entier via `:focus-within`. Son `isolation:isolate` en faisait alors une pile atomique face à la carte restaurants, ce qui rendait l’affichage dépendant du focus et pouvait laisser une suggestion ou la carte blanche au mauvais niveau. Le Hero et la carte partagent désormais un contexte local unique : le décor/fond reste sous la carte, la carte conserve son léger chevauchement au repos, et le contenu de recherche (dont les deux menus) reste au-dessus sans changement de pile au focus. Les deux menus se ferment aussi mutuellement et à la sortie pointeur ; aucune dimension ni marge n’est modifiée.

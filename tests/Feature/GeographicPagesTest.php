@@ -33,7 +33,9 @@ class GeographicPagesTest extends TestCase
             ->assertSee('Aix visible')
             ->assertDontSee('Avignon hors département')
             ->assertSee('"@type":"BreadcrumbList"', false);
-        $this->get('/restos/bouches-du-rhone?page=2')->assertOk()->assertSee('noindex,follow', false);
+        $this->get('/restos/bouches-du-rhone?page=2')->assertOk()
+            ->assertSee('content="index,follow"', false)
+            ->assertSee('rel="canonical" href="'.route('cities.show', 'bouches-du-rhone').'?page=2"', false);
 
         $this->get('/restos/provence-alpes-cote-d-azur')
             ->assertOk()
