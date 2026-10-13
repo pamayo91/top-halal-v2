@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-13
+
+- Back-office Filament : la publication obligatoire des assets vendor est
+  documentée dans le déploiement après l'incident de preview où CSS, scripts et
+  polices n'étaient pas présents. La CSP conserve sa politique publique stricte
+  et accorde les compatibilités requises (`unsafe-eval`, avatar par défaut)
+  uniquement sous `/admin`. Les rares clés françaises absentes de Filament 5
+  sont surchargées par l'application et les parcours login/logout/relogin sont
+  désormais couverts par Playwright.
+
 ## 2026-10-12
 
 - Preview production : recette publique complète et contrôles d'intégrité de

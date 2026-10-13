@@ -1,5 +1,19 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Runtime Filament de la preview production réparé
+
+La recette BO de `prod-preview.top-halal.fr` a identifié trois causes
+indépendantes : les 37 assets vendor Filament (CSS, JavaScript et polices)
+étaient absents du checkout production car `filament:assets` n'avait pas été
+exécuté ; la CSP empêchait Alpine d'évaluer les expressions requises par
+Filament 5 ; et quatre libellés français manquaient dans la distribution
+Filament installée. Le déploiement rend désormais `filament:assets`
+obligatoire après Composer. La compatibilité CSP (`unsafe-eval`, avatar
+Filament) reste strictement bornée à `/admin`; le front public ne reçoit pas
+ces exceptions. Les surcharges de traduction de l'application ne couvrent que
+les clés françaises absentes. Login, navigation BO, logout et relogin ont été
+validés avec le seul compte de test dédié, sans mutation métier.
+
 ## 2026-10-12 — Recette de la preview production
 
 La preview HTTPS `prod-preview.top-halal.fr` a été contrôlée sur le checkout
