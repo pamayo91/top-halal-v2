@@ -114,7 +114,7 @@ class GeographicPageResolver
                     || ($region['slug'] === $baseSlug && count($region['department_codes']) === 1);
                 $candidate = $mustQualify ? $baseSlug.'-'.$department['code'] : $baseSlug;
 
-                if ($citySlugs->has($candidate) || $usedDepartmentSlugs->has($candidate)) {
+                if (($candidate !== $baseSlug && $citySlugs->has($candidate)) || $usedDepartmentSlugs->has($candidate)) {
                     $candidate = $baseSlug.'-departement-'.$department['code'];
                 }
 
