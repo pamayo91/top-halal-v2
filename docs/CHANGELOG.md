@@ -2,6 +2,16 @@
 
 ## 2026-10-13
 
+- Formalisation de l'exploitation post-production : `main` est la branche
+  stable de production, `develop` reste l'intégration sur `dev.top-halal.fr`.
+  Les correctifs techniques suivent une promotion sélective branche dédiée ->
+  préproduction -> validation explicite -> même correctif vers `main`.
+- Documentation des frontières de déploiement : BDD et storage préproduction
+  ne sont jamais synchronisés vers la production; les données BO production
+  restent la source de vérité. Les migrations de schéma s'exécutent sur la BDD
+  production avec le code, tandis que les mutations de données sont cadrées,
+  auditées et protégées séparément.
+
 - Production V2 : SMTP opérationnel, scheduler/worker Cron fini activés et
   vérifiés, avec un test transactionnel contrôlé passé à `sent` dans
   l'historique. La preview production redirige désormais en 301 vers le

@@ -1,5 +1,18 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Workflow de maintenance post-production formalisé
+
+La production est désormais l'état opérationnel : `main` est la branche stable
+de production, `develop` l'intégration/préproduction sur `dev.top-halal.fr`.
+Les correctifs techniques sont promus sélectivement depuis une branche dédiée,
+validés sur préproduction (tests ciblés, navigateur si pertinent et gate
+complète), puis promus à l'identique vers `main` après validation explicite du
+propriétaire. Les BDD et storages préproduction/production sont indépendants;
+aucune synchronisation vers la production n'est une étape de déploiement.
+Les migrations de schéma s'exécutent directement en production avec le code,
+alors que les mutations de données exigent un cadrage et des protections
+supplémentaires.
+
 ## 2026-10-13 — Production V2 opérationnelle
 
 Le cutover est suivi de l'activation validée du SMTP, du scheduler, du worker
@@ -476,4 +489,4 @@ Authenticated BO test access: the local-only `PREPROD_ADMIN_EMAIL` / `PREPROD_AD
 | Legacy inventory | DONE | `legacy:inventory` ran against `meyo5199_th` via SELECT-only `legacy_wp`; reports are in `docs/generated/` |
 | Migration mapping | IN PROGRESS | Restaurant pilot schema and selected IDs documented; other content mappings remain draft |
 | PageSpeed/CWV gates | TODO | Representative templates |
-| Production cutover | TODO | Full migration + delta + URL/redirect validation |
+| Production cutover | DONE (historique) | La mise en production est actée le 2026-10-13 ; les entrées antérieures décrivent la préparation et le cutover historique. |

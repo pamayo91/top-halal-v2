@@ -1,5 +1,32 @@
 # Architectural & Product Decisions
 
+## 2026-10-13 — D045 — Exploitation post-production : promotion sélective et frontières de données
+
+Top-Halal V2 est en production. `main` représente l'état stable destiné à la
+production et `develop` l'intégration validée sur `dev.top-halal.fr`. Une
+correction technique isolée part de `main`, est validée sur `develop` et la
+préproduction avec les tests ciblés, la recette navigateur pertinente et la
+gate complète `composer test:regression`, puis ne rejoint `main` qu'après
+validation explicite du propriétaire. La promotion porte le même correctif
+identifié (merge ou cherry-pick revu), jamais un merge global automatique de
+`develop` lorsque celui-ci contient d'autres travaux.
+
+Le code, la BDD et le stockage média sont trois frontières indépendantes. La
+BDD de préproduction ne doit jamais être copiée, fusionnée ni synchronisée vers
+la production dans un déploiement normal; le storage préproduction ne doit pas
+non plus remplacer les médias de production. Les données administrées depuis le
+BO production sont la source de vérité et ne sont pas écrasées par le code.
+Une migration de schéma testée est exécutée directement sur la BDD production
+avec le code déployé, en conservant ses données. Toute migration/script qui
+modifie les données existantes doit être explicitement cadré, audité et validé
+selon son risque; les restaurations, rebuilds/reseeds et réimports legacy
+restent soumis aux deux confirmations explicites distinctes.
+
+Les corrections applicatives restent traçables dans Git : l'édition directe
+habituelle des fichiers via SSH, cPanel ou éditeur serveur est interdite. Les
+changements administrables conçus pour Filament suivent le BO production et
+restent des données propres à cet environnement.
+
 ## 2026-09-29 — D044 — Les horaires de nuit et chevauchants restent littéraux
 
 Les horaires saisis conservent les heures indiquées par le contributeur ou l’administrateur. Une fermeture antérieure à l’ouverture désigne une fermeture après minuit, y compris `00:00`, sans suffixe de présentation ajouté. Les plages qui se chevauchent ne sont pas corrigées ni rejetées ; seule une plage dont les deux heures sont identiques est vide et reste invalide. Cette règle est centralisée dans `RestaurantHours` et s’applique au formulaire public, à l’éditeur déposant et à Filament.

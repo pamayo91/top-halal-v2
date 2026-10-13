@@ -7,13 +7,13 @@
 - The Git checkout must live outside any publicly accessible directory.
 - Never expose project root, `.env`, `storage`, legacy dumps, SSH material or Git metadata through the web server.
 - Production/preproduction secrets live in server-side environment configuration, never Git.
-- Do not deploy to production until the production cutover plan is explicitly approved.
+- Production is active. A production deployment remains an explicit, owner-approved promotion; no deployment in this repository update is authorised by this document.
 
 ## Git Strategy
 - Remote repository: private GitHub repository at `git@github.com:pamayo91/top-halal-v2.git`.
 - Codex workstation remote URL: `git@github-tophalal-codex:pamayo91/top-halal-v2.git`.
 - Preproduction server remote URL: `git@github-tophalal:pamayo91/top-halal-v2.git`.
-- `main`: stable branch for future production-ready code.
+- `main`: stable branch deployed to production.
 - `develop`: preproduction integration branch.
 - `feature/...`: temporary branches for significant work; merge into `develop` only after validation.
 - Codex workflow: edit code, run targeted local tests, commit, push to GitHub, SSH to preproduction, pull `develop`, run deployment steps, then validate preproduction with browser/Playwright.
@@ -23,6 +23,53 @@
   is local commit, GitHub push, then preproduction pull/deployment. Before a
   production-readiness audit, verify `git merge-base --is-ancestor HEAD
   origin/develop` and `git rev-parse HEAD = git rev-parse origin/develop`.
+
+## Post-production maintenance and selective promotion
+
+For an isolated production fix, branch from stable `main` (`fix/...` or
+`hotfix/...`), keep the diff limited to that correction and add its necessary
+tests. Integrate the correction into `develop`, deploy it to `dev.top-halal.fr`,
+run targeted checks and browser validation where relevant, then run the full
+`composer test:regression` gate. A failure returns the fix to the same loop.
+
+Only after explicit owner validation may the exact tested correction be promoted
+to `main`. Use a reviewed merge or a reviewed cherry-pick of the precise commit;
+do not merge `develop` wholesale when it contains unrelated, unfinished or
+unapproved work. Inspect the promoted diff and deploy `main`, then confirm the
+deployed commit, site response and `/health` where applicable, changed flow,
+new HTTP 500s, pertinent Laravel logs and frontend console/network errors.
+For redirects, also check old URL, expected 301/410, final destination and no
+chain/loop; for robots/sitemap/routes/assets, inspect the response actually
+served by production.
+
+## Production data, storage and migrations
+
+The preproduction and production databases are independent. A normal code
+deployment must never copy, replace, merge or synchronise preproduction data
+or individual rows into production. Production BO changes are production data
+and the source of truth after launch; a future code deployment must not erase
+them. Likewise, do not globally synchronise preproduction storage to production
+or delete, replace or reset production uploads during a Git deployment.
+
+Deploy a tested schema migration with its code, then execute that same migration
+in production in a controlled manner (normally `artisan migrate --force`), so
+the schema changes in place while existing production data remains. Test data
+from preproduction never moves with it. Before a data-changing migration or
+script, document affected tables/data, predicted creates/updates/deletes when
+calculable, idempotence, interaction with BO edits, backup/rollback plan,
+preproduction evidence and necessary human approval. Prefer create-if-absent
+for new BO-managed settings. `migrate:fresh`, global reseeds, restores, legacy
+reimports and global rebuilds are not deployment operations and retain the
+two-confirmation safeguard in `AGENTS.md`.
+
+Laravel cache maintenance is distinct from business data: use only applicable
+cache commands. Clear route cache after route changes; do not route-cache this
+application while closure routes exist.
+
+No production infrastructure command is inferred here. The repository documents
+the production application-root and Cron model, but the production SSH alias,
+DocumentRoot confirmation, database identifier and current user-crontab entries
+still require an authoritative operational record before being used or changed.
 
 ## Required Manual GitHub Actions
 - Confirm whether branch protection is desired for `main` and `develop`.

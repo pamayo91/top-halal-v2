@@ -1,10 +1,19 @@
-# Top-Halal V2 — Project Brief
+# Top-Halal V2 — Project Brief (historical baseline)
+
+## Current operational state — 2026-10-13
+
+Top-Halal V2 is in production. `main` is the stable production branch and
+`develop` remains the integration branch validated on `https://dev.top-halal.fr/`.
+This document preserves the original project baseline below; current operational
+rules are maintained in `AGENTS.md`, `docs/DEPLOYMENT.md`, `docs/DECISIONS.md`
+and `docs/STATUS.md`. Preproduction is not a source of business data or media
+to copy into production.
 
 ## Goal
 Rebuild Top-Halal from scratch as a fast, SEO-first Laravel application while migrating useful WordPress/ListingPro data and preserving historical SEO value.
 
 ## Existing-data inventory (from pre-project analysis)
-Approximate legacy inventory to reconcile again with scripts before migration:
+Approximate legacy inventory recorded before the now-finalised migration:
 - 7,704 restaurant/listing records; ~7,633 published.
 - 121 published articles.
 - 90 published pages.
@@ -16,7 +25,8 @@ Approximate legacy inventory to reconcile again with scripts before migration:
 - 84 ListingPro review records.
 - 20,183 WordPress comment rows, of which ~19,454 are spam; ~713 approved and 15 pending real comments were observed.
 - ~63 legacy contents contain Visual Composer `[vc_*]` shortcodes.
-These numbers are a baseline only. The migration command must produce authoritative current counts from the imported legacy database.
+These numbers are a historical baseline only. Do not query or rerun legacy
+migrations without the owner's explicit new legacy-data authorisation.
 
 ## Hosting
 - Dedicated server.
@@ -27,20 +37,19 @@ These numbers are a baseline only. The migration command must produce authoritat
 - Cron available.
 - No Docker.
 
-## Preproduction data sources
+## Historical preproduction data sources
 - Laravel V2 uses a distinct MariaDB database: `meyo5199_top_halal_v2`.
 - Legacy WordPress data is read directly from the existing `meyo5199_th` database through a dedicated SELECT-only user.
 - Legacy WordPress table prefix: `tp_`.
 - The legacy SQL dump under `legacy/` is a safety/reference snapshot only and is not the primary source for now.
-- No WordPress content import has started.
+- Legacy migration is finalised; this section is retained as historical context.
 
-## Current preproduction status
+## Historical preproduction bootstrap status
 - Public preproduction URL: `https://dev.top-halal.fr/`.
 - Apache DocumentRoot points to Laravel `public/`.
 - HTTPS, HTTP-to-HTTPS redirect, `/health`, cookies/session, noindex headers, robots blocking and sensitive path protections are validated.
-- WordPress/ListingPro inventory has been generated through read-only legacy access.
-- The next migration step is a reviewed sample only, not a full import.
-- The first sample must stay limited to 10 restaurants, 5 articles, a few pages, threaded comments and restaurant reviews until validation approves broader migration.
+- The entries below describe the initial bootstrap stage, not the current
+  production state. See `docs/STATUS.md` for current status.
 
 ## Bootstrap requirement
 The Laravel application must be initialized through the official Composer workflow on the appropriate preproduction/development environment after the preproduction server audit has been run and reviewed. Do not create or commit a hand-made Laravel source skeleton to work around missing PHP or Composer on the local Windows workstation.
