@@ -39,14 +39,11 @@ class SubmissionLinkNofollowTest extends TestCase
             'url' => 'https://top-halal.fr/ajouter-un-restaurant',
             'target_blank' => true,
         ]);
-        $parent = MenuItem::create(['menu_id' => $menu->id, 'label' => 'Plus', 'link_type' => 'none']);
-        MenuItem::create(['menu_id' => $menu->id, 'parent_id' => $parent->id, 'label' => 'Ajouter', 'link_type' => 'internal_url', 'url' => '/ajouter-un-restaurant']);
         MenuItem::create(['menu_id' => $menu->id, 'label' => 'Blog', 'link_type' => 'internal_url', 'url' => '/blog']);
 
         $html = $this->get('/')->assertOk()->getContent();
 
         $this->assertMatchesRegularExpression('/href="https:\/\/top-halal\.fr\/ajouter-un-restaurant"[^>]*rel="[^"]*nofollow[^"]*"/', $html);
-        $this->assertStringContainsString('href="/ajouter-un-restaurant" rel="nofollow"', $html);
         $this->assertStringContainsString('href="/blog"', $html);
         $this->assertStringNotContainsString('href="/blog" rel="nofollow"', $html);
 
@@ -59,8 +56,34 @@ class SubmissionLinkNofollowTest extends TestCase
                 'is_active' => false,
                 'target_blank' => true,
                 'nofollow' => false,
+            ], [
+                'id' => 2,
+                'label' => 'Plus',
+                'url' => null,
+                'children' => [[
+                    'id' => 3,
+                    'label' => 'Ajouter',
+                    'url' => '/ajouter-un-restaurant',
+                    'children' => [],
+                    'is_active' => false,
+                    'target_blank' => false,
+                    'nofollow' => false,
+                ]],
+                'is_active' => false,
+                'target_blank' => false,
+                'nofollow' => false,
+            ], [
+                'id' => 4,
+                'label' => 'Blog',
+                'url' => '/blog',
+                'children' => [],
+                'is_active' => false,
+                'target_blank' => false,
+                'nofollow' => false,
             ]]],
         ]);
         $this->assertStringContainsString('rel="noopener noreferrer nofollow"', $targetBlankLink);
+        $this->assertStringContainsString('href="/ajouter-un-restaurant" rel="nofollow"', $targetBlankLink);
+        $this->assertStringNotContainsString('href="/blog" rel="nofollow"', $targetBlankLink);
     }
 }
