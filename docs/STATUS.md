@@ -1,5 +1,12 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Liens de soumission en nofollow
+
+Tous les liens publics vers `/ajouter-un-restaurant`, y compris les liens de
+navigation configurables et leur forme absolue canonique, rendent désormais
+`rel="nofollow"`. Les liens ouvrant une nouvelle fenêtre conservent aussi
+`noopener noreferrer`.
+
 ## 2026-10-13 — SEO des collections paginées
 
 Les collections publiques déjà indexables (annuaire, guide, taxonomies géographiques/de spécialité/de service et facettes SEO ouvertes) distinguent désormais chaque page de pagination : page 1 a une canonical propre, les pages suivantes sont `index,follow` et ont une canonical auto-référente limitée à `?page=N`. La règle est centralisée dans `PublicPaginationSeo`; les paramètres de tracking et les filtres/recherches restent exclus des canonicals. Les surfaces délibérément `noindex,follow` ne sont jamais ouvertes par la pagination. Le sitemap n’est pas modifié.
