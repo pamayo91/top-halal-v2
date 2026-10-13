@@ -2,6 +2,12 @@
 
 ## 2026-10-13
 
+- Ajout du registre opérationnel `docs/PRODUCTION_RUNBOOK.md` : constats
+  production vérifiés en lecture seule, déploiement sélectif, matrice de
+  changements, health checks, rollback non destructif et journal sans faux
+  historique. Les paramètres internes non audités par SSH restent marqués
+  explicitement « À confirmer ».
+
 - Formalisation de l'exploitation post-production : `main` est la branche
   stable de production, `develop` reste l'intégration sur `dev.top-halal.fr`.
   Les correctifs techniques suivent une promotion sélective branche dédiée ->

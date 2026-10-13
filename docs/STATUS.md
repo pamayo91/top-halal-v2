@@ -1,5 +1,14 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Registre opérationnel production
+
+Le registre `docs/PRODUCTION_RUNBOOK.md` centralise désormais les constats de
+production vérifiés en lecture seule, les procédures de déploiement/rollback et
+les paramètres encore à confirmer. L'audit a confirmé la surface publique,
+HTTPS, santé, robots, sitemap et protections de chemins sensibles; faute d'un
+alias SSH production local, les chemins internes, runtime, BDD, crontab,
+storage, build et sauvegardes restent explicitement à confirmer.
+
 ## 2026-10-13 — Workflow de maintenance post-production formalisé
 
 La production est désormais l'état opérationnel : `main` est la branche stable

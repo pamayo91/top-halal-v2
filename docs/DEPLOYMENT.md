@@ -1,5 +1,10 @@
 # Deployment — Preproduction & Production
 
+Le registre vérifié à consulter avant toute opération de production est
+[`docs/PRODUCTION_RUNBOOK.md`](PRODUCTION_RUNBOOK.md). Il sépare les constats
+techniquement confirmés des paramètres qui restent à vérifier; ne complétez pas
+un chemin, une crontab ou un runtime par analogie avec la préproduction.
+
 ## Principles
 - No Docker.
 - Deploy preproduction over SSH using Git directly on the server; rsync is not the primary deployment method.
@@ -180,14 +185,14 @@ Laravel scheduler runs through this server Cron entry every minute:
 
 ## Production operating Cron
 
-Production uses the same finite, lock-protected worker model, with paths rooted
-at `/home/meyo5199/top-halal-v2-prod`. Register each of these entries once in
-the production account's user crontab: scheduler every minute, the queue worker
-every minute, and the delivery-history retention at 03:05. The scheduler only
-owns verification cleanup; the retention command remains separate and must not
-be duplicated in `routes/console.php`. Keep SMTP credentials exclusively in
-the encrypted BO setting. `prod-preview.top-halal.fr` is an application-level
-301 to the canonical production URL, while `dev.top-halal.fr` remains separate.
+The application has a finite, lock-protected worker model suitable for
+production. The actual production application root, user crontab entries,
+frequencies and retention command must be read and confirmed from the production
+environment before use; do not infer them from preproduction. The scheduler
+owns verification cleanup, while delivery-history retention remains separate
+from `routes/console.php`. Keep SMTP credentials exclusively in the encrypted
+BO setting. `prod-preview.top-halal.fr` is an application-level 301 to the
+canonical production URL, while `dev.top-halal.fr` remains separate.
 
 ## Queue worker
 
@@ -199,7 +204,9 @@ Preproduction is hosted on o2switch mutualised and has no persistent Supervisor/
 
 The executable script first reconciles tracked delivery-history rows whose database job has disappeared, then uses `/opt/alt/php84/usr/bin/php artisan queue:work database --queue=default --stop-when-empty --tries=4 --timeout=75 --sleep=1 --no-interaction` behind `/usr/bin/flock -n`. `config/queue.php` sets database `retry_after=90`, leaving a 15-second safety margin above the worker timeout. New transactional mailables and notifications define their own progressive `30,120,300`-second backoff arrays; Laravel 13 serialises these into queue payloads. Do not run a permanent worker for this setup.
 
-The worker script resolves its application directory from its own location. It may therefore be used unchanged by the production Cron at `/home/meyo5199/top-halal-v2-prod/scripts/run-queue-worker-cron.sh`; do not copy the preproduction path into a production Cron entry.
+The worker script resolves its application directory from its own location. It
+may be used unchanged once the production checkout and Cron target are
+confirmed; never copy a preproduction path into a production Cron entry.
 
 ## Transactional email
 - Keep SMTP settings server-side / encrypted in the V2 settings; do not put credentials in Cron or logs.
