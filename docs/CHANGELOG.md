@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- SEO : les collections publiques déjà indexables conservent une canonical propre
+  en page 1 et deviennent auto-canoniques/indexables en `?page=N` à partir de la
+  page 2. Les recherches et filtres conservent `noindex,follow`; le sitemap ne
+  change pas.
+
 - SEO/front : les liens Facebook et X du composant éditorial partagé portent
   `nofollow noopener noreferrer`; X utilise directement `x.com/intent/tweet`.
   Le robots de production exclut aussi `/login`, `/forgot-password` et les

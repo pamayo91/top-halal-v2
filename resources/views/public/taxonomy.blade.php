@@ -1,8 +1,12 @@
 @php
     $cityPage = $kind === 'ville' ? ($citySeo ?? null) : null;
-    $robots = request('page') || (isset($open) && ! $open) ? 'noindex,follow' : 'index,follow';
+    $indexable = ! isset($open) || $open;
+    $robots = $indexable ? 'index,follow' : 'noindex,follow';
+    $canonical = $indexable
+        ? app(\App\Services\PublicPaginationSeo::class)->canonical(url()->current(), $restaurants)
+        : url()->current();
 @endphp
-<x-layouts.app title="{{ $title ?? ($cityPage?->config?->seo_title ?: ($term->name.' | Top Halal')) }}" description="{{ $description ?? $cityPage?->config?->seo_description }}" canonical="{{ url()->current() }}" robots="{{ $robots }}">
+<x-layouts.app title="{{ $title ?? ($cityPage?->config?->seo_title ?: ($term->name.' | Top Halal')) }}" description="{{ $description ?? $cityPage?->config?->seo_description }}" canonical="{{ $canonical }}" robots="{{ $robots }}">
     <section class="page-header">
         <div class="shell">
             <x-breadcrumbs :items="$breadcrumbs" />

@@ -1,4 +1,4 @@
-<x-layouts.app title="{{ $title }}" description="{{ $description }}" canonical="{{ url()->current() }}" robots="{{ request('page') ? 'noindex,follow' : 'index,follow' }}">
+<x-layouts.app title="{{ $title }}" description="{{ $description }}" canonical="{{ app(\App\Services\PublicPaginationSeo::class)->canonical(url()->current(), $restaurants) }}" robots="index,follow">
     <section class="page-header">
         <div class="shell">
             <x-breadcrumbs :items="$breadcrumbs" />
