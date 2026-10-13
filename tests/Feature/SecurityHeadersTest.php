@@ -27,10 +27,19 @@ class SecurityHeadersTest extends TestCase
         $this->assertStringContainsString('https://ui-avatars.com', (string) $response->headers->get('Content-Security-Policy'));
     }
 
-    public function test_non_canonical_hosts_stay_noindex(): void
+    public function test_production_preview_redirects_to_the_canonical_site(): void
     {
         config()->set('app.url', 'https://top-halal.fr');
 
-        $this->get('https://prod-preview.top-halal.fr/')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        $this->get('https://prod-preview.top-halal.fr/contact?source=preview')
+            ->assertRedirect('https://top-halal.fr/contact?source=preview');
+    }
+
+    public function test_dev_host_is_not_redirected_to_production(): void
+    {
+        config()->set('app.url', 'https://top-halal.fr');
+
+        $this->get('https://dev.top-halal.fr/admin/login')->assertOk()
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
 }

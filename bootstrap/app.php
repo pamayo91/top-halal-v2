@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias(['password.change.required' => \App\Http\Middleware\RequirePasswordChange::class, 'admin' => \App\Http\Middleware\EnsureAdmin::class]);
+        $middleware->append(\App\Http\Middleware\RedirectProductionPreview::class);
         $middleware->append(\App\Http\Middleware\CanonicalisePublicUrl::class);
         $middleware->append(\App\Http\Middleware\ResolveLegacyRedirect::class);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
