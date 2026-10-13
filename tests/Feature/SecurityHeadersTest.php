@@ -8,7 +8,7 @@ class SecurityHeadersTest extends TestCase
 {
     public function test_public_responses_receive_security_headers(): void
     {
-        $response = $this->get('/');
+        $response = $this->get('/health');
 
         $response->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
