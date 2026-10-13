@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- Audit production strictement read-only : le registre confirme désormais le
+  checkout/commit `main`, runtime, BDD, storage, build Vite, queue et crontab
+  actifs. DocumentRoot Apache et garanties de sauvegarde restent explicitement
+  à confirmer; aucune production n'a été modifiée.
+
 - Ajout du registre opérationnel `docs/PRODUCTION_RUNBOOK.md` : constats
   production vérifiés en lecture seule, déploiement sélectif, matrice de
   changements, health checks, rollback non destructif et journal sans faux

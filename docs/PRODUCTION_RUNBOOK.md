@@ -3,11 +3,11 @@
 ## Objet et règles de sécurité
 
 Ce registre est la référence opérationnelle avant tout déploiement, diagnostic
-ou intervention sur la production. Il a été créé le 2026-10-13 (Europe/Paris)
-à partir d'un audit strictement en lecture seule : surface HTTP publique,
-référentiel Git et documentation versionnée. Aucun accès SSH de production
-configuré localement n'était disponible pendant cet audit; aucune valeur interne
-non vérifiée n'est donc présentée comme un fait.
+ou intervention sur la production. Créé le 2026-10-13 (Europe/Paris), il a été
+complété par un audit strictement en lecture seule de la surface HTTP, du
+référentiel Git et du checkout de production. Les constats internes ci-dessous
+proviennent exclusivement de commandes de lecture; aucune tâche applicative,
+Cron, cache, fichier, média ou donnée n'a été modifié.
 
 Ne jamais inscrire ici de `.env`, mot de passe, clé privée SSH, clé API, secret
 SMTP, credential/DSN BDD, token, cookie ou donnée personnelle. Les secrets
@@ -32,19 +32,20 @@ production pendant un déploiement standard.
 | Sécurité HTTP | CONFIRMÉ | HTTPS, HSTS, CSP, `nosniff`, Referrer-Policy et Permissions-Policy sont servis sur les réponses contrôlées. |
 | Exposition de fichiers sensibles | CONFIRMÉ | `/.env` et `/.git/HEAD` répondent 403; `/artisan` et `/composer.json` répondent 404. |
 | Référence Git | CONFIRMÉ | Le tag `v2.0.0-production` et `origin/main`/`origin/develop` pointent sur `8f7f189` à l'audit. |
-| Alias SSH production | À CONFIGURER | Seul `top-halal-preprod` est présent dans la configuration SSH locale. |
+| Accès SSH production | CONFIRMÉ | L'alias local `top-halal-preprod` atteint le compte `meyo5199` sur `belette.o2switch.net` et permet la lecture du checkout production. Aucun alias dédié nommé production n'existe localement. |
 
 ## Accès et application
 
 | Élément | État | Registre |
 | --- | --- | --- |
-| SSH production, utilisateur et méthode d'accès | À CONFIRMER | Créer ou valider un alias dédié, sans en copier les secrets ici. |
-| Checkout Git production | À CONFIRMER | Une documentation historique mentionne `/home/meyo5199/top-halal-v2-prod`; ne pas l'utiliser avant vérification SSH. |
-| Branche déployée | CONFIRMÉ (politique) | `main`. Confirmer le commit réel sur le serveur avant toute intervention. |
-| Remote Git du checkout | À CONFIRMER | Vérifier `git remote -v` sur la production, sans publier de clé ni de token. |
+| SSH production, utilisateur et méthode d'accès | CONFIRMÉ | L'alias existant est nommé `top-halal-preprod`, mais son accès SSH atteint bien la production; utilisateur `meyo5199`. Créer un alias dédié reste une amélioration de clarté, non une condition de l'accès actuel. |
+| Checkout Git production | CONFIRMÉ | `/home/meyo5199/top-halal-v2-prod`, avec répertoire `.git`. |
+| Branche déployée | CONFIRMÉ | `main`, HEAD `8f7f189cad983093bec123b98aba325d5f8186e7`, correspondant au tag/référence de production documenté. Le working tree est propre. |
+| Remote Git du checkout | CONFIRMÉ | `origin` utilise l'alias GitHub de déploiement documenté; aucune clé ni credential n'est enregistrée dans ce registre. |
 | DocumentRoot Apache et `public/` servi | À CONFIRMER | Vérifier la configuration réellement active; ne pas déduire celle-ci de la préproduction. |
-| `.env`, logs Laravel et storage | À CONFIRMER | Vérifier seulement existence, propriétaire et chemin; ne jamais afficher le contenu de `.env`. |
-| BDD Laravel production | À CONFIRMER | Identifier moteur/version/connexion et, si validé comme non sensible, identifiant logique; jamais le DSN ni les credentials. |
+| `.env` et logs Laravel | CONFIRMÉ | `.env` existe à la racine du checkout, permissions `600`; logs sous `storage/logs`. Son contenu sensible n'a pas été affiché. |
+| Storage/médias | CONFIRMÉ | Les originaux V2 sont sous `storage/app/private/media/originals`; `storage/app/public` existe mais aucun lien `public/storage` n'est présent. Les médias sont délivrés par la route Laravel versionnée `/media/{asset}/v/{checksum}` depuis le disque `local`. |
+| BDD Laravel production | CONFIRMÉ | Connexion `mariadb`, BDD `meyo5199_top_halal_prod`, MariaDB serveur `11.4.13`. Aucun credential n'a été lu ni enregistré. |
 
 La BDD production est la source de vérité pour les données administrées dans son
 BO. Elle ne doit jamais être remplacée, fusionnée ou synchronisée depuis la BDD
@@ -57,12 +58,13 @@ uploads.
 
 | Élément | État | Registre |
 | --- | --- | --- |
-| Laravel du dépôt | CONFIRMÉ | `composer.lock` référence `laravel/framework` `v13.29.0`. La version réellement chargée en production reste à contrôler par SSH. |
-| PHP CLI, Composer, MariaDB, Git et extensions | À CONFIRMER | L'audit versionné disponible concerne la préproduction, pas la production. Vérifier versions, chemin PHP explicite, Composer, Git, MariaDB et extensions requises sans modifier le serveur. |
-| PHP par défaut | À CONFIRMER | Contrôler séparément `php -v` et le binaire explicitement utilisé par Artisan. |
-| Node/npm en production | À CONFIRMER | Ne pas supposer l'absence observée en préproduction. |
-| Vite | CONFIRMÉ (code) | Les layouts Blade utilisent `@vite`; le build attendu est `public/build/` avec `manifest.json`. |
-| Build réellement déployé | À CONFIRMER | Vérifier présence/horodatage du manifest et la méthode de transfert sans remplacer d'asset. |
+| Laravel réellement chargé | CONFIRMÉ | `Laravel Framework 13.29.0`. |
+| PHP CLI | CONFIRMÉ | Le `php` par défaut et `/opt/alt/php84/usr/bin/php` sont tous deux PHP 8.4.26; ce dernier reste le chemin explicite à employer pour Artisan/Cron. |
+| Composer | CONFIRMÉ | Composer 2.10.2, fonctionnel via `/opt/alt/php84/usr/bin/php /usr/local/bin/composer`. |
+| Git | CONFIRMÉ | Git 2.56.0 dans le checkout production. |
+| MariaDB | CONFIRMÉ | Client et serveur MariaDB 11.4.13. |
+| Node/npm en production | NON APPLICABLE | Les exécutables ne sont pas présents sur le serveur; le build ne doit pas y être lancé. |
+| Vite et build réellement déployé | CONFIRMÉ | `public/build/`, `assets/` et `manifest.json` existent (manifest du 2026-10-12 23:02); les assets Vite ciblés de la page d'accueil répondent HTTP 200. |
 | Filament assets | CONFIRMÉ (procédure) | Après une modification de dépendances, `artisan filament:assets` est requis avant recette BO; les assets ne sont pas remplacés par Vite. |
 
 Le projet prévoit le disque Laravel `public` sous `storage/app/public`, publié
@@ -76,20 +78,22 @@ contenu et `manifest.json` inclus, sans copier les sources ni secrets.
 | Élément | État | Registre |
 | --- | --- | --- |
 | HTTPS et redirection preview | CONFIRMÉ | HTTPS public est actif; `prod-preview` redirige 301 vers le domaine principal. |
-| HTTP -> HTTPS, VirtualHost, DocumentRoot, certificat | À CONFIRMER | Contrôler en lecture seule avec l'accès serveur/hébergement; aucune modification Apache/DNS/certificat dans ce workflow. |
+| HTTP -> HTTPS | CONFIRMÉ | `http://top-halal.fr/` redirige 301 vers HTTPS. |
+| VirtualHost, DocumentRoot et certificat | À CONFIRMER | La configuration Apache/cPanel active n'est pas lisible avec cet accès. Le répertoire historique `/home/meyo5199/top-halal.fr` ne prouve pas le DocumentRoot V2 et ne doit pas être pris comme tel. |
 | Règles Apache | CONFIRMÉ (principe) | Domaine/protocole et infrastructure relèvent d'Apache; les redirections de contenu relèvent de Laravel. |
 | Queue utilisée par le code | CONFIRMÉ | Le worker lance `queue:work database --queue=default --stop-when-empty` avec `flock`, timeout 75 s et 4 essais. |
-| Worker/Cron réellement actifs en production | À CONFIRMER | Lire la crontab production et, si utile, l'état/logs sans lancer ni arrêter de worker. |
+| Worker/Cron réellement actifs en production | CONFIRMÉ | Crontab : scheduler chaque minute, script worker chaque minute et purge e-mails à 03:05, tous sous `/home/meyo5199/top-halal-v2-prod`. |
 | Scheduler applicatif défini | CONFIRMÉ (code) | `contributions:purge-verifications` est planifié à 03:10, protégé contre les chevauchements. |
-| Scheduler/Cron réel et purge e-mails | À CONFIRMER | Vérifier fréquence, commande PHP, logs et éventuelle purge `emails:purge-delivery-logs`; ne rien créer/modifier. |
+| Scheduler/Cron réel et purge e-mails | CONFIRMÉ | Scheduler : `schedule:run` chaque minute; purge `emails:purge-delivery-logs --days=60 --no-interaction` à 03:05, avec logs sous `storage/logs`. |
 | Cache de routes | CONFIRMÉ (règle) | Des closure routes existent : vider le cache de routes lors d'un changement de routes, sans utiliser `route:cache`. |
 
 Le script versionné `scripts/run-queue-worker-cron.sh` détermine le répertoire
 de l'application depuis son propre emplacement, reconcilie les historiques de
 livraison, puis prend un verrou dans `storage/framework/queue-worker.lock`.
-Il décrit le mécanisme applicatif; il ne prouve pas que la crontab production le
-déclenche. Lors d'un futur audit SSH, relever sans secret les entrées Top-Halal,
-leur fréquence, le binaire PHP et les fichiers de log associés.
+La crontab vérifiée appelle ce script chaque minute et les logs scheduler/worker
+ont été modifiés pendant l'audit. Il emploie `/usr/bin/flock -n`, le driver
+`database`, la file `default`, quatre essais, un timeout de 75 secondes et le
+`retry_after` configuré à 90 secondes.
 
 Commandes à évaluer pour un futur déploiement, jamais à exécuter pendant un
 audit : `artisan optimize:clear`, `artisan config:cache` et `artisan view:cache`.
@@ -150,6 +154,26 @@ exécuter `route:cache` tant que des routes closure sont présentes.
 - Ajouter les contrôles spécifiques : ancienne URL/code/destination pour une
   redirection; assets et formats desktop/mobile pour le frontend.
 
+## Diagnostic production read-only
+
+Les commandes suivantes ont été employées sans mutation lors de l'audit :
+
+```bash
+git status --short --branch
+git branch --show-current
+git rev-parse HEAD
+git remote -v
+php -v
+/opt/alt/php84/usr/bin/php artisan --version
+/opt/alt/php84/usr/bin/php /usr/local/bin/composer --version
+crontab -l
+ls -ld .env storage storage/app/public storage/logs public/build
+readlink public/storage
+```
+
+Une interrogation BDD éventuelle doit rester limitée à `SELECT VERSION()` et
+`SELECT DATABASE()` et ne doit jamais afficher de credential ni de DSN.
+
 ## Rollback non destructif
 
 **Code.** Identifier le dernier commit déployé sain, créer un correctif Git
@@ -173,8 +197,8 @@ données créées ou modifiées entre-temps dans le BO production.
 
 | Élément | État | Action avant changement risqué |
 | --- | --- | --- |
-| Sauvegarde BDD production | À CONFIRMER | Vérifier mécanisme, fréquence, emplacement privé, restauration et rétention. |
-| Sauvegarde storage/médias | À CONFIRMER | Vérifier mécanisme, fréquence, restauration et périmètre. |
+| Sauvegarde BDD production | À CONFIRMER | Deux artefacts privés ont été observés dans un répertoire de sauvegarde le 2026-10-13, sans preuve de fréquence, de contenu ou de restauration testée. |
+| Sauvegarde storage/médias | À CONFIRMER | Aucun mécanisme/rétention/restauration vérifiable n'a été trouvé par cet audit. |
 | Sauvegardes hébergeur | À CONFIRMER DANS O2SWITCH/CPANEL | Ne jamais présumer leur disponibilité ni leur configuration. |
 
 ## Journal des futurs déploiements
@@ -192,21 +216,20 @@ réel et autorisé.
 - Surface publique `top-halal.fr`, HTTPS, santé, robots, sitemap, headers de
   sécurité et protection des chemins sensibles contrôlés le 2026-10-13.
 - Redirection 301 de `prod-preview.top-halal.fr` vers le domaine principal.
-- Politique Git `main`/`develop`, tag de production et mécanismes applicatifs
-  versionnés (Vite, queue, scheduler, cache de routes) contrôlés dans Git.
+- Checkout production, `main`/HEAD propre, remote Git, PHP 8.4.26, Composer
+  2.10.2, Laravel 13.29.0, Git 2.56.0, MariaDB 11.4.13 et BDD V2 confirmés.
+- Crontab scheduler/worker/purge, build Vite servi, storage interne et route de
+  diffusion média versionnée contrôlés en lecture seule.
 
 ### À confirmer
 
-- Alias SSH, utilisateur, checkout, remote, DocumentRoot, `.env`, logs,
-  storage/lien symbolique, runtime réellement chargé et BDD de production.
-- Crontab active, queue/scheduler/purge réels, Node/npm, build/manifeste actifs,
-  sauvegardes et leurs procédures de restauration.
-- Réglages Apache non visibles publiquement : HTTP -> HTTPS, VirtualHost,
-  certificat et règles d'infrastructure précises.
+- VirtualHost, DocumentRoot exact et certificat, faute de visibilité sur la
+  configuration Apache/cPanel active.
+- Sauvegardes : fréquence, périmètre, rétention et procédure de restauration.
 
 ### Non applicable
 
 - Synchronisation BDD préproduction -> production et synchronisation globale de
   storage préproduction -> production : interdites par l'architecture.
-- Docker et worker permanent Supervisor/systemd : non prévus par l'architecture
-  documentée; ne pas les introduire sans décision explicite.
+- Docker et Node/npm sur le serveur : non utilisés par l'architecture active;
+  ne pas les introduire sans décision explicite.

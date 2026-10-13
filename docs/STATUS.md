@@ -1,5 +1,15 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Audit SSH production read-only
+
+L'accès SSH existant a confirmé le checkout `/home/meyo5199/top-halal-v2-prod`
+sur `main`/`8f7f189`, les runtimes PHP 8.4.26, Laravel 13.29.0, Composer 2.10.2,
+Git 2.56.0 et MariaDB 11.4.13, ainsi que la BDD V2 distincte. La crontab
+production active scheduler, worker verrouillé et purge e-mails; le build Vite
+est présent et servi. Aucun fichier, donnée, cache, Cron ou service n'a été
+modifié. Le DocumentRoot Apache exact et les garanties de sauvegarde/restauration
+restent à confirmer par la configuration Apache/cPanel.
+
 ## 2026-10-13 — Registre opérationnel production
 
 Le registre `docs/PRODUCTION_RUNBOOK.md` centralise désormais les constats de
