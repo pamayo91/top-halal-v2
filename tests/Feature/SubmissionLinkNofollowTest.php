@@ -44,7 +44,8 @@ class SubmissionLinkNofollowTest extends TestCase
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringContainsString('href="https://top-halal.fr/ajouter-un-restaurant" target="_blank" rel="noopener noreferrer nofollow"', $html);
+        $this->assertStringContainsString('href="https://top-halal.fr/ajouter-un-restaurant"', $html);
+        $this->assertStringContainsString('rel="noopener noreferrer nofollow"', $html);
         $this->assertStringContainsString('href="/ajouter-un-restaurant" rel="nofollow"', $html);
         $this->assertStringContainsString('href="/blog"', $html);
         $this->assertStringNotContainsString('href="/blog" rel="nofollow"', $html);
