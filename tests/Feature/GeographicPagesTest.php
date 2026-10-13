@@ -66,7 +66,10 @@ class GeographicPagesTest extends TestCase
             ->assertSee($seineSaintDenis->name)
             ->assertDontSee($reunion->name)
             ->assertSee('Île-de-France')
-            ->assertSee('Seine-Saint-Denis');
+            ->assertSee('Seine-Saint-Denis')
+            ->assertSee('href="'.route('cities.show', 'seine-saint-denis').'"', false)
+            ->assertSee('"item":"'.route('cities.show', 'seine-saint-denis').'"', false)
+            ->assertDontSee('href="'.route('cities.show', 'saint-denis').'">Seine-Saint-Denis', false);
         $this->get('/restos/saint-denis-974')
             ->assertOk()
             ->assertSee($reunion->name)

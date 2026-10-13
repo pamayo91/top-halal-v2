@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 /** Builds only the administrative landing pages represented by published structured communes. */
 class GeographicPageResolver
 {
-    private const CACHE_KEY = 'public-administrative-pages-v3';
+    private const CACHE_KEY = 'public-administrative-pages-v4';
 
     public function __construct(
         private readonly AdministrativeGeography $administrative,
@@ -33,9 +33,21 @@ class GeographicPageResolver
         return $this->departments()->firstWhere('slug', $slug);
     }
 
+    /** Resolves a department from its administrative code, never a display label or city slug. */
+    public function departmentForCode(string $code): ?object
+    {
+        return $this->departments()->firstWhere('code', strtoupper(trim($code)));
+    }
+
     public function regionForSlug(string $slug): ?object
     {
         return $this->regions()->firstWhere('slug', $slug);
+    }
+
+    /** Resolves a region from its administrative code, never a display label or city slug. */
+    public function regionForCode(string $code): ?object
+    {
+        return $this->regions()->firstWhere('code', trim($code));
     }
 
     public function forget(): void
@@ -75,16 +87,6 @@ class GeographicPageResolver
                 $departments[$code]['restaurants_count'] += $city->restaurants_count;
             }
 
-            $citiesBySlug = $cities->keyBy('slug');
-            foreach ($departments as &$department) {
-                $city = $citiesBySlug->get($department['slug']);
-
-                if ($city !== null && ! $this->administrative->cityAndDepartmentShareTerritory($city->city_code, $department['code'])) {
-                    $department['slug'] .= '-'.$department['code'];
-                }
-            }
-            unset($department);
-
             $regions = [];
             foreach ($departments as $department) {
                 $code = $department['region']['code'];
@@ -96,6 +98,49 @@ class GeographicPageResolver
                 $regions[$code]['department_codes'][] = $department['code'];
                 $regions[$code]['restaurants_count'] += $department['restaurants_count'];
             }
+
+            // Public paths are a single namespace.  Keep every administrative
+            // identity distinct from published communes and other levels before
+            // any route is emitted.  A city may never capture an administrative
+            // breadcrumb merely because its display name happens to match.
+            $citySlugs = $cities->pluck('slug')->flip();
+            $usedDepartmentSlugs = collect();
+            foreach ($departments as &$department) {
+                $baseSlug = $department['slug'];
+                $region = $regions[$department['region']['code']];
+                $mustQualify = $citySlugs->has($baseSlug)
+                    || ($region['slug'] === $baseSlug && count($region['department_codes']) === 1);
+                $candidate = $mustQualify ? $baseSlug.'-'.$department['code'] : $baseSlug;
+
+                if ($citySlugs->has($candidate) || $usedDepartmentSlugs->has($candidate)) {
+                    $candidate = $baseSlug.'-departement-'.$department['code'];
+                }
+
+                $department['slug'] = $candidate;
+                $usedDepartmentSlugs->put($candidate, true);
+            }
+            unset($department);
+
+            $reservedSlugs = $citySlugs->merge($usedDepartmentSlugs);
+            $usedRegionSlugs = collect();
+            foreach ($regions as &$region) {
+                $baseSlug = $region['slug'];
+                $candidate = $reservedSlugs->has($baseSlug) ? $baseSlug.'-region' : $baseSlug;
+
+                if ($reservedSlugs->has($candidate) || $usedRegionSlugs->has($candidate)) {
+                    $candidate = $baseSlug.'-region-'.$region['code'];
+                }
+
+                $region['slug'] = $candidate;
+                $usedRegionSlugs->put($candidate, true);
+            }
+            unset($region);
+
+            // Departments retain a copy of the final canonical regional route.
+            foreach ($departments as &$department) {
+                $department['region'] = $regions[$department['region']['code']];
+            }
+            unset($department);
 
             return [
                 'departments' => collect($departments)->sortBy('name')->values()->all(),
