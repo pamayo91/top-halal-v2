@@ -55,8 +55,13 @@ Avoid heavy frontend frameworks, unnecessary JS, third-party scripts, remote fon
 
 ## Testing rules
 Every completed feature requires appropriate automated tests.
+- Before starting a technical task, classify it as `MICRO`, `FAST` or `COMPLET`
+  under the production-maintenance workflow below. Reclassify immediately if its
+  actual scope reveals data, auth, security, dependency or transversal impact.
 - PHP/business rules: Pest/PHPUnit.
-- Browser flows: Playwright on preproduction.
+- Browser flows: Playwright on preproduction when the classified risk and the
+  affected user journey require it; it is not a default for a localised MICRO
+  correction.
 - Codex/browser validation: navigate as a real visitor/admin, fill forms, submit them, inspect visible results, console, network errors and relevant accessibility/performance issues.
 - For authenticated back-office validation on preproduction, use only the dedicated test administrator supplied through local `PREPROD_ADMIN_EMAIL` and `PREPROD_ADMIN_PASSWORD` environment variables. Never use, modify, reset or make a fixture of the project owner's human administrator account. Tests requiring these variables must skip with an explicit reason when they are unavailable.
 - If an E2E/browser test finds a defect, diagnose, fix, redeploy and rerun the failing flow before marking complete.
@@ -64,11 +69,11 @@ Every completed feature requires appropriate automated tests.
 
 ## NON-REGRESSION GATE
 - For every significant functional change, run targeted tests during development and the complete regression suite before marking the work DONE.
-- `composer test:regression` is the mandatory preproduction gate. It verifies PHP sentinel coverage, database integrity, V2 media/storage, Playwright public sentinels, HTTP 500s, browser console/network failures and Laravel exceptions generated during the run.
+- `composer test:regression` is the mandatory preproduction gate for a `COMPLET` change. It may be used once for a `FAST` change when its risk or perimeter justifies it, and is not required for a `MICRO` change. It verifies PHP sentinel coverage, database integrity, V2 media/storage, Playwright public sentinels, HTTP 500s, browser console/network failures and Laravel exceptions generated during the run.
 - The regression gate must never pin real mutable business records as permanent fixtures. Capture `regression:snapshot` immediately before deployment and pass its run ID to the post-deployment gate; compare only changes made during that deployment, while retaining dynamic orphan/media/storage integrity checks.
 - A new HTTP 500, lost media, unexpected lost relationship, unexpected count decrease, failed Playwright regression or new Laravel exception blocks DONE.
 - Never repair data artificially, rerun a global migration, recreate relations/media, or change a valid fixture merely to make a regression test pass. Diagnose and correct the root cause in code first; restore data only afterwards when necessary.
-- The regression suite protects the existing application as well as the changed feature. It is never optional because a change appears isolated.
+- The regression suite protects the existing application as well as the changed feature. It is never optional for `COMPLET` work or a `FAST` task explicitly escalated to it; a genuinely isolated `MICRO` change follows its own targeted proof path.
 - After a root-cause correction, rerun the complete regression suite. Inspect the complete Git diff before every functional commit; explain any unrelated or large change and verify that no secret, `.env`, or unintended deletion is staged.
 
 ## Documentation rules
@@ -111,8 +116,15 @@ Maintain:
 
 ## Production maintenance workflow
 - Production is active. `main` is the stable, production branch; `develop` is the integration branch deployed to `dev.top-halal.fr` for preproduction validation.
-- A technical correction starts from the stable `main` state on a focused `fix/...` or `hotfix/...` branch. Make only the intended change, add or adapt its tests, then integrate that exact correction into `develop` for preproduction.
-- Deploy the correction to `dev.top-halal.fr`, run targeted tests and relevant browser checks, then run the complete `composer test:regression` gate. Fix and repeat until preproduction is green. Promotion to production requires the project owner's explicit approval.
+- Classify every technical task before implementation and record the classification briefly when useful: `MICRO` is a tightly localised, presentation/SEO-only correction with no BDD, migration, business data, dependency, auth/permission, queue/job, transactional e-mail, upload/storage, sensitive business form, critical security or identified transversal impact. Typical cases are a link or external URL, `rel="nofollow"`, a small `robots.txt` or meta SEO rule, copy, one HTML attribute, isolated CSS, icon/label, share URL or presentation-only Blade correction. `FAST` covers a limited functional change such as small PHP/SEO/controller/route/reusable-component/frontend behaviour, without sensitive migration, auth/permission, massive mutation or critical transversal impact. `COMPLET` is mandatory for a migration or data mutation; auth, permissions, accounts, claims/ownership, security, sensitive business forms, restaurants, reviews/comments with business logic, queues/jobs, transactional e-mail, storage/media/upload, a dependency, a new feature, architecture, data deletion, significant route change, or any impact that cannot be clearly bounded.
+- A technical correction starts from the stable `main` state on a focused `fix/...` or `hotfix/...` branch. Make only the intended change, inspect only the directly relevant files/components for `MICRO` (the limited functional perimeter for `FAST`), add or adapt the necessary targeted proof, then integrate that exact correction into `develop` for preproduction.
+- `MICRO`: one clean commit is the objective (two only when genuinely justified); deploy once to preproduction, make one real verification directly tied to the change, wait for owner validation, selectively promote the validated commit, then make only change-related production checks. Do not run Playwright, `composer test:regression`, a regression snapshot, broad scans or unrelated desktop/mobile checks by default.
+- `FAST`: use targeted PHP tests and one browser or Playwright check only when relevant, deploy once to preproduction and verify the affected flow. `composer test:regression` and its snapshot are conditional and run at most once when the risk or combined perimeter justifies them; they are not an iteration default.
+- `COMPLET`: run targeted tests, relevant Playwright/browser validation, preproduction validation, the mandatory snapshot-backed `composer test:regression` gate, owner validation, selective promotion and the complete module-appropriate production checks.
+- Several independent MICRO/FAST corrections may each receive their own targeted proof, then share one preproduction deployment, one lot check, one owner validation and one production deployment. A fully MICRO lot does not acquire a complete gate merely by having several items; reclassify it to `FAST` or `COMPLET` when the cumulative risk becomes transversal.
+- If an expected test command is unavailable, never improvise a complex orchestration, concurrent executions, a manual reconstruction of the full gate, a background task to bypass terminal limits or repeated cache changes to force a MICRO/FAST pass. Continue with the declared targeted proof for `MICRO`/`FAST`; for `COMPLET`, stop as `BLOCKED` until the mandatory gate can run correctly. Never silently weaken a required gate.
+- For environment-dependent `robots.txt`, validate the production branch logic with an automated or targeted check, verify preproduction's own intentional blocking/protection, then inspect the real production `/robots.txt` after deployment. Never alter preproduction temporarily to mimic production.
+- Reclassify immediately rather than continuing as MICRO if implementation reveals BDD, auth, security, dependencies or transversal impact. Promotion to production always requires the project owner's explicit approval.
 - Promote only the reviewed correction to `main` (for example by a reviewed merge or cherry-pick of the tested commit). Do not merge all of `develop` merely because it contains the correction: unfinished or unapproved work in `develop` must not reach production. Do not rewrite history or force-push.
 - Deploy `main` to production only after that approval and perform change-appropriate post-deployment checks: deployed commit, site and `/health` where applicable, changed behavior, new HTTP 500s, relevant Laravel logs, and browser console/network for frontend changes. Check redirects (old URL, status, final destination), served `robots.txt`, generated sitemap, route/cache behavior, and real assets or desktop/mobile presentation when affected.
 - A BO change intentionally exposed in Filament (content, settings, navigation, SEO metadata, a simple exact redirect, or other managed business value) is production data and may be made in the production BO through the normal administrative workflow. Validate broad or risky changes, including regex redirects, on preproduction first when useful. Do not replace it through a later code deployment.

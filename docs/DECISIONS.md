@@ -1,15 +1,27 @@
 # Architectural & Product Decisions
 
-## 2026-10-13 — D045 — Exploitation post-production : promotion sélective et frontières de données
+## 2026-10-13 — D045 — Exploitation post-production : promotion sélective et validation proportionnée
 
 Top-Halal V2 est en production. `main` représente l'état stable destiné à la
 production et `develop` l'intégration validée sur `dev.top-halal.fr`. Une
 correction technique isolée part de `main`, est validée sur `develop` et la
-préproduction avec les tests ciblés, la recette navigateur pertinente et la
-gate complète `composer test:regression`, puis ne rejoint `main` qu'après
-validation explicite du propriétaire. La promotion porte le même correctif
+préproduction avec une preuve proportionnée au risque, puis ne rejoint `main`
+qu'après validation explicite du propriétaire. La promotion porte le même correctif
 identifié (merge ou cherry-pick revu), jamais un merge global automatique de
 `develop` lorsque celui-ci contient d'autres travaux.
+
+Chaque tâche technique est classée avant implémentation : `MICRO` pour une
+correction strictement localisée de présentation/SEO sans impact sensible,
+`FAST` pour une petite évolution fonctionnelle bornée, et `COMPLET` dès qu'il
+existe une migration ou mutation de données, auth/permission, sécurité,
+dependency, queue, e-mail, upload/storage, fonctionnalité nouvelle ou impact
+transversal incertain. `MICRO` exige la preuve ciblée minimale fiable et ne
+requiert ni Playwright ni `composer test:regression`; `FAST` conserve les tests
+ciblés et ne lance cette gate qu'une fois si son risque le justifie; `COMPLET`
+requiert la gate complète avec snapshot. Une classification est réévaluée dès
+que le périmètre réel l'élargit. La gate obligatoire ne peut être contournée par
+une orchestration improvisée : si elle est indisponible pour un `COMPLET`, le
+travail reste bloqué.
 
 Le code, la BDD et le stockage média sont trois frontières indépendantes. La
 BDD de préproduction ne doit jamais être copiée, fusionnée ni synchronisée vers

@@ -1,5 +1,16 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Validation post-production proportionnée au risque
+
+Le workflow de maintenance classe désormais chaque changement technique en
+`MICRO`, `FAST` ou `COMPLET`. MICRO conserve une preuve strictement ciblée sans
+Playwright, snapshot ni `composer test:regression`; FAST utilise des contrôles
+ciblés et ne lance cette gate qu'en fonction du risque; COMPLET conserve la
+gate snapshot obligatoire. Les lots de micro-correctifs partagent un unique
+déploiement/contrôle, les commandes indisponibles ne donnent pas lieu à une
+orchestration improvisée, et `robots.txt` conserve son contrôle spécifique par
+environnement. D045 est étendue, sans créer de décision concurrente.
+
 ## 2026-10-13 — Dernières confirmations du registre production
 
 L'alias local explicite `top-halal-prod` a été créé et validé en lecture seule

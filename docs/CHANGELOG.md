@@ -2,6 +2,13 @@
 
 ## 2026-10-13
 
+- Exploitation post-production : validation désormais proportionnée au risque
+  avec trois niveaux `MICRO` / `FAST` / `COMPLET`. La gate
+  `composer test:regression` est non requise pour MICRO, conditionnelle pour
+  FAST et obligatoire avec snapshot pour COMPLET. Les lots de correctifs
+  partagent un déploiement et une validation ciblée; les orchestrations de
+  contournement et les contrôles sans lien avec le diff sont interdits.
+
 - Registre production finalisé : alias local explicite `top-halal-prod` validé,
   DocumentRoot et certificat HTTPS confirmés, JetBackup 5 identifié comme
   mécanisme de sauvegarde o2switch. Les détails de rétention/restauration

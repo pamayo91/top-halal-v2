@@ -32,10 +32,19 @@ un chemin, une crontab ou un runtime par analogie avec la préproduction.
 ## Post-production maintenance and selective promotion
 
 For an isolated production fix, branch from stable `main` (`fix/...` or
-`hotfix/...`), keep the diff limited to that correction and add its necessary
-tests. Integrate the correction into `develop`, deploy it to `dev.top-halal.fr`,
-run targeted checks and browser validation where relevant, then run the full
-`composer test:regression` gate. A failure returns the fix to the same loop.
+`hotfix/...`), classify it as `MICRO`, `FAST` or `COMPLET` before implementation
+and keep the diff limited to that correction. The detailed classification and
+proof rules are binding in `AGENTS.md` and the production runbook. Integrate the
+correction into `develop` and deploy it once to `dev.top-halal.fr`: `MICRO`
+uses only its targeted proof; `FAST` uses targeted tests and a browser check
+when relevant; `COMPLET` runs targeted tests, relevant browser/Playwright
+validation and the full snapshot-backed `composer test:regression` gate.
+
+`composer test:regression` is never automatic for `MICRO`, conditional for
+`FAST` only when risk/perimeter warrants it, and mandatory for `COMPLET`.
+Do not replace an unavailable command with concurrent, background or manually
+assembled gate orchestration. A `COMPLET` deployment remains blocked until its
+mandatory gate can run correctly.
 
 Only after explicit owner validation may the exact tested correction be promoted
 to `main`. Use a reviewed merge or a reviewed cherry-pick of the precise commit;
@@ -83,17 +92,17 @@ still require their authoritative control-plane records.
 
 ## Target deployment flow
 1. SSH to preproduction using the saved alias `top-halal-preprod`.
-2. Before updating Git or running migrations, run `artisan regression:snapshot --json` and retain its `run_id` outside Git for this deployment.
-2. Enter the non-public application directory.
-3. `git fetch --prune` and update the working tree from `origin/develop`.
-4. `composer install` when dependencies changed; use the preproduction-safe flags decided after server audit.
-5. Run Laravel migrations when needed, with preproduction safeguards.
-6. Build frontend assets when needed. Run `/opt/alt/php84/usr/bin/php artisan filament:assets` after Composer install (and before any BO validation) on both preproduction and production: Filament CSS, JavaScript and fonts are vendor-published and are not part of Vite's `public/build/` output.
-7. Run Laravel optimization/cache commands appropriate for preproduction.
-8. Restart queue workers when workers exist and code affecting jobs changed.
-9. Clear the route cache whenever `routes/` changes; this project contains closure routes and must not route-cache them. Run health check and targeted smoke/E2E tests against the preproduction URL.
-10. Run `composer test:regression` from the workstation after deployment with `PREPROD_REGRESSION_SNAPSHOT_ID` set to that pre-deployment run ID. It blocks on count losses introduced during this deployment, dynamic database/media/relation integrity failures, HTTP 500, Playwright console/network failures or new Laravel exceptions.
-11. If validation fails, stop and fix before considering deployment complete.
+2. Classify the deployment before updating Git. Run `artisan regression:snapshot --json` and retain its `run_id` only for a `COMPLET` deployment, or for a `FAST` deployment deliberately escalated to the full gate; a `MICRO` deployment does not take a regression snapshot.
+3. Enter the non-public application directory.
+4. `git fetch --prune` and update the working tree from `origin/develop`.
+5. `composer install` when dependencies changed; use the preproduction-safe flags decided after server audit.
+6. Run Laravel migrations when needed, with preproduction safeguards.
+7. Build frontend assets when needed. Run `/opt/alt/php84/usr/bin/php artisan filament:assets` after Composer install (and before any BO validation) on both preproduction and production: Filament CSS, JavaScript and fonts are vendor-published and are not part of Vite's `public/build/` output.
+8. Run Laravel optimization/cache commands appropriate for preproduction.
+9. Restart queue workers when workers exist and code affecting jobs changed.
+10. Clear the route cache whenever `routes/` changes; this project contains closure routes and must not route-cache them. Run only the classification-appropriate health check and targeted proof against the preproduction URL.
+11. For `COMPLET`, run `composer test:regression` from the workstation after deployment with `PREPROD_REGRESSION_SNAPSHOT_ID` set to that pre-deployment run ID. It blocks on count losses introduced during this deployment, dynamic database/media/relation integrity failures, HTTP 500, Playwright console/network failures or new Laravel exceptions. For a justified `FAST` gate, use the same sequence once; do not run it for `MICRO`.
+12. If validation fails, stop and fix before considering deployment complete.
 
 ## Frontend build and test safety
 

@@ -100,12 +100,45 @@ audit : `artisan optimize:clear`, `artisan config:cache` et `artisan view:cache`
 N'utiliser `artisan route:clear` qu'en cas de changement de routes; ne pas
 exécuter `route:cache` tant que des routes closure sont présentes.
 
+## Classification et preuve proportionnée au risque
+
+Avant toute tâche technique, classer explicitement le changement. Le but est de
+prouver le comportement modifié avec le minimum d'actions fiables nécessaires,
+sans réduire les protections d'un changement significatif. Reclasser sans délai
+si le périmètre réel révèle un risque plus large.
+
+| Niveau | Champ | Preuve préproduction | Gate de régression |
+| --- | --- | --- | --- |
+| `MICRO` | Lien, URL externe, `nofollow`, petite règle robots/méta SEO, texte, attribut HTML, CSS isolé, icône/libellé, URL de partage ou Blade seulement présentation. Exclut BDD/migration/données métier/dépendance/auth/queue/e-mail/upload-storage/formulaire sensible/sécurité critique/impact transversal. | Inspection ciblée, assertion PHP existante si disponible, HTML rendu, GET HTTP, attribut/URL, lecture d'un fichier public ou un seul contrôle navigateur réel. | Non requis. Ni Playwright systématique ni snapshot. |
+| `FAST` | Petite logique PHP/SEO dynamique/contrôleur/composant réutilisé/comportement front/route, avec impact limité et sans migration sensible, auth/permission, mutation massive ou impact transversal critique. | Tests PHP ciblés et un contrôle navigateur ou Playwright seulement si le flux l'exige. | Conditionnel, une seule fois si risque ou périmètre le justifie. |
+| `COMPLET` | Migration ou mutation de données, auth/permissions/comptes/claims/ownership/sécurité, formulaire métier, ajout de restaurant, avis/commentaires métier, queue/job/e-mail, upload/storage/médias, dépendance, fonctionnalité/architecture nouvelle, suppression de données, route importante ou impact non borné. | Tests ciblés, validation navigateur/Playwright pertinente et recette préproduction. | Obligatoire, avec snapshot de déploiement. |
+
+Les correctifs indépendants peuvent être regroupés : chaque MICRO/FAST reçoit
+sa preuve ciblée, puis le lot reçoit un seul déploiement préproduction, un seul
+contrôle du lot, une validation propriétaire et une promotion/déploiement
+production. Un lot entièrement MICRO ne déclenche pas une gate complète; le
+reclasser vers FAST ou COMPLET dès que le cumul devient transversal.
+
+Ne pas improviser une gate : si une commande attendue est indisponible, ne pas
+lancer d'exécutions concurrentes, de tâche de fond pour contourner le terminal,
+de reproduction manuelle de la gate en plusieurs commandes ou de nettoyages de
+cache répétés. MICRO et FAST restent sur leurs preuves ciblées; COMPLET reste
+`BLOCKED` jusqu'à l'exécution correcte de sa gate obligatoire.
+
+`robots.txt` est dépendant de l'environnement : tester la logique de la branche
+production, vérifier sur préproduction sa protection volontaire propre, puis
+contrôler le vrai `/robots.txt` en production. Ne jamais modifier temporairement
+la préproduction afin de simuler la production.
+
 ## Procédure standard de déploiement — à exécuter seulement après autorisation
 
 1. Vérifier l'autorisation du propriétaire, la branche `main`, le commit exact,
    son diff et l'absence de fonctionnalités non approuvées.
-2. Vérifier que ce même correctif a été validé sur `develop`/`dev.top-halal.fr`,
-   avec tests ciblés, recette pertinente et `composer test:regression` vert.
+2. Vérifier que ce même correctif a été validé sur `develop`/`dev.top-halal.fr`
+   selon son niveau : preuve ciblée pour MICRO, tests ciblés et recette
+   pertinente pour FAST, et snapshot + `composer test:regression` vert pour
+   COMPLET. La gate FAST éventuelle n'est exécutée qu'une fois et doit être
+   justifiée par le risque/périmètre.
 3. Déterminer si une migration de données est impliquée. Une migration de schéma
    peut être exécutée avec le code; une mutation de données exige analyse de
    portée, volumes, idempotence, interaction BO, sauvegarde/rollback et
@@ -145,14 +178,19 @@ exécuter `route:cache` tant que des routes closure sont présentes.
 
 ## Health checks post-déploiement
 
-- Confirmer le commit réellement déployé et le domaine principal en HTTPS.
-- Vérifier `/health`, l'accueil, une fiche restaurant, une page ville, un
-  article, `/robots.txt` et `/sitemap.xml`.
-- Tester directement la fonctionnalité modifiée; vérifier le BO si concerné.
-- Examiner les nouvelles erreurs HTTP 500, les logs Laravel pertinents et,
-  pour le frontend, console et réseau navigateur.
+- Toujours confirmer le commit réellement déployé et tester directement la
+  fonctionnalité modifiée.
+- MICRO : effectuer seulement les contrôles liés au changement et `/health` si
+  pertinent. Ne pas ouvrir par défaut accueil, article, ville, restaurant,
+  mobile, desktop ou plusieurs journaux sans lien avec le diff.
+- FAST : ajouter les logs pertinents et le parcours fonctionnel concerné, avec
+  une vérification navigateur si elle répond au risque identifié.
+- COMPLET : effectuer les contrôles complets appropriés au module, dont les
+  nouvelles erreurs HTTP 500, les logs Laravel pertinents et, pour le frontend,
+  console/réseau et formats nécessaires.
 - Ajouter les contrôles spécifiques : ancienne URL/code/destination pour une
-  redirection; assets et formats desktop/mobile pour le frontend.
+  redirection; réponse réelle robots/sitemap; assets et formats desktop/mobile
+  seulement lorsqu'ils sont affectés.
 
 ## Diagnostic production read-only
 
