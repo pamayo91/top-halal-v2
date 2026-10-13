@@ -186,6 +186,7 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
             '- Exécuté : '.$report['audited_at'],
             '- Sélection : '.$report['selection'],
             '- Garantie : lecture seule V2 ; aucun accès legacy, aucune redirection ou donnée métier modifiée.',
+            '- Vérification de sécurité : le test dédié intercepte les requêtes SQL d’écriture ; aucun INSERT, UPDATE, DELETE ni création de restaurant/référentiel n’est autorisé par cette commande.',
             '',
             '## Synthèse',
             '',

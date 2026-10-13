@@ -1,5 +1,15 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Audit des villes non résolues
+
+L’audit V2 strictement en lecture seule des 63 fiches exclues des breadcrumbs
+géographiques conclut à 59 `city_code` absents et 4 libellés manifestement non
+municipaux (quartier, adresse postale ou laboratoire). Aucun code invalide,
+cas étranger, donnée structurelle incomplète ni bug du resolver n’a été
+observé. Les recommandations restent manuelles : aucun code ni champ de fiche
+n’a été modifié. Les rapports détaillés Markdown et CSV sont versionnés dans
+`docs/generated/`.
+
 ## 2026-10-13 — Fil d’Ariane géographique résolu par identité administrative
 
 Les fil d’Ariane publics des fiches, villes, départements, régions et facettes

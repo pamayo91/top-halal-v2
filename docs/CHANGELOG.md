@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- Données/géographie : audit V2 en lecture seule des 63 fiches sans ville
+  résolue, avec CSV et rapport détaillé versionnés. Les 59 codes INSEE absents
+  et 4 libellés non municipaux sont seulement recommandés pour revue manuelle ;
+  aucune donnée, redirection ou règle de breadcrumb n’a été modifiée.
+
 - SEO/géographie : les fil d’Ariane des fiches et pages géographiques sont
   désormais résolus depuis les identifiants administratifs, partagés à
   l’identique avec le JSON-LD, et protégés contre les homonymies de slugs.
