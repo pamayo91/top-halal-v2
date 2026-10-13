@@ -2,6 +2,12 @@
 
 ## 2026-10-13
 
+- SEO/géographie : les fil d’Ariane des fiches et pages géographiques sont
+  désormais résolus depuis les identifiants administratifs, partagés à
+  l’identique avec le JSON-LD, et protégés contre les homonymies de slugs.
+  L’audit en lecture seule `geography:audit-breadcrumbs` contrôle l’ensemble
+  des surfaces publiques concernées.
+
 - SEO : tous les liens vers `/ajouter-un-restaurant` sont désormais en
   `nofollow`, y compris dans les menus configurables; les liens déjà en nouvelle
   fenêtre conservent `noopener noreferrer`.

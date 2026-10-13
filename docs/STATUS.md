@@ -1,5 +1,17 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Fil d’Ariane géographique résolu par identité administrative
+
+Les fil d’Ariane publics des fiches, villes, départements, régions et facettes
+ouvertes sont maintenant construits par un service unique à partir du code INSEE
+de la ville et des codes administratifs région/département. Le HTML et le
+`BreadcrumbList` JSON-LD consomment exactement cette même structure. Les
+homonymies ville/département/région disposent d’URLs qualifiées stables, sans
+altérer le cas territorial partagé de Paris. La commande de lecture seule
+`geography:audit-breadcrumbs` couvre toutes les surfaces indexables : sur
+préproduction elle ne signale aucune divergence et isole 63 fiches publiées
+sans ville résolue, donc sans niveau géographique à afficher.
+
 ## 2026-10-13 — Liens de soumission en nofollow
 
 Tous les liens publics vers `/ajouter-un-restaurant`, y compris les liens de
