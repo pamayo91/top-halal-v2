@@ -12,7 +12,7 @@ class PublicPaginationSeoTest extends TestCase
 
     public function test_indexable_collection_pages_are_self_canonical_and_page_one_stays_clean(): void
     {
-        $burger = Category::create(['legacy_term_id' => 7001, 'name' => 'Burger', 'slug' => 'burger']);
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 7001, 'name' => 'Burger']);
         $this->restaurants(13, $burger);
         $this->articles(17);
         CitySpecialtySeoPage::create(['city_code' => '13055', 'category_id' => $burger->id, 'state' => 'open']);
@@ -47,7 +47,7 @@ class PublicPaginationSeoTest extends TestCase
 
     public function test_paginated_filtered_directory_remains_noindex(): void
     {
-        $burger = Category::create(['legacy_term_id' => 7101, 'name' => 'Burger', 'slug' => 'burger']);
+        $burger = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 7101, 'name' => 'Burger']);
         $this->restaurants(13, $burger);
 
         $this->get('/restaurants?categories[]=burger&page=2')
