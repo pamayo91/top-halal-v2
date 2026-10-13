@@ -1,8 +1,110 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Liens de soumission en nofollow
+
+Tous les liens publics vers `/ajouter-un-restaurant`, y compris les liens de
+navigation configurables et leur forme absolue canonique, rendent désormais
+`rel="nofollow"`. Les liens ouvrant une nouvelle fenêtre conservent aussi
+`noopener noreferrer`.
+
 ## 2026-10-13 — SEO des collections paginées
 
 Les collections publiques déjà indexables (annuaire, guide, taxonomies géographiques/de spécialité/de service et facettes SEO ouvertes) distinguent désormais chaque page de pagination : page 1 a une canonical propre, les pages suivantes sont `index,follow` et ont une canonical auto-référente limitée à `?page=N`. La règle est centralisée dans `PublicPaginationSeo`; les paramètres de tracking et les filtres/recherches restent exclus des canonicals. Les surfaces délibérément `noindex,follow` ne sont jamais ouvertes par la pagination. Le sitemap n’est pas modifié.
+
+## 2026-10-13 — Préproduction : partage social et exclusions robots
+
+Les boutons de partage éditoriaux communs aux Articles et Pages ajoutent
+désormais `nofollow` sans retirer `noopener noreferrer`; X ouvre directement
+son endpoint de partage. Le robots de production est couvert par les tests
+pour `/login`, `/forgot-password` et tout paramètre `near_me`, tout en
+conservant la règle claim et sans réintroduire de directive sitemap. Sur
+préproduction, `Disallow: /`, `X-Robots-Tag: noindex, nofollow`, le sitemap,
+les tests PHP ciblés et l’E2E desktop/mobile sont validés. Aucune promotion
+production n’a été effectuée.
+
+## 2026-10-13 — Robots : claims exclus du crawl, sitemap indépendant
+
+Le rendu applicatif de `robots.txt` de production conserve `Allow: /`, ajoute
+`Disallow: */claim` pour les parcours publics de revendication et ne déclare
+plus de sitemap. La route `/sitemap.xml` reste publique et indépendante de
+cette déclaration. La préproduction conserve son `Disallow: /` et rend aussi
+explicitement `X-Robots-Tag: noindex, nofollow` sur tous ses environnements
+non-production. La validation préproduction (tests ciblés, robots/sitemap/headers
+réels et gate de régression) est validée; aucune promotion vers `main` n’a été
+effectuée.
+
+## 2026-10-13 — Production V2 opérationnelle
+
+Le cutover est suivi de l'activation validée du SMTP, du scheduler, du worker
+Cron fini et de la purge quotidienne des historiques. Le sous-domaine
+`prod-preview.top-halal.fr` redirige en permanence vers le domaine canonique;
+`dev.top-halal.fr` reste la préproduction protégée. Un e-mail transactionnel
+technique contrôlé a traversé la queue et est conservé comme trace `sent` dans
+l'historique, sans création de donnée métier.
+
+## 2026-10-13 — Préparation finale au cutover V2
+
+La release V2 est figée après contrôle du checkout, de la BDD, du storage, des
+assets et de la preview production. Une sauvegarde logique BDD vérifiée et une
+archive storage privée vérifiée ont été créées hors du webroot. La queue et les
+échecs sont vides; SMTP, Cron et worker restent volontairement inactifs. Le
+script worker Cron résout désormais le chemin de l'application depuis son
+propre emplacement, ce qui le rend sûr pour l'instance production. Le
+DocumentRoot final reste une action manuelle du propriétaire; aucun cutover
+n'a été effectué.
+
+## 2026-10-13 — Runtime Filament de la preview production réparé
+
+La recette BO de `prod-preview.top-halal.fr` a identifié trois causes
+indépendantes : les 37 assets vendor Filament (CSS, JavaScript et polices)
+étaient absents du checkout production car `filament:assets` n'avait pas été
+exécuté ; la CSP empêchait Alpine d'évaluer les expressions requises par
+Filament 5 ; et quatre libellés français manquaient dans la distribution
+Filament installée. Le déploiement rend désormais `filament:assets`
+obligatoire après Composer. La compatibilité CSP (`unsafe-eval`, avatar
+Filament) reste strictement bornée à `/admin`; le front public ne reçoit pas
+ces exceptions. Les surcharges de traduction de l'application ne couvrent que
+les clés françaises absentes. Login, navigation BO, logout et relogin ont été
+validés avec le seul compte de test dédié, sans mutation métier.
+
+## 2026-10-12 — Recette de la preview production
+
+La preview HTTPS `prod-preview.top-halal.fr` a été contrôlée sur le checkout
+production `3e59c6b`. Les sentinelles publiques Playwright (45 réussites, une
+exclusion attendue), les parcours géographiques, les relations/médias et les
+compteurs de la BDD de production sont conformes; `robots.txt` et
+`X-Robots-Tag` maintiennent l'instance en `noindex,nofollow`, les e-mails sont
+neutralisés et Cron/worker restent désactivés. Les mesures navigateur mobile à
+contexte frais donnent un LCP de 472–684 ms et un CLS nul sur les cinq pages
+représentatives testées. Réserve à lever avant le cutover : le formulaire
+Filament de connexion admin ne déclenche pas de requête Livewire dans le
+navigateur automatisé avec le compte dédié; aucun compte ni donnée métier n'a
+été modifié pendant ce diagnostic.
+
+## 2026-10-12 — Copie contrôlée de la BDD V2 vers production
+
+Après les deux confirmations explicites du propriétaire, la BDD V2 préproduction a été copiée vers la BDD production vide avec un dump transactionnel sans `--databases`, empêchant toute instruction `USE` vers la source. Les 54 tables, 71 migrations et compteurs métier sont identiques ; la vérification dynamique ne relève aucune relation ou média manquant. Les fichiers client temporaires ont été supprimés, les dumps source et cible-vide restent privés (`600`), et la preview production fonctionne en HTTPS avec e-mails neutralisés, Cron/worker désactivés et `noindex,nofollow`.
+
+## 2026-10-12 — Nettoyage contrôlé des dépôts techniques
+
+Après audit relationnel, 62 soumissions `example.invalid` purement techniques et leurs 62 restaurants `pending` non legacy ont été supprimés de la seule préproduction. La transaction a aussi retiré 434 horaires, 34 relations catégorie, 34 relations service, 62 liens média et 88 journaux e-mail de test. Aucun compte, claim, asset média, avis, demande de retrait, enrichissement ou donnée legacy n'était lié ; l'unique asset partagé reste conservé. Les contrôles post-opération confirment zéro soumission/adresse/journal `example.invalid` et zéro orphelin sur les relations contrôlées.
+
+## 2026-10-12 — Clôture P1 préparation production
+
+Headers de sécurité applicatifs testés, audit OPcache, audit read-only des données de test, mesures navigateur représentatives et audit des fuites `dev.top-halal.fr` sont consignés dans `docs/generated/production-preparation-p1-2026-10-12.md`. Aucun métier n'a été supprimé : 62 soumissions `example.invalid` sont seulement qualifiées candidates. Les deux liens internes absolus de préproduction trouvés dans `quick-hallal` ont été remplacés par des chemins relatifs. OPcache reste à vérifier/activer par l'hébergement pour le SAPI web PHP 8.4 avant une vraie production.
+
+## 2026-10-12 — Traçabilité Git de la préproduction rétablie
+
+Le checkout préproduction validé `b7d4661` contenait 35 commits de plus que
+`origin/develop`. L'audit a établi qu'il s'agissait de 31 merges successifs de
+la branche distante et de quatre commits Top-Halal (médias éditoriaux et footer),
+sans secret, artefact sensible, blob volumineux ni différence d'arbre finale
+avec la branche distante. La branche préproduction a été poussée normalement
+en fast-forward vers GitHub, puis relue depuis `origin/develop`; les deux refs
+pointent désormais le même commit. La gate complète post-synchronisation avec
+snapshot est verte. Règle durable : une préproduction candidate à la production
+ne doit jamais contenir de commit absent de `origin/develop` ; le flux obligatoire
+est commit local, push GitHub, puis pull/déploiement préproduction.
 
 ## 2026-10-04 — Piles stables Hero / recherche / restaurants de l’accueil
 

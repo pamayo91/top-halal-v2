@@ -1,0 +1,89 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Menu;
+use App\Models\MenuItem;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Blade;
+use Tests\TestCase;
+
+class SubmissionLinkNofollowTest extends TestCase
+{
+    use DatabaseMigrations;
+
+    public function test_static_submission_links_are_nofollow_on_the_homepage_and_account_dashboard(): void
+    {
+        $url = route('restaurant-submissions.create');
+
+        $home = $this->get('/')->assertOk()->getContent();
+        $this->assertSame(3, substr_count($home, 'href="'.$url.'" rel="nofollow"'));
+
+        $dashboard = $this->actingAs(User::factory()->create())
+            ->get(route('account.dashboard'))
+            ->assertOk()
+            ->getContent();
+        $this->assertSame(4, substr_count($dashboard, 'href="'.$url.'" rel="nofollow"'));
+    }
+
+    public function test_navigation_submission_links_are_nofollow_and_preserve_existing_rel_tokens(): void
+    {
+        $menu = Menu::where('location', 'header_main')->firstOrFail();
+        MenuItem::where('menu_id', $menu->id)->delete();
+
+        MenuItem::create([
+            'menu_id' => $menu->id,
+            'label' => 'Proposer',
+            'link_type' => 'external_url',
+            'url' => 'https://top-halal.fr/ajouter-un-restaurant',
+            'target_blank' => true,
+        ]);
+        MenuItem::create(['menu_id' => $menu->id, 'label' => 'Blog', 'link_type' => 'internal_url', 'url' => '/blog']);
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('/href="https:\/\/top-halal\.fr\/ajouter-un-restaurant"[^>]*rel="[^"]*nofollow[^"]*"/', $html);
+        $this->assertStringContainsString('href="/blog"', $html);
+        $this->assertDoesNotMatchRegularExpression('/href="\/blog"[^>]*rel="[^"]*nofollow[^"]*"/', $html);
+
+        $targetBlankLink = Blade::render('<x-navigation.menu :menu="$menu" />', [
+            'menu' => ['items' => [[
+                'id' => 1,
+                'label' => 'Proposer',
+                'url' => 'https://top-halal.fr/ajouter-un-restaurant',
+                'children' => [],
+                'is_active' => false,
+                'target_blank' => true,
+                'nofollow' => false,
+            ], [
+                'id' => 2,
+                'label' => 'Plus',
+                'url' => null,
+                'children' => [[
+                    'id' => 3,
+                    'label' => 'Ajouter',
+                    'url' => '/ajouter-un-restaurant',
+                    'children' => [],
+                    'is_active' => false,
+                    'target_blank' => false,
+                    'nofollow' => false,
+                ]],
+                'is_active' => false,
+                'target_blank' => false,
+                'nofollow' => false,
+            ], [
+                'id' => 4,
+                'label' => 'Blog',
+                'url' => '/blog',
+                'children' => [],
+                'is_active' => false,
+                'target_blank' => false,
+                'nofollow' => false,
+            ]]],
+        ]);
+        $this->assertStringContainsString('rel="noopener noreferrer nofollow"', $targetBlankLink);
+        $this->assertMatchesRegularExpression('/href="\/ajouter-un-restaurant"[^>]*rel="[^"]*nofollow[^"]*"/', $targetBlankLink);
+        $this->assertDoesNotMatchRegularExpression('/href="\/blog"[^>]*rel="[^"]*nofollow[^"]*"/', $targetBlankLink);
+    }
+}

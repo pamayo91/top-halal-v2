@@ -5,13 +5,14 @@
 - Build deterministic URL mapping from WordPress -> V2.
 - Generate canonical, robots directives, sitemaps, breadcrumbs and correct status codes natively.
 - Avoid indexable combinations of arbitrary filters; most query/filter combinations should be noindex unless explicitly promoted to a quality landing page.
+- Internal links to `/ajouter-un-restaurant`, including the canonical absolute URL, carry `rel="nofollow"`; any existing `rel` tokens are retained.
 - Structured data derives from visible, factual content.
 
 ## Frozen public URL contract (2026-08-26)
 - Canonical public URLs are HTTPS, on the canonical host, with no trailing slash except `/`.
 - Restaurants use `/resto/{slug}`; category and service pages use `/specialites/{slug}` and `/service/{slug}`. Published editorial content uses its root slug: `/{slug}`. Legacy city slugs without an identical structured-city slug redirect through the application redirect engine; the retired legacy Geography tables are not present at runtime.
 - A page/article slug collision is a migration anomaly to resolve before cutover; it must never produce two indexable URLs.
-- `/sitemap.xml` contains only indexable canonical URLs. `robots.txt` exposes it in production only; preproduction remains disallow-all/noindex.
+- `/sitemap.xml` contains only indexable canonical URLs and remains publicly accessible. Production `robots.txt` allows crawl but does not declare the sitemap; it disallows public claim URLs with `Disallow: */claim`, authentication entry points (`/login`, `/forgot-password`) and any URL carrying `near_me` (`/*near_me=*`). Preproduction remains disallow-all/noindex.
 - Arbitrary query parameters canonicalize to the parameter-free URL and are `noindex,follow`. For every public collection that is already indexable, pagination is a sequence of distinct URLs: page 1 has the clean base canonical (including when requested as `?page=1`), and page `N > 1` is `index,follow` with a self-canonical `?page=N`. Tracking and discovery/filter parameters never enter that canonical. A collection that is deliberately `noindex,follow` remains so on every page; pagination alone never opens it.
 
 ## Structured data and facets

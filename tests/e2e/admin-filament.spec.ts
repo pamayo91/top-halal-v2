@@ -19,20 +19,25 @@ test.describe('Filament administration', () => {
     });
 
     await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
+    await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+    await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
     await page.locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL(/\/admin$/);
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await expect(page.getByRole('searchbox', { name: 'Recherche globale' })).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('filament-panels::');
+    await expect(page.locator('body')).not.toContainText('filament::components');
     for (const [path, heading] of [
       ['/admin/restaurants', 'Restaurants'],
       ['/admin/articles', 'Articles'],
       ['/admin/pages', 'Pages'],
+      ['/admin/media-assets', null],
+      ['/admin/users', null],
       ['/admin/restaurant-reviews', 'Avis'],
       ['/admin/comments', 'Commentaires'],
       ['/admin/restaurant-claims', 'Claims'],
+      ['/admin/email-delivery-logs', null],
       ['/admin/redirect-rules', null],
       ['/admin/settings', 'Réglages'],
       ['/admin/admin-audit-logs', null],
@@ -46,10 +51,27 @@ test.describe('Filament administration', () => {
     expect(networkErrors).toEqual([]);
   });
 
+  test('admin session logs out and authenticates again with the dedicated test account', async ({ page }) => {
+    const login = async () => {
+      await page.goto('/admin');
+      await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+      await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/admin$/);
+    };
+
+    await login();
+    await page.getByRole('button', { name: 'Menu utilisateur' }).click();
+    await page.getByRole('button', { name: 'Déconnexion' }).click();
+    await expect(page).toHaveURL(/\/admin\/login$/);
+    await login();
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
+  });
+
   test('review and comment detail dialogs show historical dates', async ({ page }) => {
     await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
+    await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+    await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/admin$/);
 
@@ -69,8 +91,8 @@ test.describe('Filament administration', () => {
 
   test('restaurant duplicate signals are visible and filterable without exposing technical details', async ({ page }) => {
     await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
+    await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+    await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/admin$/);
 

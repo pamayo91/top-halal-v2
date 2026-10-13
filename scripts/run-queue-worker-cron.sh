@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-readonly APP_PATH='/home/meyo5199/top-halal-v2'
+readonly APP_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly PHP_BINARY='/opt/alt/php84/usr/bin/php'
 readonly LOCK_FILE="$APP_PATH/storage/framework/queue-worker.lock"
 

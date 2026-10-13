@@ -17,6 +17,12 @@
 - `develop`: preproduction integration branch.
 - `feature/...`: temporary branches for significant work; merge into `develop` only after validation.
 - Codex workflow: edit code, run targeted local tests, commit, push to GitHub, SSH to preproduction, pull `develop`, run deployment steps, then validate preproduction with browser/Playwright.
+- A preproduction revision considered valid for production must always be
+  reachable from `origin/develop` before validation is accepted. Never retain
+  durable development commits only in the server checkout: the mandatory order
+  is local commit, GitHub push, then preproduction pull/deployment. Before a
+  production-readiness audit, verify `git merge-base --is-ancestor HEAD
+  origin/develop` and `git rev-parse HEAD = git rev-parse origin/develop`.
 
 ## Required Manual GitHub Actions
 - Confirm whether branch protection is desired for `main` and `develop`.
@@ -29,7 +35,7 @@
 3. `git fetch --prune` and update the working tree from `origin/develop`.
 4. `composer install` when dependencies changed; use the preproduction-safe flags decided after server audit.
 5. Run Laravel migrations when needed, with preproduction safeguards.
-6. Build frontend assets when needed.
+6. Build frontend assets when needed. Run `/opt/alt/php84/usr/bin/php artisan filament:assets` after Composer install (and before any BO validation) on both preproduction and production: Filament CSS, JavaScript and fonts are vendor-published and are not part of Vite's `public/build/` output.
 7. Run Laravel optimization/cache commands appropriate for preproduction.
 8. Restart queue workers when workers exist and code affecting jobs changed.
 9. Clear the route cache whenever `routes/` changes; this project contains closure routes and must not route-cache them. Run health check and targeted smoke/E2E tests against the preproduction URL.
@@ -42,7 +48,7 @@ The preproduction SSH environment has no Node.js executable in PATH. After the G
 
 ### Filament assets
 
-Filament back-office CSS, JavaScript and fonts are vendor-published files under `public/css/filament/`, `public/js/filament/` and `public/fonts/filament/`. They are intentionally ignored by Git but must remain physically present because Apache serves them directly. Regenerate them with `/opt/alt/php84/usr/bin/php artisan filament:assets` after installing or updating dependencies that affect Filament, before validating the back office. The current deployment flow does not run this command automatically; automate it in the future deployment script rather than deleting these assets from an active environment.
+Filament back-office CSS, JavaScript and fonts are vendor-published files under `public/css/filament/`, `public/js/filament/` and `public/fonts/filament/`. They are intentionally ignored by Git but must remain physically present because Apache serves them directly. Regenerate them with `/opt/alt/php84/usr/bin/php artisan filament:assets` after every Composer install and before validating the back office; this is a mandatory deployment step, not a Vite build substitute.
 
 Before running `artisan test` on preproduction, run `artisan optimize:clear` first so PHPUnit’s SQLite testing configuration is not shadowed by the cached preproduction configuration. Recreate the configuration, route and view caches after the test run. Never run database-migrating tests against a cached preproduction configuration.
 
@@ -74,7 +80,7 @@ Create `scripts/deploy-preprod.sh` after the server audit confirms final paths, 
 - PHP 8.4 binary: `/opt/alt/php84/usr/bin/php`.
 - Composer works when invoked explicitly with PHP 8.4: `/opt/alt/php84/usr/bin/php /usr/local/bin/composer`.
 - Required PHP 8.4 extensions for Laravel bootstrap are enabled.
-- `opcache` is still missing from PHP 8.4 and should be enabled before performance validation.
+- Le module `opcache.so` est présent pour PHP 8.4, mais il n'est pas chargé par le CLI (`php -m`/`php -i`). Le compte de déploiement ne peut pas confirmer ni modifier le SAPI web : activer/vérifier OPcache auprès de l'hébergement avant une mise en production, sans tenter une activation CLI isolée.
 - Composer 2.10.2 and Git 2.48.2 are available.
 - MariaDB client is 11.4.13.
 - Node/npm are not available in SSH PATH.
@@ -125,6 +131,17 @@ Laravel scheduler runs through this server Cron entry every minute:
 * * * * * cd /home/meyo5199/top-halal-v2 && /opt/alt/php84/usr/bin/php artisan schedule:run --no-interaction >> /home/meyo5199/top-halal-v2/storage/logs/scheduler.log 2>&1
 ```
 
+## Production operating Cron
+
+Production uses the same finite, lock-protected worker model, with paths rooted
+at `/home/meyo5199/top-halal-v2-prod`. Register each of these entries once in
+the production account's user crontab: scheduler every minute, the queue worker
+every minute, and the delivery-history retention at 03:05. The scheduler only
+owns verification cleanup; the retention command remains separate and must not
+be duplicated in `routes/console.php`. Keep SMTP credentials exclusively in
+the encrypted BO setting. `prod-preview.top-halal.fr` is an application-level
+301 to the canonical production URL, while `dev.top-halal.fr` remains separate.
+
 ## Queue worker
 
 Preproduction is hosted on o2switch mutualised and has no persistent Supervisor/systemd worker. Use the user Cron every minute instead, with a non-blocking `flock` lock so overlapping runs cannot process a job twice:
@@ -134,6 +151,8 @@ Preproduction is hosted on o2switch mutualised and has no persistent Supervisor/
 ```
 
 The executable script first reconciles tracked delivery-history rows whose database job has disappeared, then uses `/opt/alt/php84/usr/bin/php artisan queue:work database --queue=default --stop-when-empty --tries=4 --timeout=75 --sleep=1 --no-interaction` behind `/usr/bin/flock -n`. `config/queue.php` sets database `retry_after=90`, leaving a 15-second safety margin above the worker timeout. New transactional mailables and notifications define their own progressive `30,120,300`-second backoff arrays; Laravel 13 serialises these into queue payloads. Do not run a permanent worker for this setup.
+
+The worker script resolves its application directory from its own location. It may therefore be used unchanged by the production Cron at `/home/meyo5199/top-halal-v2-prod/scripts/run-queue-worker-cron.sh`; do not copy the preproduction path into a production Cron entry.
 
 ## Transactional email
 - Keep SMTP settings server-side / encrypted in the V2 settings; do not put credentials in Cron or logs.

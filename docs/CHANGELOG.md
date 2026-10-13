@@ -1,8 +1,57 @@
 # Changelog
 
-## Unreleased
+## 2026-10-13
 
-- Corrected public indexable collection pagination SEO: page 1 keeps the clean canonical and pages 2+ are indexable with their own `?page=N` canonical. The shared rule excludes arbitrary query parameters, while filtered/search surfaces remain `noindex,follow`; sitemap policy is unchanged.
+- SEO : tous les liens vers `/ajouter-un-restaurant` sont désormais en
+  `nofollow`, y compris dans les menus configurables; les liens déjà en nouvelle
+  fenêtre conservent `noopener noreferrer`.
+
+- SEO : les collections publiques déjà indexables conservent une canonical propre
+  en page 1 et deviennent auto-canoniques/indexables en `?page=N` à partir de la
+  page 2. Les recherches et filtres conservent `noindex,follow`; le sitemap ne
+  change pas.
+
+- SEO/front : les liens Facebook et X du composant éditorial partagé portent
+  `nofollow noopener noreferrer`; X utilise directement `x.com/intent/tweet`.
+  Le robots de production exclut aussi `/login`, `/forgot-password` et les
+  URLs avec le paramètre `near_me`, sans restaurer `Sitemap:`.
+
+- SEO : le `robots.txt` de production exclut les URLs publiques de
+  revendication avec `Disallow: */claim` et ne publie plus de directive
+  `Sitemap:`. `/sitemap.xml` demeure servi publiquement; la préproduction
+  conserve `Disallow: /` et le header `X-Robots-Tag: noindex, nofollow`.
+
+- Production V2 : SMTP opérationnel, scheduler/worker Cron fini activés et
+  vérifiés, avec un test transactionnel contrôlé passé à `sent` dans
+  l'historique. La preview production redirige désormais en 301 vers le
+  domaine canonique; la préproduction `dev` reste indépendante et noindex.
+
+- Cutover V2 : préparation finale validée avec sauvegarde BDD et archive
+  storage privées, vérifiées et hors webroot. Le worker Cron est désormais
+  portable entre préproduction et production grâce à la résolution dynamique
+  de son chemin applicatif; son activation reste explicitement post-cutover.
+
+- Back-office Filament : la publication obligatoire des assets vendor est
+  documentée dans le déploiement après l'incident de preview où CSS, scripts et
+  polices n'étaient pas présents. La CSP conserve sa politique publique stricte
+  et accorde les compatibilités requises (`unsafe-eval`, avatar par défaut)
+  uniquement sous `/admin`. Les rares clés françaises absentes de Filament 5
+  sont surchargées par l'application et les parcours login/logout/relogin sont
+  désormais couverts par Playwright.
+
+## 2026-10-12
+
+- Preview production : recette publique complète et contrôles d'intégrité de
+  la copie V2 validés. La preview reste isolée (`noindex,nofollow`, e-mails
+  neutralisés, Cron/worker inactifs). Un diagnostic Filament reste requis pour
+  la soumission de connexion BO automatisée, qui ne lance aucune requête
+  Livewire dans ce contexte; aucune donnée n'a été créée ou modifiée.
+
+- Préproduction : le commit validé `b7d4661` est désormais publié normalement
+  sur `develop` après audit ciblé des 35 commits auparavant seulement présents
+  sur le serveur. Le checkout a été relu depuis GitHub et la gate complète à
+  snapshot est verte. La procédure interdit désormais de valider pour production
+  un commit absent de `origin/develop`.
 
 ## 2026-10-04
 
@@ -648,3 +697,18 @@
 
 - Remplacé les glyphes de partage Facebook, X et e-mail par leurs SVG inline locaux, avec couleurs de marque, état survol/focus inversé et focus clavier visible, sans modifier les destinations ni leur encodage.
 - Uniformisé ensuite les trois actions dans des pastilles pleines de 40 px : monogramme Facebook sans cercle interne, X réduit et enveloppe renforcée.
+
+# 2026-10-12 — Préparation production : headers et audits P1
+
+- Ajout d'un middleware de headers de sécurité : CSP adaptée au public/à l'administration, `nosniff`, politique de referrer stricte et permissions navigateur réduites. HSTS est réservé à l'environnement Laravel `production` servi en HTTPS.
+- Ajout de la couverture PHP des headers et validation navigateur préproduction sans erreur console/page sur les pages publiques représentatives.
+- Remplacement de deux liens internes absolus de préproduction dans la page publiée `quick-hallal` par des chemins relatifs ; audit final des sources applicatives et données éditoriales concernées documenté.
+- Ajout du rapport de clôture P1 avec état OPcache, candidats de nettoyage en lecture seule et métriques navigateur mesurées (sans score Lighthouse inventé).
+
+# 2026-10-12 — Nettoyage des données de test préproduction
+
+- Suppression transactionnelle, après audit, de 62 dépôts techniques `example.invalid`, de leurs 62 restaurants V2 non publiés et de leurs dépendances directes strictement techniques. Aucun utilisateur, claim, asset média partagé, donnée legacy ou donnée métier ambiguë n'a été supprimé.
+
+# 2026-10-12 — Initialisation contrôlée de la BDD production V2
+
+- Copie complète et validée de la seule BDD V2 préproduction vers la cible production initialement vide, après double confirmation explicite. Le dump ne contient pas de sélection de base source ; contrôles de schéma, compteurs, relations, médias et preview HTTPS conformes. Les jobs restent vides et le mail/worker/Cron production restent neutralisés avant cutover.
