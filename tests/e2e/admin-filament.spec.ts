@@ -26,6 +26,8 @@ test.describe('Filament administration', () => {
     await expect(page).toHaveURL(/\/admin$/);
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await expect(page.getByRole('searchbox', { name: 'Recherche globale' })).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('filament-panels::');
+    await expect(page.locator('body')).not.toContainText('filament::components');
     for (const [path, heading] of [
       ['/admin/restaurants', 'Restaurants'],
       ['/admin/articles', 'Articles'],
