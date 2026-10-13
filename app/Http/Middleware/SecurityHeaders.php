@@ -33,7 +33,7 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), geolocation=(), microphone=()');
 
-        if ($request->getHost() !== parse_url((string) config('app.url'), PHP_URL_HOST)) {
+        if (! app()->environment('production') || $request->getHost() !== parse_url((string) config('app.url'), PHP_URL_HOST)) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
 

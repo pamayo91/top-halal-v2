@@ -1,5 +1,15 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Robots : claims exclus du crawl, sitemap indépendant
+
+Le rendu applicatif de `robots.txt` de production conserve `Allow: /`, ajoute
+`Disallow: */claim` pour les parcours publics de revendication et ne déclare
+plus de sitemap. La route `/sitemap.xml` reste publique et indépendante de
+cette déclaration. La préproduction conserve son `Disallow: /` et rend aussi
+explicitement `X-Robots-Tag: noindex, nofollow` sur tous ses environnements
+non-production. La validation préproduction reste à exécuter avant toute
+promotion vers `main`.
+
 ## 2026-10-13 — Production V2 opérationnelle
 
 Le cutover est suivi de l'activation validée du SMTP, du scheduler, du worker

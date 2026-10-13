@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- SEO : le `robots.txt` de production exclut les URLs publiques de
+  revendication avec `Disallow: */claim` et ne publie plus de directive
+  `Sitemap:`. `/sitemap.xml` demeure servi publiquement; la préproduction
+  conserve `Disallow: /` et le header `X-Robots-Tag: noindex, nofollow`.
+
 - Production V2 : SMTP opérationnel, scheduler/worker Cron fini activés et
   vérifiés, avec un test transactionnel contrôlé passé à `sent` dans
   l'historique. La preview production redirige désormais en 301 vers le
