@@ -37,7 +37,8 @@ test('department and region pages use short URLs, pagination, SEO directives and
 
   const pagination = await page.goto('/restos/bouches-du-rhone?page=2');
   expect(pagination?.status()).toBe(200);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/restos\/bouches-du-rhone\?page=2$/);
 });
 
 test('Paris remains a single URL and Corsica and DOM pages stay usable', async ({ page }) => {
