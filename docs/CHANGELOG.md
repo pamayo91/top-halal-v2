@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- Registre production finalisé : alias local explicite `top-halal-prod` validé,
+  DocumentRoot et certificat HTTPS confirmés, JetBackup 5 identifié comme
+  mécanisme de sauvegarde o2switch. Les détails de rétention/restauration
+  JetBackup et la configuration Apache fine restent à confirmer.
+
 - Audit production strictement read-only : le registre confirme désormais le
   checkout/commit `main`, runtime, BDD, storage, build Vite, queue et crontab
   actifs. DocumentRoot Apache et garanties de sauvegarde restent explicitement

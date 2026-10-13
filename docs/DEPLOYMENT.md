@@ -71,10 +71,11 @@ Laravel cache maintenance is distinct from business data: use only applicable
 cache commands. Clear route cache after route changes; do not route-cache this
 application while closure routes exist.
 
-No production infrastructure command is inferred here. The repository documents
-the production application-root and Cron model, but the production SSH alias,
-DocumentRoot confirmation, database identifier and current user-crontab entries
-still require an authoritative operational record before being used or changed.
+Consult `docs/PRODUCTION_RUNBOOK.md` before an operation: it confirms the
+production alias `top-halal-prod`, Laravel checkout, DocumentRoot, database
+identifier and active Cron entries. Do not infer any additional infrastructure
+parameter; VirtualHost/certificate details and JetBackup retention/restoration
+still require their authoritative control-plane records.
 
 ## Required Manual GitHub Actions
 - Confirm whether branch protection is desired for `main` and `develop`.

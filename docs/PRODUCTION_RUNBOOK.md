@@ -32,17 +32,17 @@ production pendant un déploiement standard.
 | Sécurité HTTP | CONFIRMÉ | HTTPS, HSTS, CSP, `nosniff`, Referrer-Policy et Permissions-Policy sont servis sur les réponses contrôlées. |
 | Exposition de fichiers sensibles | CONFIRMÉ | `/.env` et `/.git/HEAD` répondent 403; `/artisan` et `/composer.json` répondent 404. |
 | Référence Git | CONFIRMÉ | Le tag `v2.0.0-production` et `origin/main`/`origin/develop` pointent sur `8f7f189` à l'audit. |
-| Accès SSH production | CONFIRMÉ | L'alias local `top-halal-preprod` atteint le compte `meyo5199` sur `belette.o2switch.net` et permet la lecture du checkout production. Aucun alias dédié nommé production n'existe localement. |
+| Accès SSH production | CONFIRMÉ | L'alias local recommandé `top-halal-prod` atteint le compte `meyo5199` sur `belette.o2switch.net` et permet la lecture du checkout production. |
 
 ## Accès et application
 
 | Élément | État | Registre |
 | --- | --- | --- |
-| SSH production, utilisateur et méthode d'accès | CONFIRMÉ | L'alias existant est nommé `top-halal-preprod`, mais son accès SSH atteint bien la production; utilisateur `meyo5199`. Créer un alias dédié reste une amélioration de clarté, non une condition de l'accès actuel. |
+| SSH production, utilisateur et méthode d'accès | CONFIRMÉ | Utiliser `top-halal-prod`. L'ancien alias `top-halal-preprod` atteint techniquement le même compte, mais ne doit plus être l'alias normal des opérations production afin d'éviter les erreurs humaines. |
 | Checkout Git production | CONFIRMÉ | `/home/meyo5199/top-halal-v2-prod`, avec répertoire `.git`. |
 | Branche déployée | CONFIRMÉ | `main`, HEAD `8f7f189cad983093bec123b98aba325d5f8186e7`, correspondant au tag/référence de production documenté. Le working tree est propre. |
 | Remote Git du checkout | CONFIRMÉ | `origin` utilise l'alias GitHub de déploiement documenté; aucune clé ni credential n'est enregistrée dans ce registre. |
-| DocumentRoot Apache et `public/` servi | À CONFIRMER | Vérifier la configuration réellement active; ne pas déduire celle-ci de la préproduction. |
+| DocumentRoot Apache et `public/` servi | CONFIRMÉ | Le propriétaire confirme `/home/meyo5199/top-halal-v2-prod/public`, cohérent avec le checkout Laravel et son répertoire `public`. |
 | `.env` et logs Laravel | CONFIRMÉ | `.env` existe à la racine du checkout, permissions `600`; logs sous `storage/logs`. Son contenu sensible n'a pas été affiché. |
 | Storage/médias | CONFIRMÉ | Les originaux V2 sont sous `storage/app/private/media/originals`; `storage/app/public` existe mais aucun lien `public/storage` n'est présent. Les médias sont délivrés par la route Laravel versionnée `/media/{asset}/v/{checksum}` depuis le disque `local`. |
 | BDD Laravel production | CONFIRMÉ | Connexion `mariadb`, BDD `meyo5199_top_halal_prod`, MariaDB serveur `11.4.13`. Aucun credential n'a été lu ni enregistré. |
@@ -77,9 +77,9 @@ contenu et `manifest.json` inclus, sans copier les sources ni secrets.
 
 | Élément | État | Registre |
 | --- | --- | --- |
-| HTTPS et redirection preview | CONFIRMÉ | HTTPS public est actif; `prod-preview` redirige 301 vers le domaine principal. |
+| HTTPS, certificat et redirection preview | CONFIRMÉ | HTTPS public est actif, le certificat de `top-halal.fr` est confirmé actif par le propriétaire, et `prod-preview` redirige 301 vers le domaine principal. Autorité, renouvellement et configuration ne sont pas documentés ici. |
 | HTTP -> HTTPS | CONFIRMÉ | `http://top-halal.fr/` redirige 301 vers HTTPS. |
-| VirtualHost, DocumentRoot et certificat | À CONFIRMER | La configuration Apache/cPanel active n'est pas lisible avec cet accès. Le répertoire historique `/home/meyo5199/top-halal.fr` ne prouve pas le DocumentRoot V2 et ne doit pas être pris comme tel. |
+| VirtualHost et configuration détaillée du certificat | À CONFIRMER | La configuration Apache/cPanel active n'est pas lisible avec cet accès. Le DocumentRoot est confirmé séparément; le répertoire historique `/home/meyo5199/top-halal.fr` ne doit pas être pris comme référence V2. |
 | Règles Apache | CONFIRMÉ (principe) | Domaine/protocole et infrastructure relèvent d'Apache; les redirections de contenu relèvent de Laravel. |
 | Queue utilisée par le code | CONFIRMÉ | Le worker lance `queue:work database --queue=default --stop-when-empty` avec `flock`, timeout 75 s et 4 essais. |
 | Worker/Cron réellement actifs en production | CONFIRMÉ | Crontab : scheduler chaque minute, script worker chaque minute et purge e-mails à 03:05, tous sous `/home/meyo5199/top-halal-v2-prod`. |
@@ -186,6 +186,13 @@ vérifiée et une restauration ciblée éventuelle, puis obtenir la validation
 humaine nécessaire. Les protections à deux confirmations pour restauration,
 rebuild/reseed et réimport legacy restent obligatoires.
 
+Pour une migration de schéma habituelle, appliquer le workflow de déploiement
+documenté. Avant une migration ou un script susceptible de supprimer, réécrire
+ou transformer massivement des données, de modifier/supprimer une colonne avec
+données ou de rendre l'opération difficilement réversible, vérifier dans
+JetBackup 5 la présence d'un point de restauration approprié. Cette vérification
+ne remplace aucune des protections, analyses ou validations exigées ailleurs.
+
 **Assets.** Conserver le build précédemment validé jusqu'aux health checks. Si
 nécessaire, restaurer explicitement ce build et son `manifest.json` cohérent,
 puis vérifier les pages concernées.
@@ -197,9 +204,9 @@ données créées ou modifiées entre-temps dans le BO production.
 
 | Élément | État | Action avant changement risqué |
 | --- | --- | --- |
-| Sauvegarde BDD production | À CONFIRMER | Deux artefacts privés ont été observés dans un répertoire de sauvegarde le 2026-10-13, sans preuve de fréquence, de contenu ou de restauration testée. |
-| Sauvegarde storage/médias | À CONFIRMER | Aucun mécanisme/rétention/restauration vérifiable n'a été trouvé par cet audit. |
-| Sauvegardes hébergeur | À CONFIRMER DANS O2SWITCH/CPANEL | Ne jamais présumer leur disponibilité ni leur configuration. |
+| Mécanisme de sauvegarde o2switch | CONFIRMÉ | JetBackup 5 est disponible côté o2switch/cPanel, selon le propriétaire. |
+| Sauvegarde BDD production | À CONFIRMER DANS JETBACKUP 5 | Vérifier point de restauration, fréquence, contenu, rétention et restauration avant une opération sensible. |
+| Sauvegarde storage/médias | À CONFIRMER DANS JETBACKUP 5 | Vérifier point de restauration, périmètre, rétention et procédure de restauration. |
 
 ## Journal des futurs déploiements
 
@@ -223,9 +230,10 @@ réel et autorisé.
 
 ### À confirmer
 
-- VirtualHost, DocumentRoot exact et certificat, faute de visibilité sur la
+- VirtualHost et paramètres détaillés du certificat, faute de visibilité sur la
   configuration Apache/cPanel active.
-- Sauvegardes : fréquence, périmètre, rétention et procédure de restauration.
+- JetBackup 5 : fréquence, points disponibles, périmètre, rétention et
+  procédure de restauration.
 
 ### Non applicable
 

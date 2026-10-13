@@ -1,5 +1,13 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Dernières confirmations du registre production
+
+L'alias local explicite `top-halal-prod` a été créé et validé en lecture seule
+sur le checkout production. Le propriétaire confirme le DocumentRoot
+`/home/meyo5199/top-halal-v2-prod/public`, le certificat HTTPS actif et
+JetBackup 5 disponible dans o2switch/cPanel. Fréquence, rétention, périmètre et
+restauration JetBackup restent à contrôler avant une opération BDD sensible.
+
 ## 2026-10-13 — Audit SSH production read-only
 
 L'accès SSH existant a confirmé le checkout `/home/meyo5199/top-halal-v2-prod`
