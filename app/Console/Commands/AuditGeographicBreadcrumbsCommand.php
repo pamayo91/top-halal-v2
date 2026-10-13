@@ -24,7 +24,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
             $counts['restaurants']++;
             $city = $cities->cityForCode((string) $restaurant->city_code);
             if ($city === null) {
-                $errors[] = $this->error('restaurant_city_unresolved', (string) $restaurant->id, (string) $restaurant->city_code);
+                $errors[] = $this->auditError('restaurant_city_unresolved', (string) $restaurant->id, (string) $restaurant->city_code);
                 return;
             }
             $this->verifyCityTrail($breadcrumbs->forRestaurant($restaurant), $city, $cities, $geography, "restaurant:{$restaurant->id}", $errors);
@@ -39,7 +39,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
             $counts['specialty_facets']++;
             $city = $cities->cityForCode($facet->city_code);
             if ($city === null || $facet->category === null) {
-                $errors[] = $this->error('specialty_facet_identity_unresolved', (string) $facet->id);
+                $errors[] = $this->auditError('specialty_facet_identity_unresolved', (string) $facet->id);
                 continue;
             }
             $this->verifyCityTrail($breadcrumbs->forCityFacet($city, $facet->category), $city, $cities, $geography, "specialty_facet:{$facet->id}", $errors);
@@ -49,7 +49,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
             $counts['service_facets']++;
             $city = $cities->cityForCode($facet->city_code);
             if ($city === null || $facet->feature === null) {
-                $errors[] = $this->error('service_facet_identity_unresolved', (string) $facet->id);
+                $errors[] = $this->auditError('service_facet_identity_unresolved', (string) $facet->id);
                 continue;
             }
             $this->verifyCityTrail($breadcrumbs->forCityFacet($city, $facet->feature), $city, $cities, $geography, "service_facet:{$facet->id}", $errors);
@@ -70,7 +70,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
         }
 
         if ($before !== $this->fingerprint()) {
-            $errors[] = $this->error('read_only_guard_failed', 'restaurants_changed_during_audit');
+            $errors[] = $this->auditError('read_only_guard_failed', 'restaurants_changed_during_audit');
         }
 
         $report = ['audited_at' => now('Europe/Paris')->toIso8601String(), 'read_only' => true, 'counts' => $counts, 'errors' => $errors];
@@ -91,7 +91,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
         $region = $geography->regionForCode($city->region['code']);
         $department = $geography->departmentForCode($city->department['code']);
         if ($region === null || $department === null) {
-            $errors[] = $this->error('administrative_identity_unresolved', $scope);
+            $errors[] = $this->auditError('administrative_identity_unresolved', $scope);
             return;
         }
 
@@ -104,7 +104,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
         foreach ($items as $item) {
             if ($item['url'] === null || in_array($item['label'], ['Accueil', 'Restaurants'], true)) continue;
             if (! isset($expected[$item['url']])) {
-                $errors[] = $this->error('unexpected_geographic_destination', $scope, $item['url']);
+                $errors[] = $this->auditError('unexpected_geographic_destination', $scope, $item['url']);
                 continue;
             }
             [$kind, $identity] = $expected[$item['url']];
@@ -122,12 +122,12 @@ class AuditGeographicBreadcrumbsCommand extends Command
             'region' => $geography->regionForSlug($slug),
         };
         $actual = $resolved?->{$kind === 'city' ? 'city_code' : 'code'} ?? 'unresolved';
-        if ($actual !== $identity) $errors[] = $this->error("{$kind}_destination_mismatch", $scope, "expected={$identity};actual={$actual};slug={$slug}");
-        if ($kind === 'city' && $cities->ambiguityForSlug($slug)->isNotEmpty()) $errors[] = $this->error('city_disambiguation_used_as_precise_destination', $scope, $slug);
+        if ($actual !== $identity) $errors[] = $this->auditError("{$kind}_destination_mismatch", $scope, "expected={$identity};actual={$actual};slug={$slug}");
+        if ($kind === 'city' && $cities->ambiguityForSlug($slug)->isNotEmpty()) $errors[] = $this->auditError('city_disambiguation_used_as_precise_destination', $scope, $slug);
     }
 
     /** @return array{scope:string,kind:string,identity:string,actual:string} */
-    private function error(string $kind, string $scope, string $actual = ''): array
+    private function auditError(string $kind, string $scope, string $actual = ''): array
     {
         return ['scope' => $scope, 'kind' => $kind, 'identity' => '', 'actual' => $actual];
     }
