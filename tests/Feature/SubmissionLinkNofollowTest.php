@@ -6,6 +6,7 @@ use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Blade;
 use Tests\TestCase;
 
 class SubmissionLinkNofollowTest extends TestCase
@@ -44,10 +45,22 @@ class SubmissionLinkNofollowTest extends TestCase
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertStringContainsString('href="https://top-halal.fr/ajouter-un-restaurant"', $html);
-        $this->assertStringContainsString('rel="noopener noreferrer nofollow"', $html);
+        $this->assertStringContainsString('href="https://top-halal.fr/ajouter-un-restaurant" rel="nofollow"', $html);
         $this->assertStringContainsString('href="/ajouter-un-restaurant" rel="nofollow"', $html);
         $this->assertStringContainsString('href="/blog"', $html);
         $this->assertStringNotContainsString('href="/blog" rel="nofollow"', $html);
+
+        $targetBlankLink = Blade::render('<x-navigation.menu :menu="$menu" />', [
+            'menu' => ['items' => [[
+                'id' => 1,
+                'label' => 'Proposer',
+                'url' => 'https://top-halal.fr/ajouter-un-restaurant',
+                'children' => [],
+                'is_active' => false,
+                'target_blank' => true,
+                'nofollow' => false,
+            ]]],
+        ]);
+        $this->assertStringContainsString('rel="noopener noreferrer nofollow"', $targetBlankLink);
     }
 }
