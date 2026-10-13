@@ -45,7 +45,7 @@ class SubmissionLinkNofollowTest extends TestCase
 
         $this->assertMatchesRegularExpression('/href="https:\/\/top-halal\.fr\/ajouter-un-restaurant"[^>]*rel="[^"]*nofollow[^"]*"/', $html);
         $this->assertStringContainsString('href="/blog"', $html);
-        $this->assertStringNotContainsString('href="/blog" rel="nofollow"', $html);
+        $this->assertDoesNotMatchRegularExpression('/href="\/blog"[^>]*rel="[^"]*nofollow[^"]*"/', $html);
 
         $targetBlankLink = Blade::render('<x-navigation.menu :menu="$menu" />', [
             'menu' => ['items' => [[
@@ -83,7 +83,7 @@ class SubmissionLinkNofollowTest extends TestCase
             ]]],
         ]);
         $this->assertStringContainsString('rel="noopener noreferrer nofollow"', $targetBlankLink);
-        $this->assertStringContainsString('href="/ajouter-un-restaurant" rel="nofollow"', $targetBlankLink);
-        $this->assertStringNotContainsString('href="/blog" rel="nofollow"', $targetBlankLink);
+        $this->assertMatchesRegularExpression('/href="\/ajouter-un-restaurant"[^>]*rel="[^"]*nofollow[^"]*"/', $targetBlankLink);
+        $this->assertDoesNotMatchRegularExpression('/href="\/blog"[^>]*rel="[^"]*nofollow[^"]*"/', $targetBlankLink);
     }
 }
