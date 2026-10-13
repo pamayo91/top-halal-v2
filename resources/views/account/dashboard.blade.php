@@ -28,7 +28,7 @@
                         <p class="eyebrow">Mes établissements</p>
                         <h2 id="mes-restaurants-title">Mes restaurants</h2>
                     </div>
-                    <a class="button button-secondary" href="{{ route('restaurant-submissions.create') }}">Ajouter un restaurant</a>
+                    <a class="button button-secondary" href="{{ route('restaurant-submissions.create') }}" rel="nofollow">Ajouter un restaurant</a>
                 </div>
 
                 @forelse($restaurants as $restaurant)
@@ -80,7 +80,7 @@
                         <span aria-hidden="true">⌁</span>
                         <h3>Vous n’avez aucun restaurant à gérer pour le moment.</h3>
                         <p>Ajoutez une fiche pour la proposer à Top Halal. Vous pourrez ensuite suivre son parcours depuis votre espace.</p>
-                        <a class="button" href="{{ route('restaurant-submissions.create') }}">Ajouter un restaurant</a>
+                        <a class="button" href="{{ route('restaurant-submissions.create') }}" rel="nofollow">Ajouter un restaurant</a>
                     </div>
                 @endforelse
             </section>

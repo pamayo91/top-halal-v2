@@ -2,6 +2,10 @@
 
 ## 2026-10-13
 
+- SEO : tous les liens vers `/ajouter-un-restaurant` sont désormais en
+  `nofollow`, y compris dans les menus configurables; les liens déjà en nouvelle
+  fenêtre conservent `noopener noreferrer`.
+
 - SEO : les collections publiques déjà indexables conservent une canonical propre
   en page 1 et deviennent auto-canoniques/indexables en `?page=N` à partir de la
   page 2. Les recherches et filtres conservent `noindex,follow`; le sitemap ne

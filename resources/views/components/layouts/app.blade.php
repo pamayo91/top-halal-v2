@@ -12,7 +12,7 @@
         <nav class="main-nav" aria-label="Navigation principale"><x-navigation.menu :menu="$headerNavigation['menu']" /></nav>
         <div class="nav-account">
             @if($headerNavigation['account_visible']) <a class="button button-small button-secondary" href="{{ auth()->check() ? route('account.dashboard') : route('login') }}">{{ $headerNavigation['account_label'] }}</a>@endif
-            @if($headerNavigation['submission_visible'])<a class="button button-small" href="{{ route('restaurant-submissions.create') }}">{{ $headerNavigation['submission_label'] }} <span aria-hidden="true">→</span></a>@endif
+            @if($headerNavigation['submission_visible'])<a class="button button-small" href="{{ route('restaurant-submissions.create') }}" rel="nofollow">{{ $headerNavigation['submission_label'] }} <span aria-hidden="true">→</span></a>@endif
         </div>
         @if($adminEditUrl ?? null)<a class="button button-small" href="{{ $adminEditUrl }}" aria-label="Modifier cette page dans l’administration">Éditer</a>@endif
         <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-nav"><span class="menu-toggle-icon" aria-hidden="true"></span></button>
@@ -22,7 +22,7 @@
         <div class="mobile-nav-panel shell">
             <x-navigation.menu :menu="$headerNavigation['mobile_menu']" :mobile="true" />
             @if($headerNavigation['account_visible'])<a class="button button-secondary" href="{{ auth()->check() ? route('account.dashboard') : route('login') }}">{{ $headerNavigation['account_label'] }}</a>@endif
-            @if($headerNavigation['submission_visible'])<a class="button" href="{{ route('restaurant-submissions.create') }}">{{ $headerNavigation['submission_label'] }} <span aria-hidden="true">→</span></a>@endif
+            @if($headerNavigation['submission_visible'])<a class="button" href="{{ route('restaurant-submissions.create') }}" rel="nofollow">{{ $headerNavigation['submission_label'] }} <span aria-hidden="true">→</span></a>@endif
         </div>
     </nav>
 </header>

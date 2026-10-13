@@ -5,6 +5,7 @@
 - Build deterministic URL mapping from WordPress -> V2.
 - Generate canonical, robots directives, sitemaps, breadcrumbs and correct status codes natively.
 - Avoid indexable combinations of arbitrary filters; most query/filter combinations should be noindex unless explicitly promoted to a quality landing page.
+- Internal links to `/ajouter-un-restaurant`, including the canonical absolute URL, carry `rel="nofollow"`; any existing `rel` tokens are retained.
 - Structured data derives from visible, factual content.
 
 ## Frozen public URL contract (2026-08-26)
