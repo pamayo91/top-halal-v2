@@ -148,7 +148,7 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
 
     private function isManifestlyNonAdministrativeValue(Restaurant $restaurant): bool
     {
-        $city = Str::of((string) $restaurant->city_name)->ascii()->lower()->squish()->value();
+        $city = Str::of((string) $restaurant->city_name)->ascii()->lower()->replace('-', ' ')->squish()->value();
 
         return in_array($city, ['auber lab', 'toulouse mirail', 'paris la defense cedex'], true)
             || Str::contains(Str::lower((string) $restaurant->name), 'quick lab');
