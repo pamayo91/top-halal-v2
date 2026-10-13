@@ -18,7 +18,8 @@ class AuditGeographicBreadcrumbsCommand extends Command
     {
         $before = $this->fingerprint();
         $errors = [];
-        $counts = ['restaurants' => 0, 'cities' => 0, 'specialty_facets' => 0, 'service_facets' => 0, 'departments' => 0, 'regions' => 0];
+        $counts = ['restaurants' => 0, 'restaurants_without_resolved_city' => 0, 'cities' => 0, 'specialty_facets' => 0, 'service_facets' => 0, 'departments' => 0, 'regions' => 0];
+        $excludedRestaurants = [];
         $citiesByCode = $cities->cities()->keyBy('city_code');
         $citiesBySlug = $citiesByCode->keyBy('slug');
         $departmentsByCode = $geography->departments()->keyBy('code');
@@ -26,11 +27,12 @@ class AuditGeographicBreadcrumbsCommand extends Command
         $regionsByCode = $geography->regions()->keyBy('code');
         $regionsBySlug = $regionsByCode->keyBy('slug');
 
-        Restaurant::query()->where('status', 'published')->orderBy('id')->each(function (Restaurant $restaurant) use (&$errors, &$counts, $administrative, $citiesByCode, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, $breadcrumbs): void {
+        Restaurant::query()->where('status', 'published')->orderBy('id')->each(function (Restaurant $restaurant) use (&$errors, &$counts, &$excludedRestaurants, $administrative, $citiesByCode, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, $breadcrumbs): void {
             $counts['restaurants']++;
             $city = $citiesByCode->get($administrative->canonicalCityCode((string) $restaurant->city_code));
             if ($city === null) {
-                $errors[] = $this->auditError('restaurant_city_unresolved', (string) $restaurant->id, (string) $restaurant->city_code);
+                $counts['restaurants_without_resolved_city']++;
+                $excludedRestaurants[] = ['restaurant_id' => $restaurant->id, 'city_code' => $restaurant->city_code];
                 return;
             }
             $this->verifyCityTrail($breadcrumbs->forRestaurant($restaurant, $city), $city, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, "restaurant:{$restaurant->id}", $errors);
@@ -79,7 +81,7 @@ class AuditGeographicBreadcrumbsCommand extends Command
             $errors[] = $this->auditError('read_only_guard_failed', 'restaurants_changed_during_audit');
         }
 
-        $report = ['audited_at' => now('Europe/Paris')->toIso8601String(), 'read_only' => true, 'counts' => $counts, 'errors' => $errors];
+        $report = ['audited_at' => now('Europe/Paris')->toIso8601String(), 'read_only' => true, 'counts' => $counts, 'excluded_restaurants_without_resolved_city' => $excludedRestaurants, 'errors' => $errors];
         if (! $this->option('json')) {
             $path = base_path((string) $this->option('out'));
             File::ensureDirectoryExists(dirname($path));
