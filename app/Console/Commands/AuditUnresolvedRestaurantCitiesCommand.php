@@ -11,6 +11,18 @@ use Illuminate\Support\Str;
 /** Produces a read-only, deterministic explanation for every unresolved restaurant city. */
 class AuditUnresolvedRestaurantCitiesCommand extends Command
 {
+    /** @var list<string> */
+    private const CATEGORIES = [
+        'A — city_code absent',
+        'B — city_code invalide ou inconnu',
+        'C — city_name / city_code incohérents',
+        'D — Code arrondissement / ancienne représentation territoriale',
+        'E — Commune étrangère / hors référentiel France',
+        'F — Données structurées incomplètes',
+        'G — Valeur manifestement anormale ou donnée parasite',
+        'H — Bug probable du resolver',
+    ];
+
     protected $signature = 'geography:audit-unresolved-restaurant-cities
         {--json : Emit the report as JSON only}
         {--out=docs/generated/unresolved-restaurant-cities-audit.md : Markdown report path}
@@ -24,12 +36,13 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
     public function handle(AdministrativeGeography $administrative, CityPageResolver $cities): int
     {
         $before = $this->fingerprint();
+        $resolvedCities = $cities->cities()->keyBy('city_code');
         $rows = Restaurant::query()
             ->where('status', 'published')
             ->orderBy('id')
             ->get(self::FIELDS)
-            ->filter(fn (Restaurant $restaurant): bool => $cities->cityForCode((string) $restaurant->city_code) === null)
-            ->map(fn (Restaurant $restaurant): array => $this->row($restaurant, $administrative, $cities))
+            ->filter(fn (Restaurant $restaurant): bool => ! $resolvedCities->has($administrative->canonicalCityCode((string) $restaurant->city_code)))
+            ->map(fn (Restaurant $restaurant): array => $this->row($restaurant, $administrative))
             ->values()
             ->all();
 
@@ -63,13 +76,13 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
     }
 
     /** @return array<string, mixed> */
-    private function row(Restaurant $restaurant, AdministrativeGeography $administrative, CityPageResolver $cities): array
+    private function row(Restaurant $restaurant, AdministrativeGeography $administrative): array
     {
         $cityCode = trim((string) $restaurant->city_code);
         $reference = $cityCode === ''
             ? 'non applicable : code INSEE absent'
             : ($administrative->resolve($cityCode) === null ? 'aucune correspondance administrative locale' : 'correspondance administrative locale trouvée');
-        [$classification, $failure, $action, $confidence, $notes] = $this->classify($restaurant, $administrative, $cities);
+        [$classification, $failure, $action, $confidence, $notes] = $this->classify($restaurant, $administrative);
 
         return [
             'restaurant_id' => $restaurant->id,
@@ -94,7 +107,7 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
     }
 
     /** @return array{string, string, string, string, string} */
-    private function classify(Restaurant $restaurant, AdministrativeGeography $administrative, CityPageResolver $cities): array
+    private function classify(Restaurant $restaurant, AdministrativeGeography $administrative): array
     {
         $cityCode = trim((string) $restaurant->city_code);
         $country = strtoupper(trim((string) $restaurant->country_code));
@@ -124,11 +137,6 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
             return ['D — Code arrondissement / ancienne représentation territoriale', 'canonical_city_code_not_published_by_resolver', 'Vérifier la disponibilité de la commune canonique dans les données V2 avant toute décision.', 'medium', 'Le code est canoniquement ramené à '.$canonical.'.'];
         }
 
-        $candidate = $cities->cityForCode($cityCode);
-        if ($candidate !== null && ! $this->sameCityName((string) $restaurant->city_name, (string) $candidate->city_name)) {
-            return ['C — city_name / city_code incohérents', 'city_name_differs_from_local_canonical_city_label', 'Vérifier la divergence dans la source ; aucune réécriture automatique.', 'medium', 'Le libellé diffère de la ville canonique actuellement résolue dans V2.'];
-        }
-
         return ['H — Bug probable du resolver', 'administrative_code_present_but_city_page_resolver_returned_null', 'Investigation logicielle du resolver requise ; ne pas modifier la fiche.', 'medium', 'Le code semble administrativement résoluble, mais CityPageResolver ne retourne aucune ville.'];
     }
 
@@ -146,16 +154,11 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
             || Str::contains(Str::lower((string) $restaurant->name), 'quick lab');
     }
 
-    private function sameCityName(string $left, string $right): bool
-    {
-        return Str::of($left)->ascii()->lower()->replaceMatches('/[^a-z0-9]+/', '')->value()
-            === Str::of($right)->ascii()->lower()->replaceMatches('/[^a-z0-9]+/', '')->value();
-    }
-
     /** @param list<array<string, mixed>> $rows @return array<string, mixed> */
     private function summary(array $rows): array
     {
-        $categories = collect($rows)->countBy('classification')->sortKeys()->all();
+        $categories = array_fill_keys(self::CATEGORIES, 0);
+        foreach ($rows as $row) $categories[$row['classification']] = ($categories[$row['classification']] ?? 0) + 1;
         $normal = 0;
         $resolver = collect($rows)->where('classification', 'H — Bug probable du resolver')->count();
         $business = collect($rows)->where('classification', 'E — Commune étrangère / hors référentiel France')->count();
