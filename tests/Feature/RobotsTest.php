@@ -21,7 +21,7 @@ class RobotsTest extends TestCase
                 ->assertSeeText('Disallow: */claim')
                 ->assertDontSee('Sitemap:', false);
 
-            $this->assertSame("User-agent: *\nAllow: /\nDisallow: */claim\n", $response->getContent());
+            $this->assertSame("User-agent: *\nAllow: /\nDisallow: */claim\nDisallow: /login\nDisallow: /forgot-password\nDisallow: /*near_me=*\n", $response->getContent());
         });
     }
 

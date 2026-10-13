@@ -11,7 +11,7 @@
 - Canonical public URLs are HTTPS, on the canonical host, with no trailing slash except `/`.
 - Restaurants use `/resto/{slug}`; category and service pages use `/specialites/{slug}` and `/service/{slug}`. Published editorial content uses its root slug: `/{slug}`. Legacy city slugs without an identical structured-city slug redirect through the application redirect engine; the retired legacy Geography tables are not present at runtime.
 - A page/article slug collision is a migration anomaly to resolve before cutover; it must never produce two indexable URLs.
-- `/sitemap.xml` contains only indexable canonical URLs and remains publicly accessible. Production `robots.txt` allows crawl but does not declare the sitemap; it disallows public claim URLs with `Disallow: */claim`. Preproduction remains disallow-all/noindex.
+- `/sitemap.xml` contains only indexable canonical URLs and remains publicly accessible. Production `robots.txt` allows crawl but does not declare the sitemap; it disallows public claim URLs with `Disallow: */claim`, authentication entry points (`/login`, `/forgot-password`) and any URL carrying `near_me` (`/*near_me=*`). Preproduction remains disallow-all/noindex.
 - Arbitrary query parameters canonicalize to the parameter-free URL and are `noindex,follow`. Pagination is `?page=N`; page 1 is canonicalized to the root and pages above 1 are `noindex,follow` until a curated collection is approved.
 
 ## Structured data and facets
