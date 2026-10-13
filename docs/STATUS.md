@@ -1,5 +1,16 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Préparation finale au cutover V2
+
+La release V2 est figée après contrôle du checkout, de la BDD, du storage, des
+assets et de la preview production. Une sauvegarde logique BDD vérifiée et une
+archive storage privée vérifiée ont été créées hors du webroot. La queue et les
+échecs sont vides; SMTP, Cron et worker restent volontairement inactifs. Le
+script worker Cron résout désormais le chemin de l'application depuis son
+propre emplacement, ce qui le rend sûr pour l'instance production. Le
+DocumentRoot final reste une action manuelle du propriétaire; aucun cutover
+n'a été effectué.
+
 ## 2026-10-13 — Runtime Filament de la preview production réparé
 
 La recette BO de `prod-preview.top-halal.fr` a identifié trois causes

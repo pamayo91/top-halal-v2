@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- Cutover V2 : préparation finale validée avec sauvegarde BDD et archive
+  storage privées, vérifiées et hors webroot. Le worker Cron est désormais
+  portable entre préproduction et production grâce à la résolution dynamique
+  de son chemin applicatif; son activation reste explicitement post-cutover.
+
 - Back-office Filament : la publication obligatoire des assets vendor est
   documentée dans le déploiement après l'incident de preview où CSS, scripts et
   polices n'étaient pas présents. La CSP conserve sa politique publique stricte
