@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class RobotsTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_production_robots_blocks_claim_urls_without_exposing_a_sitemap_directive(): void
     {
         $this->asProduction(function (): void {
