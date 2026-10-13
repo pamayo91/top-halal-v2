@@ -35,7 +35,7 @@
 3. `git fetch --prune` and update the working tree from `origin/develop`.
 4. `composer install` when dependencies changed; use the preproduction-safe flags decided after server audit.
 5. Run Laravel migrations when needed, with preproduction safeguards.
-6. Build frontend assets when needed.
+6. Build frontend assets when needed. Run `/opt/alt/php84/usr/bin/php artisan filament:assets` after Composer install (and before any BO validation) on both preproduction and production: Filament CSS, JavaScript and fonts are vendor-published and are not part of Vite's `public/build/` output.
 7. Run Laravel optimization/cache commands appropriate for preproduction.
 8. Restart queue workers when workers exist and code affecting jobs changed.
 9. Clear the route cache whenever `routes/` changes; this project contains closure routes and must not route-cache them. Run health check and targeted smoke/E2E tests against the preproduction URL.
@@ -48,7 +48,7 @@ The preproduction SSH environment has no Node.js executable in PATH. After the G
 
 ### Filament assets
 
-Filament back-office CSS, JavaScript and fonts are vendor-published files under `public/css/filament/`, `public/js/filament/` and `public/fonts/filament/`. They are intentionally ignored by Git but must remain physically present because Apache serves them directly. Regenerate them with `/opt/alt/php84/usr/bin/php artisan filament:assets` after installing or updating dependencies that affect Filament, before validating the back office. The current deployment flow does not run this command automatically; automate it in the future deployment script rather than deleting these assets from an active environment.
+Filament back-office CSS, JavaScript and fonts are vendor-published files under `public/css/filament/`, `public/js/filament/` and `public/fonts/filament/`. They are intentionally ignored by Git but must remain physically present because Apache serves them directly. Regenerate them with `/opt/alt/php84/usr/bin/php artisan filament:assets` after every Composer install and before validating the back office; this is a mandatory deployment step, not a Vite build substitute.
 
 Before running `artisan test` on preproduction, run `artisan optimize:clear` first so PHPUnit’s SQLite testing configuration is not shadowed by the cached preproduction configuration. Recreate the configuration, route and view caches after the test run. Never run database-migrating tests against a cached preproduction configuration.
 

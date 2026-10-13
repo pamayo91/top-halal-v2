@@ -24,6 +24,7 @@ class SecurityHeadersTest extends TestCase
 
         $this->assertStringContainsString("'unsafe-eval'", (string) $response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString('https://unpkg.com', (string) $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('https://ui-avatars.com', (string) $response->headers->get('Content-Security-Policy'));
     }
 
     public function test_non_canonical_hosts_stay_noindex(): void

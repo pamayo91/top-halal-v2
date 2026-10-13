@@ -19,7 +19,7 @@ class SecurityHeaders
             "form-action 'self'",
             "frame-ancestors 'none'",
             "object-src 'none'",
-            "img-src 'self' data: https://*.tile.openstreetmap.org",
+            "img-src 'self' data: https://*.tile.openstreetmap.org".($admin ? ' https://ui-avatars.com' : ''),
             "font-src 'self' data:",
             "connect-src 'self'",
             // Filament 5 evaluates its component expressions through Alpine.
