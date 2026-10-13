@@ -22,7 +22,9 @@ class SecurityHeaders
             "img-src 'self' data: https://*.tile.openstreetmap.org",
             "font-src 'self' data:",
             "connect-src 'self'",
-            "script-src 'self' 'unsafe-inline'".($admin ? ' https://unpkg.com' : ''),
+            // Filament 5 evaluates its component expressions through Alpine.
+            // Keep this compatibility exception inside the back-office only.
+            "script-src 'self' 'unsafe-inline'".($admin ? " 'unsafe-eval' https://unpkg.com" : ''),
             "style-src 'self' 'unsafe-inline'".($admin ? ' https://unpkg.com' : ''),
         ];
 

@@ -19,8 +19,8 @@ test.describe('Filament administration', () => {
     });
 
     await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
+    await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+    await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
     await page.locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL(/\/admin$/);
@@ -48,8 +48,8 @@ test.describe('Filament administration', () => {
 
   test('review and comment detail dialogs show historical dates', async ({ page }) => {
     await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
+    await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+    await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/admin$/);
 
@@ -69,8 +69,8 @@ test.describe('Filament administration', () => {
 
   test('restaurant duplicate signals are visible and filterable without exposing technical details', async ({ page }) => {
     await page.goto('/admin');
-    await page.locator('input[type="email"]').fill(email!);
-    await page.locator('input[type="password"]').fill(password!);
+    await page.getByRole('textbox', { name: 'Adresse e-mail*' }).fill(email!);
+    await page.getByRole('textbox', { name: 'Mot de passe*' }).fill(password!);
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/admin$/);
 
