@@ -1,5 +1,16 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Préproduction : partage social et exclusions robots
+
+Les boutons de partage éditoriaux communs aux Articles et Pages ajoutent
+désormais `nofollow` sans retirer `noopener noreferrer`; X ouvre directement
+son endpoint de partage. Le robots de production est couvert par les tests
+pour `/login`, `/forgot-password` et tout paramètre `near_me`, tout en
+conservant la règle claim et sans réintroduire de directive sitemap. Sur
+préproduction, `Disallow: /`, `X-Robots-Tag: noindex, nofollow`, le sitemap,
+les tests PHP ciblés et l’E2E desktop/mobile sont validés. Aucune promotion
+production n’a été effectuée.
+
 ## 2026-10-13 — Robots : claims exclus du crawl, sitemap indépendant
 
 Le rendu applicatif de `robots.txt` de production conserve `Allow: /`, ajoute

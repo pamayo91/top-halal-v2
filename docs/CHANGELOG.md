@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- SEO/front : les liens Facebook et X du composant éditorial partagé portent
+  `nofollow noopener noreferrer`; X utilise directement `x.com/intent/tweet`.
+  Le robots de production exclut aussi `/login`, `/forgot-password` et les
+  URLs avec le paramètre `near_me`, sans restaurer `Sitemap:`.
+
 - SEO : le `robots.txt` de production exclut les URLs publiques de
   revendication avec `Disallow: */claim` et ne publie plus de directive
   `Sitemap:`. `/sitemap.xml` demeure servi publiquement; la préproduction
