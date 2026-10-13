@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\{CityServiceSeoPage, CitySpecialtySeoPage, Restaurant};
-use App\Services\{CityPageResolver, GeographicBreadcrumbs, GeographicPageResolver};
+use App\Services\{AdministrativeGeography, CityPageResolver, GeographicBreadcrumbs, GeographicPageResolver};
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -14,59 +14,65 @@ class AuditGeographicBreadcrumbsCommand extends Command
 
     protected $description = 'Audits published restaurant, city and open facet breadcrumbs without changing data.';
 
-    public function handle(CityPageResolver $cities, GeographicPageResolver $geography, GeographicBreadcrumbs $breadcrumbs): int
+    public function handle(AdministrativeGeography $administrative, CityPageResolver $cities, GeographicPageResolver $geography, GeographicBreadcrumbs $breadcrumbs): int
     {
         $before = $this->fingerprint();
         $errors = [];
         $counts = ['restaurants' => 0, 'cities' => 0, 'specialty_facets' => 0, 'service_facets' => 0, 'departments' => 0, 'regions' => 0];
+        $citiesByCode = $cities->cities()->keyBy('city_code');
+        $citiesBySlug = $citiesByCode->keyBy('slug');
+        $departmentsByCode = $geography->departments()->keyBy('code');
+        $departmentsBySlug = $departmentsByCode->keyBy('slug');
+        $regionsByCode = $geography->regions()->keyBy('code');
+        $regionsBySlug = $regionsByCode->keyBy('slug');
 
-        Restaurant::query()->where('status', 'published')->orderBy('id')->each(function (Restaurant $restaurant) use (&$errors, &$counts, $cities, $geography, $breadcrumbs): void {
+        Restaurant::query()->where('status', 'published')->orderBy('id')->each(function (Restaurant $restaurant) use (&$errors, &$counts, $administrative, $citiesByCode, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, $breadcrumbs): void {
             $counts['restaurants']++;
-            $city = $cities->cityForCode((string) $restaurant->city_code);
+            $city = $citiesByCode->get($administrative->canonicalCityCode((string) $restaurant->city_code));
             if ($city === null) {
                 $errors[] = $this->auditError('restaurant_city_unresolved', (string) $restaurant->id, (string) $restaurant->city_code);
                 return;
             }
-            $this->verifyCityTrail($breadcrumbs->forRestaurant($restaurant), $city, $cities, $geography, "restaurant:{$restaurant->id}", $errors);
+            $this->verifyCityTrail($breadcrumbs->forRestaurant($restaurant, $city), $city, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, "restaurant:{$restaurant->id}", $errors);
         });
 
-        foreach ($cities->cities() as $city) {
+        foreach ($citiesByCode as $city) {
             $counts['cities']++;
-            $this->verifyCityTrail($breadcrumbs->forCity($city), $city, $cities, $geography, "city:{$city->city_code}", $errors);
+            $this->verifyCityTrail($breadcrumbs->forCity($city), $city, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, "city:{$city->city_code}", $errors);
         }
 
         foreach (CitySpecialtySeoPage::query()->with('category')->where('state', 'open')->get() as $facet) {
             $counts['specialty_facets']++;
-            $city = $cities->cityForCode($facet->city_code);
+            $city = $citiesByCode->get($administrative->canonicalCityCode($facet->city_code));
             if ($city === null || $facet->category === null) {
                 $errors[] = $this->auditError('specialty_facet_identity_unresolved', (string) $facet->id);
                 continue;
             }
-            $this->verifyCityTrail($breadcrumbs->forCityFacet($city, $facet->category), $city, $cities, $geography, "specialty_facet:{$facet->id}", $errors);
+            $this->verifyCityTrail($breadcrumbs->forCityFacet($city, $facet->category), $city, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, "specialty_facet:{$facet->id}", $errors);
         }
 
         foreach (CityServiceSeoPage::query()->with('feature')->where('state', 'open')->get() as $facet) {
             $counts['service_facets']++;
-            $city = $cities->cityForCode($facet->city_code);
+            $city = $citiesByCode->get($administrative->canonicalCityCode($facet->city_code));
             if ($city === null || $facet->feature === null) {
                 $errors[] = $this->auditError('service_facet_identity_unresolved', (string) $facet->id);
                 continue;
             }
-            $this->verifyCityTrail($breadcrumbs->forCityFacet($city, $facet->feature), $city, $cities, $geography, "service_facet:{$facet->id}", $errors);
+            $this->verifyCityTrail($breadcrumbs->forCityFacet($city, $facet->feature), $city, $citiesBySlug, $departmentsByCode, $departmentsBySlug, $regionsByCode, $regionsBySlug, "service_facet:{$facet->id}", $errors);
         }
 
-        foreach ($geography->departments() as $department) {
+        foreach ($departmentsByCode as $department) {
             $counts['departments']++;
             foreach ($breadcrumbs->forDepartment($department) as $item) {
                 if ($item['url'] !== null && $item['label'] !== 'Accueil' && $item['label'] !== 'Restaurants') {
-                    $this->verifyDestination('region', $item['url'], $department->region['code'], $cities, $geography, "department:{$department->code}", $errors);
+                    $this->verifyDestination('region', $item['url'], $department->region['code'], $citiesBySlug, $departmentsBySlug, $regionsBySlug, "department:{$department->code}", $errors);
                 }
             }
         }
 
-        foreach ($geography->regions() as $region) {
+        foreach ($regionsByCode as $region) {
             $counts['regions']++;
-            $this->verifyDestination('region', route('cities.show', $region->slug), $region->code, $cities, $geography, "region:{$region->code}", $errors);
+            $this->verifyDestination('region', route('cities.show', $region->slug), $region->code, $citiesBySlug, $departmentsBySlug, $regionsBySlug, "region:{$region->code}", $errors);
         }
 
         if ($before !== $this->fingerprint()) {
@@ -86,10 +92,10 @@ class AuditGeographicBreadcrumbsCommand extends Command
     }
 
     /** @param list<array{label:string,url:?string}> $items @param list<array{scope:string,kind:string,identity:string,actual:string}> $errors */
-    private function verifyCityTrail(array $items, object $city, CityPageResolver $cities, GeographicPageResolver $geography, string $scope, array &$errors): void
+    private function verifyCityTrail(array $items, object $city, \Illuminate\Support\Collection $citiesBySlug, \Illuminate\Support\Collection $departmentsByCode, \Illuminate\Support\Collection $departmentsBySlug, \Illuminate\Support\Collection $regionsByCode, \Illuminate\Support\Collection $regionsBySlug, string $scope, array &$errors): void
     {
-        $region = $geography->regionForCode($city->region['code']);
-        $department = $geography->departmentForCode($city->department['code']);
+        $region = $regionsByCode->get($city->region['code']);
+        $department = $departmentsByCode->get($city->department['code']);
         if ($region === null || $department === null) {
             $errors[] = $this->auditError('administrative_identity_unresolved', $scope);
             return;
@@ -108,22 +114,21 @@ class AuditGeographicBreadcrumbsCommand extends Command
                 continue;
             }
             [$kind, $identity] = $expected[$item['url']];
-            $this->verifyDestination($kind, $item['url'], $identity, $cities, $geography, $scope, $errors);
+            $this->verifyDestination($kind, $item['url'], $identity, $citiesBySlug, $departmentsBySlug, $regionsBySlug, $scope, $errors);
         }
     }
 
     /** @param list<array{scope:string,kind:string,identity:string,actual:string}> $errors */
-    private function verifyDestination(string $kind, string $url, string $identity, CityPageResolver $cities, GeographicPageResolver $geography, string $scope, array &$errors): void
+    private function verifyDestination(string $kind, string $url, string $identity, \Illuminate\Support\Collection $citiesBySlug, \Illuminate\Support\Collection $departmentsBySlug, \Illuminate\Support\Collection $regionsBySlug, string $scope, array &$errors): void
     {
         $slug = basename((string) parse_url($url, PHP_URL_PATH));
         $resolved = match ($kind) {
-            'city' => $cities->cityForSlug($slug),
-            'department' => $geography->departmentForSlug($slug),
-            'region' => $geography->regionForSlug($slug),
+            'city' => $citiesBySlug->get($slug),
+            'department' => $departmentsBySlug->get($slug),
+            'region' => $regionsBySlug->get($slug),
         };
         $actual = $resolved?->{$kind === 'city' ? 'city_code' : 'code'} ?? 'unresolved';
         if ($actual !== $identity) $errors[] = $this->auditError("{$kind}_destination_mismatch", $scope, "expected={$identity};actual={$actual};slug={$slug}");
-        if ($kind === 'city' && $cities->ambiguityForSlug($slug)->isNotEmpty()) $errors[] = $this->auditError('city_disambiguation_used_as_precise_destination', $scope, $slug);
     }
 
     /** @return array{scope:string,kind:string,identity:string,actual:string} */

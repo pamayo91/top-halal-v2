@@ -19,9 +19,9 @@ class GeographicBreadcrumbs
     ) {}
 
     /** @return list<array{label:string,url:?string}> */
-    public function forRestaurant(Restaurant $restaurant): array
+    public function forRestaurant(Restaurant $restaurant, ?object $city = null): array
     {
-        $city = $this->cities->cityForCode((string) $restaurant->city_code);
+        $city ??= $this->cities->cityForCode((string) $restaurant->city_code);
 
         return $city === null
             ? [...$this->base(), ['label' => $restaurant->name, 'url' => null]]
