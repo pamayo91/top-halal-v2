@@ -2,6 +2,11 @@
 
 ## 2026-10-13
 
+- Production V2 : SMTP opérationnel, scheduler/worker Cron fini activés et
+  vérifiés, avec un test transactionnel contrôlé passé à `sent` dans
+  l'historique. La preview production redirige désormais en 301 vers le
+  domaine canonique; la préproduction `dev` reste indépendante et noindex.
+
 - Cutover V2 : préparation finale validée avec sauvegarde BDD et archive
   storage privées, vérifiées et hors webroot. Le worker Cron est désormais
   portable entre préproduction et production grâce à la résolution dynamique

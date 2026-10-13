@@ -1,5 +1,14 @@
 # Top-Halal V2 — Status
 
+## 2026-10-13 — Production V2 opérationnelle
+
+Le cutover est suivi de l'activation validée du SMTP, du scheduler, du worker
+Cron fini et de la purge quotidienne des historiques. Le sous-domaine
+`prod-preview.top-halal.fr` redirige en permanence vers le domaine canonique;
+`dev.top-halal.fr` reste la préproduction protégée. Un e-mail transactionnel
+technique contrôlé a traversé la queue et est conservé comme trace `sent` dans
+l'historique, sans création de donnée métier.
+
 ## 2026-10-13 — Préparation finale au cutover V2
 
 La release V2 est figée après contrôle du checkout, de la BDD, du storage, des

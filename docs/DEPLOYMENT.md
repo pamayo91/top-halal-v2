@@ -131,6 +131,17 @@ Laravel scheduler runs through this server Cron entry every minute:
 * * * * * cd /home/meyo5199/top-halal-v2 && /opt/alt/php84/usr/bin/php artisan schedule:run --no-interaction >> /home/meyo5199/top-halal-v2/storage/logs/scheduler.log 2>&1
 ```
 
+## Production operating Cron
+
+Production uses the same finite, lock-protected worker model, with paths rooted
+at `/home/meyo5199/top-halal-v2-prod`. Register each of these entries once in
+the production account's user crontab: scheduler every minute, the queue worker
+every minute, and the delivery-history retention at 03:05. The scheduler only
+owns verification cleanup; the retention command remains separate and must not
+be duplicated in `routes/console.php`. Keep SMTP credentials exclusively in
+the encrypted BO setting. `prod-preview.top-halal.fr` is an application-level
+301 to the canonical production URL, while `dev.top-halal.fr` remains separate.
+
 ## Queue worker
 
 Preproduction is hosted on o2switch mutualised and has no persistent Supervisor/systemd worker. Use the user Cron every minute instead, with a non-blocking `flock` lock so overlapping runs cannot process a job twice:
