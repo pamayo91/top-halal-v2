@@ -7,8 +7,9 @@ Le rendu applicatif de `robots.txt` de production conserve `Allow: /`, ajoute
 plus de sitemap. La route `/sitemap.xml` reste publique et indépendante de
 cette déclaration. La préproduction conserve son `Disallow: /` et rend aussi
 explicitement `X-Robots-Tag: noindex, nofollow` sur tous ses environnements
-non-production. La validation préproduction reste à exécuter avant toute
-promotion vers `main`.
+non-production. La validation préproduction (tests ciblés, robots/sitemap/headers
+réels et gate de régression) est validée; aucune promotion vers `main` n’a été
+effectuée.
 
 ## 2026-10-13 — Production V2 opérationnelle
 
