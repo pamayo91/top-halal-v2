@@ -13,8 +13,8 @@ class GeographicBreadcrumbAuditTest extends TestCase
 
     public function test_the_read_only_audit_covers_published_restaurants_cities_and_open_facets_without_findings(): void
     {
-        $category = Category::create(['legacy_term_id' => 1, 'name' => 'Burger', 'slug' => 'burger']);
-        $feature = Feature::create(['legacy_term_id' => 2, 'name' => 'Terrasse', 'slug' => 'terrasse']);
+        $category = Category::firstOrCreate(['slug' => 'burger'], ['legacy_term_id' => 1, 'name' => 'Burger']);
+        $feature = Feature::firstOrCreate(['slug' => 'terrasse'], ['legacy_term_id' => 2, 'name' => 'Terrasse']);
         $north = $this->published('Saint-Denis 93', 'saint-denis-93-test', 'Saint-Denis', '93066');
         $this->published('Saint-Denis Réunion', 'saint-denis-974-test', 'Saint-Denis', '97411');
         $this->published('Indre commune', 'indre-commune-test', 'Indre', '44074');

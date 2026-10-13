@@ -103,12 +103,14 @@ class GeographicPageResolver
             // identity distinct from published communes and other levels before
             // any route is emitted.  A city may never capture an administrative
             // breadcrumb merely because its display name happens to match.
-            $citySlugs = $cities->pluck('slug')->flip();
+            $citiesBySlug = $cities->keyBy('slug');
+            $citySlugs = $citiesBySlug->keys()->flip();
             $usedDepartmentSlugs = collect();
             foreach ($departments as &$department) {
                 $baseSlug = $department['slug'];
                 $region = $regions[$department['region']['code']];
-                $mustQualify = $citySlugs->has($baseSlug)
+                $collidingCity = $citiesBySlug->get($baseSlug);
+                $mustQualify = ($collidingCity !== null && ! $this->administrative->cityAndDepartmentShareTerritory($collidingCity->city_code, $department['code']))
                     || ($region['slug'] === $baseSlug && count($region['department_codes']) === 1);
                 $candidate = $mustQualify ? $baseSlug.'-'.$department['code'] : $baseSlug;
 
