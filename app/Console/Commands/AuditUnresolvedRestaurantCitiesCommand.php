@@ -227,6 +227,10 @@ class AuditUnresolvedRestaurantCitiesCommand extends Command
 
     private function fingerprint(): string
     {
-        return json_encode(Restaurant::query()->selectRaw('COUNT(*) as count, MAX(updated_at) as newest, SUM(CRC32(CONCAT_WS("|", id, city_code, city_name, postal_code, address_line1, country_code, latitude, longitude))) as checksum')->first()->toArray(), JSON_THROW_ON_ERROR);
+        return hash('sha256', Restaurant::query()
+            ->where('status', 'published')
+            ->orderBy('id')
+            ->get(['id', 'city_code', 'city_name', 'postal_code', 'address_line1', 'country_code', 'latitude', 'longitude', 'updated_at'])
+            ->toJson(JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
     }
 }
