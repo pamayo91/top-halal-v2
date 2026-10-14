@@ -6,6 +6,7 @@ use App\Models\{CommuneReference, Restaurant};
 use App\Services\CommuneTextNormalizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class BackfillQuickCityCodesCommandTest extends TestCase
@@ -20,6 +21,6 @@ class BackfillQuickCityCodesCommandTest extends TestCase
         Artisan::call('quick:backfill-city-codes', ['--json' => true]); $dry = json_decode(Artisan::output(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($dry['read_only']); $this->assertSame('unique_match', $dry['rows'][0]['status']); $this->assertNull($restaurant->fresh()->city_code);
         Artisan::call('quick:backfill-city-codes', ['--apply' => true, '--json' => true]); $apply = json_decode(Artisan::output(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame(1, $apply['applied']); $this->assertSame('93031', $restaurant->fresh()->city_code); $this->assertSame($before, $restaurant->fresh()->only(array_keys($before)));
+        $this->assertSame(1, $apply['applied']); $this->assertSame('93031', DB::table('restaurants')->where('id', $restaurant->id)->value('city_code')); $this->assertSame($before, $restaurant->fresh()->only(array_keys($before)));
     }
 }
