@@ -2,6 +2,10 @@
 
 ## 2026-10-14
 
+- Données Quick : 54 codes INSEE complétés de façon déterministe depuis le
+  référentiel V2 local ; 9 fiches restent sans code par exclusion manuelle ou
+  absence de correspondance certaine. Seul `restaurants.city_code` a changé.
+
 - Front : le bloc SSR « Villes aux alentours » des pages ville est désormais
   contenu dans le shell public, avec les mêmes gouttières responsive que le
   listing, sans changement de maillage géographique.

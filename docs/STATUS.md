@@ -1,5 +1,16 @@
 # Top-Halal V2 — Status
 
+## 2026-10-14 — Quick : complétion bornée des codes INSEE
+
+Sur 63 Quick audités, 54 `city_code` ont été complétés transactionnellement
+depuis `commune_references`, par nom normalisé et département du code postal.
+Neuf fiches restent volontairement sans code : quatre exclusions manuelles et
+cinq sans correspondance locale certaine. Seule la colonne `city_code` a été
+écrite ; adresse, ville textuelle, coordonnées, slug et URL sont inchangés.
+Le faux blocage initial venait de l’opérateur PHP `+`, qui conservait la valeur
+`null` proposée ; `array_merge` corrige ce comportement. L’audit géographique
+final est sans erreur et la gate COMPLETE est validée.
+
 ## 2026-10-14 — Alignement du maillage « Villes aux alentours »
 
 Le bloc SSR de villes proches des pages ville réutilise désormais le conteneur
