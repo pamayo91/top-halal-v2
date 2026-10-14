@@ -43,14 +43,16 @@
             </section>
         @endif
         @if($kind === 'ville' && ($nearbyCities ?? collect())->isNotEmpty())
-            <section class="nearby-cities section-heading-accent" aria-labelledby="nearby-cities-title">
-                <h2 id="nearby-cities-title">Villes aux alentours</h2>
-                <ul class="nearby-cities-grid">
-                    @foreach($nearbyCities as $nearbyCity)
-                        <li><a href="{{ route('cities.show', $nearbyCity->slug) }}">{{ $nearbyCity->city_name }}</a></li>
-                    @endforeach
-                </ul>
-            </section>
+            <div class="shell">
+                <section class="nearby-cities section-heading-accent" aria-labelledby="nearby-cities-title">
+                    <h2 id="nearby-cities-title">Villes aux alentours</h2>
+                    <ul class="nearby-cities-grid">
+                        @foreach($nearbyCities as $nearbyCity)
+                            <li><a href="{{ route('cities.show', $nearbyCity->slug) }}">{{ $nearbyCity->city_name }}</a></li>
+                        @endforeach
+                    </ul>
+                </section>
+            </div>
         @endif
         @if(filled($cityPage?->config?->content_bottom))<div class="city-seo-content shell">{!! $cityPage->config->content_bottom !!}</div>@endif
     </section>

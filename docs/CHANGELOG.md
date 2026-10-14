@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-14
+
+- Front : le bloc SSR « Villes aux alentours » des pages ville est désormais
+  contenu dans le shell public, avec les mêmes gouttières responsive que le
+  listing, sans changement de maillage géographique.
+
 ## 2026-10-13
 
 - SEO : tous les liens vers `/ajouter-un-restaurant` sont désormais en

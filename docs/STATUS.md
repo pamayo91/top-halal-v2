@@ -1,5 +1,11 @@
 # Top-Halal V2 — Status
 
+## 2026-10-14 — Alignement du maillage « Villes aux alentours »
+
+Le bloc SSR de villes proches des pages ville réutilise désormais le conteneur
+public et ses gouttières responsive. Le calcul géographique, les liens et le
+maillage restent inchangés.
+
 ## 2026-10-13 — Liens de soumission en nofollow
 
 Tous les liens publics vers `/ajouter-un-restaurant`, y compris les liens de
