@@ -60,16 +60,17 @@ Every completed feature requires appropriate automated tests.
 - Codex/browser validation: navigate as a real visitor/admin, fill forms, submit them, inspect visible results, console, network errors and relevant accessibility/performance issues.
 - For authenticated back-office validation on preproduction, use only the dedicated test administrator supplied through local `PREPROD_ADMIN_EMAIL` and `PREPROD_ADMIN_PASSWORD` environment variables. Never use, modify, reset or make a fixture of the project owner's human administrator account. Tests requiring these variables must skip with an explicit reason when they are unavailable.
 - If an E2E/browser test finds a defect, diagnose, fix, redeploy and rerun the failing flow before marking complete.
-- Run targeted tests during development; run the full relevant suite before completing a milestone.
+- Classify the effective change after inspection and before selecting tests, using MICRO / FAST / COMPLET in `docs/DECISIONS.md` and `docs/DEPLOYMENT.md`. The line count never determines the level; risk and impact radius do. Use the lowest level that covers the real risk, upgrade immediately when the discovered scope grows, and choose the higher level when uncertain.
+- Run targeted tests during development. The complete regression gate is required for COMPLET work and for milestones whose effective scope is COMPLET; it is conditional for FAST and not required by default for MICRO.
 
 ## NON-REGRESSION GATE
-- For every significant functional change, run targeted tests during development and the complete regression suite before marking the work DONE.
-- `composer test:regression` is the mandatory preproduction gate. It verifies PHP sentinel coverage, database integrity, V2 media/storage, Playwright public sentinels, HTTP 500s, browser console/network failures and Laravel exceptions generated during the run.
-- The regression gate must never pin real mutable business records as permanent fixtures. Capture `regression:snapshot` immediately before deployment and pass its run ID to the post-deployment gate; compare only changes made during that deployment, while retaining dynamic orphan/media/storage integrity checks.
+- For COMPLET work, run targeted tests during development and the complete regression suite before marking the work DONE. FAST work uses the gate only when its actual impact requires a COMPLET validation; MICRO work never runs it by habit.
+- `composer test:regression` is the mandatory preproduction gate for COMPLET work. It verifies PHP sentinel coverage, database integrity, V2 media/storage, Playwright public sentinels, HTTP 500s, browser console/network failures and Laravel exceptions generated during the run.
+- The regression gate must never pin real mutable business records as permanent fixtures. For COMPLET work, capture `regression:snapshot` immediately before deployment and pass its run ID to the post-deployment gate; compare only changes made during that deployment, while retaining dynamic orphan/media/storage integrity checks.
 - A new HTTP 500, lost media, unexpected lost relationship, unexpected count decrease, failed Playwright regression or new Laravel exception blocks DONE.
 - Never repair data artificially, rerun a global migration, recreate relations/media, or change a valid fixture merely to make a regression test pass. Diagnose and correct the root cause in code first; restore data only afterwards when necessary.
-- The regression suite protects the existing application as well as the changed feature. It is never optional because a change appears isolated.
-- After a root-cause correction, rerun the complete regression suite. Inspect the complete Git diff before every functional commit; explain any unrelated or large change and verify that no secret, `.env`, or unintended deletion is staged.
+- When executed, the regression suite protects the existing application as well as the changed feature. It is never optional for a change classified COMPLET merely because it appears isolated.
+- After a root-cause correction on COMPLET work, rerun the complete regression suite. Inspect the complete Git diff before every functional commit; explain any unrelated or large change and verify that no secret, `.env`, or unintended deletion is staged.
 
 ## Documentation rules
 Documentation is part of the deliverable.

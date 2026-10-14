@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-14 — Validation proportionnée MICRO / FAST / COMPLET
+
+Le projet adopte formellement les niveaux MICRO, FAST et COMPLET. La profondeur de validation dépend désormais du risque et du rayon d’impact du changement effectif, jamais du seul nombre de lignes : MICRO emploie des contrôles ciblés, FAST des tests ciblés avec gate complète conditionnelle, et COMPLET conserve snapshot pré-déploiement et gate complète obligatoires.
+
 ## 2026-10-13 — Audit des villes non résolues
 
 L’audit V2 strictement en lecture seule des 63 fiches exclues des breadcrumbs

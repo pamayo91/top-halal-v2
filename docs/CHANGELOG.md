@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-14
+
+- Développement / validation : formalisation des niveaux MICRO, FAST et COMPLET afin d’adapter les tests au risque réel. Les micro-corrections n’entraînent plus automatiquement snapshot et gate complète ; les changements sensibles conservent la validation intégrale.
+
 ## 2026-10-13
 
 - Données/géographie : audit V2 en lecture seule des 63 fiches sans ville

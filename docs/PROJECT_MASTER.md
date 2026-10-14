@@ -846,13 +846,15 @@ Pour chaque nouvelle phase :
 3. lire les specs concernées ;
 4. inspecter Git ;
 5. implémenter ;
-6. tester ;
+6. classer le changement effectif MICRO / FAST / COMPLET après inspection, puis tester proportionnellement ;
 7. corriger ;
-8. tester préproduction ;
+8. valider en préproduction lorsque le niveau et le changement le nécessitent ;
 9. documenter ;
 10. commit ;
 11. push develop ;
-12. déployer.
+12. déployer lorsque nécessaire.
+
+Les niveaux de validation sont définis de façon normative dans `docs/DECISIONS.md` (D045) et opérationnelle dans `docs/DEPLOYMENT.md`. Le risque et le rayon d’impact, et non le nombre de lignes, déterminent la profondeur de test : MICRO reçoit des contrôles ciblés, FAST des tests ciblés avec gate complète conditionnelle, COMPLET conserve snapshot et gate complète obligatoires. Une modification purement documentaire ne nécessite ni déploiement runtime ni test applicatif.
 
 Ne pas revenir avec un simple état d'avancement.
 
