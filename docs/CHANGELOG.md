@@ -2,6 +2,10 @@
 
 ## 2026-10-14
 
+- Front : le bloc SSR « Villes aux alentours » des pages ville est désormais
+  contenu dans le shell public, avec les mêmes gouttières responsive que le
+  listing, sans changement de maillage géographique.
+
 - Développement / validation : formalisation des niveaux MICRO, FAST et COMPLET afin d’adapter les tests au risque réel. Les micro-corrections n’entraînent plus automatiquement snapshot et gate complète ; les changements sensibles conservent la validation intégrale.
 
 ## 2026-10-13
