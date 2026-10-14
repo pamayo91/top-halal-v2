@@ -50,15 +50,15 @@ class BackfillQuickCityCodesCommand extends Command
     private function resolve(Restaurant $restaurant, CommuneTextNormalizer $normalizer): array
     {
         $base = ['restaurant_id' => $restaurant->id, 'name' => $restaurant->name, 'city_name' => $restaurant->city_name, 'postal_code' => $restaurant->postal_code, 'city_code' => $restaurant->city_code, 'commune_found' => null, 'proposed_city_code' => null];
-        if (in_array($restaurant->id, self::EXCLUDED_IDS, true)) return $base + ['status' => 'excluded_manual_review', 'reason' => 'Explicitly excluded non-municipal or special city label.'];
-        if (strtoupper((string) $restaurant->country_code) !== 'FR') return $base + ['status' => 'no_match', 'reason' => 'Country is outside the French local reference.'];
+        if (in_array($restaurant->id, self::EXCLUDED_IDS, true)) return array_merge($base, ['status' => 'excluded_manual_review', 'reason' => 'Explicitly excluded non-municipal or special city label.']);
+        if (strtoupper((string) $restaurant->country_code) !== 'FR') return array_merge($base, ['status' => 'no_match', 'reason' => 'Country is outside the French local reference.']);
         $department = $this->postalDepartment((string) $restaurant->postal_code);
-        if ($department === null) return $base + ['status' => 'no_match', 'reason' => 'Postal code cannot deterministically bound a French department.'];
+        if ($department === null) return array_merge($base, ['status' => 'no_match', 'reason' => 'Postal code cannot deterministically bound a French department.']);
         $matches = CommuneReference::query()->where('normalized_name', $normalizer->normalize((string) $restaurant->city_name))->get(['city_code', 'city_name', 'department_code'])
             ->filter(fn (CommuneReference $commune): bool => in_array($commune->department_code, $department, true))->values();
-        if ($matches->count() !== 1) return $base + ['status' => $matches->isEmpty() ? 'no_match' : 'ambiguous', 'reason' => $matches->isEmpty() ? 'No local commune matches normalized name and postal department.' : 'Several local communes match normalized name and postal department.'];
+        if ($matches->count() !== 1) return array_merge($base, ['status' => $matches->isEmpty() ? 'no_match' : 'ambiguous', 'reason' => $matches->isEmpty() ? 'No local commune matches normalized name and postal department.' : 'Several local communes match normalized name and postal department.']);
         $commune = $matches->first();
-        return $base + ['commune_found' => ['city_name' => $commune->city_name, 'city_code' => $commune->city_code, 'department_code' => $commune->department_code], 'proposed_city_code' => $commune->city_code, 'status' => 'unique_match', 'reason' => 'Unique local match on normalized city name and postal department.'];
+        return array_merge($base, ['commune_found' => ['city_name' => $commune->city_name, 'city_code' => $commune->city_code, 'department_code' => $commune->department_code], 'proposed_city_code' => $commune->city_code, 'status' => 'unique_match', 'reason' => 'Unique local match on normalized city name and postal department.']);
     }
 
     /** @return list<string>|null */
