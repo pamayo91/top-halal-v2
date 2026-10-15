@@ -1,10 +1,59 @@
 # Top-Halal V2 — Status
 
+## 2026-10-15 — Quick : clôture de la résolution géographique
+
+Les neuf derniers Quick ont reçu leur `city_code` après validation humaine dans
+le fichier de revue manuel : les 54 rattachements déterministes précédents et
+ces 9 décisions traitent désormais les 63/63 fiches initialement non résolues.
+Seule `restaurants.city_code` a été mise à jour ; adresse, ville textuelle,
+code postal, coordonnées, slug et URL sont inchangés. Le préflight a validé les
+9 IDs, noms/slugs et communes INSEE, puis la transaction a contrôlé qu'aucune
+autre colonne de restaurant ne différait. `geography:audit-breadcrumbs` est
+sans erreur et sans restaurant exclu ; les tests ciblés et la gate COMPLETE
+préproduction avec snapshot `4172b552-566f-497e-b208-810e92df6052` sont verts.
+
+## 2026-10-14 — Quick : complétion bornée des codes INSEE
+
+Sur 63 Quick audités, 54 `city_code` ont été complétés transactionnellement
+depuis `commune_references`, par nom normalisé et département du code postal.
+Neuf fiches restent volontairement sans code : quatre exclusions manuelles et
+cinq sans correspondance locale certaine. Seule la colonne `city_code` a été
+écrite ; adresse, ville textuelle, coordonnées, slug et URL sont inchangés.
+Le faux blocage initial venait de l’opérateur PHP `+`, qui conservait la valeur
+`null` proposée ; `array_merge` corrige ce comportement. L’audit géographique
+final est sans erreur et la gate COMPLETE est validée.
+
 ## 2026-10-14 — Alignement du maillage « Villes aux alentours »
 
 Le bloc SSR de villes proches des pages ville réutilise désormais le conteneur
 public et ses gouttières responsive. Le calcul géographique, les liens et le
 maillage restent inchangés.
+
+## 2026-10-14 — Validation proportionnée MICRO / FAST / COMPLET
+
+Le projet adopte formellement les niveaux MICRO, FAST et COMPLET. La profondeur de validation dépend désormais du risque et du rayon d’impact du changement effectif, jamais du seul nombre de lignes : MICRO emploie des contrôles ciblés, FAST des tests ciblés avec gate complète conditionnelle, et COMPLET conserve snapshot pré-déploiement et gate complète obligatoires.
+
+## 2026-10-13 — Audit des villes non résolues
+
+L’audit V2 strictement en lecture seule des 63 fiches exclues des breadcrumbs
+géographiques conclut à 59 `city_code` absents et 4 libellés manifestement non
+municipaux (quartier, adresse postale ou laboratoire). Aucun code invalide,
+cas étranger, donnée structurelle incomplète ni bug du resolver n’a été
+observé. Les recommandations restent manuelles : aucun code ni champ de fiche
+n’a été modifié. Les rapports détaillés Markdown et CSV sont versionnés dans
+`docs/generated/`.
+
+## 2026-10-13 — Fil d’Ariane géographique résolu par identité administrative
+
+Les fil d’Ariane publics des fiches, villes, départements, régions et facettes
+ouvertes sont maintenant construits par un service unique à partir du code INSEE
+de la ville et des codes administratifs région/département. Le HTML et le
+`BreadcrumbList` JSON-LD consomment exactement cette même structure. Les
+homonymies ville/département/région disposent d’URLs qualifiées stables, sans
+altérer le cas territorial partagé de Paris. La commande de lecture seule
+`geography:audit-breadcrumbs` couvre toutes les surfaces indexables : sur
+préproduction elle ne signale aucune divergence et isole 63 fiches publiées
+sans ville résolue, donc sans niveau géographique à afficher.
 
 ## 2026-10-13 — Liens de soumission en nofollow
 

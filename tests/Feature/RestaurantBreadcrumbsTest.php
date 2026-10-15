@@ -40,12 +40,30 @@ class RestaurantBreadcrumbsTest extends TestCase
         $this->assertRestaurantBreadcrumb($saintDenis, [
             ['Accueil', route('home')], ['Restaurants', route('restaurants.index')], ['Île-de-France', route('cities.show', 'ile-de-france')], ['Seine-Saint-Denis', route('cities.show', 'seine-saint-denis')], ['Saint-Denis', route('cities.show', 'saint-denis-93')], [$saintDenis->name, route('restaurants.show', $saintDenis->slug)],
         ]);
+        $this->assertRestaurantBreadcrumb($this->published(1010, 'Bistrot Saint-Denis Réunion bis', 'bistrot-saint-denis-reunion-bis', 'Saint-Denis', '97411'), [
+            ['Accueil', route('home')], ['Restaurants', route('restaurants.index')], ['La Réunion', route('cities.show', 'la-reunion')], ['Saint-Denis', route('cities.show', 'saint-denis-974')], ['Bistrot Saint-Denis Réunion bis', route('restaurants.show', 'bistrot-saint-denis-reunion-bis')],
+        ]);
         $this->assertRestaurantBreadcrumb($pointeAPitre, [
             ['Accueil', route('home')], ['Restaurants', route('restaurants.index')], ['Guadeloupe', route('cities.show', 'guadeloupe')], ['Pointe-à-Pitre', route('cities.show', 'pointe-a-pitre')], [$pointeAPitre->name, route('restaurants.show', $pointeAPitre->slug)],
         ]);
         $this->assertRestaurantBreadcrumb($chateauroux, [
             ['Accueil', route('home')], ['Restaurants', route('restaurants.index')], ['Centre-Val de Loire', route('cities.show', 'centre-val-de-loire')], ['Indre', route('cities.show', 'indre-36')], ['Châteauroux', route('cities.show', 'chateauroux')], [$chateauroux->name, route('restaurants.show', $chateauroux->slug)],
         ]);
+
+        foreach ([
+            ['Mayenne', '53147', 'Laval', '53130', 'mayenne-53'],
+            ['Vienne', '38544', 'Poitiers', '86194', 'vienne-86'],
+        ] as [$collidingCity, $collidingCityCode, $departmentCity, $departmentCityCode, $departmentSlug]) {
+            $this->published(1100 + strlen($collidingCity), 'Commune '.$collidingCity, 'commune-'.(string) str($collidingCity)->slug(), $collidingCity, $collidingCityCode);
+            $restaurant = $this->published(1200 + strlen($collidingCity), 'Restaurant '.$departmentCity, 'restaurant-'.(string) str($departmentCity)->slug(), $departmentCity, $departmentCityCode);
+            $department = $departmentCityCode === '53130' ? 'Mayenne' : 'Vienne';
+            $region = $departmentCityCode === '53130' ? 'Pays de la Loire' : 'Nouvelle-Aquitaine';
+            $regionSlug = $departmentCityCode === '53130' ? 'pays-de-la-loire' : 'nouvelle-aquitaine';
+
+            $this->assertRestaurantBreadcrumb($restaurant, [
+                ['Accueil', route('home')], ['Restaurants', route('restaurants.index')], [$region, route('cities.show', $regionSlug)], [$department, route('cities.show', $departmentSlug)], [$departmentCity, route('cities.show', (string) str($departmentCity)->slug())], [$restaurant->name, route('restaurants.show', $restaurant->slug)],
+            ]);
+        }
     }
 
     /** @param list<array{string,string}> $expected */

@@ -23,6 +23,12 @@ test('structured city pages remain usable on desktop and mobile with their admin
     );
   }
 
+  const saintDenis = await page.goto('/restos/saint-denis-93');
+  expect(saintDenis?.status()).toBe(200);
+  await expect(page.locator('.breadcrumbs').getByRole('link', { name: 'Seine-Saint-Denis', exact: true })).toHaveAttribute('href', /\/restos\/seine-saint-denis$/);
+  const saintDenisHrefs = await page.locator('.breadcrumbs a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  expect(saintDenisHrefs).not.toContain('/restos/saint-denis');
+
   if ((page.viewportSize()?.width ?? 0) < 760) {
     expect(await page.locator('body').evaluate(el => el.scrollWidth > el.clientWidth)).toBe(false);
   }

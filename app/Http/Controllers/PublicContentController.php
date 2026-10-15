@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\{RedirectResponse, Request, Response};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, CommuneDirectory, EditorialSidebar, GeographicPageResolver, HomepageSettings, NearbyCityService, PublicRestaurantSearch};
+use App\Services\{CityPageResolver, CitySeoService, CityServiceSeoService, CitySpecialtySeoService, CommentThreads, CommuneDirectory, EditorialSidebar, GeographicBreadcrumbs, GeographicPageResolver, HomepageSettings, NearbyCityService, PublicRestaurantSearch};
 use App\Services\ContributionIdentityService;
 
 class PublicContentController extends Controller
@@ -24,6 +24,7 @@ class PublicContentController extends Controller
         private readonly CitySpecialtySeoService $citySpecialties,
         private readonly CityServiceSeoService $cityServices,
         private readonly GeographicPageResolver $geography,
+        private readonly GeographicBreadcrumbs $breadcrumbs,
         private readonly NearbyCityService $nearbyCities,
         private readonly EditorialSidebar $sidebar,
         private readonly CommentThreads $commentThreads,
@@ -112,7 +113,7 @@ class PublicContentController extends Controller
         $restaurant = $this->search->published()->where('slug', $slug)->firstOrFail();
         $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
         $adminEditUrl = $this->adminEditUrlFor($restaurant);
-        $breadcrumbs = $this->restaurantBreadcrumbs($restaurant);
+        $breadcrumbs = $this->breadcrumbs->forRestaurant($restaurant);
 
         return response()->view('public.restaurant', compact('restaurant', 'reviews', 'adminEditUrl', 'breadcrumbs'));
     }
@@ -148,7 +149,7 @@ class PublicContentController extends Controller
                 restaurants: $this->search->orderByRecent($this->search->published()->whereIn('city_code', $city->source_city_codes))->paginate(12)->withQueryString(),
                 open: (bool) $citySeo?->open,
                 citySeo: $citySeo,
-                breadcrumbs: $this->cityBreadcrumbs($city),
+                breadcrumbs: $this->breadcrumbs->forCity($city),
                 nearbyCities: $this->nearbyCities->nearbyFor($city),
                 city: $city,
                 citySpecialties: $this->citySpecialties->openedForCity($city),
@@ -171,7 +172,7 @@ class PublicContentController extends Controller
                 kind: 'département',
                 restaurants: $this->search->orderByRecent($this->geography->scopeDepartment($this->search->published(), $department))->paginate(12)->withQueryString(),
                 open: $department->restaurants_count >= $this->citySeo->threshold(),
-                breadcrumbs: $this->departmentBreadcrumbs($department),
+                breadcrumbs: $this->breadcrumbs->forDepartment($department),
             );
         }
 
@@ -181,7 +182,7 @@ class PublicContentController extends Controller
                 kind: 'région',
                 restaurants: $this->search->orderByRecent($this->geography->scopeRegion($this->search->published(), $region))->paginate(12)->withQueryString(),
                 open: $region->restaurants_count >= $this->citySeo->threshold(),
-                breadcrumbs: $this->breadcrumbs((object) ['name' => $region->name]),
+                breadcrumbs: $this->breadcrumbs->forRegion($region),
             );
         }
 
@@ -209,7 +210,7 @@ class PublicContentController extends Controller
             ->paginate(12)
             ->withQueryString();
         $defaults = ($service ? $this->cityServices : $this->citySpecialties)->defaults($cityPage, $term, $restaurants->total());
-        $breadcrumbs = $this->cityFacetBreadcrumbs($cityPage, $term);
+        $breadcrumbs = $this->breadcrumbs->forCityFacet($cityPage, $term);
 
         return response()->view('public.city-specialty', [
             'city' => $cityPage,
@@ -327,78 +328,6 @@ class PublicContentController extends Controller
             ['label' => 'Restaurants', 'url' => route('restaurants.index')],
             ['label' => $current->name, 'url' => null],
         ];
-    }
-
-    /** @return list<array{label:string,url:?string}> */
-    private function cityBreadcrumbs(object $city): array
-    {
-        $breadcrumbs = [
-            ['label' => 'Accueil', 'url' => route('home')],
-            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
-            ['label' => $city->region['name'], 'url' => route('cities.show', $city->region['slug'])],
-        ];
-
-        if ($city->department['slug'] !== $city->slug && $city->department['slug'] !== $city->region['slug']) {
-            $breadcrumbs[] = ['label' => $city->department['name'], 'url' => route('cities.show', $city->department['slug'])];
-        }
-
-        $breadcrumbs[] = ['label' => $city->city_name, 'url' => null];
-
-        return $breadcrumbs;
-    }
-
-    /** @return list<array{label:string,url:?string}> */
-    private function cityFacetBreadcrumbs(object $city, object $term): array
-    {
-        $breadcrumbs = $this->cityBreadcrumbs($city);
-        array_pop($breadcrumbs);
-        $breadcrumbs[] = ['label' => $city->city_name, 'url' => route('cities.show', $city->slug)];
-        $breadcrumbs[] = ['label' => $term->name, 'url' => null];
-
-        return $breadcrumbs;
-    }
-
-    /** @return list<array{label:string,url:?string}> */
-    private function restaurantBreadcrumbs(Restaurant $restaurant): array
-    {
-        $breadcrumbs = [
-            ['label' => 'Accueil', 'url' => route('home')],
-            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
-        ];
-
-        $city = $this->cities->cityForCode((string) $restaurant->city_code);
-
-        if ($city !== null) {
-            $breadcrumbs[] = ['label' => $city->region['name'], 'url' => route('cities.show', $city->region['slug'])];
-
-            $department = $this->geography->departments()->firstWhere('code', $city->department['code']);
-            if ($department !== null && $department->slug !== $city->slug && $department->slug !== $city->region['slug']) {
-                $breadcrumbs[] = ['label' => $department->name, 'url' => route('cities.show', $department->slug)];
-            }
-
-            $breadcrumbs[] = ['label' => $city->city_name, 'url' => route('cities.show', $city->slug)];
-        }
-
-        $breadcrumbs[] = ['label' => $restaurant->name, 'url' => null];
-
-        return $breadcrumbs;
-    }
-
-    /** @return list<array{label:string,url:?string}> */
-    private function departmentBreadcrumbs(object $department): array
-    {
-        $breadcrumbs = [
-            ['label' => 'Accueil', 'url' => route('home')],
-            ['label' => 'Restaurants', 'url' => route('restaurants.index')],
-        ];
-
-        if ($department->region['slug'] !== $department->slug) {
-            $breadcrumbs[] = ['label' => $department->region['name'], 'url' => route('cities.show', $department->region['slug'])];
-        }
-
-        $breadcrumbs[] = ['label' => $department->name, 'url' => null];
-
-        return $breadcrumbs;
     }
 
     private function cityLabel(object $city): string

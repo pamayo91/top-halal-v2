@@ -1,12 +1,38 @@
 # Changelog
 
+## 2026-10-15
+
+- Données Quick : les 9 derniers `city_code` ont été complétés après validation
+  humaine du fichier de revue, portant le traitement à 63/63 fiches initialement
+  non résolues (54 déterministes, 9 manuelles). Seule la colonne
+  `restaurants.city_code` a changé ; aucune adresse, ville textuelle, code
+  postal, coordonnée, slug ou URL n'a été modifié. L'audit géographique, les
+  tests ciblés et la gate COMPLETE préproduction sont passés.
+
 ## 2026-10-14
+
+- Données Quick : 54 codes INSEE complétés de façon déterministe depuis le
+  référentiel V2 local ; 9 fiches restent sans code par exclusion manuelle ou
+  absence de correspondance certaine. Seul `restaurants.city_code` a changé.
 
 - Front : le bloc SSR « Villes aux alentours » des pages ville est désormais
   contenu dans le shell public, avec les mêmes gouttières responsive que le
   listing, sans changement de maillage géographique.
 
+- Développement / validation : formalisation des niveaux MICRO, FAST et COMPLET afin d’adapter les tests au risque réel. Les micro-corrections n’entraînent plus automatiquement snapshot et gate complète ; les changements sensibles conservent la validation intégrale.
+
 ## 2026-10-13
+
+- Données/géographie : audit V2 en lecture seule des 63 fiches sans ville
+  résolue, avec CSV et rapport détaillé versionnés. Les 59 codes INSEE absents
+  et 4 libellés non municipaux sont seulement recommandés pour revue manuelle ;
+  aucune donnée, redirection ou règle de breadcrumb n’a été modifiée.
+
+- SEO/géographie : les fil d’Ariane des fiches et pages géographiques sont
+  désormais résolus depuis les identifiants administratifs, partagés à
+  l’identique avec le JSON-LD, et protégés contre les homonymies de slugs.
+  L’audit en lecture seule `geography:audit-breadcrumbs` contrôle l’ensemble
+  des surfaces publiques concernées.
 
 - SEO : tous les liens vers `/ajouter-un-restaurant` sont désormais en
   `nofollow`, y compris dans les menus configurables; les liens déjà en nouvelle

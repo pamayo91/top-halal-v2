@@ -37,18 +37,22 @@ async function assertRestaurantBreadcrumb(
   const restaurantResponse = await page.goto(restaurantHref!);
   expect(restaurantResponse?.status()).toBe(200);
   const restaurantPath = new URL(page.url()).pathname;
-  const expectedNames = ['Accueil', 'Restaurants', region.name, ...(department ? [department.name] : []), city, await page.locator('h1').innerText()];
+  const currentName = await page.locator('.breadcrumbs [aria-current="page"]').innerText();
+  const expectedNames = ['Accueil', 'Restaurants', region.name, ...(department ? [department.name] : []), city, currentName];
   const expectedPaths = ['/', '/restaurants', `/restos/${region.slug}`, ...(department ? [`/restos/${department.slug}`] : []), `/restos/${citySlug}`, restaurantPath];
   const data = await breadcrumb(page);
 
   expect(data.map((item) => item.name)).toEqual(expectedNames);
   expect(data.map((item) => new URL(item.item).pathname)).toEqual(expectedPaths);
   expect(new Set(data.map((item) => item.name)).size).toBe(data.length);
-  await expect(page.locator('.breadcrumbs [aria-current="page"]')).toHaveText(expectedNames.at(-1)!);
+  await expect(page.locator('.breadcrumbs [aria-current="page"]')).toHaveText(currentName);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', new RegExp(`${restaurantPath}$`));
 
   if (citySlug === 'saint-denis-93') {
+    await expect(page.locator('.breadcrumbs').getByRole('link', { name: 'Seine-Saint-Denis', exact: true })).toHaveAttribute('href', /\/restos\/seine-saint-denis$/);
     await expect(page.locator('.breadcrumbs').getByRole('link', { name: 'Saint-Denis', exact: true })).toHaveAttribute('href', /\/restos\/saint-denis-93$/);
+    const hrefs = await page.locator('.breadcrumbs a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+    expect(hrefs).not.toContain('/restos/saint-denis');
   }
 }
 
