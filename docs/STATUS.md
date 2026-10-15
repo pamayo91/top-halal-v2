@@ -1,5 +1,17 @@
 # Top-Halal V2 — Status
 
+## 2026-10-15 — Quick : clôture de la résolution géographique
+
+Les neuf derniers Quick ont reçu leur `city_code` après validation humaine dans
+le fichier de revue manuel : les 54 rattachements déterministes précédents et
+ces 9 décisions traitent désormais les 63/63 fiches initialement non résolues.
+Seule `restaurants.city_code` a été mise à jour ; adresse, ville textuelle,
+code postal, coordonnées, slug et URL sont inchangés. Le préflight a validé les
+9 IDs, noms/slugs et communes INSEE, puis la transaction a contrôlé qu'aucune
+autre colonne de restaurant ne différait. `geography:audit-breadcrumbs` est
+sans erreur et sans restaurant exclu ; les tests ciblés et la gate COMPLETE
+préproduction avec snapshot `4172b552-566f-497e-b208-810e92df6052` sont verts.
+
 ## 2026-10-14 — Quick : complétion bornée des codes INSEE
 
 Sur 63 Quick audités, 54 `city_code` ont été complétés transactionnellement

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-15
+
+- Données Quick : les 9 derniers `city_code` ont été complétés après validation
+  humaine du fichier de revue, portant le traitement à 63/63 fiches initialement
+  non résolues (54 déterministes, 9 manuelles). Seule la colonne
+  `restaurants.city_code` a changé ; aucune adresse, ville textuelle, code
+  postal, coordonnée, slug ou URL n'a été modifié. L'audit géographique, les
+  tests ciblés et la gate COMPLETE préproduction sont passés.
+
 ## 2026-10-14
 
 - Données Quick : 54 codes INSEE complétés de façon déterministe depuis le
