@@ -76,7 +76,7 @@ class SettingsPage extends Page
                         ->helperText('Exemple : G-XXXXXXXXXX. Cet identifiant n’est pas un secret.')
                         ->nullable()
                         ->maxLength(34)
-                        ->requiredIf('analytics_ga4_enabled')
+                        ->requiredIf('analytics_ga4_enabled', true)
                         ->rules([
                             function (string $attribute, mixed $value, Closure $fail): void {
                                 if (blank($value)) {
