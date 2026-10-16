@@ -23,7 +23,7 @@ test.describe('Réglages Google Analytics', () => {
     await page.goto('/admin');
     await page.getByLabel(/Adresse e-mail/).fill(email!);
     await page.getByLabel(/Mot de passe/).fill(password!);
-    await page.getByRole('button', { name: 'Connexion' }).click();
+    await page.getByRole('button', { name: 'Connexion' }).click({ noWaitAfter: true });
     await expect(page).toHaveURL(/\/admin$/);
     await page.goto('/admin/settings');
 
