@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-16
+
+- Back-office : ajout de la configuration GA4 non secrète dans « Réglages ». Elle est désactivée par défaut, exige un ID `G-…` valide lorsqu’elle est activée et utilise le cache/invalidation du système `settings`. Aucun tracking, script ou requête Google, cookie Analytics, changement CSP ou rendu public n’est introduit ; le consentement et l’intégration frontend restent séparés.
+
 ## 2026-10-15
 
 - Données Quick : les 9 derniers `city_code` ont été complétés après validation

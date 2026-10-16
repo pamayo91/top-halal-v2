@@ -5,7 +5,9 @@ namespace App\Filament\Pages;
 use App\Models\{MediaAsset, Setting};
 use App\Filament\Support\EditorialSidebarFields;
 use App\Services\EditorialSidebar;
-use App\Services\{AdminAudit, ErrorPageSettings, NearbyCityService};
+use App\Services\{AdminAudit, AnalyticsSettings, ErrorPageSettings, NearbyCityService};
+use Closure;
+use Illuminate\Validation\ValidationException;
 use Filament\Forms\Components\{Select, Textarea, TextInput, Toggle};
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -26,6 +28,7 @@ class SettingsPage extends Page
     public function mount(): void
     {
         $settings = Setting::pluck('value', 'key');
+        $analytics = app(AnalyticsSettings::class)->values();
 
         $this->form->fill([
             'site_name' => $settings['site_name']['text'] ?? 'Top Halal',
@@ -37,6 +40,8 @@ class SettingsPage extends Page
             'editorial_sidebar_articles' => $settings['editorial_sidebar_articles'] ?? ['blocks' => app(EditorialSidebar::class)->global('articles')],
             'editorial_sidebar_pages' => $settings['editorial_sidebar_pages'] ?? ['blocks' => app(EditorialSidebar::class)->global('pages')],
             'error_404' => $settings[ErrorPageSettings::SETTINGS_KEY] ?? [],
+            'analytics_ga4_enabled' => $analytics['enabled'],
+            'analytics_ga4_measurement_id' => $analytics['measurement_id'],
         ]);
     }
 
@@ -60,6 +65,34 @@ class SettingsPage extends Page
                         ->label('Nombre maximum de villes proches')
                         ->integer()->minValue(1)->maxValue(NearbyCityService::MAX_LIMIT)->required(),
                 ]),
+            Section::make('Google Analytics')
+                ->description('Prépare uniquement la configuration GA4. Aucun script, cookie ou suivi n’est encore chargé sur le site public.')
+                ->schema([
+                    Toggle::make('analytics_ga4_enabled')
+                        ->label('Activer Google Analytics'),
+                    TextInput::make('analytics_ga4_measurement_id')
+                        ->label('ID de mesure GA4')
+                        ->placeholder('G-XXXXXXXXXX')
+                        ->helperText('Exemple : G-XXXXXXXXXX. Cet identifiant n’est pas un secret.')
+                        ->nullable()
+                        ->maxLength(34)
+                        ->requiredIf('analytics_ga4_enabled')
+                        ->rules([
+                            function (string $attribute, mixed $value, Closure $fail): void {
+                                if (blank($value)) {
+                                    return;
+                                }
+
+                                if (! AnalyticsSettings::isValidMeasurementId(AnalyticsSettings::normalizeMeasurementId($value))) {
+                                    $fail('Saisissez un ID de mesure GA4 valide, au format G-XXXXXXXXXX.');
+                                }
+                            },
+                        ])
+                        ->dehydrateStateUsing(fn (?string $state): ?string => AnalyticsSettings::normalizeMeasurementId($state))
+                        ->validationMessages([
+                            'required' => 'Un ID de mesure GA4 valide est requis pour activer Google Analytics.',
+                        ]),
+                ]),
             EditorialSidebarFields::section('editorial_sidebar_articles', 'Sidebar éditoriale — Articles')->description('Configuration par défaut des Articles. Les Articles affichent la sidebar sauf override explicite.'),
             EditorialSidebarFields::section('editorial_sidebar_pages', 'Sidebar éditoriale — Pages')->description('Configuration utilisée seulement lorsqu’une Page active explicitement sa sidebar.'),
             Section::make('Page 404')
@@ -79,6 +112,16 @@ class SettingsPage extends Page
     public function save(): void
     {
         $data = $this->form->getState();
+        $analyticsEnabled = (bool) ($data['analytics_ga4_enabled'] ?? false);
+        $measurementId = AnalyticsSettings::normalizeMeasurementId($data['analytics_ga4_measurement_id'] ?? null);
+
+        if ($analyticsEnabled && ! AnalyticsSettings::isValidMeasurementId($measurementId)) {
+            throw ValidationException::withMessages([
+                'data.analytics_ga4_measurement_id' => 'Un ID de mesure GA4 valide est requis pour activer Google Analytics.',
+            ]);
+        }
+
+        unset($data['analytics_ga4_enabled'], $data['analytics_ga4_measurement_id']);
 
         foreach ($data as $key => $value) {
             $nearbySetting = in_array($key, ['city_nearby_radius_km', 'city_nearby_maximum'], true);
@@ -101,7 +144,16 @@ class SettingsPage extends Page
             }
         }
 
-        app(AdminAudit::class)->record('settings.updated', 'settings', array_keys($data));
+        Setting::updateOrCreate(
+            ['key' => AnalyticsSettings::ENABLED_KEY],
+            ['value' => ['enabled' => $analyticsEnabled], 'group' => 'analytics'],
+        );
+        Setting::updateOrCreate(
+            ['key' => AnalyticsSettings::MEASUREMENT_ID_KEY],
+            ['value' => ['value' => $measurementId], 'group' => 'analytics'],
+        );
+
+        app(AdminAudit::class)->record('settings.updated', 'settings', [...array_keys($data), 'analytics_ga4_enabled', 'analytics_ga4_measurement_id']);
         Notification::make()->title('Réglages enregistrés')->success()->send();
     }
 }

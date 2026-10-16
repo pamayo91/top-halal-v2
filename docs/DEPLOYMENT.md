@@ -105,6 +105,10 @@ Use `/opt/alt/php84/usr/bin/php` explicitly for Composer, Artisan, tests, deploy
 
 The simplified restaurant-location release includes a destructive-schema-only migration: it drops the obsolete geocoding/qualification columns but does not alter `address` or any structured address/GPS value. Deploy the code first, run `migrate --force` once, then run the complete preproduction regression gate. Do not run any legacy enrichment, restore or import command as part of this deployment.
 
+## GA4 configuration release
+
+This FAST release has no migration, dependency, Vite build or public asset change. Deploy the committed `develop` revision to preproduction, run the targeted `AnalyticsSettingsTest` with PHP 8.4, clear and rebuild application caches, then validate the `/admin/settings` Analytics section using only the dedicated test administrator. Use a synthetic valid Measurement ID only; save, reload, change and disable it, then restore the disabled/empty default state. Confirm on a representative public page that neither Google scripts, requests nor Analytics cookies appear and that the public CSP remains unchanged. Do not deploy this configuration-only release to production without separate authorization.
+
 ## Administrative geographic pages release
 
 Deploy the application code and run the two forward-only migrations for `city_seo_pages.city_code` and the `restaurants(status, city_code)` index. They do not rewrite restaurant geography or query the legacy database. Clear application caches before verification, then rebuild configuration and views. Validate a precise homonym city, its noindex disambiguation page, a suffixed city/department collision, Paris, a department, a region, Corse, a DOM page and `/sitemap.xml`; finish with the complete workstation `composer test:regression` gate.

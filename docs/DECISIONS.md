@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-10-16 — D046 — Configuration GA4 préparée sans activation frontend
+
+Les réglages non secrets `analytics.ga4.enabled` et `analytics.ga4.measurement_id` utilisent la table générique `settings`; aucune table, colonne, clé API ou secret Google n’est nécessaire. `AnalyticsSettings` est l’unique accès applicatif prévu, avec cache et invalidation à chaque modification de ces clés. L’activation BO reste sans effet sur le frontend tant que la future étape distincte de consentement et de chargement différé n’est pas validée : aucun script Google, cookie Analytics, changement CSP ou identifiant dans le HTML public n’est autorisé ici. Ce changement est classé FAST : logique de réglage globale bornée, sans migration ni modification de surface publique.
+
 ## 2026-10-14 — D045 — Validation proportionnée selon trois niveaux : MICRO / FAST / COMPLET
 
 La profondeur de validation est choisie après inspection du code existant et avant de définir les tests. Elle dépend du risque réel et du rayon d’impact du changement effectif, jamais du seul nombre de lignes du diff. Toujours retenir le niveau le plus faible qui couvre correctement ce risque, sans surtester parce qu’une gate existe ni sous-tester un petit diff sensible. En cas de doute entre deux niveaux, retenir le niveau supérieur.
