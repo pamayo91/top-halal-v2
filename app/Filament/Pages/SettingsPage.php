@@ -78,12 +78,8 @@ class SettingsPage extends Page
                         ->maxLength(34)
                         ->requiredIf('analytics_ga4_enabled', true)
                         ->rules([
-                            function (string $attribute, mixed $value, Closure $fail): void {
-                                if (blank($value)) {
-                                    return;
-                                }
-
-                                if (! AnalyticsSettings::isValidMeasurementId(AnalyticsSettings::normalizeMeasurementId($value))) {
+                            fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                if (filled($value) && ! AnalyticsSettings::isValidMeasurementId(AnalyticsSettings::normalizeMeasurementId($value))) {
                                     $fail('Saisissez un ID de mesure GA4 valide, au format G-XXXXXXXXXX.');
                                 }
                             },
