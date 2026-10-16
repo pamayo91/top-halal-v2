@@ -2,7 +2,7 @@
 
 ## 2026-10-16 — Préparation BO de Google Analytics 4
 
-La page Filament « Réglages » comporte désormais la configuration non secrète GA4 : activation désactivée par défaut et ID de mesure validé/normalisé. Le service `AnalyticsSettings` centralise une lecture mise en cache et invalidée avec les clés `settings`; aucune migration n’est requise. Cette étape reste strictement sans effet public : ni script ou requête Google, ni cookie Analytics, ni Measurement ID dans le HTML, ni changement Vite ou CSP. Le consentement et le chargement frontend restent à réaliser séparément.
+La page Filament « Réglages » comporte désormais la configuration non secrète GA4 : activation désactivée par défaut et ID de mesure validé/normalisé. Le service `AnalyticsSettings` centralise une lecture mise en cache et invalidée avec les clés `settings`; aucune migration n’est requise. Cette étape reste strictement sans effet public : ni script ou requête Google, ni cookie Analytics, ni Measurement ID dans le HTML, ni changement Vite ou CSP. Les cinq scénarios PHP ciblés et la recette Playwright préproduction (ID fictif, sauvegarde/relecture/modification/désactivation, puis contrôle public) sont verts ; le test restaure l’état initial. Le consentement et le chargement frontend restent à réaliser séparément.
 
 ## 2026-10-15 — Quick : clôture de la résolution géographique
 

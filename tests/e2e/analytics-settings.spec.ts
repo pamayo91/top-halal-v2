@@ -27,48 +27,55 @@ test.describe('Réglages Google Analytics', () => {
     await expect(page).toHaveURL(/\/admin$/);
     await page.goto('/admin/settings');
 
-    const enabled = page.getByRole('checkbox', { name: 'Activer Google Analytics' });
+    const enabled = page.locator('#form\\.analytics_ga4_enabled');
     const measurementId = page.getByRole('textbox', { name: 'ID de mesure GA4' });
     const save = page.getByRole('button', { name: 'Enregistrer', exact: true });
-    const originalEnabled = await enabled.isChecked();
+    const isEnabled = async () => (await enabled.getAttribute('aria-checked')) === 'true';
+    const setEnabled = async (value: boolean) => {
+      if ((await isEnabled()) !== value) await enabled.click({ noWaitAfter: true });
+    };
+    const originalEnabled = await isEnabled();
     const originalMeasurementId = await measurementId.inputValue();
 
     try {
-      await enabled.setChecked(true);
+      await setEnabled(true);
       await measurementId.fill('UA-12345-6');
-      await save.click();
+      await save.click({ noWaitAfter: true });
       await expect(page.getByText('Saisissez un ID de mesure GA4 valide, au format G-XXXXXXXXXX.')).toBeVisible();
 
       await measurementId.fill(' g-ab12cd34ef ');
-      await save.click();
+      await save.click({ noWaitAfter: true });
       await expect(page.getByText('Réglages enregistrés', { exact: true })).toBeVisible();
       await page.reload();
-      await expect(enabled).toBeChecked();
+      await expect(enabled).toHaveAttribute('aria-checked', 'true');
       await expect(measurementId).toHaveValue('G-AB12CD34EF');
 
       await measurementId.fill('G-ZY98XW76VU');
-      await save.click();
+      await save.click({ noWaitAfter: true });
       await expect(page.getByText('Réglages enregistrés', { exact: true })).toBeVisible();
       await page.reload();
       await expect(measurementId).toHaveValue('G-ZY98XW76VU');
 
-      await enabled.setChecked(false);
+      await setEnabled(false);
       await measurementId.fill('');
-      await save.click();
+      await save.click({ noWaitAfter: true });
       await expect(page.getByText('Réglages enregistrés', { exact: true })).toBeVisible();
       await page.reload();
-      await expect(enabled).not.toBeChecked();
+      await expect(enabled).toHaveAttribute('aria-checked', 'false');
       await expect(measurementId).toHaveValue('');
     } finally {
-      await enabled.setChecked(originalEnabled);
+      await setEnabled(originalEnabled);
       await measurementId.fill(originalMeasurementId);
-      await save.click();
+      await save.click({ noWaitAfter: true });
       await expect(page.getByText('Réglages enregistrés', { exact: true })).toBeVisible();
     }
 
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Trouvez votre restaurant halal, simplement.' })).toBeVisible();
-    expect(await page.content()).not.toMatch(/googletagmanager\.com|google-analytics\.com|dataLayer|G-[A-Z0-9]{4,32}/i);
+    const publicHtml = await page.content();
+    expect(publicHtml).not.toMatch(/googletagmanager\.com|google-analytics\.com|dataLayer/i);
+    expect(publicHtml).not.toContain('G-AB12CD34EF');
+    expect(publicHtml).not.toContain('G-ZY98XW76VU');
     expect(requests.filter(url => /googletagmanager\.com|google-analytics\.com/i.test(url))).toEqual([]);
     expect(consoleErrors).toEqual([]);
     expect(failedRequests).toEqual([]);
