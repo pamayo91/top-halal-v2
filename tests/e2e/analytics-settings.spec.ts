@@ -4,6 +4,10 @@ const email = process.env.PREPROD_ADMIN_EMAIL;
 const password = process.env.PREPROD_ADMIN_PASSWORD;
 
 test.describe('Réglages Google Analytics', () => {
+  test.use({
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
+  });
+
   test.skip(!email || !password, 'PREPROD_ADMIN_EMAIL and PREPROD_ADMIN_PASSWORD are required.');
 
   test('configuration GA4 validates, persists, restores and does not affect the public frontend', async ({ page }, testInfo) => {
