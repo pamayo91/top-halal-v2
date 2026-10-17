@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Filament\Pages\SettingsPage;
 use App\Models\{Setting, User};
 use App\Services\AnalyticsSettings;
+use App\Services\AnalyticsConsent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -84,5 +85,32 @@ class AnalyticsSettingsTest extends TestCase
             ->assertDontSee('google-analytics.com')
             ->assertDontSee('dataLayer')
             ->assertHeader('Content-Security-Policy', "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: https://*.tile.openstreetmap.org; font-src 'self' data:; connect-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+    }
+
+    public function test_consent_interface_is_only_rendered_for_a_configured_analytics_service(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee("Mesure d'audience")
+            ->assertDontSee('Gérer les cookies');
+
+        Setting::create(['key' => AnalyticsSettings::ENABLED_KEY, 'group' => 'analytics', 'value' => ['enabled' => true]]);
+        Setting::create(['key' => AnalyticsSettings::MEASUREMENT_ID_KEY, 'group' => 'analytics', 'value' => ['value' => 'G-AB12CD34EF']]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee("Mesure d'audience")
+            ->assertSee('Gérer les cookies')
+            ->assertSee('data-analytics-consent-banner', false)
+            ->assertDontSee('G-AB12CD34EF');
+
+        $this->withCookie(AnalyticsConsent::COOKIE, AnalyticsConsent::DENIED)->get('/')
+            ->assertOk()
+            ->assertDontSee('data-analytics-consent-banner', false)
+            ->assertSee('Votre choix actuel : refusé.');
+
+        $this->withCookie(AnalyticsConsent::COOKIE, 'invalid')->get('/')
+            ->assertOk()
+            ->assertSee('data-analytics-consent-banner', false);
     }
 }

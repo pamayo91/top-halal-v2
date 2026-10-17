@@ -5,6 +5,8 @@
 @php($navigation = app(\App\Services\PublicNavigation::class))
 @php($headerNavigation = $navigation->header())
 @php($footerNavigation = $navigation->footer())
+@php($analyticsConsentAvailable = app(\App\Services\AnalyticsSettings::class)->isConfigured())
+@php($analyticsConsentState = $analyticsConsentAvailable ? app(\App\Services\AnalyticsConsent::class)->state() : null)
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 <header class="site-header">
     <div class="shell nav-wrap">
@@ -42,7 +44,8 @@
         </div>
         @foreach($footerNavigation['columns'] as $column)<nav aria-label="{{ $column['name'] }}"><x-navigation.menu :menu="$column" /></nav>@endforeach
     </div>
-    <div class="shell footer-bottom"><p class="footer-copyright">{{ $footerNavigation['copyright'] }}</p>@if($footerNavigation['legal']['items'])<nav class="footer-legal" aria-label="Liens légaux"><x-navigation.menu :menu="$footerNavigation['legal']" /></nav>@endif</div>
+    <div class="shell footer-bottom"><p class="footer-copyright">{{ $footerNavigation['copyright'] }}</p><div class="footer-legal-actions">@if($footerNavigation['legal']['items'])<nav class="footer-legal" aria-label="Liens légaux"><x-navigation.menu :menu="$footerNavigation['legal']" /></nav>@endif @if($analyticsConsentAvailable)<button class="link-button footer-cookie-settings" type="button" data-analytics-consent-manage>Gérer les cookies</button>@endif</div></div>
 </footer>
+@if($analyticsConsentAvailable)<x-analytics-consent :state="$analyticsConsentState" />@endif
 </body>
 </html>

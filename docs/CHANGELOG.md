@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-17
+
+- Frontend : ajout du consentement Analytics first-party versionné, rendu seulement lorsque la configuration GA4 est complète. Le bandeau fixe et la gestion réversible au footer restent SSR/minimal JS, sans layout shift ; aucun chargement, appel, cookie ou global Google n’est ajouté.
+
 ## 2026-10-16
 
 - Back-office : ajout de la configuration GA4 non secrète dans « Réglages ». Elle est désactivée par défaut, exige un ID `G-…` valide lorsqu’elle est activée et utilise le cache/invalidation du système `settings`. Aucun tracking, script ou requête Google, cookie Analytics, changement CSP ou rendu public n’est introduit ; le consentement et l’intégration frontend restent séparés.

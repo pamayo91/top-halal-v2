@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-10-17 — D047 — Consentement Analytics first-party avant tout chargement GA4
+
+Le consentement est une primitive publique minimale et versionnée : `AnalyticsConsent` normalise l’état serveur `unknown`, `granted` ou `denied`, tandis que le module Vite `analytics-consent.js` est l’unique API frontend (`analyticsConsentState`, `setAnalyticsConsent`, événement `top-halal:analytics-consent-changed`). Le cookie first-party `top_halal_analytics_consent_v1` ne contient que le choix, est émis côté navigateur avec `Path=/`, `SameSite=Lax`, `Secure` en HTTPS et 183 jours pour l’acceptation comme le refus. Le bandeau SSR n’est rendu que si `AnalyticsSettings::isConfigured()` et si l’état est inconnu ; le footer ouvre un dialogue natif réversible. Aucune bibliothèque CMP, aucune requête ni identité Google, aucun chargement GA4/gtag/GTM, cookie Google ou adaptation CSP n’est admis dans cette étape. Une étape future pourra écouter l’événement et charger GA4 uniquement après `granted`, de façon différée. Changement classé FAST : primitive frontend publique transversale mais sans tiers, donnée métier ni modification de sécurité/CSP.
+
 ## 2026-10-16 — D046 — Configuration GA4 préparée sans activation frontend
 
 Les réglages non secrets `analytics.ga4.enabled` et `analytics.ga4.measurement_id` utilisent la table générique `settings`; aucune table, colonne, clé API ou secret Google n’est nécessaire. `AnalyticsSettings` est l’unique accès applicatif prévu, avec cache et invalidation à chaque modification de ces clés. L’activation BO reste sans effet sur le frontend tant que la future étape distincte de consentement et de chargement différé n’est pas validée : aucun script Google, cookie Analytics, changement CSP ou identifiant dans le HTML public n’est autorisé ici. Ce changement est classé FAST : logique de réglage globale bornée, sans migration ni modification de surface publique.

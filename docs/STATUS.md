@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-17 — Consentement Analytics first-party
+
+Lorsque les réglages GA4 sont valides et activés, le shell Blade public rend désormais un bandeau SSR compact en bas de viewport et un accès footer « Gérer les cookies ». Le choix versionné `top_halal_analytics_consent_v1` est exclusivement first-party (`granted` ou `denied`), 183 jours, `Path=/`, `SameSite=Lax` et `Secure` en HTTPS ; son état est réversible dans un dialogue natif accessible. Aucun choix ne crée de requête/script/cookie Google, Measurement ID public, `dataLayer`, événement ou modification CSP : le futur chargeur GA4 devra écouter la primitive Vite et ne s’exécuter qu’après `granted`. Le changement est FAST ; la validation couvre les tests PHP ciblés, build Vite et parcours Playwright préproduction desktop/mobile avec restauration des réglages initiaux.
+
 ## 2026-10-16 — Préparation BO de Google Analytics 4
 
 La page Filament « Réglages » comporte désormais la configuration non secrète GA4 : activation désactivée par défaut et ID de mesure validé/normalisé. Le service `AnalyticsSettings` centralise une lecture mise en cache et invalidée avec les clés `settings`; aucune migration n’est requise. Cette étape reste strictement sans effet public : ni script ou requête Google, ni cookie Analytics, ni Measurement ID dans le HTML, ni changement Vite ou CSP. Les cinq scénarios PHP ciblés et la recette Playwright préproduction (ID fictif, sauvegarde/relecture/modification/désactivation, puis contrôle public) sont verts ; le test restaure l’état initial. Le consentement et le chargement frontend restent à réaliser séparément.
