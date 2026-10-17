@@ -91,7 +91,7 @@ class AnalyticsSettingsTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertDontSee("Mesure d'audience")
+            ->assertDontSee("Mesure d'audience", false)
             ->assertDontSee('Gérer les cookies');
 
         Setting::create(['key' => AnalyticsSettings::ENABLED_KEY, 'group' => 'analytics', 'value' => ['enabled' => true]]);
@@ -99,7 +99,7 @@ class AnalyticsSettingsTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee("Mesure d'audience")
+            ->assertSee("Mesure d'audience", false)
             ->assertSee('Gérer les cookies')
             ->assertSee('data-analytics-consent-banner', false)
             ->assertDontSee('G-AB12CD34EF');
