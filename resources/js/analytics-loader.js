@@ -42,7 +42,9 @@ const pageReferrer = () => {
     }
 };
 
-const gtag = (...args) => window.dataLayer.push(args);
+function gtag() {
+    window.dataLayer.push(arguments);
+}
 
 const initialize = () => {
     scheduled = false;
