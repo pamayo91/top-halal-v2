@@ -1,8 +1,12 @@
 # Architectural & Product Decisions
 
+## 2026-10-17 — D050 — Cookies GA4 explicitement Secure et Mesures améliorées désactivées
+
+La propriété GA4 a été réglée manuellement par son propriétaire pour désactiver les Mesures améliorées ; la validation réseau confirme qu’aucun événement automatique ni URL avec query string n’est désormais émis. Le loader ajoute `cookie_flags: 'SameSite=Lax;Secure'` au `config` du flux unique, option officielle de gtag.js, sans modifier le domaine automatique, le chemin `/` ou l’expiration de 183 jours. Chromium confirme le drapeau `Secure` pour les deux cookies GA4. Ce correctif est FAST : une unique option de configuration d’un tiers global, validée par build, tests ciblés et parcours réels complets en préproduction ; il ne nécessite pas une nouvelle gate COMPLETE.
+
 ## 2026-10-17 — D049 — Enhanced Measurement GA4 à décider avant activation production
 
-La validation de la propriété GA4 réelle confirme la collecte consentie, mais révèle qu’Enhanced Measurement génère automatiquement `view_search_results` et transmet l’URL complète d’une recherche, y compris sa query string. Ce comportement est indépendant du `page_view` explicite Top-Halal, qui reste minimisé. Aucun réglage de la propriété n’a été changé pendant la validation : avant l’activation production, le propriétaire doit décider explicitement de désactiver ou de reconfigurer cette mesure automatique afin de préserver la minimisation des URLs. Le Measurement ID reste exclusivement en configuration serveur et n’est pas documenté.
+La validation initiale de la propriété GA4 réelle avait révélé qu’Enhanced Measurement générait automatiquement `view_search_results` avec l’URL complète d’une recherche. Le propriétaire a ensuite désactivé ce réglage dans la propriété ; la validation réseau D050 confirme la disparition de cette collecte. Le `page_view` explicite Top-Halal reste minimisé. Le Measurement ID reste exclusivement en configuration serveur et n’est pas documenté.
 
 ## 2026-10-17 — D048 — GA4 direct, Basic Consent Mode et page view minimisée
 

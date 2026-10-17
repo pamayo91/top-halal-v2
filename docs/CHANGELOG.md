@@ -2,6 +2,10 @@
 
 ## 2026-10-17
 
+- Analytics : après désactivation manuelle des Mesures améliorées dans la propriété, validation réseau sans événement automatique ni query string ; les cookies GA4 demandent désormais explicitement `SameSite=Lax;Secure`, tout en restant limités à 183 jours et `/`.
+
+## 2026-10-17
+
 - Analytics : correction du protocole de file gtag (`arguments` natif), permettant au loader direct de transmettre réellement le `page_view` autorisé. La validation préproduction a aussi identifié une collecte automatique `view_search_results` d’Enhanced Measurement à décider avant toute activation production.
 
 ## 2026-10-17
