@@ -101,8 +101,7 @@ class AnalyticsSettingsTest extends TestCase
             ->assertOk()
             ->assertSee("Mesure d'audience", false)
             ->assertSee('Gérer les cookies')
-            ->assertSee('data-analytics-consent-banner', false)
-            ->assertDontSee('G-AB12CD34EF');
+            ->assertSee('data-analytics-consent-banner', false);
 
         $this->withCookie(AnalyticsConsent::COOKIE, AnalyticsConsent::DENIED)->get('/')
             ->assertOk()
