@@ -73,18 +73,18 @@ class AnalyticsSettingsTest extends TestCase
         $this->assertFalse($settings->isConfigured());
     }
 
-    public function test_public_html_and_csp_remain_analytics_free_even_when_configured(): void
+    public function test_configured_analytics_exposes_only_the_measurement_id_and_minimal_csp_sources(): void
     {
         Setting::create(['key' => AnalyticsSettings::ENABLED_KEY, 'group' => 'analytics', 'value' => ['enabled' => true]]);
         Setting::create(['key' => AnalyticsSettings::MEASUREMENT_ID_KEY, 'group' => 'analytics', 'value' => ['value' => 'G-AB12CD34EF']]);
 
         $this->get('/')
             ->assertOk()
-            ->assertDontSee('G-AB12CD34EF')
+            ->assertSee('data-analytics-measurement-id="G-AB12CD34EF"', false)
             ->assertDontSee('googletagmanager.com')
             ->assertDontSee('google-analytics.com')
             ->assertDontSee('dataLayer')
-            ->assertHeader('Content-Security-Policy', "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: https://*.tile.openstreetmap.org; font-src 'self' data:; connect-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+            ->assertHeader('Content-Security-Policy', "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data: https://*.tile.openstreetmap.org https://www.googletagmanager.com https://*.google-analytics.com; font-src 'self' data:; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com; script-src 'self' 'unsafe-inline'; script-src-elem 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'");
     }
 
     public function test_consent_interface_is_only_rendered_for_a_configured_analytics_service(): void

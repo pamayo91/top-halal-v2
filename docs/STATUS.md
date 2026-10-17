@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-17 — Loader GA4 direct après opt-in
+
+Le loader GA4 public direct est conditionnel à la configuration BO valide et au consentement `granted`. Il attend la fin du chargement puis une période idle, ne crée aucune primitive Google avant cette condition, configure Consent Mode v2 pour Analytics seul, et envoie un unique `page_view` explicite sans query string ni fragment. Les cookies GA4 sont limités à 183 jours ; le retrait nettoie les cookies accessibles et recharge sans tag. La CSP publique autorise uniquement les sources Analytics sans Ads nécessaires à `gtag.js` et à la collecte. Ce changement est COMPLET ; la validation comprend les tests ciblés, build, contrôles navigateur préproduction et gate complète avec snapshot.
+
 ## 2026-10-17 — Consentement Analytics first-party
 
 Lorsque les réglages GA4 sont valides et activés, le shell Blade public rend désormais un bandeau SSR compact en bas de viewport et un accès footer « Gérer les cookies ». Le choix versionné `top_halal_analytics_consent_v1` est exclusivement first-party (`granted` ou `denied`), 183 jours, `Path=/`, `SameSite=Lax` et `Secure` en HTTPS ; son état est réversible dans un dialogue natif accessible. Aucun choix ne crée de requête/script/cookie Google, Measurement ID public, `dataLayer`, événement ou modification CSP : le futur chargeur GA4 devra écouter la primitive Vite et ne s’exécuter qu’après `granted`. Le changement est FAST ; la validation couvre les tests PHP ciblés, build Vite et parcours Playwright préproduction desktop/mobile avec restauration des réglages initiaux.

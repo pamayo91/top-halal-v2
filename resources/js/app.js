@@ -25,8 +25,10 @@ import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';
 import { initializeRestaurantHoursEditors, validateRestaurantHoursEditors } from './restaurant-hours-editor';
 import './sticky-toc';
 import { initializeAnalyticsConsent } from './analytics-consent';
+import { initializeAnalyticsLoader } from './analytics-loader';
 
 initializeAnalyticsConsent();
+initializeAnalyticsLoader();
 
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');

@@ -2,6 +2,10 @@
 
 ## 2026-10-17
 
+- Analytics : ajout du loader GA4 direct en Basic Consent Mode, différé après opt-in. Il limite les cookies à 183 jours, n’envoie qu’un `page_view` sans query string, nettoie après retrait du consentement et ne couvre aucun événement métier, GTM, Ads ou CMP.
+
+## 2026-10-17
+
 - Frontend : ajout du consentement Analytics first-party versionné, rendu seulement lorsque la configuration GA4 est complète. Le bandeau fixe et la gestion réversible au footer restent SSR/minimal JS, sans layout shift ; aucun chargement, appel, cookie ou global Google n’est ajouté.
 
 ## 2026-10-16
