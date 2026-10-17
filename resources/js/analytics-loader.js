@@ -60,6 +60,7 @@ const initialize = () => {
         send_page_view: false,
         cookie_expires: COOKIE_MAX_AGE_SECONDS,
         cookie_path: '/',
+        cookie_flags: 'SameSite=Lax;Secure',
         allow_google_signals: false,
     });
     if (!pageViewSent) {
