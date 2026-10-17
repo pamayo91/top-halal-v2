@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-17 — Validation préproduction de la propriété GA4
+
+La propriété GA4 réelle a été activée temporairement en préproduction, puis les réglages ont été rendus à l’état initial désactivé/sans ID. Après consentement, `gtag.js` répond 200 et la collecte GA4 répond 204 ; la page d’accueil produit un `page_view` dont `page_location` est réduit à l’origine et au chemin. Aucun appel, global ou cookie Analytics n’est observé en état unknown ou denied. Les cookies GA réels `_ga` et `_ga_<suffixe de propriété>` utilisent le domaine `.top-halal.fr`, le chemin `/`, `SameSite=Lax`, 183 jours ; Chromium les expose sans attribut Secure. Réserve bloquante pour la production : l’Enhanced Measurement de la propriété émet automatiquement `view_search_results` sur une recherche et transmet son URL complète avec query string. Ce réglage de propriété n’a pas été modifié ; aucune activation production ne doit intervenir avant décision explicite sur cette collecte.
+
 ## 2026-10-17 — Loader GA4 direct après opt-in
 
 Le loader GA4 public direct est conditionnel à la configuration BO valide et au consentement `granted`. Il attend la fin du chargement puis une période idle, ne crée aucune primitive Google avant cette condition, configure Consent Mode v2 pour Analytics seul, et envoie un unique `page_view` explicite sans query string ni fragment. Les cookies GA4 sont limités à 183 jours ; le retrait nettoie les cookies accessibles et recharge sans tag. La CSP publique autorise uniquement les sources Analytics sans Ads nécessaires à `gtag.js` et à la collecte. Ce changement est COMPLET ; la validation comprend les tests ciblés, build, contrôles navigateur préproduction et gate complète avec snapshot.

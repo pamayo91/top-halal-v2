@@ -2,6 +2,10 @@
 
 ## 2026-10-17
 
+- Analytics : correction du protocole de file gtag (`arguments` natif), permettant au loader direct de transmettre réellement le `page_view` autorisé. La validation préproduction a aussi identifié une collecte automatique `view_search_results` d’Enhanced Measurement à décider avant toute activation production.
+
+## 2026-10-17
+
 - Analytics : ajout du loader GA4 direct en Basic Consent Mode, différé après opt-in. Il limite les cookies à 183 jours, n’envoie qu’un `page_view` sans query string, nettoie après retrait du consentement et ne couvre aucun événement métier, GTM, Ads ou CMP.
 
 ## 2026-10-17

@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-10-17 — D049 — Enhanced Measurement GA4 à décider avant activation production
+
+La validation de la propriété GA4 réelle confirme la collecte consentie, mais révèle qu’Enhanced Measurement génère automatiquement `view_search_results` et transmet l’URL complète d’une recherche, y compris sa query string. Ce comportement est indépendant du `page_view` explicite Top-Halal, qui reste minimisé. Aucun réglage de la propriété n’a été changé pendant la validation : avant l’activation production, le propriétaire doit décider explicitement de désactiver ou de reconfigurer cette mesure automatique afin de préserver la minimisation des URLs. Le Measurement ID reste exclusivement en configuration serveur et n’est pas documenté.
+
 ## 2026-10-17 — D048 — GA4 direct, Basic Consent Mode et page view minimisée
 
 Le loader public `analytics-loader.js` ne reçoit un ID depuis le rendu SSR que lorsque `AnalyticsSettings::isConfigured()` est vrai. Il relit le consentement first-party existant, attend `load` puis une période idle (fallback court), et ne crée `dataLayer`, `gtag` ni le script `gtag.js` que pour `granted`. Il est idempotent, crée `config` une seule fois avec `send_page_view: false`, puis un unique `page_view` explicite dont `page_location` et `page_referrer` ne contiennent ni query string ni fragment. La configuration GA4 restreint les cookies au chemin `/` et à 183 jours, et désactive Google signals. Après opt-in, Consent Mode v2 reçoit `analytics_storage: granted` et toutes les finalités publicitaires à `denied`; avant opt-in, aucun tag ni ping Google n’existe : il s’agit bien du mode Basic. Un retrait nettoie les seuls cookies `_ga` accessibles, envoie le refus si le tag est présent puis recharge une fois dans un document sans tag. Le changement est COMPLET car il ajoute un tiers, une CSP publique et une primitive globale sur toutes les pages.
