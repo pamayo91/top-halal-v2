@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-10-18 — D051 — Activation GA4 production par settings uniquement
+
+La production utilise la révision GA4 validée en préproduction, promue sans migration ni dépendance. L’activation ne modifie que les deux réglages génériques déjà prévus : l’état activé et l’identifiant de mesure, qui ne sont ni versionnés ni dupliqués dans le code. Aucun événement métier, tag additionnel, GTM, Ads ou mode debug n’est ajouté. Les contrôles navigateur de production confirment le Basic Consent Mode, l’unique page view minimisée et le retrait effectif du consentement.
+
 ## 2026-10-17 — D050 — Cookies GA4 explicitement Secure et Mesures améliorées désactivées
 
 La propriété GA4 a été réglée manuellement par son propriétaire pour désactiver les Mesures améliorées ; la validation réseau confirme qu’aucun événement automatique ni URL avec query string n’est désormais émis. Le loader ajoute `cookie_flags: 'SameSite=Lax;Secure'` au `config` du flux unique, option officielle de gtag.js, sans modifier le domaine automatique, le chemin `/` ou l’expiration de 183 jours. Chromium confirme le drapeau `Secure` pour les deux cookies GA4. Ce correctif est FAST : une unique option de configuration d’un tiers global, validée par build, tests ciblés et parcours réels complets en préproduction ; il ne nécessite pas une nouvelle gate COMPLETE.

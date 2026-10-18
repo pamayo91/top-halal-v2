@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-18 — Activation GA4 en production
+
+La révision GA4 validée en préproduction a été promue sur `main`, puis activée exclusivement via les réglages production existants. Les états unknown et denied n’émettent aucune requête Google, global ou cookie Analytics. Après consentement, le seul `page_view` explicite est transmis par `gtag.js` et `g/collect`, avec un hostname de production et une URL réduite au chemin ; les cookies `_ga` restent `SameSite=Lax`, `Secure`, `/` et 183 jours. Les cinq familles publiques et le retrait de consentement ont été contrôlés. La confirmation Temps réel/DebugView reste à effectuer manuellement depuis une session Google Analytics authentifiée ; aucun mode debug permanent n’a été ajouté.
+
 ## 2026-10-17 — Validation finale GA4 préproduction
 
 Après désactivation manuelle des Mesures améliorées par le propriétaire de la propriété, la recette réseau ne reçoit plus que le `page_view` explicite : aucun `view_search_results`, scroll, clic sortant, téléchargement ou formulaire automatique, y compris sur les URLs à query string. `page_location` et `page_referrer` restent réduits à `origin + pathname`. Le paramètre officiel `cookie_flags: 'SameSite=Lax;Secure'` a été ajouté au seul `config` GA4 ; Chromium confirme maintenant `_ga` et `_ga_<suffixe de propriété>` avec `.top-halal.fr`, `/`, `SameSite=Lax`, `Secure` et 183 jours. Les parcours unknown, denied, granted, retrait et ré-acceptation, ainsi que les cinq familles publiques, sont validés ; un seul `page_view` est transmis par document SSR. Le transport répond `200` pour `gtag.js` et `204` pour `g/collect`. La propriété reste désactivée/sans ID en préproduction après la recette. La révision est prête à être promue, mais l’activation production exige toujours une autorisation explicite et la saisie BO de la configuration hors Git.
