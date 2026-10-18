@@ -18,11 +18,17 @@ import '../css/typography.css';
 import '../css/navigation.css';
 import '../css/directory-filters.css';
 import '../css/footer-layout.css';
+import '../css/analytics-consent.css';
 import { initializeAddressSelectors } from './address-selector';
 import { initializeManagedRestaurantMedia } from './managed-restaurant-media';
 import { initializeRestaurantPhotoPickers } from './restaurant-photo-picker';
 import { initializeRestaurantHoursEditors, validateRestaurantHoursEditors } from './restaurant-hours-editor';
 import './sticky-toc';
+import { initializeAnalyticsConsent } from './analytics-consent';
+import { initializeAnalyticsLoader } from './analytics-loader';
+
+initializeAnalyticsConsent();
+initializeAnalyticsLoader();
 
 const menu = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');

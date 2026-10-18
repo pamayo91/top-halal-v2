@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-17
+
+- Analytics : après désactivation manuelle des Mesures améliorées dans la propriété, validation réseau sans événement automatique ni query string ; les cookies GA4 demandent désormais explicitement `SameSite=Lax;Secure`, tout en restant limités à 183 jours et `/`.
+
+## 2026-10-17
+
+- Analytics : correction du protocole de file gtag (`arguments` natif), permettant au loader direct de transmettre réellement le `page_view` autorisé. La validation préproduction a aussi identifié une collecte automatique `view_search_results` d’Enhanced Measurement à décider avant toute activation production.
+
+## 2026-10-17
+
+- Analytics : ajout du loader GA4 direct en Basic Consent Mode, différé après opt-in. Il limite les cookies à 183 jours, n’envoie qu’un `page_view` sans query string, nettoie après retrait du consentement et ne couvre aucun événement métier, GTM, Ads ou CMP.
+
+## 2026-10-17
+
+- Frontend : ajout du consentement Analytics first-party versionné, rendu seulement lorsque la configuration GA4 est complète. Le bandeau fixe et la gestion réversible au footer restent SSR/minimal JS, sans layout shift ; aucun chargement, appel, cookie ou global Google n’est ajouté.
+
+## 2026-10-16
+
+- Back-office : ajout de la configuration GA4 non secrète dans « Réglages ». Elle est désactivée par défaut, exige un ID `G-…` valide lorsqu’elle est activée et utilise le cache/invalidation du système `settings`. Aucun tracking, script ou requête Google, cookie Analytics, changement CSP ou rendu public n’est introduit ; le consentement et l’intégration frontend restent séparés.
+
 ## 2026-10-15
 
 - Données Quick : les 9 derniers `city_code` ont été complétés après validation

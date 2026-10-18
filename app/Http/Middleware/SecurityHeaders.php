@@ -19,12 +19,13 @@ class SecurityHeaders
             "form-action 'self'",
             "frame-ancestors 'none'",
             "object-src 'none'",
-            "img-src 'self' data: https://*.tile.openstreetmap.org".($admin ? ' https://ui-avatars.com' : ''),
+            "img-src 'self' data: https://*.tile.openstreetmap.org https://www.googletagmanager.com https://*.google-analytics.com".($admin ? ' https://ui-avatars.com' : ''),
             "font-src 'self' data:",
-            "connect-src 'self'",
+            "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com",
             // Filament 5 evaluates its component expressions through Alpine.
             // Keep this compatibility exception inside the back-office only.
             "script-src 'self' 'unsafe-inline'".($admin ? " 'unsafe-eval' https://unpkg.com" : ''),
+            "script-src-elem 'self' https://www.googletagmanager.com".($admin ? ' https://unpkg.com' : ''),
             "style-src 'self' 'unsafe-inline'".($admin ? ' https://unpkg.com' : ''),
         ];
 

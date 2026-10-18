@@ -1,5 +1,25 @@
 # Top-Halal V2 — Status
 
+## 2026-10-17 — Validation finale GA4 préproduction
+
+Après désactivation manuelle des Mesures améliorées par le propriétaire de la propriété, la recette réseau ne reçoit plus que le `page_view` explicite : aucun `view_search_results`, scroll, clic sortant, téléchargement ou formulaire automatique, y compris sur les URLs à query string. `page_location` et `page_referrer` restent réduits à `origin + pathname`. Le paramètre officiel `cookie_flags: 'SameSite=Lax;Secure'` a été ajouté au seul `config` GA4 ; Chromium confirme maintenant `_ga` et `_ga_<suffixe de propriété>` avec `.top-halal.fr`, `/`, `SameSite=Lax`, `Secure` et 183 jours. Les parcours unknown, denied, granted, retrait et ré-acceptation, ainsi que les cinq familles publiques, sont validés ; un seul `page_view` est transmis par document SSR. Le transport répond `200` pour `gtag.js` et `204` pour `g/collect`. La propriété reste désactivée/sans ID en préproduction après la recette. La révision est prête à être promue, mais l’activation production exige toujours une autorisation explicite et la saisie BO de la configuration hors Git.
+
+## 2026-10-17 — Validation préproduction de la propriété GA4
+
+La propriété GA4 réelle a été activée temporairement en préproduction, puis les réglages ont été rendus à l’état initial désactivé/sans ID. Après consentement, `gtag.js` répond 200 et la collecte GA4 répond 204 ; la page d’accueil produit un `page_view` dont `page_location` est réduit à l’origine et au chemin. Aucun appel, global ou cookie Analytics n’est observé en état unknown ou denied. Les cookies GA réels `_ga` et `_ga_<suffixe de propriété>` utilisent le domaine `.top-halal.fr`, le chemin `/`, `SameSite=Lax`, 183 jours ; Chromium les expose sans attribut Secure. Réserve bloquante pour la production : l’Enhanced Measurement de la propriété émet automatiquement `view_search_results` sur une recherche et transmet son URL complète avec query string. Ce réglage de propriété n’a pas été modifié ; aucune activation production ne doit intervenir avant décision explicite sur cette collecte.
+
+## 2026-10-17 — Loader GA4 direct après opt-in
+
+Le loader GA4 public direct est conditionnel à la configuration BO valide et au consentement `granted`. Il attend la fin du chargement puis une période idle, ne crée aucune primitive Google avant cette condition, configure Consent Mode v2 pour Analytics seul, et envoie un unique `page_view` explicite sans query string ni fragment. Les cookies GA4 sont limités à 183 jours ; le retrait nettoie les cookies accessibles et recharge sans tag. La CSP publique autorise uniquement les sources Analytics sans Ads nécessaires à `gtag.js` et à la collecte. Ce changement est COMPLET ; la validation comprend les tests ciblés, build, contrôles navigateur préproduction et gate complète avec snapshot.
+
+## 2026-10-17 — Consentement Analytics first-party
+
+Lorsque les réglages GA4 sont valides et activés, le shell Blade public rend désormais un bandeau SSR compact en bas de viewport et un accès footer « Gérer les cookies ». Le choix versionné `top_halal_analytics_consent_v1` est exclusivement first-party (`granted` ou `denied`), 183 jours, `Path=/`, `SameSite=Lax` et `Secure` en HTTPS ; son état est réversible dans un dialogue natif accessible. Aucun choix ne crée de requête/script/cookie Google, Measurement ID public, `dataLayer`, événement ou modification CSP : le futur chargeur GA4 devra écouter la primitive Vite et ne s’exécuter qu’après `granted`. Le changement est FAST ; la validation couvre les tests PHP ciblés, build Vite et parcours Playwright préproduction desktop/mobile avec restauration des réglages initiaux.
+
+## 2026-10-16 — Préparation BO de Google Analytics 4
+
+La page Filament « Réglages » comporte désormais la configuration non secrète GA4 : activation désactivée par défaut et ID de mesure validé/normalisé. Le service `AnalyticsSettings` centralise une lecture mise en cache et invalidée avec les clés `settings`; aucune migration n’est requise. Cette étape reste strictement sans effet public : ni script ou requête Google, ni cookie Analytics, ni Measurement ID dans le HTML, ni changement Vite ou CSP. Les cinq scénarios PHP ciblés et la recette Playwright préproduction (ID fictif, sauvegarde/relecture/modification/désactivation, puis contrôle public) sont verts ; le test restaure l’état initial. Le consentement et le chargement frontend restent à réaliser séparément.
+
 ## 2026-10-15 — Quick : clôture de la résolution géographique
 
 Les neuf derniers Quick ont reçu leur `city_code` après validation humaine dans

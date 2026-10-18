@@ -1,5 +1,25 @@
 # Architectural & Product Decisions
 
+## 2026-10-17 — D050 — Cookies GA4 explicitement Secure et Mesures améliorées désactivées
+
+La propriété GA4 a été réglée manuellement par son propriétaire pour désactiver les Mesures améliorées ; la validation réseau confirme qu’aucun événement automatique ni URL avec query string n’est désormais émis. Le loader ajoute `cookie_flags: 'SameSite=Lax;Secure'` au `config` du flux unique, option officielle de gtag.js, sans modifier le domaine automatique, le chemin `/` ou l’expiration de 183 jours. Chromium confirme le drapeau `Secure` pour les deux cookies GA4. Ce correctif est FAST : une unique option de configuration d’un tiers global, validée par build, tests ciblés et parcours réels complets en préproduction ; il ne nécessite pas une nouvelle gate COMPLETE.
+
+## 2026-10-17 — D049 — Enhanced Measurement GA4 à décider avant activation production
+
+La validation initiale de la propriété GA4 réelle avait révélé qu’Enhanced Measurement générait automatiquement `view_search_results` avec l’URL complète d’une recherche. Le propriétaire a ensuite désactivé ce réglage dans la propriété ; la validation réseau D050 confirme la disparition de cette collecte. Le `page_view` explicite Top-Halal reste minimisé. Le Measurement ID reste exclusivement en configuration serveur et n’est pas documenté.
+
+## 2026-10-17 — D048 — GA4 direct, Basic Consent Mode et page view minimisée
+
+Le loader public `analytics-loader.js` ne reçoit un ID depuis le rendu SSR que lorsque `AnalyticsSettings::isConfigured()` est vrai. Il relit le consentement first-party existant, attend `load` puis une période idle (fallback court), et ne crée `dataLayer`, `gtag` ni le script `gtag.js` que pour `granted`. Il est idempotent, crée `config` une seule fois avec `send_page_view: false`, puis un unique `page_view` explicite dont `page_location` et `page_referrer` ne contiennent ni query string ni fragment. La configuration GA4 restreint les cookies au chemin `/` et à 183 jours, et désactive Google signals. Après opt-in, Consent Mode v2 reçoit `analytics_storage: granted` et toutes les finalités publicitaires à `denied`; avant opt-in, aucun tag ni ping Google n’existe : il s’agit bien du mode Basic. Un retrait nettoie les seuls cookies `_ga` accessibles, envoie le refus si le tag est présent puis recharge une fois dans un document sans tag. Le changement est COMPLET car il ajoute un tiers, une CSP publique et une primitive globale sur toutes les pages.
+
+## 2026-10-17 — D047 — Consentement Analytics first-party avant tout chargement GA4
+
+Le consentement est une primitive publique minimale et versionnée : `AnalyticsConsent` normalise l’état serveur `unknown`, `granted` ou `denied`, tandis que le module Vite `analytics-consent.js` est l’unique API frontend (`analyticsConsentState`, `setAnalyticsConsent`, événement `top-halal:analytics-consent-changed`). Le cookie first-party `top_halal_analytics_consent_v1` ne contient que le choix, est émis côté navigateur avec `Path=/`, `SameSite=Lax`, `Secure` en HTTPS et 183 jours pour l’acceptation comme le refus. Le bandeau SSR n’est rendu que si `AnalyticsSettings::isConfigured()` et si l’état est inconnu ; le footer ouvre un dialogue natif réversible. Aucune bibliothèque CMP, aucune requête ni identité Google, aucun chargement GA4/gtag/GTM, cookie Google ou adaptation CSP n’est admis dans cette étape. Une étape future pourra écouter l’événement et charger GA4 uniquement après `granted`, de façon différée. Changement classé FAST : primitive frontend publique transversale mais sans tiers, donnée métier ni modification de sécurité/CSP.
+
+## 2026-10-16 — D046 — Configuration GA4 préparée sans activation frontend
+
+Les réglages non secrets `analytics.ga4.enabled` et `analytics.ga4.measurement_id` utilisent la table générique `settings`; aucune table, colonne, clé API ou secret Google n’est nécessaire. `AnalyticsSettings` est l’unique accès applicatif prévu, avec cache et invalidation à chaque modification de ces clés. L’activation BO reste sans effet sur le frontend tant que la future étape distincte de consentement et de chargement différé n’est pas validée : aucun script Google, cookie Analytics, changement CSP ou identifiant dans le HTML public n’est autorisé ici. Ce changement est classé FAST : logique de réglage globale bornée, sans migration ni modification de surface publique.
+
 ## 2026-10-14 — D045 — Validation proportionnée selon trois niveaux : MICRO / FAST / COMPLET
 
 La profondeur de validation est choisie après inspection du code existant et avant de définir les tests. Elle dépend du risque réel et du rayon d’impact du changement effectif, jamais du seul nombre de lignes du diff. Toujours retenir le niveau le plus faible qui couvre correctement ce risque, sans surtester parce qu’une gate existe ni sous-tester un petit diff sensible. En cas de doute entre deux niveaux, retenir le niveau supérieur.

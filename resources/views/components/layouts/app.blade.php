@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="fr" style="--site-ink:{{ config('design.ink') }};--site-muted:{{ config('design.muted') }};--site-green:{{ config('design.primary') }};--site-green-dark:{{ config('design.primary_dark') }};--site-line:{{ config('design.line') }};--site-font:{{ config('design.font_stack') }}">
+<html lang="fr" @if(app(\App\Services\AnalyticsSettings::class)->isConfigured()) data-analytics-measurement-id="{{ app(\App\Services\AnalyticsSettings::class)->measurementId() }}" @endif style="--site-ink:{{ config('design.ink') }};--site-muted:{{ config('design.muted') }};--site-green:{{ config('design.primary') }};--site-green-dark:{{ config('design.primary_dark') }};--site-line:{{ config('design.line') }};--site-font:{{ config('design.font_stack') }}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="{{ config('design.primary') }}"><meta name="robots" content="{{ $robots ?? 'noindex,follow' }}"><title>{{ html_entity_decode($title ?? 'Top Halal', ENT_QUOTES | ENT_HTML5, 'UTF-8') }}</title>@isset($description)<meta name="description" content="{{ html_entity_decode($description, ENT_QUOTES | ENT_HTML5, 'UTF-8') }}">@endisset @isset($canonical)<link rel="canonical" href="{{ $canonical }}">@endisset @if(! app()->environment('testing')) @vite(['resources/css/app.css', 'resources/js/app.js']) @endif {{ $head ?? '' }} @stack('head')</head>
 <body>
 @php($navigation = app(\App\Services\PublicNavigation::class))
 @php($headerNavigation = $navigation->header())
 @php($footerNavigation = $navigation->footer())
+@php($analyticsConsentAvailable = app(\App\Services\AnalyticsSettings::class)->isConfigured())
+@php($analyticsConsentState = $analyticsConsentAvailable ? app(\App\Services\AnalyticsConsent::class)->state() : null)
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 <header class="site-header">
     <div class="shell nav-wrap">
@@ -42,7 +44,8 @@
         </div>
         @foreach($footerNavigation['columns'] as $column)<nav aria-label="{{ $column['name'] }}"><x-navigation.menu :menu="$column" /></nav>@endforeach
     </div>
-    <div class="shell footer-bottom"><p class="footer-copyright">{{ $footerNavigation['copyright'] }}</p>@if($footerNavigation['legal']['items'])<nav class="footer-legal" aria-label="Liens légaux"><x-navigation.menu :menu="$footerNavigation['legal']" /></nav>@endif</div>
+    <div class="shell footer-bottom"><p class="footer-copyright">{{ $footerNavigation['copyright'] }}</p><div class="footer-legal-actions">@if($footerNavigation['legal']['items'])<nav class="footer-legal" aria-label="Liens légaux"><x-navigation.menu :menu="$footerNavigation['legal']" /></nav>@endif @if($analyticsConsentAvailable)<button class="link-button footer-cookie-settings" type="button" data-analytics-consent-manage>Gérer les cookies</button>@endif</div></div>
 </footer>
+@if($analyticsConsentAvailable)<x-analytics-consent :state="$analyticsConsentState" />@endif
 </body>
 </html>
