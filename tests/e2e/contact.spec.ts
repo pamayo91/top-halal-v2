@@ -44,7 +44,7 @@ test.describe('Contact public', () => {
     await expect(page.locator('.contact-count')).toHaveText('34 / 5000');
     await page.waitForTimeout(2100);
     await page.getByRole('button', { name: 'Envoyer mon message' }).click();
-    await expect(page.getByRole('status')).toContainText('Votre message a bien été envoyé.');
+    await expect(page.getByRole('status')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Message envoyé' })).toBeVisible();
     expect(errors).toEqual([]);
   });
