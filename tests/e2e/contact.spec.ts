@@ -43,7 +43,7 @@ test.describe('Contact public', () => {
     await page.locator('textarea[name="message"]').fill('Message de validation automatisée.');
     await expect(page.locator('.contact-count')).toHaveText('34 / 5000');
     await page.getByRole('button', { name: 'Envoyer mon message' }).click();
-    await expect(page.getByRole('status')).toContainText('Merci');
+    await expect(page.getByRole('status')).toContainText('Votre message a bien été envoyé.');
     await expect(page.getByRole('heading', { name: 'Message envoyé' })).toBeVisible();
     expect(errors).toEqual([]);
   });
