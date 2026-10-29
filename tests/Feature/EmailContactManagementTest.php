@@ -8,6 +8,7 @@ use App\Services\{EmailGlobalSettings, EmailTemplateRenderer, MailSettings};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class EmailContactManagementTest extends TestCase
@@ -18,7 +19,7 @@ class EmailContactManagementTest extends TestCase
     {
         Mail::fake();
         Setting::create(['key' => 'contact_settings', 'group' => 'contact', 'value' => ['recipient' => 'admin@top-halal.fr', 'send_confirmation' => true, 'success_message' => 'Merci']]);
-        $this->post('/contact', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => '<b>Texte</b>', 'website' => ''])->assertRedirect(route('contact.create'))->assertSessionHas('status', 'Merci');
+        $this->postContact(['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => '<b>Texte</b>', 'website' => ''])->assertRedirect(route('contact.create'))->assertSessionHas('status', 'Merci');
         $this->assertDatabaseHas('contact_messages', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'status' => 'new']); $this->assertDatabaseCount('email_delivery_logs', 2);
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contact_admin' && $mail->replyToAddress === 'alice@top-halal.fr');
         Mail::assertQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contact_confirmation');
@@ -27,14 +28,22 @@ class EmailContactManagementTest extends TestCase
     public function test_contact_confirmation_can_be_disabled_without_losing_the_message(): void
     {
         Mail::fake(); Setting::create(['key' => 'contact_settings', 'group' => 'contact', 'value' => ['recipient' => 'admin@top-halal.fr', 'send_confirmation' => false]]);
-        $this->post('/contact', ['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => 'Texte', 'website' => ''])->assertRedirect();
+        $this->postContact(['name' => 'Alice', 'email' => 'alice@top-halal.fr', 'subject' => 'Question', 'message' => 'Texte', 'website' => ''])->assertRedirect();
         $this->assertDatabaseCount('contact_messages', 1); $this->assertDatabaseCount('email_delivery_logs', 1); Mail::assertNotQueued(TemplateMailable::class, fn (TemplateMailable $mail) => $mail->templateKey === 'contact_confirmation');
     }
 
     public function test_contact_validates_honeypot_and_required_fields(): void
     {
-        $this->post('/contact', ['website' => 'bot'])->assertSessionHasErrors('message'); $this->assertDatabaseCount('contact_messages', 0);
+        $this->post('/contact', ['website' => 'bot'])->assertRedirect(route('contact.create')); $this->assertDatabaseCount('contact_messages', 0);
         $this->post('/contact', ['name' => '', 'email' => 'wrong', 'subject' => '', 'message' => ''])->assertSessionHasErrors(['name', 'email', 'subject', 'message']);
+    }
+
+    private function postContact(array $data)
+    {
+        $token = app(\App\Services\ContactSpamProtection::class)->issueFormToken();
+        Carbon::setTestNow(now()->addSeconds(3));
+        try { return $this->post('/contact', $data + ['form_token' => $token]); }
+        finally { Carbon::setTestNow(); }
     }
 
     public function test_templates_fallback_override_and_unknown_variable_are_safe(): void

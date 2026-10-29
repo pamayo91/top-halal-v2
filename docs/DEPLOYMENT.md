@@ -54,6 +54,10 @@ The complete gate retains all its existing checks when it is run: PHP sentinels,
 11. For COMPLET work, run `composer test:regression` from the workstation after deployment with `PREPROD_REGRESSION_SNAPSHOT_ID` set to that pre-deployment run ID. It blocks on count losses introduced during this deployment, dynamic database/media/relation integrity failures, HTTP 500, Playwright console/network failures or new Laravel exceptions.
 12. If the validation required by the selected level fails, stop and fix before considering deployment complete.
 
+## Contact anti-spam release
+
+This is a COMPLET release. Capture the required regression snapshot before deployment, deploy the committed `develop` revision to preproduction, run the forward-only contact fingerprint migration once, clear/rebuild application caches and restart the finite queue worker on its next Cron run. Run the targeted Contact Feature tests, then browser validation desktop/mobile using a genuinely delayed form submission and finish with `composer test:regression` using the captured snapshot ID. Inspect `storage/logs/contact-antispam-*.log` only as aggregate outcomes; do not export or commit it. Production deployment remains subject to explicit owner authorization.
+
 ## Frontend build and test safety
 
 The preproduction SSH environment has no Node.js executable in PATH. After the Git deployment, build Vite assets with the approved workstation runtime and copy only the resulting `public/build/` artifacts to the exact preproduction `public/build/` directory; copy the *contents* (including `manifest.json`) into that exact directory, rather than nesting a `build/` directory or leaving an older manifest in place. Do not copy source files or secrets.

@@ -51,6 +51,13 @@ return [
     */
 
     'channels' => [
+        'contact_antispam' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/contact-antispam.log'),
+            'level' => 'info',
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
 
         'stack' => [
             'driver' => 'stack',

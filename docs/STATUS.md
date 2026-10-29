@@ -1,5 +1,9 @@
 # Top-Halal V2 — Status
 
+## 2026-10-29 — Correctif anti-spam Contact en cours de validation préproduction
+
+L’audit production en lecture seule a relevé 92 messages Contact le 29 octobre, sur 15 empreintes IP historiques récentes ; la vague a déjà produit 108 notifications administrateur et 108 confirmations marquées `sent` sur les quatorze derniers jours, sans job en attente au moment du contrôle. Les valeurs répétées sont des messages de quatre caractères, mais aucun contenu ou e-mail n’est reporté. La protection existante ne contrôlait que le honeypot et une limite 5/h sur la paire e-mail/IP, sans jeton GET/POST ni déduplication atomique. Le correctif COMPLET ajoute ces couches avant persistance/queue ; aucune donnée parasite n’a été supprimée et aucune production n’a été modifiée.
+
 ## 2026-10-17 — Validation finale GA4 préproduction
 
 Après désactivation manuelle des Mesures améliorées par le propriétaire de la propriété, la recette réseau ne reçoit plus que le `page_view` explicite : aucun `view_search_results`, scroll, clic sortant, téléchargement ou formulaire automatique, y compris sur les URLs à query string. `page_location` et `page_referrer` restent réduits à `origin + pathname`. Le paramètre officiel `cookie_flags: 'SameSite=Lax;Secure'` a été ajouté au seul `config` GA4 ; Chromium confirme maintenant `_ga` et `_ga_<suffixe de propriété>` avec `.top-halal.fr`, `/`, `SameSite=Lax`, `Secure` et 183 jours. Les parcours unknown, denied, granted, retrait et ré-acceptation, ainsi que les cinq familles publiques, sont validés ; un seul `page_view` est transmis par document SSR. Le transport répond `200` pour `gtag.js` et `204` pour `g/collect`. La propriété reste désactivée/sans ID en préproduction après la recette. La révision est prête à être promue, mais l’activation production exige toujours une autorisation explicite et la saisie BO de la configuration hors Git.

@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-10-29 — D051 — Défense anti-spam Contact en amont et atomique
+
+La soumission Contact est une modification **COMPLET** (sécurité, persistance, queue et e-mails). Le honeypot existant est conservé et complété par un jeton chiffré de chargement avec délai minimal, trois limites indépendantes (IP courte/longue et e-mail haché) et une empreinte de contenu. Une contrainte unique BDD sur l’empreinte, libérée transactionnellement après une heure, constitue le dernier rempart contre les requêtes identiques concurrentes. Les refus anti-spam silencieux n’atteignent ni `contact_messages`, ni Email Delivery Logs, ni la queue. Les en-têtes `X-Forwarded-For` ne sont pas implicitement dignes de confiance : seule la configuration Laravel explicite des proxies peut modifier l’IP visiteur.
+
 ## 2026-10-17 — D050 — Cookies GA4 explicitement Secure et Mesures améliorées désactivées
 
 La propriété GA4 a été réglée manuellement par son propriétaire pour désactiver les Mesures améliorées ; la validation réseau confirme qu’aucun événement automatique ni URL avec query string n’est désormais émis. Le loader ajoute `cookie_flags: 'SameSite=Lax;Secure'` au `config` du flux unique, option officielle de gtag.js, sans modifier le domaine automatique, le chemin `/` ou l’expiration de 183 jours. Chromium confirme le drapeau `Secure` pour les deux cookies GA4. Ce correctif est FAST : une unique option de configuration d’un tiers global, validée par build, tests ciblés et parcours réels complets en préproduction ; il ne nécessite pas une nouvelle gate COMPLETE.

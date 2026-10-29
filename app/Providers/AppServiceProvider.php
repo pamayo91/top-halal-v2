@@ -11,6 +11,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
+use App\Services\ContactSpamProtection;
 use Illuminate\Support\Facades\Event;
 use App\Models\EmailDeliveryLog;
 use App\Services\EmailDeliveryErrorSanitizer;
@@ -45,7 +46,20 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('public-address-autocomplete', fn (Request $request): Limit => Limit::perMinute(20)->by('address|'.$request->ip()));
         RateLimiter::for('restaurant-duplicate-check', fn (Request $request): Limit => Limit::perMinute(30)->by('restaurant-duplicates|'.$request->ip()));
         RateLimiter::for('restaurant-submission', fn (Request $request): Limit => Limit::perHour(5)->by('restaurant|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
-        RateLimiter::for('contact', fn (Request $request): Limit => Limit::perHour(5)->by('contact|'.strtolower((string) $request->input('email')).'|'.$request->ip()));
+        RateLimiter::for('contact', function (Request $request): array {
+            $email = strtolower(trim((string) $request->input('email')));
+            $emailHash = hash_hmac('sha256', $email, (string) config('app.key'));
+            $ipHash = app(ContactSpamProtection::class)->hashIp($request);
+            $response = function () use ($request) {
+                app(ContactSpamProtection::class)->log('rate_limit', $request);
+                return redirect()->route('contact.create')->withErrors(['message' => 'Vous avez envoyé plusieurs messages récemment. Veuillez réessayer plus tard.']);
+            };
+            return [
+                Limit::perMinutes(10, 5)->by('contact-ip-short|'.$ipHash)->response($response),
+                Limit::perDay(20)->by('contact-ip-day|'.$ipHash)->response($response),
+                Limit::perHour(5)->by('contact-email|'.$emailHash)->response($response),
+            ];
+        });
         RateLimiter::for('account-email-change', fn (Request $request): Limit => Limit::perHour(3)->by('account-email-change|'.($request->user()?->id ?? 'guest').'|'.$request->ip()));
         RateLimiter::for('expiring-link-resend', function (Request $request): Limit {
             $subject = $request->route('submission') ?? $request->route('claim') ?? $request->route('verification');

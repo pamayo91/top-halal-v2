@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-29
+
+- Contact : défense serveur multicouche ajoutée avant toute création métier : honeypot conservé, jeton de délai chiffré, limites IP/e-mail à clés HMAC, déduplication de contenu atomique sur une heure et télémétrie privée sans contenu ni e-mail. Les refus anti-spam ne créent ni message, ni Email Delivery Log, ni job SMTP.
+
 ## 2026-10-17
 
 - Analytics : après désactivation manuelle des Mesures améliorées dans la propriété, validation réseau sans événement automatique ni query string ; les cookies GA4 demandent désormais explicitement `SameSite=Lax;Secure`, tout en restant limités à 183 jours et `/`.

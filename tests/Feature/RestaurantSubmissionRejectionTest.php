@@ -7,6 +7,7 @@ use App\Models\{Restaurant, RestaurantClaim, RestaurantSubmission, User};
 use App\Services\RestaurantSubmissionModeration;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -62,13 +63,16 @@ class RestaurantSubmissionRejectionTest extends TestCase
             ->assertSee('Contestation d’un refus de proposition')
             ->assertSee($submission->fresh()->rejection_reference);
 
-        $this->post(route('contact.store'), [
+        $token = app(\App\Services\ContactSpamProtection::class)->issueFormToken();
+        Carbon::setTestNow(now()->addSeconds(3));
+        try { $this->post(route('contact.store'), [
             'name' => 'Amina', 'email' => 'amina@example.test',
             'subject' => 'Contestation d’un refus de proposition',
             'message' => 'Je pense que les informations sont exactes.',
             'submission_reference' => $submission->fresh()->rejection_reference,
             'website' => '',
-        ])->assertRedirect(route('contact.create'));
+            'form_token' => $token,
+        ])->assertRedirect(route('contact.create')); } finally { Carbon::setTestNow(); }
         $this->assertDatabaseHas('contact_messages', [
             'subject' => 'Contestation d’un refus de proposition',
             'message' => "Référence proposition : {$submission->fresh()->rejection_reference}\n\nJe pense que les informations sont exactes.",
