@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Contact public', () => {
   test('is responsive, validates and accepts a message without browser failures', async ({ page }, testInfo) => {
+    const contactTestEmail = process.env.PREPROD_CONTACT_TEST_EMAIL;
+    test.skip(!contactTestEmail, 'PREPROD_CONTACT_TEST_EMAIL is required for the preproduction mail flow.');
     const errors: string[] = [];
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('pageerror', (error) => errors.push(error.message));
@@ -38,8 +40,8 @@ test.describe('Contact public', () => {
     await page.locator('input[name="email"]').fill('invalide');
     await page.getByRole('button', { name: 'Envoyer mon message' }).click();
     await expect(page.locator('input[name="email"]')).toBeFocused();
-    await page.locator('input[name="email"]').fill(`validation-${Date.now()}@top-halal.fr`);
-    await page.locator('input[name="subject"]').fill('Validation préproduction');
+    await page.locator('input[name="email"]').fill(contactTestEmail);
+    await page.locator('input[name="subject"]').fill(`Validation préproduction ${testInfo.project.name}-${Date.now()}`);
     await page.locator('textarea[name="message"]').fill('Message de validation automatisée.');
     await expect(page.locator('.contact-count')).toHaveText('34 / 5000');
     await page.waitForTimeout(2100);
