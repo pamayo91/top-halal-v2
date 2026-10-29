@@ -34,7 +34,7 @@ class EmailContactManagementTest extends TestCase
 
     public function test_contact_validates_honeypot_and_required_fields(): void
     {
-        $this->post('/contact', ['website' => 'bot'])->assertRedirect(route('contact.create')); $this->assertDatabaseCount('contact_messages', 0);
+        $this->post('/contact', ['name' => 'Bot', 'email' => 'bot@example.test', 'subject' => 'Sujet', 'message' => 'Message', 'website' => 'bot'])->assertRedirect(route('contact.create')); $this->assertDatabaseCount('contact_messages', 0);
         $this->post('/contact', ['name' => '', 'email' => 'wrong', 'subject' => '', 'message' => ''])->assertSessionHasErrors(['name', 'email', 'subject', 'message']);
     }
 
