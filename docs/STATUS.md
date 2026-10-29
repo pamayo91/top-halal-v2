@@ -1,8 +1,8 @@
 # Top-Halal V2 — Status
 
-## 2026-10-29 — Correctif anti-spam Contact en cours de validation préproduction
+## 2026-10-29 — Correctif anti-spam Contact : blocage de recette SMTP préproduction
 
-L’audit production en lecture seule a relevé 92 messages Contact le 29 octobre, sur 15 empreintes IP historiques récentes ; la vague a déjà produit 108 notifications administrateur et 108 confirmations marquées `sent` sur les quatorze derniers jours, sans job en attente au moment du contrôle. Les valeurs répétées sont des messages de quatre caractères, mais aucun contenu ou e-mail n’est reporté. La protection existante ne contrôlait que le honeypot et une limite 5/h sur la paire e-mail/IP, sans jeton GET/POST ni déduplication atomique. Le correctif COMPLET ajoute ces couches avant persistance/queue ; aucune donnée parasite n’a été supprimée et aucune production n’a été modifiée.
+L’audit production en lecture seule a relevé 92 messages Contact le 29 octobre, sur 15 empreintes IP historiques récentes ; la vague a déjà produit 108 notifications administrateur et 108 confirmations marquées `sent` sur les quatorze derniers jours, sans job en attente au moment du contrôle. Les valeurs répétées sont des messages de quatre caractères, mais aucun contenu ou e-mail n’est reporté. La protection existante ne contrôlait que le honeypot et une limite 5/h sur la paire e-mail/IP, sans jeton GET/POST ni déduplication atomique. Le correctif COMPLET ajoute ces couches avant persistance/queue ; les tests PHP ciblés et le parcours navigateur desktop/mobile sont verts, et les notifications administrateur de recette sont envoyées. La gate finale reste bloquée car l’adresse du compte de test dédié reçoit un refus SMTP `550 No Such User Here` pour les confirmations Contact. Aucune donnée parasite n’a été supprimée et aucune production n’a été modifiée.
 
 ## 2026-10-17 — Validation finale GA4 préproduction
 
