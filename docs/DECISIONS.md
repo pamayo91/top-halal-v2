@@ -1,5 +1,9 @@
 # Architectural & Product Decisions
 
+## 2026-11-02 — D053 — Défense anti-spam des vérifications de contribution
+
+Les soumissions anonymes qui demandent une vérification e-mail de contribution sont protégées avant écriture par le honeypot existant, un jeton chiffré émis au GET avec délai minimal, des quotas IP/e-mail à clés HMAC et une empreinte unique de la vérification pending. L’empreinte comprend type, cible, e-mail normalisé et payload utile; la contrainte unique BDD est le rempart concurrent. Un duplicate pending ne crée ni token, ni journal de livraison, ni job, ni e-mail. Les comptes authentifiés ou détenteurs d’une preuve d’identité gardent leur flux direct sans vérification e-mail. Le renvoi explicite d’un lien expiré reste un flux séparé et limité par objet/IP.
+
 ## 2026-10-29 — D052 — Défense anti-spam Contact en amont et atomique
 
 La soumission Contact est une modification **COMPLET** (sécurité, persistance, queue et e-mails). Le honeypot existant est conservé et complété par un jeton chiffré de chargement avec délai minimal, trois limites indépendantes (IP courte/longue et e-mail haché) et une empreinte de contenu. Une contrainte unique BDD sur l’empreinte, libérée transactionnellement après une heure, constitue le dernier rempart contre les requêtes identiques concurrentes. Les refus anti-spam silencieux n’atteignent ni `contact_messages`, ni Email Delivery Logs, ni la queue. Les en-têtes `X-Forwarded-For` ne sont pas implicitement dignes de confiance : seule la configuration Laravel explicite des proxies peut modifier l’IP visiteur.

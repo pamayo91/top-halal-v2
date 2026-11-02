@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-02
+
+- Contributions : protection anti-spam commune des vérifications anonymes (avis, commentaires, signalements) avec délai signé, honeypot, limites HMAC IP/e-mail et déduplication atomique pending ; un rejet ne crée ni vérification, contribution, Delivery Log, job ni e-mail, tandis que le renvoi de lien expiré reste opérationnel.
+
 ## 2026-10-29
 
 - Contact : défense serveur multicouche ajoutée avant toute création métier : honeypot conservé, jeton de délai chiffré, limites IP/e-mail à clés HMAC, déduplication de contenu atomique sur une heure et télémétrie privée sans contenu ni e-mail. Les refus anti-spam ne créent ni message, ni Email Delivery Log, ni job SMTP.
