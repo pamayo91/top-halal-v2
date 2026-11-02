@@ -111,14 +111,6 @@ class ContributionIdentityService
     private function submit(Request $request, string $contributionType, string $targetType, int $targetId, array $data): array
     {
         $spam = app(ContributionSpamProtection::class);
-        if (filled($data['website'] ?? null)) {
-            $spam->log('honeypot', $request);
-            return ['verified' => false, 'verification' => null, 'blocked' => true];
-        }
-        if ($spam->verifyFormToken($data['form_token'] ?? null) !== 'ok') {
-            $spam->log('time_trap', $request);
-            return ['verified' => false, 'verification' => null, 'blocked' => true];
-        }
         $email = $request->user()?->email ?? Str::lower(trim((string) $data['email']));
         $user = $request->user() ?: User::query()->where('email', $email)->first();
 
@@ -126,6 +118,14 @@ class ContributionIdentityService
             DB::transaction(fn () => $this->createDirectContribution($contributionType, $targetType, $targetId, $user, $data, $email, $request->user()?->is($user) ?? false));
 
             return ['verified' => true, 'verification' => null];
+        }
+        if (filled($data['website'] ?? null)) {
+            $spam->log('honeypot', $request);
+            return ['verified' => false, 'verification' => null, 'blocked' => true];
+        }
+        if ($spam->verifyFormToken($data['form_token'] ?? null) !== 'ok') {
+            $spam->log('time_trap', $request);
+            return ['verified' => false, 'verification' => null, 'blocked' => true];
         }
 
         $payload = $this->payload($contributionType, $data);

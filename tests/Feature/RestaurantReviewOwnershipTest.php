@@ -6,7 +6,7 @@ use App\Exceptions\RestaurantReviewOwnershipException;
 use App\Mail\TemplateMailable;
 use App\Models\{Article, Comment, ContributionVerification, LegacyRestaurantAuthorship, Restaurant, RestaurantClaim, RestaurantReview, RestaurantSubmission, User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\{Crypt, Mail};
 use Tests\TestCase;
 
 class RestaurantReviewOwnershipTest extends TestCase
@@ -179,6 +179,6 @@ class RestaurantReviewOwnershipTest extends TestCase
 
     private function reviewPayload(array $overrides = []): array
     {
-        return [...['name' => 'Amina', 'rating' => 5, 'title' => 'Très bien', 'content' => 'Très bon accueil.'], ...$overrides];
+        return [...['name' => 'Amina', 'rating' => 5, 'title' => 'Très bien', 'content' => 'Très bon accueil.', 'form_token' => Crypt::encryptString(json_encode(['issued_at' => now()->subSeconds(3)->timestamp, 'nonce' => bin2hex(random_bytes(16))], JSON_THROW_ON_ERROR))], ...$overrides];
     }
 }

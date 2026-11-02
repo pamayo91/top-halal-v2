@@ -46,14 +46,14 @@ class ContributionSpamProtectionTest extends TestCase
 
     public function test_email_and_ip_limits_stop_before_a_verification_or_email(): void
     {
-        foreach (range(1, 3) as $i) {
+        foreach (range(1, 5) as $i) {
             $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.'.$i])
                 ->post('/resto/protection-contribution/avis', $this->reviewPayload(['content' => 'Avis distinct '.$i]))->assertRedirect();
         }
         $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.9'])
             ->post('/resto/protection-contribution/avis', $this->reviewPayload(['content' => 'Avis distinct 4']))->assertRedirect();
-        $this->assertDatabaseCount('contribution_verifications', 3);
-        $this->assertDatabaseCount('email_delivery_logs', 3);
+        $this->assertDatabaseCount('contribution_verifications', 5);
+        $this->assertDatabaseCount('email_delivery_logs', 5);
 
         foreach (range(1, 5) as $i) {
             $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.1'])
@@ -61,8 +61,8 @@ class ContributionSpamProtectionTest extends TestCase
         }
         $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.1'])
             ->post('/protection-commentaire/commentaires', $this->commentPayload(['email' => 'ip-6@example.test', 'content' => 'Commentaire distinct 6']))->assertRedirect();
-        $this->assertDatabaseCount('contribution_verifications', 8);
-        $this->assertDatabaseCount('email_delivery_logs', 8);
+        $this->assertDatabaseCount('contribution_verifications', 10);
+        $this->assertDatabaseCount('email_delivery_logs', 10);
     }
 
     private function postReview(array $overrides = [])
