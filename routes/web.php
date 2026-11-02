@@ -71,7 +71,7 @@ Route::get('/_preview/{type}/{legacyId}', function (string $type, int $legacyId)
 })->whereIn('type', ['post', 'page']);
 
 Route::post('/_preview/{type}/{legacyId}/comments', [PreviewCommentController::class, 'store'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:contribution')
     ->whereIn('type', ['post', 'page']);
 
 Route::get('/_preview/restaurant/{legacyId}', function (int $legacyId) {
@@ -85,7 +85,7 @@ Route::get('/_preview/restaurant/v2/{restaurant}', function (Restaurant $restaur
     $reviews = $restaurant->reviews()->where('status', 'approved')->latest('created_at')->get();
     return view('public.restaurant', ['restaurant' => $restaurant, 'reviews' => $reviews, 'preview' => true, 'previewUrl' => request()->fullUrl()]);
 })->middleware('signed')->name('restaurants.preview.pending');
-Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:10,1');
+Route::post('/_preview/restaurant/{legacyId}/reviews', [PreviewRestaurantReviewController::class, 'store'])->middleware('throttle:contribution');
 
 // The former Blade back-office has been removed. Keep its reserved prefix
 // outside public editorial routing and legacy redirects.
@@ -135,12 +135,12 @@ Route::get('/restaurants/recherche/villes', [RestaurantSearchSuggestionControlle
 Route::get('/restaurants/recherche/suggestions', [RestaurantSearchSuggestionController::class, 'suggestions'])->middleware('throttle:60,1')->name('restaurants.search.suggestions');
 Route::post('/restaurants/autour-de-moi', [PublicContentController::class, 'nearMe'])->middleware('throttle:20,1')->name('restaurants.near-me');
 Route::get('/resto/{slug}', [PublicContentController::class, 'restaurant'])->name('restaurants.show');
-Route::post('/resto/{slug}/avis', [PublicContentController::class, 'storeReview'])->middleware('throttle:10,1')->name('restaurants.reviews.store');
-Route::post('/resto/{slug}/signaler-une-erreur', [PublicContentController::class, 'storeRestaurantReport'])->middleware('throttle:5,1')->name('restaurants.reports.store');
+Route::post('/resto/{slug}/avis', [PublicContentController::class, 'storeReview'])->middleware('throttle:contribution')->name('restaurants.reviews.store');
+Route::post('/resto/{slug}/signaler-une-erreur', [PublicContentController::class, 'storeRestaurantReport'])->middleware('throttle:contribution')->name('restaurants.reports.store');
 Route::get('/restos/{city}/{facet}', [PublicContentController::class, 'cityFacet'])->name('city-specialties.show');
 Route::get('/restos/{slug}', [PublicContentController::class, 'location'])->name('cities.show');
 Route::get('/specialites/{slug}', [PublicContentController::class, 'category'])->name('categories.show');
 Route::get('/service/{slug}', [PublicContentController::class, 'feature'])->name('features.show');
-Route::post('/{slug}/commentaires', [PublicContentController::class, 'storeComment'])->middleware('throttle:10,1')->where('slug', '[a-z0-9-]+')->name('editorial.comments.store');
-Route::post('/{slug}/signaler-une-erreur', [PublicContentController::class, 'storeEditorialReport'])->middleware('throttle:5,1')->where('slug', '[a-z0-9-]+')->name('editorial.reports.store');
+Route::post('/{slug}/commentaires', [PublicContentController::class, 'storeComment'])->middleware('throttle:contribution')->where('slug', '[a-z0-9-]+')->name('editorial.comments.store');
+Route::post('/{slug}/signaler-une-erreur', [PublicContentController::class, 'storeEditorialReport'])->middleware('throttle:contribution')->where('slug', '[a-z0-9-]+')->name('editorial.reports.store');
 Route::get('/{slug}', [PublicContentController::class, 'editorial'])->where('slug', '[a-z0-9-]+')->name('editorial.show');

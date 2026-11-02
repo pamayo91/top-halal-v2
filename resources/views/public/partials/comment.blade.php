@@ -7,6 +7,7 @@
         <summary aria-label="Répondre à {{ $comment->author_name }}">Répondre</summary>
         <form class="stack-form" method="post" action="{{ route('editorial.comments.store', $content->slug) }}">
             @csrf
+            <x-contribution-antispam-fields />
             <input type="hidden" name="parent_id" value="{{ $comment->id }}">
             <p class="form-help">Répondre à {{ $comment->author_name }}</p>
             <label>Nom <input name="name" required value="{{ old('name', auth()->user()?->name) }}"></label>

@@ -13,7 +13,8 @@ class StoreContentReportRequest extends FormRequest
         return [
             'email' => [$this->user() ? 'nullable' : 'required', 'email:rfc', 'max:255'],
             'message' => ['required', 'string', 'min:2', 'max:2000'],
-            'website' => ['nullable', 'max:0'],
+            'website' => ['nullable', 'string', 'max:255'],
+            'form_token' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

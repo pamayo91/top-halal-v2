@@ -25,6 +25,7 @@
         @else
         <p class="muted">Un détail est à mettre à jour ? Dites-nous lequel.</p><details><summary>Nous le signaler <span aria-hidden="true">→</span></summary><form class="stack-form" method="post" action="{{ route('editorial.reports.store', $content->slug) }}">
         @csrf
+        <x-contribution-antispam-fields />
         @if(auth()->check())
         <p class="muted">Signalement envoyé avec le compte {{ auth()->user()->email }}.</p>
         @else

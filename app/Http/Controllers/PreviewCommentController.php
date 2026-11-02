@@ -14,7 +14,7 @@ class PreviewCommentController extends Controller
         $content = $this->content($type, $legacyId);
         $result = $identities->submitComment($request, $content, $request->validated());
 
-        return back()->with($result['verified'] ? 'comment_submitted' : 'contribution_verification_sent', true);
+        return back()->with($result['verified'] ? 'comment_submitted' : ($result['blocked'] ?? false ? 'contribution_submission_blocked' : 'contribution_verification_sent'), true);
     }
 
     private function content(string $type, int $legacyId): Article|Page

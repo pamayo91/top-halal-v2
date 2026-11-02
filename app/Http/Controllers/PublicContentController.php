@@ -128,14 +128,14 @@ class PublicContentController extends Controller
         }
 
         return redirect()->to(route('restaurants.show', $restaurant->slug).'#avis')
-            ->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
+            ->with($result['verified'] ? 'review_submitted' : ($result['blocked'] ?? false ? 'contribution_submission_blocked' : 'contribution_verification_sent'), true);
     }
 
     public function storeRestaurantReport(StoreContentReportRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
     {
         $restaurant = Restaurant::where('slug', $slug)->where('status', 'published')->firstOrFail();
         $result = $identities->submitReport($request, $restaurant, $request->validated());
-        return back()->with($result['verified'] ? 'content_report_submitted' : 'content_report_verification_sent', true);
+        return back()->with($result['verified'] ? 'content_report_submitted' : ($result['blocked'] ?? false ? 'contribution_submission_blocked' : 'content_report_verification_sent'), true);
     }
 
     public function location(string $slug): Response
@@ -252,14 +252,14 @@ class PublicContentController extends Controller
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
         $result = $identities->submitComment($request, $content, $request->validated());
 
-        return back()->with($result['verified'] ? 'comment_submitted' : 'contribution_verification_sent', true);
+        return back()->with($result['verified'] ? 'comment_submitted' : ($result['blocked'] ?? false ? 'contribution_submission_blocked' : 'contribution_verification_sent'), true);
     }
 
     public function storeEditorialReport(StoreContentReportRequest $request, string $slug, ContributionIdentityService $identities): RedirectResponse
     {
         $content = Page::where('slug', $slug)->where('status', 'published')->first() ?? Article::where('slug', $slug)->where('status', 'published')->firstOrFail();
         $result = $identities->submitReport($request, $content, $request->validated());
-        return back()->with($result['verified'] ? 'content_report_submitted' : 'content_report_verification_sent', true);
+        return back()->with($result['verified'] ? 'content_report_submitted' : ($result['blocked'] ?? false ? 'contribution_submission_blocked' : 'content_report_verification_sent'), true);
     }
 
     private function taxonomy(object $term, string $kind): Response

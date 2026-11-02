@@ -13,7 +13,7 @@ class StoreRestaurantReviewRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'], 'email' => [$this->user() ? 'nullable' : 'required', 'email:rfc', 'max:255'],
             'rating' => ['required', 'integer', 'between:1,5'], 'content' => ['required', 'string', 'min:2', 'max:3000', function (string $attribute, mixed $value, \Closure $fail): void {
                 $text = html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8'); if (preg_match('/https?:\/\/|www\.|<\s*\/?a\b|(?:[a-z0-9-]+\.)+[a-z]{2,}\b/i', $text)) $fail('Les liens et URLs ne sont pas autorisés dans les avis.');
-            }], 'website' => ['nullable', 'max:0'],
+            }], 'website' => ['nullable', 'string', 'max:255'], 'form_token' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

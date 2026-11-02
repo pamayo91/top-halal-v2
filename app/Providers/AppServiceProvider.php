@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
 use App\Services\ContactSpamProtection;
+use App\Services\ContributionSpamProtection;
 use Illuminate\Support\Facades\Event;
 use App\Models\EmailDeliveryLog;
 use App\Services\EmailDeliveryErrorSanitizer;
@@ -58,6 +59,19 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perMinutes(10, 5)->by('contact-ip-short|'.$ipHash)->response($response),
                 Limit::perDay(20)->by('contact-ip-day|'.$ipHash)->response($response),
                 Limit::perHour(5)->by('contact-email|'.$emailHash)->response($response),
+            ];
+        });
+        RateLimiter::for('contribution', function (Request $request): array {
+            $email = (string) ($request->user()?->email ?? $request->input('email'));
+            $spam = app(ContributionSpamProtection::class);
+            $response = function () use ($request, $spam) {
+                $spam->log('rate_limit', $request);
+                return back();
+            };
+            return [
+                Limit::perMinutes(10, 5)->by('contribution-ip-short|'.$spam->hashIp($request))->response($response),
+                Limit::perDay(20)->by('contribution-ip-day|'.$spam->hashIp($request))->response($response),
+                Limit::perHour(3)->by('contribution-email|'.$spam->emailHash($email))->response($response),
             ];
         });
         RateLimiter::for('account-email-change', fn (Request $request): Limit => Limit::perHour(3)->by('account-email-change|'.($request->user()?->id ?? 'guest').'|'.$request->ip()));

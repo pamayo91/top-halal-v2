@@ -7,7 +7,7 @@
 <section aria-labelledby="comments-title"><h2 id="comments-title">Commentaires</h2>
 @if(session('comment_submitted'))<p role="status">Votre commentaire est en attente de modération.</p>@elseif(session('contribution_verification_sent'))<p role="status">Vérifiez votre adresse e-mail pour envoyer votre commentaire à la modération.</p>@endif
 @foreach($comments as $comment)<article data-comment-id="{{ $comment->id }}"><h3>{{ $comment->author_name }}</h3><p>{!! nl2br(e($comment->content)) !!}</p></article>@endforeach
-<form method="post" action="{{ url('/_preview/'.$type.'/'.$legacyId.'/comments') }}"><fieldset><legend>Ajouter un commentaire</legend>@csrf
+<form method="post" action="{{ url('/_preview/'.$type.'/'.$legacyId.'/comments') }}"><fieldset><legend>Ajouter un commentaire</legend>@csrf<x-contribution-antispam-fields />
 <label>Nom <input name="name" required maxlength="100" value="{{ old('name', auth()->user()?->name) }}"></label>
 @guest<label>E-mail <input name="email" type="email" required value="{{ old('email') }}"></label>@endguest
 <label class="visually-hidden" aria-hidden="true">Site web <input name="website" tabindex="-1" autocomplete="off"></label>

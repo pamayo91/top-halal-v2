@@ -18,7 +18,8 @@ class StoreCommentRequest extends FormRequest
                 if (preg_match('/https?:\/\/|www\.|<\s*\/?a\b|(?:[a-z0-9-]+\.)+[a-z]{2,}\b/i', $text)) $fail('Les liens et URLs ne sont pas autorisés dans les commentaires.');
             }],
             'parent_id' => ['nullable', 'integer', 'min:1'],
-            'website' => ['nullable', 'max:0'],
+            'website' => ['nullable', 'string', 'max:255'],
+            'form_token' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

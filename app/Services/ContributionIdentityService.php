@@ -110,6 +110,15 @@ class ContributionIdentityService
     /** @return array{verified: bool, verification: ?ContributionVerification} */
     private function submit(Request $request, string $contributionType, string $targetType, int $targetId, array $data): array
     {
+        $spam = app(ContributionSpamProtection::class);
+        if (filled($data['website'] ?? null)) {
+            $spam->log('honeypot', $request);
+            return ['verified' => false, 'verification' => null, 'blocked' => true];
+        }
+        if ($spam->verifyFormToken($data['form_token'] ?? null) !== 'ok') {
+            $spam->log('time_trap', $request);
+            return ['verified' => false, 'verification' => null, 'blocked' => true];
+        }
         $email = $request->user()?->email ?? Str::lower(trim((string) $data['email']));
         $user = $request->user() ?: User::query()->where('email', $email)->first();
 
@@ -119,27 +128,52 @@ class ContributionIdentityService
             return ['verified' => true, 'verification' => null];
         }
 
-        $token = Str::random(64);
-        $verification = ContributionVerification::create([
-            'email' => $email,
-            'author_name' => trim($data['name']),
-            'contribution_type' => $contributionType,
-            'target_type' => $targetType,
-            'target_id' => $targetId,
-            'payload' => $this->payload($contributionType, $data),
-            'token_hash' => hash('sha256', $token),
-            'expires_at' => now()->addHours((int) config('contributions.verification_expire_hours')),
-        ]);
+        $payload = $this->payload($contributionType, $data);
+        $fingerprint = $spam->fingerprint($contributionType, $targetType, $targetId, $email, $payload);
+        $verification = $this->createPendingVerification($contributionType, $targetType, $targetId, $email, trim($data['name']), $payload, $fingerprint);
+        if (! $verification) {
+            $spam->log('duplicate', $request);
+            return ['verified' => false, 'verification' => null, 'blocked' => true];
+        }
 
-        $url = URL::temporarySignedRoute('contributions.verify', $verification->expires_at, ['verification' => $verification, 'token' => $token]);
+        $url = URL::temporarySignedRoute('contributions.verify', $verification['verification']->expires_at, ['verification' => $verification['verification'], 'token' => $verification['token']]);
         app(TransactionalMailService::class)->queue('contribution_email_verification', $email, [
             'site_name' => config('app.name', 'Top Halal'),
-            'user_name' => $verification->author_name,
+            'user_name' => $verification['verification']->author_name,
             'verification_url' => $url,
             'contribution_label' => match ($contributionType) { 'review' => 'avis', 'report' => 'signalement', default => 'commentaire' },
         ]);
+        $spam->log('accepted', $request);
 
-        return ['verified' => false, 'verification' => $verification];
+        return ['verified' => false, 'verification' => $verification['verification']];
+    }
+
+    /** @return array{verification: ContributionVerification, token: string}|null */
+    private function createPendingVerification(string $contributionType, string $targetType, int $targetId, string $email, string $authorName, array $payload, string $fingerprint): ?array
+    {
+        $create = function () use ($contributionType, $targetType, $targetId, $email, $authorName, $payload, $fingerprint): array {
+            $token = Str::random(64);
+            return ['verification' => ContributionVerification::create([
+            'email' => $email,
+            'author_name' => $authorName,
+            'contribution_type' => $contributionType,
+            'target_type' => $targetType,
+            'target_id' => $targetId,
+            'payload' => $payload,
+            'fingerprint' => $fingerprint,
+            'token_hash' => hash('sha256', $token),
+            'expires_at' => now()->addHours((int) config('contributions.verification_expire_hours')),
+            ]), 'token' => $token];
+        };
+        try { return $create(); }
+        catch (QueryException) {
+            return DB::transaction(function () use ($fingerprint, $create): ?array {
+                $existing = ContributionVerification::query()->where('fingerprint', $fingerprint)->lockForUpdate()->first();
+                if ($existing?->used_at === null && $existing?->expires_at?->isFuture()) return null;
+                if ($existing) $existing->update(['fingerprint' => null]);
+                return $create();
+            }, 3);
+        }
     }
 
     private function identityFor(ContributionVerification $verification): User

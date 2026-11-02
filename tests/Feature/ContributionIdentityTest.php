@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Mail\TemplateMailable;
 use App\Models\{Article, Comment, ContributionVerification, Restaurant, RestaurantReview, Setting, User};
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\{Mail, URL};
+use Illuminate\Support\Facades\{Crypt, Mail, URL};
 use Tests\TestCase;
 
 class ContributionIdentityTest extends TestCase
@@ -101,7 +101,7 @@ class ContributionIdentityTest extends TestCase
         $restaurantUser = User::factory()->create(['role' => 'user', 'email' => 'owner@example.test']);
         Mail::fake();
         $this->actingAs($restaurantUser)->post('/resto/identite-avis/avis', [
-            'name' => 'Nom affiché', 'rating' => 4, 'title' => 'Très bien', 'content' => 'Service impeccable.',
+            'name' => 'Nom affiché', 'rating' => 4, 'title' => 'Très bien', 'content' => 'Service impeccable.', 'form_token' => $this->formToken(),
         ])->assertRedirect();
         $review = RestaurantReview::latest('id')->firstOrFail();
         $this->assertSame($restaurantUser->id, $review->user_id);
@@ -159,10 +159,10 @@ class ContributionIdentityTest extends TestCase
         $user = User::factory()->create(['email' => 'connecte@example.test']);
 
         $this->actingAs($user)->post('/resto/identite-avis/avis', [
-            'name' => 'Amina', 'rating' => 4, 'content' => 'Très bon service.',
+            'name' => 'Amina', 'rating' => 4, 'content' => 'Très bon service.', 'form_token' => $this->formToken(),
         ])->assertRedirect();
         $this->actingAs($user)->post('/identite-commentaire/commentaires', [
-            'name' => 'Amina', 'content' => 'Merci pour ces informations.',
+            'name' => 'Amina', 'content' => 'Merci pour ces informations.', 'form_token' => $this->formToken(),
         ])->assertRedirect();
 
         $this->assertDatabaseCount('restaurant_reviews', 1);
@@ -219,11 +219,16 @@ class ContributionIdentityTest extends TestCase
 
     private function reviewPayload(array $overrides = []): array
     {
-        return [...['name' => 'Amina', 'email' => 'amina@example.test', 'rating' => 5, 'title' => 'Excellent', 'content' => 'Très bon accueil.'], ...$overrides];
+        return [...['name' => 'Amina', 'email' => 'amina@example.test', 'rating' => 5, 'title' => 'Excellent', 'content' => 'Très bon accueil.', 'form_token' => $this->formToken()], ...$overrides];
     }
 
     private function commentPayload(array $overrides = []): array
     {
-        return [...['name' => 'Amina', 'email' => 'amina@example.test', 'content' => 'Merci pour cet article.'], ...$overrides];
+        return [...['name' => 'Amina', 'email' => 'amina@example.test', 'content' => 'Merci pour cet article.', 'form_token' => $this->formToken()], ...$overrides];
+    }
+
+    private function formToken(): string
+    {
+        return Crypt::encryptString(json_encode(['issued_at' => now()->subSeconds(3)->timestamp, 'nonce' => bin2hex(random_bytes(16))], JSON_THROW_ON_ERROR));
     }
 }

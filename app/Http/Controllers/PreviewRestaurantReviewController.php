@@ -19,6 +19,6 @@ class PreviewRestaurantReviewController extends Controller
             return back()->with('review_ownership_forbidden', true);
         }
 
-        return back()->with($result['verified'] ? 'review_submitted' : 'contribution_verification_sent', true);
+        return back()->with($result['verified'] ? 'review_submitted' : ($result['blocked'] ?? false ? 'contribution_submission_blocked' : 'contribution_verification_sent'), true);
     }
 }
